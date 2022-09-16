@@ -1,4 +1,4 @@
-namespace PlatipusWallet;
+namespace PlatipusWallet.Api;
 
 public class WeatherForecast
 {

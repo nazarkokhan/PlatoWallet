@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace PlatipusWallet.Controllers;
+namespace PlatipusWallet.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -17,7 +17,7 @@ public class WeatherForecastController : ControllerBase
     {
         _logger = logger;
     }
-
+    
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
