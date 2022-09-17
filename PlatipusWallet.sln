@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatipusWallet.Api", "PlatipusWallet.Api\PlatipusWallet.Api.csproj", "{FB67F84D-5603-40A3-8298-505518DC29B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatipusWallet.Domain", "PlatipusWallet.Domain\PlatipusWallet.Domain.csproj", "{6FDBD458-0A84-4896-8C7F-4300407151DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatipusWallet.Infrastructure", "PlatipusWallet.Infrastructure\PlatipusWallet.Infrastructure.csproj", "{7098C587-4D62-48BA-B3DB-50BB5D2569F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{FB67F84D-5603-40A3-8298-505518DC29B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB67F84D-5603-40A3-8298-505518DC29B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB67F84D-5603-40A3-8298-505518DC29B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FDBD458-0A84-4896-8C7F-4300407151DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FDBD458-0A84-4896-8C7F-4300407151DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FDBD458-0A84-4896-8C7F-4300407151DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FDBD458-0A84-4896-8C7F-4300407151DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
