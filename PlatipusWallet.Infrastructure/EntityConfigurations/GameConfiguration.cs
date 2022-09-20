@@ -4,10 +4,10 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class GameConfiguration : IEntityTypeConfiguration<Game>
+public class GameConfiguration : IEntityTypeConfiguration<Transaction>
 {
-    public void Configure(EntityTypeBuilder<Game> builder)
+    public void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        builder.ToTable("Games");
+        builder.ToTable("Transactions");
     }
 }

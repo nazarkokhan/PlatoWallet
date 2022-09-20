@@ -1,6 +1,7 @@
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ services
     .AddJsonOptions(
         options =>
         {
+            options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString;
             options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         })
@@ -33,7 +35,7 @@ services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddMediatR(Assembly.GetExecutingAssembly())
-    // .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+    .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
     .AddDbContext<WalletDbContext>(
         (provider, optionsBuilder) =>
         {

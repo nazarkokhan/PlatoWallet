@@ -4,5 +4,5 @@ using Enums;
 
 public record ErrorResponse(
     Status Status,
-    string Error,
+    int Error,
     string Description) : BaseResponse(Status);

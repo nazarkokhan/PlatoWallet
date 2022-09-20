@@ -1,11 +1,12 @@
-#pragma warning disable CS8618
 namespace PlatipusWallet.Domain.Entities;
 
 using Abstract;
 
 public class User : Entity
 {
-    public string Currency { get; set; }
+    public decimal Balance { get; set; }
+    
+    public string Currency { get; set; } = null!;
 
-    public List<Game> Games { get; set; } = new();
+    public List<Round> Rounds { get; set; } = new();
 }

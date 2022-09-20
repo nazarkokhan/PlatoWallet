@@ -10,12 +10,12 @@ public class WalletDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users { get; set; }
-    
-    public DbSet<Game> UserGroups { get; set; }
-    
-    public DbSet<Round> Groups { get; set; }
-    
+    public DbSet<User> Users { get; set; } = null!;
+
+    public DbSet<Round> Rounds { get; set; } = null!;
+
+    public DbSet<Transaction> Transactions { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);

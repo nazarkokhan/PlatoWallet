@@ -1,9 +1,9 @@
-#pragma warning disable CS1591
 namespace PlatipusWallet.Api.Filters;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
+using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Results.External;
 using Results.External.ActionResults;
@@ -30,24 +30,21 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             return;
         }
 
-        if (actionResult.Result.IsFailure)
-        {
-            var services = context.HttpContext.RequestServices;
-            var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
+        var services = context.HttpContext.RequestServices;
+        var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
 
-            logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
-            
-            var errorCode = ((int) actionResult.Result.ErrorCode).ToString();
+        logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
 
-            var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>();
+        var errorCode = (int) actionResult.Result.ErrorCode;
 
-            var description = actionResult.Result.ErrorCode.ToString();
-            var errorResponse = new ErrorResponse(
-                Status.Error,
-                errorCode,
-                stringLocalizer[errorCode]);
+        var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>();
 
-            context.Result = new OkObjectResult(errorResponse);
-        }
+        var description = actionResult.Result.ErrorCode.ToString();
+        var errorResponse = new ErrorResponse(
+            Status.Error,
+            errorCode,
+            stringLocalizer[errorCode.ToString()]);
+
+        context.Result = new OkObjectResult(errorResponse);
     }
 }

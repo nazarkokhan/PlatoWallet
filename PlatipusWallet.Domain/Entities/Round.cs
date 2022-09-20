@@ -4,5 +4,5 @@ using Abstract;
 
 public class Round : Entity
 {
-    public string TransactionId { get; set; } = null!;
+    public List<Transaction> Transactions { get; set; } = new();
 }
