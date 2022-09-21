@@ -5,59 +5,69 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using Application.Requests.Base;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Results.External;
 using Results.External.Enums;
 
 public class VerifySignatureMiddleware : IMiddleware
 {
-    private readonly string _walletControllerPath = new PathString("/wallet");
-    private readonly BaseResponse _errorResponse = new(Status.Ok);
+    private readonly BaseResponse _errorResponse = new(Status.Error);
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        context.Request.EnableBuffering();
-
-        if (!context.Request.Path.StartsWithSegments(_walletControllerPath))
+        if (context.Request.Path != "/wallet")
         {
             await next(context);
             return;
         }
 
-        if (!context.Request.Headers.TryGetValue("X-REQUEST-SIGN", out var signature))
+
+        if (!context.Request.Headers.TryGetValue("X-REQUEST-SIGN", out var requestSignature))
         {
             await MakeErrorResponse(context);
             return;
         }
 
+        context.Request.EnableBuffering();
+
         var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
         _ = await context.Request.Body.ReadAsync(buffer);
 
-        var casinoId = JsonNode.Parse(buffer)?["casino_id"]?.GetValue<string>();
+        var sessionIdString = JsonNode.Parse(buffer)?["session_id"]?.GetValue<string>();
 
-        if (casinoId is null)
+        if (sessionIdString is null || Guid.TryParse(sessionIdString, out var sessionId))
         {
             await MakeErrorResponse(context);
             return;
         }
 
         var dbContext = context.RequestServices.GetRequiredService<DbContext>();
-        var casino = await dbContext.Set<Casino>()
-            .Where(c => c.Id == casinoId)
+        var session = await dbContext.Set<Session>()
+            .Where(c => c.Id == sessionId)
+            .Select(
+                s => new
+                {
+                    s.Id,
+                    Casion = new
+                    {
+                        s.User.Casino.SignatureKey
+                    }
+                })
             .FirstOrDefaultAsync();
 
-        if (casino is null)
+        if (session is null)
         {
             await MakeErrorResponse(context);
             return;
         }
 
-        var signatureBytes = Encoding.UTF8.GetBytes(casino.SignatureKey);
-        var ownSignature = Convert.ToBase64String(HMACSHA256.HashData(signatureBytes, buffer));
-
-        if (ownSignature != signature)
+        var signatureKeyBytes = Encoding.UTF8.GetBytes(session.Casion.SignatureKey);
+        var hmac = HMACSHA256.HashData(signatureKeyBytes, buffer);
+        var ownSignature = Convert.ToHexString(hmac);
+        
+        if (ownSignature.Equals(requestSignature, StringComparison.InvariantCultureIgnoreCase))
         {
             await MakeErrorResponse(context);
             return;

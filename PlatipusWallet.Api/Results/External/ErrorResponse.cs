@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Results.External;
 
+using Application.Requests.Base;
 using Enums;
 
 public record ErrorResponse(

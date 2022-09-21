@@ -1,7 +1,7 @@
 namespace PlatipusWallet.Api.Controllers.Abstract;
 
 using Microsoft.AspNetCore.Mvc;
-using PlatipusWallet.Api.Results.External;
+using Results.External;
 
 [ApiController]
 [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]

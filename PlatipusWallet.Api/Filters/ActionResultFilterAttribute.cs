@@ -1,9 +1,8 @@
 namespace PlatipusWallet.Api.Filters;
 
+using Application.Requests.Base;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Localization;
-using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Results.External;
 using Results.External.ActionResults;
@@ -14,9 +13,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
     public override void OnResultExecuting(ResultExecutingContext context)
     {
         if (context.Result is not ExternalActionResult actionResult)
-        {
             return;
-        }
 
         if (actionResult.Result.IsSuccess)
         {
@@ -37,13 +34,15 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
         var errorCode = (int) actionResult.Result.ErrorCode;
 
-        var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>();
+        // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>();
 
         var description = actionResult.Result.ErrorCode.ToString();
         var errorResponse = new ErrorResponse(
             Status.Error,
             errorCode,
-            stringLocalizer[errorCode.ToString()]);
+            description
+            // stringLocalizer[errorCode.ToString()]
+            );
 
         context.Result = new OkObjectResult(errorResponse);
     }

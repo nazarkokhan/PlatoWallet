@@ -18,6 +18,7 @@ builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Confi
 var services = builder.Services;
 
 services
+    .AddTransient<VerifySignatureMiddleware>()
     .AddControllers(
         options =>
         {

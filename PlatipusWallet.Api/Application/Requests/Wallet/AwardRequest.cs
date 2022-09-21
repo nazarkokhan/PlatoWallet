@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Application.Requests.Wallet;
 
+using Base;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public record AwardRequest(
     string RoundId,
     string TransactionId,
     string Amount,
-    string AwardId) : IRequest<IResult<BalanceResponse>>
+    string AwardId) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<AwardRequest, IResult<BalanceResponse>>
     {

@@ -1,10 +1,10 @@
 namespace PlatipusWallet.Api.Application.Behaviors;
 
+using Extensions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Results.Common;
 using Results.Common.Result;
-using TradePlus.Api.Common.Extensions;
 
 public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

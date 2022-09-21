@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Application.Requests.Wallet;
 
+using Base;
 using MediatR;
 using Responses;
 using Results.Common.Result;
@@ -12,7 +13,7 @@ public record RollbackRequest(
     string Game,
     string RoundId,
     string TransactionId,
-    string Amount) : IRequest<IResult<BalanceResponse>>
+    string Amount) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<RollbackRequest, IResult<BalanceResponse>>
     {

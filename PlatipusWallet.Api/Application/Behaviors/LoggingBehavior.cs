@@ -1,4 +1,4 @@
-namespace TradePlus.Api.Common.Behaviors;
+namespace PlatipusWallet.Api.Application.Behaviors;
 
 using System.Threading;
 using System.Threading.Tasks;

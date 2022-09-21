@@ -1,4 +1,4 @@
-namespace TradePlus.Api.Common.Extensions;
+namespace PlatipusWallet.Api.Application.Extensions;
 
 using System;
 using System.Linq;

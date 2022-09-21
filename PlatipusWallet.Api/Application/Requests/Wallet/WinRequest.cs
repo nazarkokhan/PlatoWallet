@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Application.Requests.Wallet;
 
+using Base;
 using MediatR;
 using Responses;
 using Results.Common.Result;
@@ -13,7 +14,7 @@ public record WinRequest(
     string RoundId,
     string TransactionId,
     string Finished,
-    string Amount) : IRequest<IResult<BalanceResponse>>
+    string Amount) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<WinRequest, IResult<BalanceResponse>>
     {

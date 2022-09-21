@@ -7,14 +7,14 @@ using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("admin")]
-public class AdminController : ApiController
+[Route("auth")]
+public class AuthController : ApiController
 {
     private readonly IMediator _mediator;
 
-    public AdminController(IMediator mediator) => _mediator = mediator;
+    public AuthController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("balance")]
+    [HttpPost("login")]
     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

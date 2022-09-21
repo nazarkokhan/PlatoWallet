@@ -2,10 +2,10 @@ namespace PlatipusWallet.Api.Application.Requests.Admin;
 
 using System.Threading;
 using System.Threading.Tasks;
+using Base;
 using MediatR;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
-using Results.External;
 
 public record CreateUserRequest() : IRequest<IResult<BaseResponse>>
 {

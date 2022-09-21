@@ -1,4 +1,4 @@
-namespace PlatipusWallet.Api.Application.Behaviors;
+namespace PlatipusWallet.Api.Application.Extensions;
 
 using Results.Common;
 using Results.Common.Result;
@@ -11,7 +11,7 @@ public static class DynamicResultFactory
 
     public static TResponse CreateFailureResult<TResponse>(
         ErrorCode errorCode,
-        Exception? exception)
+        Exception? exception = null)
         where TResponse : class
     {
         var responseType = typeof(TResponse);
