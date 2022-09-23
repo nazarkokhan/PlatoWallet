@@ -1,8 +1,8 @@
 namespace PlatipusWallet.Domain.Entities;
 
-using Abstract;
+using Abstract.Generic;
 
-public class Round : Entity
+public class Round : Entity<string>
 {
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;

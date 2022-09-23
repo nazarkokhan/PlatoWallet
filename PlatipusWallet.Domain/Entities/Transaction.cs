@@ -1,9 +1,11 @@
 namespace PlatipusWallet.Domain.Entities;
 
-using Abstract;
+using Abstract.Generic;
 
-public class Transaction : Entity
+public class Transaction : Entity<string>
 {
-    public Guid RoundId { get; set; }
+    public decimal Amount { get; set; }
+    
+    public string RoundId { get; set; } = null!;
     public Round Round { get; set; } = null!;
 }

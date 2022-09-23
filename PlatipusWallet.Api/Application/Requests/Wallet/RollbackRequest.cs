@@ -1,13 +1,13 @@
 namespace PlatipusWallet.Api.Application.Requests.Wallet;
 
-using Base;
+using Base.Requests;
+using Base.Responses;
 using MediatR;
-using Responses;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
 
 public record RollbackRequest(
-    string SessionId,
+    Guid SessionId,
     string User,
     string Currency,
     string Game,

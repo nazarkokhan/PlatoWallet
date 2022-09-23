@@ -2,7 +2,7 @@ namespace PlatipusWallet.Api.Controllers;
 
 using Abstract;
 using Application.Requests.Admin;
-using Application.Requests.Base;
+using Application.Requests.Base.Requests;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,8 +14,8 @@ public class AdminController : ApiController
 
     public AdminController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("balance")]
-    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
+    [HttpPost("mock-error")]
+    // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

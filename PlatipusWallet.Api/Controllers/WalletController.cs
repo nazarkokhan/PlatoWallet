@@ -1,7 +1,7 @@
 namespace PlatipusWallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Responses;
+using Application.Requests.Base.Responses;
 using Application.Requests.Wallet;
 using Extensions;
 using MediatR;

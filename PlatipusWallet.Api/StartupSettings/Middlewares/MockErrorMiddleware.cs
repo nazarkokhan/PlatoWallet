@@ -1,7 +1,7 @@
-namespace PlatipusWallet.Api.Middlewares;
+namespace PlatipusWallet.Api.StartupSettings.Middlewares;
 
-using Application.Requests.Base;
-using Results.External.Enums;
+using Application.Requests.Base.Responses;
+using PlatipusWallet.Api.Results.External.Enums;
 
 public class MockErrorMiddleware : IMiddleware
 {

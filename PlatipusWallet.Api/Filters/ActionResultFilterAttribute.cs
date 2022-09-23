@@ -1,6 +1,7 @@
 namespace PlatipusWallet.Api.Filters;
 
-using Application.Requests.Base;
+using Application.Requests.Base.Requests;
+using Application.Requests.Base.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Results.Common.Result.WithData;

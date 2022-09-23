@@ -1,21 +1,24 @@
 namespace PlatipusWallet.Api.Application.Requests.Wallet;
 
-using Base;
+using Base.Requests;
+using Base.Responses;
+using Domain.Entities;
 using Infrastructure.Persistence;
 using MediatR;
-using Responses;
+using Microsoft.EntityFrameworkCore;
+using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
 
 public record BetRequest(
-    string SessionId,
+    Guid SessionId,
     string User,
     string Currency,
     string Game,
     string RoundId,
     string TransactionId,
-    string Finished,
-    string Amount) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
+    bool Finished,
+    decimal Amount) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<BetRequest, IResult<BalanceResponse>>
     {
@@ -30,9 +33,36 @@ public record BetRequest(
             BetRequest request,
             CancellationToken cancellationToken)
         {
-            var result = (BalanceResponse) default;
+            var round = await _context.Set<Round>()
+                .Where(
+                    r => r.Id == request.RoundId &&
+                         r.User.UserName == request.User)
+                .Include(r => r.User.Currency)
+                .Include(r => r.Transactions)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            return ResultFactory.Success(result);
+            if (round is null)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.BadParametersInTheRequest);
+            
+            if (round.User.Currency.Name != request.Currency)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
+
+            round.User.Balance -= request.Amount;
+
+            var transaction = new Transaction
+            {
+                Id = request.TransactionId,
+                Amount = request.Amount
+            };
+            
+            round.Transactions.Add(transaction);
+
+            _context.Update(round);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var response = new BalanceResponse(round.User.Balance);
+
+            return ResultFactory.Success(response);
         }
     }
 }

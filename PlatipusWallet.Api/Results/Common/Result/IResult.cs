@@ -7,6 +7,9 @@ public interface IResult
     bool IsFailure { get; }
 
     public ErrorCode ErrorCode { get; }
+    
+    string ErrorDescription { get; set; }
 
     Exception? Exception { get; }
+
 }

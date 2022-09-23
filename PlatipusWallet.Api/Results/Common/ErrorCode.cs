@@ -22,5 +22,6 @@ public enum ErrorCode
     DuplicateAward = 18,
     AwardIsAlreadyCanceled = 19,
     AwardDoesNotExist = 20,
-    Unknown = 100
+    Unknown = 100,
+    CouldNotTryToMockSessionError = 1000
 }

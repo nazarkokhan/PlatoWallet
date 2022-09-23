@@ -9,18 +9,18 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Options;
-using Base;
+using Base.Requests;
+using Base.Responses;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
-using Responses;
 using Results.Common;
-using Results.External.Enums;
 
 public record SignUpRequest(
     string UserName,
     string Password,
     string CasinoId,
-    string Currency) : IRequest<IResult<BaseResponse>>
+    string Currency,
+    decimal Balance) : IRequest<IResult<BaseResponse>>
 {
     public class Handler : IRequestHandler<SignUpRequest, IResult<BaseResponse>>
     {
@@ -45,24 +45,34 @@ public record SignUpRequest(
             var user = await _context.Set<User>()
                 .Where(u => u.UserName == request.UserName &&
                             u.CasinoId == request.CasinoId)
+                .Include(u => u.Casino.CasinoCurrencies)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is not null)
                 return ResultFactory.Failure<BaseResponse>(ErrorCode.Unknown);
 
+            var casinoCurrency = await _context.Set<CasinoCurrencies>()
+                .Where(c => c.CasinoId == request.CasinoId &&
+                            c.Currency.Name == request.Currency)
+                .Select(c => c.Currency)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (casinoCurrency is null)
+                return ResultFactory.Failure<BaseResponse>(ErrorCode.WrongCurrency);
+            
             user = new User
             {
                 UserName = request.UserName,
                 Password = request.Password,
-                Balance = 0,
-                Currency = request.Currency,
+                Balance = request.Balance,
+                CurrencyId = casinoCurrency.Id,
             };
 
             _context.Add(user);
 
             await _context.SaveChangesAsync(cancellationToken);
             
-            var result = new BalanceResponse(Status.Ok, user.Balance);
+            var result = new BalanceResponse(user.Balance);
 
             return ResultFactory.Success(result);
         }

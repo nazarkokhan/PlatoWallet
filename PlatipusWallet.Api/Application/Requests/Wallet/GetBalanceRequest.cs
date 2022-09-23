@@ -1,14 +1,17 @@
 namespace PlatipusWallet.Api.Application.Requests.Wallet;
 
-using Base;
+using Base.Requests;
+using Base.Responses;
+using Domain.Entities;
 using Infrastructure.Persistence;
 using MediatR;
-using Responses;
+using Microsoft.EntityFrameworkCore;
+using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
 
 public record GetBalanceRequest(
-    string SessionId,
+    Guid SessionId,
     string User,
     string Currency,
     string Game) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
@@ -26,9 +29,29 @@ public record GetBalanceRequest(
             GetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var result = (BalanceResponse) default;
+            var user = await _context.Set<User>()
+                .Where(u => u.UserName == request.User &&
+                            u.Sessions
+                                .Select(s => s.Id)
+                                .Contains(request.SessionId))
+                .Select(
+                    s => new
+                    {
+                        s.Id,
+                        s.Balance,
+                        s.IsDisabled
+                    })
+                .FirstOrDefaultAsync(cancellationToken);
 
-            return ResultFactory.Success(result);
+            if (user is null)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.InvalidUser);
+            
+            if (user.IsDisabled)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.UserDisabled);
+
+            var response = new BalanceResponse(user.Balance);
+
+            return ResultFactory.Success(response);
         }
     }
 }

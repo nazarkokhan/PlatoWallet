@@ -1,8 +1,9 @@
 namespace PlatipusWallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Admin;
-using Application.Requests.Base;
+using Application.Requests.Auth;
+using Application.Requests.Base.Requests;
+using Application.Requests.Base.Responses;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,8 +15,13 @@ public class AuthController : ApiController
 
     public AuthController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("login")]
+    [HttpPost("signup")]
     [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateUser(CreateUserRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignUp(SignUpRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("login")]
+    [ProducesResponseType(typeof(LogInRequest.Response), StatusCodes.Status200OK)]
+    public async Task<IActionResult> LogIn(LogInRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
