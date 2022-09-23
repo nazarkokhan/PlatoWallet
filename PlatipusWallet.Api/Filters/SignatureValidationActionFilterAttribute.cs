@@ -43,7 +43,7 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
 
         context.Result = new JsonResult(errorMock.Body)
         {
-            StatusCode = (int?) errorMock.ResponseStatusCode
+            StatusCode = (int?) errorMock.HttpStatusCode
         };
     }
 }

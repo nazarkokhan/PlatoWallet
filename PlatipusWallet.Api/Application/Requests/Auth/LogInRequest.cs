@@ -1,6 +1,5 @@
 namespace PlatipusWallet.Api.Application.Requests.Auth;
 
-using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
 using FluentValidation;
@@ -16,9 +15,9 @@ using Results.Common.Result.WithData;
 public record LogInRequest(
     string UserName,
     string Password,
-    string CasinoId) : IRequest<IResult<BaseResponse>>
+    string CasinoId) : IRequest<IResult<LogInRequest.Response>>
 {
-    public class Handler : IRequestHandler<LogInRequest, IResult<BaseResponse>>
+    public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
         private readonly WalletDbContext _context;
 
@@ -27,7 +26,7 @@ public record LogInRequest(
             _context = context;
         }
 
-        public async Task<IResult<BaseResponse>> Handle(
+        public async Task<IResult<Response>> Handle(
             LogInRequest request,
             CancellationToken cancellationToken)
         {
@@ -36,7 +35,7 @@ public record LogInRequest(
                 .AnyAsync(cancellationToken);
 
             if (!casinoExist)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.InvalidCasinoId);
+                return ResultFactory.Failure<Response>(ErrorCode.InvalidCasinoId);
 
             var user = await _context.Set<User>()
                 .Where(
@@ -45,13 +44,13 @@ public record LogInRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.InvalidUser);
+                return ResultFactory.Failure<Response>(ErrorCode.InvalidUser);
 
             if (user.IsDisabled)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.UserDisabled);
+                return ResultFactory.Failure<Response>(ErrorCode.UserDisabled);
             
             if (user.Password != request.Password)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.Unknown);
+                return ResultFactory.Failure<Response>(ErrorCode.Unknown);
             
             var session = new Session
             {

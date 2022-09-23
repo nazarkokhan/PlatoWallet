@@ -1,6 +1,5 @@
 namespace PlatipusWallet.Api.Application.Requests.Auth;
 
-using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
 using Infrastructure.Persistence;

@@ -9,7 +9,7 @@ public class ErrorMock : Entity
 
     public string Body { get; set; }
 
-    public HttpStatusCode ResponseStatusCode { get; set; }
+    public HttpStatusCode HttpStatusCode { get; set; }
 
     public Guid SessionId { get; set; }
     public Session Session { get; set; } = null!;

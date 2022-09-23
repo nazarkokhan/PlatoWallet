@@ -9,7 +9,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Options;
-using Base.Requests;
 using Base.Responses;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
