@@ -3,18 +3,20 @@ namespace PlatipusWallet.Api.Application.Requests.Test;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Page;
+using PlatipusWallet.Api.Results.Common;
 using PlatipusWallet.Api.Results.Common.Result;
 using PlatipusWallet.Domain.Entities;
 using PlatipusWallet.Infrastructure.Persistence;
-using Results.Common.Result.WithData;
 
-public record GetUserSessionsPageRequest(PageRequest Page, string User) : IRequest<IResult<IPage<GetUserSessionsPageRequest.Response>>>
+public record CreateErrorMockRequest(
+    Guid SessionId,
+    string MethodPath,
+    string Body,
+    HttpStatusCode HttpStatusCode) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<GetUserSessionsPageRequest, IResult<IPage<Response>>>
+    public class Handler : IRequestHandler<CreateErrorMockRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -23,62 +25,32 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User) : IReque
             _context = context;
         }
 
-        public async Task<IResult<IPage<Response>>> Handle(
-            GetUserSessionsPageRequest request,
+        public async Task<IResult> Handle(
+            CreateErrorMockRequest request,
             CancellationToken cancellationToken)
         {
-            var usersQuery = _context.Set<User>()
-                .AsNoTracking();
+            var session = await _context.Set<Session>()
+                .Where(e => e.Id == request.SessionId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var totalCount = await usersQuery.CountAsync(cancellationToken);
+            if (session is null)
+                return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
 
-            usersQuery = usersQuery
-                .OrderByDescending(p => p.Id);
+            if (session.ErrorMock is not null)
+                return ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError);
 
-            var users = await usersQuery
-                .SkipTake(request.Page)
-                .Select(
-                    u => new Response(
-                        u.Id,
-                        u.UserName,
-                        u.Balance,
-                        u.Currency.Name,
-                        u.Sessions
-                            .Select(
-                                s => new SessionDto(
-                                    s.Id,
-                                    s.ExpirationDate,
-                                    s.ErrorMock == null
-                                        ? null
-                                        : new ErrorMockDto(
-                                            s.ErrorMock.Id,
-                                            s.ErrorMock.MethodPath,
-                                            s.ErrorMock.Body,
-                                            s.ErrorMock.HttpStatusCode)))
-                            .ToList()))
-                .ToListAsync(cancellationToken);
+            var errorMock = new ErrorMock
+            {
+                MethodPath = request.MethodPath,
+                Body = request.Body,
+                HttpStatusCode = request.HttpStatusCode,
+                SessionId = request.SessionId
+            };
 
-            var page = new Page<Response>(users, totalCount);
+            _context.Add(errorMock);
+            await _context.SaveChangesAsync(cancellationToken);
 
-            return ResultFactory.Success(page);
+            return ResultFactory.Success();
         }
     }
-
-    public record Response(
-        Guid Id,
-        string User,
-        decimal Balance,
-        string Currency,
-        List<SessionDto> Sessions);
-
-    public record SessionDto(
-        Guid Id,
-        DateTime ExpirationDate,
-        ErrorMockDto? ErrorMock);
-
-    public record ErrorMockDto(
-        Guid Id,
-        string MethodPath,
-        string Body,
-        HttpStatusCode HttpStatusCode);
 }

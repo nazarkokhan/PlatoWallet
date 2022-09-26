@@ -12,7 +12,7 @@ using PlatipusWallet.Infrastructure.Persistence;
 namespace PlatipusWallet.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    [Migration("20220923133921_Init")]
+    [Migration("20220926072301_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

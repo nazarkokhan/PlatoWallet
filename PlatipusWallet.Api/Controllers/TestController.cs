@@ -2,6 +2,7 @@ namespace PlatipusWallet.Api.Controllers;
 
 using Abstract;
 using Application.Requests.Admin;
+using Application.Requests.Test;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +14,7 @@ public class TestController : ApiController
 
     public TestController(IMediator mediator) => _mediator = mediator;
 
-    [HttpGet("mock-error")]
-    // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [HttpPost("error-mock")]
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

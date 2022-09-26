@@ -1,13 +1,13 @@
-namespace PlatipusWallet.Api.Application.Requests.Auth;
+namespace PlatipusWallet.Api.Application.Requests.External;
 
-using Base.Responses;
-using Domain.Entities;
-using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Base.Responses;
 using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record AddBalanceRequest(
     Guid SessionId,

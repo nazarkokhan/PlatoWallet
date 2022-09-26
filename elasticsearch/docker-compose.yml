@@ -1,0 +1,18 @@
+version: '2.2'
+services:
+  elasticsearch:
+    image: elasticsearch:8.4.2
+    platform: "linux/arm64/v8"
+    ports:
+      - 9200:9200
+    environment:
+      discovery.type: 'single-node'
+      xpack.security.enabled: 'false'
+      ELASTIC_PASSWORD: '1'
+  kibana:
+    image: kibana:8.4.2
+    platform: "linux/arm64/v8"
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601

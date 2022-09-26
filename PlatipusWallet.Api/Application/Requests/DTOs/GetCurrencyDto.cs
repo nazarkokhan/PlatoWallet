@@ -1,6 +1,6 @@
 namespace PlatipusWallet.Api.Application.Requests.DTOs;
 
-using PlatipusWallet.Api.Application.Requests.Base.Responses;
+using Base.Responses;
 
 public record GetCurrencyDto(
     Guid Id, 

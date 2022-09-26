@@ -1,18 +1,18 @@
-namespace PlatipusWallet.Api.Application.Requests.Auth;
+namespace PlatipusWallet.Api.Application.Requests.External;
 
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities;
 using FluentValidation;
-using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Options;
 using Base.Responses;
+using Options;
+using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
-using Results.Common;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record SignUpRequest(
     string UserName,
@@ -64,7 +64,8 @@ public record SignUpRequest(
                 UserName = request.UserName,
                 Password = request.Password,
                 Balance = request.Balance,
-                CurrencyId = casinoCurrency.Id,
+                CasinoId = request.CasinoId,
+                CurrencyId = casinoCurrency.Id
             };
 
             _context.Add(user);

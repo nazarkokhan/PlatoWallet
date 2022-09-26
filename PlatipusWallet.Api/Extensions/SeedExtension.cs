@@ -32,7 +32,8 @@ public static class SeedExtension
                     c => new Currency
                     {
                         Name = c,
-                    });
+                    })
+                .ToList();
             
             dbContext.AddRange(currencies);
 

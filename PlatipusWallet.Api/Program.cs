@@ -8,15 +8,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlatipusWallet.Api.Extensions;
 using PlatipusWallet.Api.Filters;
+using PlatipusWallet.Api.Options;
 using PlatipusWallet.Api.StartupSettings.JsonConverters;
 using PlatipusWallet.Api.StartupSettings.Middlewares;
 using PlatipusWallet.Api.StartupSettings.ServicesRegistrations;
 using PlatipusWallet.Infrastructure.Persistence;
 using Serilog;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
+var builderConfiguration = builder.Configuration;
 var services = builder.Services;
 
 services
@@ -36,6 +39,8 @@ services
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
         })
     .Services
+    .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
+    .Configure<SupportedCountriesOptions>(builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind)
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddMediatR(Assembly.GetExecutingAssembly())
@@ -46,14 +51,15 @@ services
         (provider, optionsBuilder) =>
         {
             optionsBuilder
-                .UseNpgsql(builder.Configuration.GetConnectionString(nameof(WalletDbContext)));
+                .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)));
 
             if (builder.Environment.IsDevelopment())
             {
                 optionsBuilder.UseLoggerFactory(provider.GetRequiredService<ILoggerFactory>());
                 optionsBuilder.EnableSensitiveDataLogging();
             }
-        });
+        })
+    .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
 
@@ -71,4 +77,4 @@ app.MapControllers();
 
 app.Seed();
 
-app.Run();
+await app.RunAsync();

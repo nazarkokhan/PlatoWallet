@@ -4,11 +4,12 @@ using Abstract;
 using Application.Requests.Base.Responses;
 using Application.Requests.Wallet;
 using Extensions;
+using Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("wallet")]
-// [SignatureValidationActionFilter]
+[ErrorMockActionFilter]
 public class WalletController : ApiController
 {
     private readonly IMediator _mediator;

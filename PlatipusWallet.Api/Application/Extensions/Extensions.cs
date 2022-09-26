@@ -1,6 +1,6 @@
 namespace PlatipusWallet.Api.Application.Extensions;
 
-using Requests.Test.Page;
+using Requests.Base.Page;
 
 public static class Extensions
 {
