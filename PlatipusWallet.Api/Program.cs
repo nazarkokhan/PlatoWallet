@@ -59,7 +59,12 @@ services
                 optionsBuilder.EnableSensitiveDataLogging();
             }
         })
-    .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
+    .AddStackExchangeRedisCache(
+        r =>
+        {
+            // "redis//:123.231?"
+            r.Configuration = builderConfiguration.GetConnectionString("RedisCache");
+        });
 
 var app = builder.Build();
 
