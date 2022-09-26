@@ -26,6 +26,7 @@ public record GetCasinoUsersPageRequest(PageRequest Page, string CasinoId) : IRe
             CancellationToken cancellationToken)
         {
             var usersQuery = _context.Set<User>()
+                .Where(u => u.CasinoId == request.CasinoId)
                 .AsNoTracking();
 
             var totalCount = await usersQuery.CountAsync(cancellationToken);
