@@ -8,6 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="Bogus.Text" Version="34.0.2" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
         <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0" />
         <PackageReference Include="MediatR" Version="10.0.1" />

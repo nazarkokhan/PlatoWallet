@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Extensions;
 
+using Bogus;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,8 @@ public static class SeedExtension
 
         if (!any)
         {
+            var dbContextTransaction = dbContext.Database.BeginTransaction();
+
             var supportedCurrencies = app.ApplicationServices
                 .GetRequiredService<IOptions<SupportedCurrenciesOptions>>()
                 .Value;
@@ -34,11 +37,59 @@ public static class SeedExtension
                         Name = c,
                     })
                 .ToList();
-            
+
             dbContext.AddRange(currencies);
 
             dbContext.SaveChanges();
+
+            app.SeedFakeData(dbContext);
+            
+            dbContextTransaction.Commit();
         }
+
+        return app;
+    }
+
+    private static IApplicationBuilder SeedFakeData(this IApplicationBuilder app, DbContext dbContext)
+    {
+        var currencies = dbContext.Set<Currency>()
+            .ToList();
+
+        Randomizer.Seed = new Random(1234567890);
+
+        var casinos = new Faker<Casino>()
+            .RuleFor(x => x.Id, x => x.Random.Word().ToLower().Replace(' ', '_'))
+            .RuleFor(x => x.SignatureKey, x => x.IndexGlobal.ToString())
+            .RuleFor(
+                x => x.CasinoCurrencies, new Faker<CasinoCurrencies>()
+                    .RuleFor(c => c.CurrencyId, c => c.PickRandom(currencies).Id)
+                    .Generate(20)
+                    .DistinctBy(d => d.CurrencyId)
+                    .ToList())
+            .Generate(20)
+            .DistinctBy(x => x.Id)
+            .ToList();
+
+        var users = new Faker<User>()
+            .RuleFor(u => u.UserName, u => u.Person.UserName.ToLower())
+            .RuleFor(u => u.Password, "qwe123")
+            .RuleFor(u => u.Balance, u => u.Finance.Amount(-1000, 10000, 3))
+            .RuleFor(u => u.CasinoId, u => u.PickRandom(casinos).Id)
+            .Generate(1000)
+            .DistinctBy(u => u.UserName)
+            .ToList();
+        
+        users.ForEach(
+            u => u.CurrencyId = new Faker()
+                .PickRandom(
+                    casinos
+                        .First(x => x.Id == u.CasinoId)
+                        .CasinoCurrencies)
+                .CurrencyId);
+        
+        dbContext.AddRange(casinos);
+        dbContext.AddRange(users);
+        dbContext.SaveChanges();
 
         return app;
     }
