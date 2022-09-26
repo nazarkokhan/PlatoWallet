@@ -60,15 +60,15 @@ public static class SeedExtension
         var casinos = new Faker<Casino>()
             .RuleFor(x => x.Id, x => x.Random.Word().ToLower().Replace(' ', '_'))
             .RuleFor(x => x.SignatureKey, x => x.IndexGlobal.ToString())
-            .RuleFor(
-                x => x.CasinoCurrencies, new Faker<CasinoCurrencies>()
-                    .RuleFor(c => c.CurrencyId, c => c.PickRandom(currencies).Id)
-                    .Generate(20)
-                    .DistinctBy(d => d.CurrencyId)
-                    .ToList())
             .Generate(20)
             .DistinctBy(x => x.Id)
             .ToList();
+        
+        casinos.ForEach(x => x.CasinoCurrencies = new Faker<CasinoCurrencies>()
+            .RuleFor(c => c.CurrencyId, c => c.PickRandom(currencies).Id)
+            .Generate(5)
+            .DistinctBy(d => d.CurrencyId)
+            .ToList());
 
         var users = new Faker<User>()
             .RuleFor(u => u.UserName, u => u.Person.UserName.ToLower())

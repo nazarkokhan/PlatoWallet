@@ -14,7 +14,6 @@ using PlatipusWallet.Api.StartupSettings.Middlewares;
 using PlatipusWallet.Api.StartupSettings.ServicesRegistrations;
 using PlatipusWallet.Infrastructure.Persistence;
 using Serilog;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
 
-public record GetCasinosPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
+public record GetCasinosPageRequest(PageRequest Page) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
 {
     public class Handler : IRequestHandler<GetCasinosPageRequest, IResult<IPage<Response>>>
     {
@@ -42,14 +42,6 @@ public record GetCasinosPageRequest(PageRequest Page, string CasinoId) : IReques
                         c.CasinoCurrencies
                             .Select(cu => cu.Currency)
                             .Select(cu => new GetCurrencyDto(cu.Id, cu.Name))
-                            .ToList(),
-                        c.Users.Select(
-                                u => new UserDto(
-                                    u.Id,
-                                    u.UserName,
-                                    u.Password,
-                                    u.IsDisabled,
-                                    new GetCurrencyDto(u.CurrencyId, u.Currency.Name)))
                             .ToList()))
                 .ToListAsync(cancellationToken);
 
@@ -62,13 +54,5 @@ public record GetCasinosPageRequest(PageRequest Page, string CasinoId) : IReques
     public record Response(
         string Id,
         string SignatureKey,
-        List<GetCurrencyDto> Currencies,
-        List<UserDto> Users);
-
-    public record UserDto(
-        Guid Id,
-        string UserName,
-        string Password,
-        bool IsDisabled,
-        GetCurrencyDto CurrencyDto);
+        List<GetCurrencyDto> Currencies);
 }
