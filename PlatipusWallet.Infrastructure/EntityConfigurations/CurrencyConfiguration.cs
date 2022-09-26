@@ -9,5 +9,7 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
     public void Configure(EntityTypeBuilder<Currency> builder)
     {
         builder.ToTable("Currencies");
+        
+        builder.HasIndex(x => x.Name).IsUnique();
     }
 }

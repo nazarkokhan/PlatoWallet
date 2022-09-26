@@ -200,6 +200,12 @@ namespace PlatipusWallet.Infrastructure.Migrations
                 column: "CurrencyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Currencies_Name",
+                table: "Currencies",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ErrorMocks_SessionId",
                 table: "ErrorMocks",
                 column: "SessionId",
@@ -229,6 +235,12 @@ namespace PlatipusWallet.Infrastructure.Migrations
                 name: "IX_Users_CurrencyId",
                 table: "Users",
                 column: "CurrencyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName",
+                table: "Users",
+                column: "UserName",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

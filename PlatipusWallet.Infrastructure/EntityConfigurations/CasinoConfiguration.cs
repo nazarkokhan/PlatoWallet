@@ -9,5 +9,6 @@ public class CasinoConfiguration : IEntityTypeConfiguration<Casino>
     public void Configure(EntityTypeBuilder<Casino> builder)
     {
         builder.ToTable("Casinos");
+        
     }
 }

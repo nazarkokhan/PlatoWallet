@@ -92,6 +92,9 @@ namespace PlatipusWallet.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Currencies", (string)null);
                 });
 
@@ -208,6 +211,9 @@ namespace PlatipusWallet.Infrastructure.Migrations
                     b.HasIndex("CasinoId");
 
                     b.HasIndex("CurrencyId");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("Users", (string)null);
                 });
