@@ -23,7 +23,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            context.Result = new OkObjectResult(new BaseResponse(Status.Ok));
+            context.Result = new OkObjectResult(new BaseResponse(Status.OK));
             return;
         }
 
@@ -38,7 +38,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
         var description = actionResult.Result.ErrorDescription;
         var errorResponse = new ErrorResponse(
-            Status.Error,
+            Status.ERROR,
             errorCode,
             description
             // stringLocalizer[errorCode.ToString()]

@@ -6,7 +6,7 @@ public record BaseResponse(Status Status)
 {
     // Ok by default in all responses
     // Status is stored in IResult and converted to error so
-    protected BaseResponse() : this(Status.Ok)
+    protected BaseResponse() : this(Status.OK)
     {
     }
 };

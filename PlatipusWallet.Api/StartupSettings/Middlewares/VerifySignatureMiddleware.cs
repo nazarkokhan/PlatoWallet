@@ -44,7 +44,7 @@ public class VerifySignatureMiddleware : IMiddleware
         if (!context.Request.Headers.TryGetValue("X-REQUEST-SIGN", out var requestSignature))
         {
             const ErrorCode errorCode = ErrorCode.MissingSignature;
-            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -59,7 +59,7 @@ public class VerifySignatureMiddleware : IMiddleware
         if (sessionIdString is null)
         {
             const ErrorCode errorCode = ErrorCode.EmptySessionId;
-            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -98,7 +98,7 @@ public class VerifySignatureMiddleware : IMiddleware
         if (session.UserIsDisabled)
         {
             const ErrorCode errorCode = ErrorCode.UserDisabled;
-            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -110,7 +110,7 @@ public class VerifySignatureMiddleware : IMiddleware
         if (!ownSignature.Equals(requestSignature, StringComparison.InvariantCultureIgnoreCase))
         {
             const ErrorCode errorCode = ErrorCode.InvalidSignature;
-            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -123,7 +123,7 @@ public class VerifySignatureMiddleware : IMiddleware
     private static async Task SessionExpired(HttpContext context)
     {
         const ErrorCode errorCode = ErrorCode.SessionExpired;
-        var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
+        var response = new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
         await context.Response.WriteAsJsonAsync(response);
     }
 }

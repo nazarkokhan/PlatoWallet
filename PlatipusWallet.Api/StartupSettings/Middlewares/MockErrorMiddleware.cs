@@ -5,7 +5,7 @@ using PlatipusWallet.Api.Results.External.Enums;
 
 public class MockErrorMiddleware : IMiddleware
 {
-    private readonly BaseResponse _errorResponse = new(Status.Error);
+    private readonly BaseResponse _errorResponse = new(Status.ERROR);
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
