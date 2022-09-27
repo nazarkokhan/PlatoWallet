@@ -1,6 +1,5 @@
 namespace PlatipusWallet.Infrastructure.Persistence;
 
-using Domain.Entities;
 using EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 

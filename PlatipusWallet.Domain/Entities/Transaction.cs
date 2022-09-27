@@ -1,7 +1,6 @@
 namespace PlatipusWallet.Domain.Entities;
 
 using Abstract.Generic;
-using Enums;
 
 public class Transaction : Entity<string>
 {

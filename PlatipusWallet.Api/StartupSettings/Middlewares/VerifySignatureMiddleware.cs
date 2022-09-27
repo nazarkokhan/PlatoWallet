@@ -54,7 +54,7 @@ public class VerifySignatureMiddleware : IMiddleware
         var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
         _ = await context.Request.Body.ReadAsync(buffer);
 
-        // var bufferString = Encoding.UTF8.GetString(buffer);
+        var bufferString = Encoding.UTF8.GetString(buffer);
         
         var sessionIdString = JsonNode.Parse(buffer)?["session_id"]?.GetValue<string>();
 

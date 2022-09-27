@@ -23,6 +23,7 @@ var services = builder.Services;
 
 services
     .AddTransient<VerifySignatureMiddleware>()
+    .AddTransient<TestBodyHashingMiddleware>()
     .AddControllers(
         options =>
         {
@@ -71,6 +72,7 @@ if (!app.Environment.IsProduction())
 
 app.UseRequestLocalization();
 
+app.UseMiddleware<TestBodyHashingMiddleware>();
 app.UseMiddleware<VerifySignatureMiddleware>();
 
 app.MapControllers();

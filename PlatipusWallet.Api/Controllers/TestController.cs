@@ -16,4 +16,17 @@ public class TestController : ApiController
     [HttpPost("error-mock")]
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("get-hash-body")]
+    public Task<IActionResult> MockError(
+        [FromBody] object request,
+        [FromQuery(Name = "signature_key")] string signatureKey,
+        CancellationToken cancellationToken)
+        => Task.FromResult<IActionResult>(
+            Ok(
+                new
+                {
+                    Request = request,
+                    SignatureKey = signatureKey
+                }));
 }
