@@ -61,8 +61,7 @@ public record WinRequest(
             var transaction = new Transaction
             {
                 Id = request.TransactionId,
-                Amount = request.Amount,
-                TransactionType = TransactionType.Win
+                Amount = request.Amount
             };
 
             round.Transactions.Add(transaction);

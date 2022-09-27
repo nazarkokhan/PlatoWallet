@@ -112,6 +112,7 @@ namespace PlatipusWallet.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    Finished = table.Column<bool>(type: "boolean", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -150,6 +151,7 @@ namespace PlatipusWallet.Infrastructure.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     RoundId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>

@@ -178,9 +178,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("RoundId");

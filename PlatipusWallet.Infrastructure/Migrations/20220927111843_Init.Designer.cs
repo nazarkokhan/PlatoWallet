@@ -12,8 +12,8 @@ using PlatipusWallet.Infrastructure.Persistence;
 namespace PlatipusWallet.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    [Migration("20220927111303_AddTransactionTypeToTransaction")]
-    partial class AddTransactionTypeToTransaction
+    [Migration("20220927111843_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -179,9 +179,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
                     b.Property<string>("RoundId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

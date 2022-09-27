@@ -12,7 +12,7 @@ public class Transaction : Entity<string>
     
     public decimal Amount { get; set; }
 
-    public TransactionType TransactionType { get; set; }
+    // public TransactionType TransactionType { get; set; }
 
     public DateTime CreatedDate { get; set; }
     
