@@ -3,6 +3,7 @@ namespace PlatipusWallet.Api.Application.Requests.Wallet;
 using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -43,20 +44,29 @@ public record BetRequest(
 
             if (round is null)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.BadParametersInTheRequest);
+
+            if (round.Transactions.Any(t => t.Id == request.TransactionId))
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
             
+            if (round.Finished)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.Unknown);
+
             if (round.User.Currency.Name != request.Currency)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
 
             round.User.Balance -= request.Amount;
+            if (request.Finished)
+                round.Finished = request.Finished;
 
             var transaction = new Transaction
             {
                 Id = request.TransactionId,
-                Amount = request.Amount
+                Amount = -request.Amount,
+                TransactionType = TransactionType.Bet
             };
             
             round.Transactions.Add(transaction);
-
+            
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 

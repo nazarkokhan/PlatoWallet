@@ -5,3 +5,7 @@ using Generic;
 public abstract class Entity : Entity<Guid>
 {
 }
+
+// public abstract class AuditableEntity : Entity
+// {
+// }

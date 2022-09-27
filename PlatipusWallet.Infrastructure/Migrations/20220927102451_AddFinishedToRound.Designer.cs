@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PlatipusWallet.Infrastructure.Persistence;
@@ -11,9 +12,10 @@ using PlatipusWallet.Infrastructure.Persistence;
 namespace PlatipusWallet.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220927102451_AddFinishedToRound")]
+    partial class AddFinishedToRound
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,15 +173,9 @@ namespace PlatipusWallet.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("RoundId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

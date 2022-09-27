@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("wallet")]
+// [Route("")]
 [ErrorMockActionFilter]
 public class WalletController : ApiController
 {
@@ -18,26 +19,41 @@ public class WalletController : ApiController
 
     [HttpPost("balance")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Balance(GetBalanceRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Balance(
+        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        GetBalanceRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Bet(BetRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Bet(
+        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        BetRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpPost("win")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Win(WinRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Win(
+        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        WinRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("rollback")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rollback(RollbackRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Rollback(
+        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        RollbackRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpPost("award")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Award(AwardRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Award(
+        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        AwardRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

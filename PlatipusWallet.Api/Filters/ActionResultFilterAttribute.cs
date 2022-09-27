@@ -12,7 +12,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
-        if (context.Result is not ExternalActionResult actionResult)
+        if (context.Cancel || context.Result is not ExternalActionResult actionResult)
             return;
 
         if (actionResult.Result.IsSuccess)
@@ -36,13 +36,13 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
         // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>();
 
-        var description = actionResult.Result.ErrorCode.ToString();
+        var description = actionResult.Result.ErrorDescription;
         var errorResponse = new ErrorResponse(
             Status.Error,
             errorCode,
             description
             // stringLocalizer[errorCode.ToString()]
-            );
+        );
 
         context.Result = new OkObjectResult(errorResponse);
     }

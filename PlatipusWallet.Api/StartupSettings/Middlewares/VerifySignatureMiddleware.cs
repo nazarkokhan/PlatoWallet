@@ -10,25 +10,32 @@ using Microsoft.EntityFrameworkCore;
 using Results.Common;
 using PlatipusWallet.Api.Results.External.Enums;
 using Domain.Entities;
+using DTOs;
 using Infrastructure.Persistence;
+using LazyCache;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using Results.External;
 
 public class VerifySignatureMiddleware : IMiddleware
 {
     private readonly IStringLocalizer<VerifySignatureMiddleware> _stringLocalizer;
     private readonly WalletDbContext _dbContext;
+    private readonly IAppCache _cache;
 
     public VerifySignatureMiddleware(
         IStringLocalizer<VerifySignatureMiddleware> stringLocalizer,
-        WalletDbContext dbContext)
+        WalletDbContext dbContext,
+        IAppCache cache)
     {
         _stringLocalizer = stringLocalizer;
         _dbContext = dbContext;
+        _cache = cache;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (context.Request.Path != "/wallet")
+        // if (!context.Request.Path.StartsWithSegments("/wallet"))
         {
             await next(context);
             return;
@@ -36,9 +43,8 @@ public class VerifySignatureMiddleware : IMiddleware
 
         if (!context.Request.Headers.TryGetValue("X-REQUEST-SIGN", out var requestSignature))
         {
-            MakeOk(context);
             const ErrorCode errorCode = ErrorCode.MissingSignature;
-            var response = (Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -52,61 +58,59 @@ public class VerifySignatureMiddleware : IMiddleware
 
         if (sessionIdString is null)
         {
-            MakeOk(context);
             const ErrorCode errorCode = ErrorCode.EmptySessionId;
-            var response = (Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
 
-        if (Guid.TryParse(sessionIdString, out var sessionId))
+        if (!Guid.TryParse(sessionIdString, out var sessionId))
         {
             await SessionExpired(context);
             return;
         }
 
-        var session = await _dbContext.Set<Session>()
-            .Where(c => c.Id == sessionId)
-            .Select(
-                s => new
-                {
-                    s.Id,
-                    s.ExpirationDate,
-                    User = new
-                    {
-                        s.User.IsDisabled
-                    },
-                    Casion = new
-                    {
-                        s.User.Casino.SignatureKey
-                    }
-                })
-            .FirstOrDefaultAsync(context.RequestAborted);
-
+        var session = await _cache.GetOrAddAsync(
+            sessionIdString, async entry =>
+            {
+                var session = await _dbContext.Set<Session>()
+                    .Where(c => c.Id == sessionId)
+                    .Select(
+                        s => new CachedSessionDto(
+                            s.Id,
+                            s.ExpirationDate,
+                            s.User.IsDisabled,
+                            s.User.Casino.SignatureKey))
+                    .FirstOrDefaultAsync(context.RequestAborted);
+                
+                return session;
+            }, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
+            });
+        
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             await SessionExpired(context);
             return;
         }
 
-        if (session.User.IsDisabled)
+        if (session.UserIsDisabled)
         {
-            MakeOk(context);
             const ErrorCode errorCode = ErrorCode.UserDisabled;
-            var response = (Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
 
-        var signatureKeyBytes = Encoding.UTF8.GetBytes(session.Casion.SignatureKey);
+        var signatureKeyBytes = Encoding.UTF8.GetBytes(session.CasinoSignatureKey);
         var hmac = HMACSHA256.HashData(signatureKeyBytes, buffer);
         var ownSignature = Convert.ToHexString(hmac);
 
         if (!ownSignature.Equals(requestSignature, StringComparison.InvariantCultureIgnoreCase))
         {
-            MakeOk(context);
             const ErrorCode errorCode = ErrorCode.InvalidSignature;
-            var response = (Status.Error, (int) errorCode, errorCode.ToString());
+            var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -116,16 +120,10 @@ public class VerifySignatureMiddleware : IMiddleware
         await next(context);
     }
 
-    private static void MakeOk(HttpContext context)
+    private static async Task SessionExpired(HttpContext context)
     {
-        context.Response.StatusCode = StatusCodes.Status200OK;
-    }
-
-    private static Task SessionExpired(HttpContext context)
-    {
-        MakeOk(context);
         const ErrorCode errorCode = ErrorCode.SessionExpired;
-        var response = (Status.Error, (int) errorCode, errorCode.ToString());
-        return context.Response.WriteAsJsonAsync(response);
+        var response = new ErrorResponse(Status.Error, (int) errorCode, errorCode.ToString());
+        await context.Response.WriteAsJsonAsync(response);
     }
 }

@@ -1,11 +1,13 @@
 namespace PlatipusWallet.Api.Filters;
 
+using System.Net.Mime;
 using Application.Requests.Base.Requests;
 using Domain.Entities;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Results.Common;
 using Results.Common.Result;
@@ -15,35 +17,35 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         // Before controller action
-        await next();
+        var executedContext = await next();
         // After controller action
-
-        var (_, baseRequestObject) = context.ActionArguments.FirstOrDefault(a => a.Value?.GetType() == typeof(BaseRequest));
-
+        
+        var (_, baseRequestObject) = context.ActionArguments.FirstOrDefault(a => a.Value?.GetType().IsAssignableTo(typeof(BaseRequest)) ?? false);
+        
         if (baseRequestObject is null)
         {
-            context.Result = ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError).ToActionResult();
+            executedContext.Result = ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError).ToActionResult();
             return;
         }
 
         var sessionId = ((BaseRequest) baseRequestObject).SessionId;
 
-        var services = context.HttpContext.RequestServices;
+        var services = executedContext.HttpContext.RequestServices;
         var dbContext = services.GetRequiredService<WalletDbContext>();
 
         var errorMock = await dbContext.Set<ErrorMock>()
             .Where(e => e.SessionId == sessionId)
-            .FirstOrDefaultAsync(context.HttpContext.RequestAborted);
+            .FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (errorMock is null)
             return;
-
-        if (errorMock.MethodPath != context.HttpContext.Request.Path)
+        if (errorMock.MethodPath != executedContext.HttpContext.Request.Path)
             return;
 
-        context.Result = new JsonResult(errorMock.Body)
+        executedContext.Result = new ObjectResult(errorMock.Body)
         {
-            StatusCode = (int?) errorMock.HttpStatusCode
+            StatusCode = (int?) errorMock.HttpStatusCode,
+            ContentTypes = new MediaTypeCollection{MediaTypeNames.Application.Json} // TODO assign from body
         };
     }
 }

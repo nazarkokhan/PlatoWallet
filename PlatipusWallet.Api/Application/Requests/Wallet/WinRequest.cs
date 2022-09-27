@@ -3,6 +3,7 @@ namespace PlatipusWallet.Api.Application.Requests.Wallet;
 using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public record WinRequest(
     string Game,
     string RoundId,
     string TransactionId,
-    string Finished,
+    bool Finished,
     decimal Amount) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<WinRequest, IResult<BalanceResponse>>
@@ -43,18 +44,27 @@ public record WinRequest(
 
             if (round is null)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.BadParametersInTheRequest);
-            
+
+            if (round.Transactions.Any(t => t.Id == request.TransactionId))
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
+
+            if (round.Finished)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.Unknown);
+
             if (round.User.Currency.Name != request.Currency)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
 
-            round.User.Balance -= request.Amount;
+            round.User.Balance += request.Amount;
+            if (request.Finished)
+                round.Finished = request.Finished;
 
             var transaction = new Transaction
             {
                 Id = request.TransactionId,
-                Amount = request.Amount
+                Amount = request.Amount,
+                TransactionType = TransactionType.Win
             };
-            
+
             round.Transactions.Add(transaction);
 
             _context.Update(round);

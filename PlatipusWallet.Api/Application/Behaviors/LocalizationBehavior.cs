@@ -28,7 +28,8 @@ public class LocalizationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
 
         var errorCode = ((int) response.ErrorCode).ToString();
 
-        response.ErrorDescription = _stringLocalizer[errorCode].Value;
+        // response.ErrorDescription = _stringLocalizer[errorCode].Value;
+        response.ErrorDescription = response.ErrorCode.ToString();
 
         return response;
     }

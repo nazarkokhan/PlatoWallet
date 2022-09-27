@@ -46,6 +46,7 @@ services
     .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
     .AddAllBehaviors()
     .AddLocalization()
+    .AddLazyCache()
     .AddDbContext<WalletDbContext>(
         (provider, optionsBuilder) =>
         {
@@ -58,12 +59,7 @@ services
                 optionsBuilder.EnableSensitiveDataLogging();
             }
         })
-    .AddStackExchangeRedisCache(
-        r =>
-        {
-            // "redis//:123.231?"
-            r.Configuration = builderConfiguration.GetConnectionString("RedisCache");
-        });
+    .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
 
