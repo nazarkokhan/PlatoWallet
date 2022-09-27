@@ -61,7 +61,7 @@ public record BetRequest(
             var transaction = new Transaction
             {
                 Id = request.TransactionId,
-                Amount = -request.Amount,
+                Amount = request.Amount,
             };
             
             round.Transactions.Add(transaction);
