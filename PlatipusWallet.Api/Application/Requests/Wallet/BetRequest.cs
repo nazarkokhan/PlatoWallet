@@ -56,6 +56,8 @@ public record BetRequest(
                     User = user
                 };
                 _context.Add(round);
+
+                await _context.SaveChangesAsync(cancellationToken);
             }
 
             if (round.Transactions.Any(t => t.Id == request.TransactionId))
