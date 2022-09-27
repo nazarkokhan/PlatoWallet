@@ -46,13 +46,14 @@ public record BetRequest(
             {
                 var user = await _context.Set<User>()
                     .Where(u => u.UserName == request.User)
+                    .Include(u => u.Currency)
                     .FirstAsync(cancellationToken);
 
                 round = new Round
                 {
                     Id = request.RoundId,
                     Finished = false,
-                    UserId = user.Id
+                    User = user
                 };
                 _context.Add(round);
             }
