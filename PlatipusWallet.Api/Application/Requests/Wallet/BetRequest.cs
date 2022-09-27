@@ -43,11 +43,23 @@ public record BetRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (round is null)
-                return ResultFactory.Failure<BalanceResponse>(ErrorCode.BadParametersInTheRequest);
+            {
+                var user = await _context.Set<User>()
+                    .Where(u => u.UserName == request.User)
+                    .FirstAsync(cancellationToken);
+
+                round = new Round
+                {
+                    Id = request.RoundId,
+                    Finished = false,
+                    UserId = user.Id
+                };
+                _context.Add(round);
+            }
 
             if (round.Transactions.Any(t => t.Id == request.TransactionId))
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
-            
+
             if (round.Finished)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.Unknown);
 
@@ -63,9 +75,9 @@ public record BetRequest(
                 Id = request.TransactionId,
                 Amount = request.Amount,
             };
-            
+
             round.Transactions.Add(transaction);
-            
+
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
