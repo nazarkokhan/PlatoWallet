@@ -30,15 +30,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
         var services = context.HttpContext.RequestServices;
         var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
         
-        logger.LogInformation("{@platipus-test}",
-            new {
-                messageTemplate = "Request failed with ErrorCode: {ErrorCode}",
-                ErrorCode = 132,
-                t = 3,
-                b = DateTime.Now
-            });
         logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
-        logger.LogWarning("Request failed with ErrorCode: {User}, {Age}", actionResult.Result.ErrorCode);
 
         var errorCode = (int) actionResult.Result.ErrorCode;
 
