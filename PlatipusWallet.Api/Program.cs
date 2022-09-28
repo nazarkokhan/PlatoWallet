@@ -14,9 +14,33 @@ using PlatipusWallet.Api.StartupSettings.Middlewares;
 using PlatipusWallet.Api.StartupSettings.ServicesRegistrations;
 using PlatipusWallet.Infrastructure.Persistence;
 using Serilog;
+using Serilog.Sinks.Elasticsearch;
+
+// Serilog.Debugging.SelfLog.Enable(msg => File.AppendAllText("./Xself.txt", msg));
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+
+builder.Host
+    .UseSerilog(
+        (context, configuration) =>
+        {
+            configuration
+                .WriteTo.Elasticsearch(
+                    new ElasticsearchSinkOptions(new Uri("http://platipus_elastic:ThairahPh2ushoo@10.0.3.46:9200"))
+                    {
+                        TypeName = null,
+                        IndexFormat = "platipus-test",
+                        BatchAction = ElasticOpType.Create,
+                    })
+                .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName);
+            
+            configuration.ReadFrom.Configuration(context.Configuration);
+        });
+
+// builder.Host.UseSerilog((context, configuration) =>
+// {
+//     configuration.ReadFrom.Configuration(context.Configuration);
+// });
 
 var builderConfiguration = builder.Configuration;
 var services = builder.Services;
@@ -63,6 +87,27 @@ services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+// logger.LogInformation(
+//     "{@platipus-test}",
+//     new
+//     {
+//         messageTemplate = "Request failed with ErrorCode: {ErrorCode}",
+//         ErrorCode = 132,
+//         t = 3,
+//         b = DateTime.Now
+//     });
+
+logger.LogInformation(
+    "{@BB}",
+    new
+    {
+        messageTemplate = "Request failed with ErrorCode: {ErrorCode}",
+        ErrorCode = 132,
+        t = 3,
+        b = DateTime.Now
+    });
 
 if (!app.Environment.IsProduction())
 {
