@@ -2,6 +2,7 @@ namespace PlatipusWallet.Api.StartupSettings.Extensions;
 
 using System.Reflection;
 using Serilog;
+using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Sinks.Elasticsearch;
@@ -51,6 +52,10 @@ public static class SerilogElasticsearchConfigurationExtensions
 
         return options;
     }
+
+    public static LoggerConfiguration ConfigurationWithElasticsearch(this LoggerSettingsConfiguration readFrom, HostBuilderContext context)
+        => readFrom.Configuration(context.Configuration)
+            .RemoveElasticsearchSinkOptionsTypeNameIfExist();
 
     public static LoggerConfiguration RemoveElasticsearchSinkOptionsTypeNameIfExist(this LoggerConfiguration configuration)
     {

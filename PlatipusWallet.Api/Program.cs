@@ -15,15 +15,13 @@ using PlatipusWallet.Api.StartupSettings.Middlewares;
 using PlatipusWallet.Api.StartupSettings.ServicesRegistrations;
 using PlatipusWallet.Infrastructure.Persistence;
 using Serilog;
-using Serilog.Debugging;
-
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog(
     (context, configuration) =>
     {
-        SelfLog.Enable(m => File.AppendAllText(context.Configuration["Serilog:SelfLogFilePath"], $"{m}\n"));
-        configuration.ReadFrom.Configuration(context.Configuration).RemoveElasticsearchSinkOptionsTypeNameIfExist();
+        configuration.EnableSelfLog(context)
+            .ReadFrom.ConfigurationWithElasticsearch(context);
     });
 
 var builderConfiguration = builder.Configuration;
