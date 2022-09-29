@@ -22,16 +22,14 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         CancellationToken cancellationToken,
         RequestHandlerDelegate<TResponse> next)
     {
-        var requestName = request.GetTypeName();
-
-        _logger.LogInformation("Start handling request {RequestName}: {@Request}", requestName, request);
+        _logger.LogInformation("Started handling request: {@Request}", request);
 
         var result = await next();
 
         if (result.IsFailure)
-            _logger.LogWarning(result.Exception, "Failure request handling {RequestName}. Result: {@Result}", requestName, result);
+            _logger.LogWarning(result.Exception, "Failure request handling {Request}. Result: {@Result}", request, result);
         else
-            _logger.LogInformation("Successful request handling {RequestName} ", requestName);
+            _logger.LogInformation("Successful request handling {Request}. Result: {@Result}", request, result);
 
         return result;
     }

@@ -10,8 +10,6 @@ public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest
     where TRequest : IRequest<TResponse>
     where TResponse : class, IResult
 {
-    private const string InnerError = nameof(InnerError);
-
     private readonly ILogger<ExceptionBehavior<TRequest, TResponse>> _logger;
 
     public ExceptionBehavior(ILogger<ExceptionBehavior<TRequest, TResponse>> logger)
@@ -27,7 +25,7 @@ public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Request {RequestName} was handled with error. Request: {@Request}", request.GetTypeName(), request);
+            _logger.LogError(e, "Request {@Request} was handled with unexpected error", request);
 
             return DynamicResultFactory.CreateFailureResult<TResponse>(ErrorCode.Unknown, e);
         }

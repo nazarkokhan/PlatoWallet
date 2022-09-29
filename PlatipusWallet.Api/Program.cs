@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlatipusWallet.Api.Extensions;
@@ -21,14 +22,20 @@ builder.Host.UseSerilog(
     (context, configuration) =>
     {
         configuration.EnableSelfLog(context)
-            .ReadFrom.Configuration(context.Configuration)
-            .OverrideElasticsearchSinkOptions(options => options.TypeName = null);
+            .ReadFrom.Configuration(context.Configuration);
     });
 
 var builderConfiguration = builder.Configuration;
 var services = builder.Services;
 
 services
+    .AddHttpLogging(
+        options =>
+        {
+            options.LoggingFields = HttpLoggingFields.All;
+            options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
+            options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
+        })
     .AddTransient<VerifySignatureMiddleware>()
     .AddTransient<TestBodyHashingMiddleware>()
     .AddControllers(
@@ -70,6 +77,8 @@ services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
+
+app.UseHttpLogging();
 
 if (!app.Environment.IsProduction())
 {

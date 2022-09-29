@@ -16,25 +16,35 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ErrorMockActionFilterAttribute>>();
+        logger.LogInformation("Handling request with possible mocked error for");
         // Before controller action
         var executedContext = await next();
         // After controller action
         
         var (_, baseRequestObject) = context.ActionArguments.FirstOrDefault(a => a.Value?.GetType().IsAssignableTo(typeof(BaseRequest)) ?? false);
-        
-        if (baseRequestObject is null)
+
+        if (baseRequestObject is not BaseRequest baseRequest)
         {
+            logger.LogCritical("Can not mock error for request not assignable to BaseRequest {BaseRequest.TypeName}", typeof(BaseRequest).FullName);
             executedContext.Result = ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError).ToActionResult();
             return;
         }
 
-        var sessionId = ((BaseRequest) baseRequestObject).SessionId;
+        var sessionId = baseRequest.SessionId;
 
         var services = executedContext.HttpContext.RequestServices;
         var dbContext = services.GetRequiredService<WalletDbContext>();
 
         var errorMock = await dbContext.Set<ErrorMock>()
             .Where(e => e.SessionId == sessionId)
+            .Select(e => new
+            {
+                e.SessionId,
+                e.Body,
+                e.MethodPath,
+                e.HttpStatusCode
+            })
             .FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (errorMock is null)
@@ -42,6 +52,7 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
         if (errorMock.MethodPath != executedContext.HttpContext.Request.Path)
             return;
 
+        logger.LogInformation("Executing error mock {@ErrorMock}", errorMock);
         executedContext.Result = new ObjectResult(errorMock.Body)
         {
             StatusCode = (int?) errorMock.HttpStatusCode,
