@@ -21,7 +21,7 @@ builder.Host.UseSerilog(
     (context, configuration) =>
     {
         configuration.EnableSelfLog(context)
-            .ReadFrom.ConfigurationWithElasticsearch(context);
+            .ReadFrom.ConfigurationWithElasticsearch(context.Configuration);
     });
 
 var builderConfiguration = builder.Configuration;
