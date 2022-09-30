@@ -40,4 +40,12 @@
       <ProjectReference Include="..\PlatipusWallet.Infrastructure\PlatipusWallet.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="logs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="logs\log-20220929.txt" />
+    </ItemGroup>
+
 </Project>

@@ -26,7 +26,7 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
 
         if (baseRequestObject is not BaseRequest baseRequest)
         {
-            logger.LogCritical("Can not mock error for request not assignable to BaseRequest {BaseRequest.TypeName}", typeof(BaseRequest).FullName);
+            logger.LogCritical("Can not mock error for request not assignable to BaseRequest {BaseRequestTypeName}", typeof(BaseRequest).FullName);
             executedContext.Result = ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError).ToActionResult();
             return;
         }
