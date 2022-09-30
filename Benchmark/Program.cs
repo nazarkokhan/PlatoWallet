@@ -1,31 +1,33 @@
 ﻿namespace Benchmark;
 
+using System.Collections;
 using System.Text.Json;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
+using Bogus;
 using LazyCache;
 using Microsoft.Extensions.Caching.Memory;
 using StackExchange.Redis;
 
-// [MemoryDiagnoser(false)]
+[MemoryDiagnoser]
 public static class Program
 {
     public static void Main(string[] args)
     {
-        // var test = new Benchmark();
-        // var redisGetString = test.Redis_Get_string();
-        // var redisGetObject = test.Redis_Get_object();
-        // var redisGetSetString = test.Redis_GetSet_string();
-        // var redisGetSetObject = test.Redis_GetSet_object();
-        // var memoryCacheGetOrCreate = test.MemoryCache_GetOrCreate();
-        // var lazyCacheGet = test.LazyCache_Get();
+        var test = new Benchmark();
+        var redisGetString = test.Redis_Get_string();
+        var redisGetObject = test.Redis_Get_object();
+        var redisGetSetString = test.Redis_GetSet_string();
+        var redisGetSetObject = test.Redis_GetSet_object();
+        var memoryCacheGetOrCreate = test.MemoryCache_Get();
+        var lazyCacheGet = test.LazyCache_Get();
         BenchmarkRunner.Run<Benchmark>();
     }
 }
 
 public class Benchmark
 {
-    private readonly Random _random;
+    // private readonly Random _random;
     private readonly string _key;
     private readonly BenchmarkSessionDto _value;
     private readonly string _valueString;
@@ -63,7 +65,7 @@ public class Benchmark
             .GetDatabase();
         var stringSet = _redis.StringSetAsync(_key, JsonSerializer.Serialize(_value), flags: CommandFlags.FireAndForget);
 
-        _random = new Random();
+        // _random = new Random();
     }
 
 
@@ -72,24 +74,24 @@ public class Benchmark
     {
         return _memoryCache.Get<BenchmarkSessionDto>(_key);
     }
-    
-    [Benchmark]
-    public BenchmarkSessionDto MemoryCache_GetOrCreate()
-    {
-        return _memoryCache.GetOrCreate(Guid.NewGuid().ToString(), entry => _value);
-    }
-    
+
+    // [Benchmark]
+    // public BenchmarkSessionDto MemoryCache_GetOrCreate()
+    // {
+    //     return _memoryCache.GetOrCreate(Guid.NewGuid().ToString(), entry => _value);
+    // }
+
     [Benchmark]
     public BenchmarkSessionDto LazyCache_Get()
     {
         return _lazyCache.Get<BenchmarkSessionDto>(_key);
     }
-    
-    [Benchmark]
-    public BenchmarkSessionDto LazyCache_GetOrAdd()
-    {
-        return _lazyCache.GetOrAdd(Guid.NewGuid().ToString(), () => _value);
-    }
+
+    // [Benchmark]
+    // public BenchmarkSessionDto LazyCache_GetOrAdd()
+    // {
+    //     return _lazyCache.GetOrAdd(Guid.NewGuid().ToString(), () => _value);
+    // }
 
     [Benchmark]
     public string Redis_Get_string()
@@ -102,7 +104,7 @@ public class Benchmark
     {
         return _redis.StringGetSet(_key, _valueString)!;
     }
-    
+
     [Benchmark]
     public BenchmarkSessionDto Redis_Get_object()
     {
