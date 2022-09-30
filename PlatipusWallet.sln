@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatipusWallet.Domain", "Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatipusWallet.Infrastructure", "PlatipusWallet.Infrastructure\PlatipusWallet.Infrastructure.csproj", "{7098C587-4D62-48BA-B3DB-50BB5D2569F9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmark", "Benchmark", "{332727B0-8423-4701-9DBF-C14EF9F2E882}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benchmark.csproj", "{48E2CB9C-129D-4443-8B0A-ABDDB109CDF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,12 @@ Global
 		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7098C587-4D62-48BA-B3DB-50BB5D2569F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48E2CB9C-129D-4443-8B0A-ABDDB109CDF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48E2CB9C-129D-4443-8B0A-ABDDB109CDF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48E2CB9C-129D-4443-8B0A-ABDDB109CDF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48E2CB9C-129D-4443-8B0A-ABDDB109CDF0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{48E2CB9C-129D-4443-8B0A-ABDDB109CDF0} = {332727B0-8423-4701-9DBF-C14EF9F2E882}
 	EndGlobalSection
 EndGlobal
