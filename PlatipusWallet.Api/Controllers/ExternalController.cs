@@ -39,4 +39,9 @@ public class ExternalController : ApiController
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CasinoCurrencies(AddRoundRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("casino-games")]
+    [ProducesResponseType(typeof(GetGamesRequest.Response), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CasinoGames(GetGamesRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

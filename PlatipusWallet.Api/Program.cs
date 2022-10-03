@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -7,6 +8,8 @@ using MediatR;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PlatipusWallet.Api.Application;
+using PlatipusWallet.Api.Application.Services;
 using PlatipusWallet.Api.Extensions;
 using PlatipusWallet.Api.Filters;
 using PlatipusWallet.Api.Options;
@@ -74,6 +77,11 @@ services
                 optionsBuilder.EnableSensitiveDataLogging();
             }
         })
+    .AddHttpClient<IGamesApiService>(options =>
+    {
+        options.BaseAddress = new Uri("https://test.platipusgaming.com/psw/");
+        options.DefaultRequestHeaders.Add("X-REQUEST-SIGN", "");
+    }).Services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
