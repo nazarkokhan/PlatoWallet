@@ -17,7 +17,7 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ErrorMockActionFilterAttribute>>();
-        logger.LogInformation("Handling request with possible mocked error for");
+        logger.LogInformation("Handling request with possible mocked error");
         // Before controller action
         var executedContext = await next();
         // After controller action
@@ -48,9 +48,15 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
             .FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (errorMock is null)
+        {
+            logger.LogInformation("Error mock not present");
             return;
+        }
         if (errorMock.MethodPath != executedContext.HttpContext.Request.Path)
+        {
+            logger.LogInformation("Error mock request path does not fit {@ErrorMock}", errorMock);
             return;
+        }
 
         logger.LogInformation("Executing error mock {@ErrorMock}", errorMock);
         executedContext.Result = new ObjectResult(errorMock.Body)

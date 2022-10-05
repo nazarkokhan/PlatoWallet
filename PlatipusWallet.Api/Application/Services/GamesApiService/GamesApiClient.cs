@@ -4,6 +4,8 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DTOs;
+using DTOs.Base;
+using DTOs.Responses;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 using Results.Common;
@@ -133,7 +135,7 @@ public static class HttpClientExtensions
 
             if (responseStatus is Status.ERROR)
             {
-                var errorModel = jsonNode.Deserialize<BaseExternalResponse>(jsonSerializerOptions)!;
+                var errorModel = jsonNode.Deserialize<BaseGamesApiErrorResponseDto>(jsonSerializerOptions)!;
                 return ResultFactory.Failure<T>(errorModel.Error, errorModel.Description);
             }
 

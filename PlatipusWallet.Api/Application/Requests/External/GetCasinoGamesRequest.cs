@@ -9,6 +9,7 @@ using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Services.GamesApiService;
 using Services.GamesApiService.DTOs;
+using Services.GamesApiService.DTOs.Responses;
 
 public record GetCasinoGamesRequest(string CasinoId) : IRequest<IResult<GetCasinoGamesListResponseDto>>
 {

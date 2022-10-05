@@ -94,24 +94,13 @@ services
 
 var app = builder.Build();
 
-app.UseHttpLogging();
-
-// app.UseSerilogRequestLogging(
-//     options =>
-//     {
-//         options.MessageTemplate = "Serilog logging {RequestBody}";
-//         options.EnrichDiagnosticContext = (context, httpContext) =>
-//         {
-//             httpContext.Request.Body.Read(new byte[])
-//             context.Set(nameof(httpContext.Request.Body), );
-//         };
-//     });
-
 if (!app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpLogging();
 
 app.UseRequestLocalization();
 

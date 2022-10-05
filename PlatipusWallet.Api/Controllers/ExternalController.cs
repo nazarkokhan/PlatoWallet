@@ -5,6 +5,7 @@ using Application.Requests.Base.Responses;
 using Application.Requests.DTOs;
 using Application.Requests.External;
 using Application.Services.GamesApiService.DTOs;
+using Application.Services.GamesApiService.DTOs.Responses;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ public class ExternalController : ApiController
 
     [HttpPost("add-balance")]
     [ProducesResponseType(typeof(LogInRequest.Response), StatusCodes.Status200OK)]
-    public async Task<IActionResult> LogIn(AddBalanceRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddBalance(AddBalanceRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("casino-currencies")]
@@ -38,7 +39,7 @@ public class ExternalController : ApiController
 
     [HttpPost("round")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CasinoCurrencies(AddRoundRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Round(AddRoundRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("casino-games")]
