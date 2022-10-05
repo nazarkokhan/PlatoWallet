@@ -18,11 +18,13 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
     {
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ErrorMockActionFilterAttribute>>();
         logger.LogInformation("Handling request with possible mocked error");
+        
         // Before controller action
         var executedContext = await next();
         // After controller action
         
         var (_, baseRequestObject) = context.ActionArguments.FirstOrDefault(a => a.Value?.GetType().IsAssignableTo(typeof(BaseRequest)) ?? false);
+        // logger.LogInformation("{@RequestBody}", baseRequestObject, executedContext);
 
         if (baseRequestObject is not BaseRequest baseRequest)
         {
