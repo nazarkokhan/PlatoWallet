@@ -74,7 +74,7 @@ public record RollbackRequest(
         public Validator()
         {
             RuleFor(p => p.Amount)
-                .ScalePrecision(38, 2);
+                .ScalePrecision(2, 38);
         }
     }
 }

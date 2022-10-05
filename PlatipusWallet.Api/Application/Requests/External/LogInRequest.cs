@@ -113,7 +113,7 @@ public record LogInRequest(
                 .MaximumLength(8);
 
             RuleFor(p => p.Balance)
-                .ScalePrecision(38, 2);
+                .ScalePrecision(2, 38);
         }
     }
 }
