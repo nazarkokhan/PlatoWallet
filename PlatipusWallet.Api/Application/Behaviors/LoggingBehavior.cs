@@ -26,9 +26,9 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         var result = await next();
 
         if (result.IsFailure)
-            _logger.LogWarning(result.Exception, "Failure request handling. Result: {@Result}", request, result);
+            _logger.LogWarning(result.Exception, "Failure request handling. Result: {@Result}", result);
         else
-            _logger.LogInformation("Successful request handling. Result: {@Result}", request, result);
+            _logger.LogInformation("Successful request handling. Result: {@Result}", result);
 
         return result;
     }
