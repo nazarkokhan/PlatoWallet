@@ -3,6 +3,7 @@ namespace PlatipusWallet.Api.Application.Requests.Wallet;
 using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -86,6 +87,15 @@ public record BetRequest(
             var response = new BalanceResponse(round.User.Balance);
 
             return ResultFactory.Success(response);
+        }
+    }
+    
+    public class Validator : AbstractValidator<BetRequest>
+    {
+        public Validator()
+        {
+            RuleFor(p => p.Amount)
+                .ScalePrecision(38, 2);
         }
     }
 }

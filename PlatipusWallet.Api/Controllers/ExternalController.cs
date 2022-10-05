@@ -4,6 +4,7 @@ using Abstract;
 using Application.Requests.Base.Responses;
 using Application.Requests.DTOs;
 using Application.Requests.External;
+using Application.Services.GamesApiService.DTOs;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ public class ExternalController : ApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("casino-games")]
-    [ProducesResponseType(typeof(GetGamesRequest.Response), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CasinoGames(GetGamesRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(GetCasinoGamesListResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CasinoGames(GetCasinoGamesRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

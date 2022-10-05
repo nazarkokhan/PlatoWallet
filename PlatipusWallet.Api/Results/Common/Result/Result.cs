@@ -10,13 +10,17 @@ public record Result : IResult
         ErrorCode = ErrorCode.Unknown;
         Exception = null;
         ErrorDescription = string.Empty;
-    } 
+    }
 
-    public Result(ErrorCode errorCode, Exception? exception = null)
+    public Result(ErrorCode errorCode, string? description = null) : this(errorCode, null, description)
+    {
+        
+    }
+    public Result(ErrorCode errorCode, Exception? exception = null, string? description = null)
     {
         IsSuccess = false;
         ErrorCode = errorCode;
-        ErrorDescription = errorCode.ToString();
+        ErrorDescription = description ?? string.Empty;
         Exception = exception;
     }
 

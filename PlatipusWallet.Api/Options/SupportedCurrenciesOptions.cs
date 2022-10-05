@@ -4,7 +4,7 @@ namespace PlatipusWallet.Api.Options;
 
 public class SupportedCurrenciesOptions
 {
-    public HashSet<string> Fiat { get; set; }
+    public HashSet<string> Fiat { get; set; } = null!;
 
-    public HashSet<string> Crypto { get; set; }
+    public HashSet<string> Crypto { get; set; } = null!;
 }

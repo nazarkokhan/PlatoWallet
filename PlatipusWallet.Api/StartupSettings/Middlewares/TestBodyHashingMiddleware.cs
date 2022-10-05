@@ -17,8 +17,6 @@ public class TestBodyHashingMiddleware : IMiddleware
         var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
         _ = await context.Request.Body.ReadAsync(buffer);
 
-        var bufferString = Encoding.UTF8.GetString(buffer);
-
         var signatureKey = HttpUtility
             .ParseQueryString(context.Request.QueryString.Value!)
             .Get("signature_key")!;
@@ -29,6 +27,6 @@ public class TestBodyHashingMiddleware : IMiddleware
 
         var validSignature = Convert.ToHexString(hmac);
 
-        await context.Response.WriteAsJsonAsync(validSignature);
+        await context.Response.WriteAsJsonAsync(validSignature.ToLower());
     }
 }

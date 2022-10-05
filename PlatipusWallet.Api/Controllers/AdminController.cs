@@ -29,4 +29,8 @@ public class AdminController : ApiController
     [HttpPost("casino/user/get-page")]
     public async Task<IActionResult> GetCasinoUsersPage(GetCasinoUsersPageRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("award")]
+    public async Task<IActionResult> CreateAward(CreateAwardRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

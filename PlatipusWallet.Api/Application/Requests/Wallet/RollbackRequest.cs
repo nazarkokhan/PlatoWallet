@@ -3,6 +3,7 @@ namespace PlatipusWallet.Api.Application.Requests.Wallet;
 using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,15 @@ public record RollbackRequest(
             var response = new BalanceResponse(round.User.Balance);
 
             return ResultFactory.Success(response);
+        }
+    }
+    
+    public class Validator : AbstractValidator<RollbackRequest>
+    {
+        public Validator()
+        {
+            RuleFor(p => p.Amount)
+                .ScalePrecision(38, 2);
         }
     }
 }

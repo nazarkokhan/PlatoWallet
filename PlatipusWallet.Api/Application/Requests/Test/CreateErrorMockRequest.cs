@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using PlatipusWallet.Api.Results.Common;
-using PlatipusWallet.Api.Results.Common.Result;
-using PlatipusWallet.Domain.Entities;
-using PlatipusWallet.Infrastructure.Persistence;
+using Results.Common;
+using Results.Common.Result;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record CreateErrorMockRequest(
     Guid SessionId,

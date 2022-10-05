@@ -5,12 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using PlatipusWallet.Api.Application.Extensions;
-using PlatipusWallet.Api.Application.Requests.Base.Page;
-using PlatipusWallet.Api.Results.Common.Result;
-using PlatipusWallet.Api.Results.Common.Result.WithData;
-using PlatipusWallet.Domain.Entities;
-using PlatipusWallet.Infrastructure.Persistence;
+using Extensions;
+using Base.Page;
+using Results.Common.Result;
+using Results.Common.Result.WithData;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record GetUserSessionsPageRequest(PageRequest Page, string User) : IRequest<IResult<IPage<GetUserSessionsPageRequest.Response>>>
 {

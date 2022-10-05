@@ -41,10 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="logs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="logs\log-20220929.txt" />
     </ItemGroup>
 

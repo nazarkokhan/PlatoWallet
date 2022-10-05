@@ -9,5 +9,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {
         builder.ToTable("Transactions");
+        
+        builder.Property(x => x.Amount).HasPrecision(38, 2);
     }
 }

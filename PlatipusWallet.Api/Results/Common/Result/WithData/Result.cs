@@ -7,7 +7,10 @@ public record Result<T> : Result, IResult<T>
         Data = data;
     }
 
-    public Result(ErrorCode errorCode, Exception? exception = null) : base(errorCode, exception)
+    public Result(
+        ErrorCode errorCode,
+        Exception? exception = null,
+        string? description = null) : base(errorCode, exception, description)
     {
         Data = default!;
     }

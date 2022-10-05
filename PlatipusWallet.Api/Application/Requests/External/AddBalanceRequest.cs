@@ -7,6 +7,7 @@ using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
 
 public record AddBalanceRequest(
@@ -49,6 +50,15 @@ public record AddBalanceRequest(
             var result = new BalanceResponse(user.Balance);
 
             return ResultFactory.Success(result);
+        }
+    }
+    
+    public class Validator : AbstractValidator<AddBalanceRequest>
+    {
+        public Validator()
+        {
+            RuleFor(p => p.Balance)
+                .ScalePrecision(38, 2);
         }
     }
 }

@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -8,8 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PlatipusWallet.Api.Application;
-using PlatipusWallet.Api.Application.Services;
+using PlatipusWallet.Api.Application.Services.GamesApiService;
 using PlatipusWallet.Api.Extensions;
 using PlatipusWallet.Api.Filters;
 using PlatipusWallet.Api.Options;
@@ -19,6 +17,7 @@ using PlatipusWallet.Api.StartupSettings.Middlewares;
 using PlatipusWallet.Api.StartupSettings.ServicesRegistrations;
 using PlatipusWallet.Infrastructure.Persistence;
 using Serilog;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog(
@@ -35,6 +34,7 @@ services
     .AddHttpLogging(
         options =>
         {
+            options.RequestHeaders.Add("X-REQUEST-SIGN");
             options.LoggingFields = HttpLoggingFields.All;
             options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
             options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
@@ -56,6 +56,14 @@ services
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
         })
     .Services
+    .Configure<JsonOptions>(
+        options =>
+        {
+            options.SerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
+            options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.SerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
+        })
     .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
     .Configure<SupportedCountriesOptions>(builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind)
     .AddEndpointsApiExplorer()
@@ -77,16 +85,27 @@ services
                 optionsBuilder.EnableSensitiveDataLogging();
             }
         })
-    .AddHttpClient<IGamesApiService>(options =>
-    {
-        options.BaseAddress = new Uri("https://test.platipusgaming.com/psw/");
-        options.DefaultRequestHeaders.Add("X-REQUEST-SIGN", "");
-    }).Services
+    .AddSingleton<IGamesApiClient, GamesApiClient>()
+    .AddTransient<RequestSignatureRelegatingHandler>()
+    .AddHttpClient<IGamesApiClient, GamesApiClient>(options => { options.BaseAddress = new Uri("https://test.platipusgaming.com/psw/"); })
+    .AddHttpMessageHandler<RequestSignatureRelegatingHandler>()
+    .Services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
 
 app.UseHttpLogging();
+
+// app.UseSerilogRequestLogging(
+//     options =>
+//     {
+//         options.MessageTemplate = "Serilog logging {RequestBody}";
+//         options.EnrichDiagnosticContext = (context, httpContext) =>
+//         {
+//             httpContext.Request.Body.Read(new byte[])
+//             context.Set(nameof(httpContext.Request.Body), );
+//         };
+//     });
 
 if (!app.Environment.IsProduction())
 {

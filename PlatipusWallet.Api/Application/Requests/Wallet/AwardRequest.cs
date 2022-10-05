@@ -3,6 +3,7 @@ namespace PlatipusWallet.Api.Application.Requests.Wallet;
 using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,35 +34,65 @@ public record AwardRequest(
             AwardRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(r => r.UserName == request.User)
-                .Include(r => r.Currency)
-                .Include(r => r.Awards)
-                .Include(r => r.Rounds)
-                .ThenInclude(r => r.Transactions)
-                .FirstAsync(cancellationToken);
-            //TODO Award hierarchy dependencies
-            
-            if (user.Currency.Name != request.Currency)
-                return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
-            
-            if (user.Awards.Any(a => a.Id == request.AwardId))
-                return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateAward);
+            var award = await _context.Set<Award>()
+                .Where(a => a.Id == request.AwardId)
+                .Include(a => a.User)
+                .Include(a => a.AwardRound!.Round)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var award = new Award
+            if (award is null || award.User.UserName != request.User)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.AwardDoesNotExist);
+
+            if (award.AwardRound is not null)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
+
+            var round = await _context.Set<Round>()
+                .Where(r => r.Id == request.RoundId)
+                .Include(a => a.Transactions)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (round is not null)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
+
+            round = new Round
             {
-                Id = request.AwardId,
-                Amount = request.Amount
+                Id = request.RoundId,
+                Finished = true,
+                Transactions = new List<Transaction>
+                {
+                    new()
+                    {
+                        Id = request.TransactionId,
+                        Amount = request.Amount
+                    }
+                },
+                AwardRound = new AwardRound
+                {
+                    Award = award
+                }
             };
-            
-            user.Awards.Add(award);
+            _context.Add(round);
 
+            var user = award.User;
+
+            user.Rounds.Add(round);
+            user.Balance += request.Amount;
             _context.Update(user);
+
             await _context.SaveChangesAsync(cancellationToken);
 
             var result = new BalanceResponse(user.Balance);
 
             return ResultFactory.Success(result);
+        }
+    }
+    
+    public class Validator : AbstractValidator<AwardRequest>
+    {
+        public Validator()
+        {
+            RuleFor(p => p.Amount)
+                .ScalePrecision(38, 2);
         }
     }
 }

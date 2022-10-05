@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PlatipusWallet.Infrastructure.Persistence;
@@ -11,9 +12,10 @@ using PlatipusWallet.Infrastructure.Persistence;
 namespace PlatipusWallet.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221004212533_AwardRemove")]
+    partial class AwardRemove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,49 +23,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("PlatipusWallet.Domain.Entities.Award", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ValidUntil")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Awards", (string)null);
-                });
-
-            modelBuilder.Entity("PlatipusWallet.Domain.Entities.AwardRound", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AwardId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoundId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AwardId")
-                        .IsUnique();
-
-                    b.HasIndex("RoundId")
-                        .IsUnique();
-
-                    b.ToTable("AwardRounds", (string)null);
-                });
 
             modelBuilder.Entity("PlatipusWallet.Domain.Entities.Casino", b =>
                 {
@@ -190,8 +149,7 @@ namespace PlatipusWallet.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("Amount")
-                        .HasPrecision(38, 2)
-                        .HasColumnType("numeric(38,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -214,8 +172,7 @@ namespace PlatipusWallet.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Balance")
-                        .HasPrecision(38, 2)
-                        .HasColumnType("numeric(38,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("CasinoId")
                         .IsRequired()
@@ -245,36 +202,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("PlatipusWallet.Domain.Entities.Award", b =>
-                {
-                    b.HasOne("PlatipusWallet.Domain.Entities.User", "User")
-                        .WithMany("Awards")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("PlatipusWallet.Domain.Entities.AwardRound", b =>
-                {
-                    b.HasOne("PlatipusWallet.Domain.Entities.Award", "Award")
-                        .WithOne("AwardRound")
-                        .HasForeignKey("PlatipusWallet.Domain.Entities.AwardRound", "AwardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PlatipusWallet.Domain.Entities.Round", "Round")
-                        .WithOne("AwardRound")
-                        .HasForeignKey("PlatipusWallet.Domain.Entities.AwardRound", "RoundId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Award");
-
-                    b.Navigation("Round");
                 });
 
             modelBuilder.Entity("PlatipusWallet.Domain.Entities.CasinoCurrencies", b =>
@@ -359,11 +286,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
                     b.Navigation("Currency");
                 });
 
-            modelBuilder.Entity("PlatipusWallet.Domain.Entities.Award", b =>
-                {
-                    b.Navigation("AwardRound");
-                });
-
             modelBuilder.Entity("PlatipusWallet.Domain.Entities.Casino", b =>
                 {
                     b.Navigation("CasinoCurrencies");
@@ -380,8 +302,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
 
             modelBuilder.Entity("PlatipusWallet.Domain.Entities.Round", b =>
                 {
-                    b.Navigation("AwardRound");
-
                     b.Navigation("Transactions");
                 });
 
@@ -392,8 +312,6 @@ namespace PlatipusWallet.Infrastructure.Migrations
 
             modelBuilder.Entity("PlatipusWallet.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Awards");
-
                     b.Navigation("Rounds");
 
                     b.Navigation("Sessions");

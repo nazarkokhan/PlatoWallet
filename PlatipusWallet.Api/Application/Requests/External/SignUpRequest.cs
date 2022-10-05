@@ -90,6 +90,9 @@ public record SignUpRequest(
             RuleFor(p => p.Password)
                 .MinimumLength(6)
                 .MaximumLength(8);
+            
+            RuleFor(p => p.Balance)
+                .ScalePrecision(38, 2);
         }
     }
 }

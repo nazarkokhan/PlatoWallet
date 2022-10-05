@@ -5,9 +5,9 @@ using Abstract;
 
 public class ErrorMock : Entity
 {
-    public string MethodPath { get; set; }
+    public string MethodPath { get; set; } = null!;
 
-    public string Body { get; set; }
+    public string Body { get; set; } = null!;
 
     public HttpStatusCode HttpStatusCode { get; set; }
 

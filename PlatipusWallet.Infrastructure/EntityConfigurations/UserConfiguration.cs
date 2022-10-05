@@ -11,5 +11,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("Users");
 
         builder.HasIndex(x => x.UserName).IsUnique();
+
+        builder.Property(x => x.Balance).HasPrecision(38, 2);
     }
 }

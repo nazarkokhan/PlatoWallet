@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PlatipusWallet.Infrastructure.Persistence;
@@ -11,9 +12,10 @@ using PlatipusWallet.Infrastructure.Persistence;
 namespace PlatipusWallet.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221004225313_LinkAwardWithRound")]
+    partial class LinkAwardWithRound
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,8 +192,7 @@ namespace PlatipusWallet.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("Amount")
-                        .HasPrecision(38, 2)
-                        .HasColumnType("numeric(38,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -214,8 +215,7 @@ namespace PlatipusWallet.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Balance")
-                        .HasPrecision(38, 2)
-                        .HasColumnType("numeric(38,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("CasinoId")
                         .IsRequired()

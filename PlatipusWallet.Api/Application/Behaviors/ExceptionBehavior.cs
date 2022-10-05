@@ -31,3 +31,34 @@ public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest
         }
     }
 }
+
+public class ExceptionBehavior2<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+    where TResponse : class, IResult
+{
+    private readonly ILogger<ExceptionBehavior2<TRequest, TResponse>> _logger;
+
+    public ExceptionBehavior2(ILogger<ExceptionBehavior2<TRequest, TResponse>> logger)
+    {
+        _logger = logger;
+    }
+
+    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    {
+        IResult? result;
+        //logic
+        try
+        {
+            //logic
+            result = await next();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Request {@Request} was handled with unexpected error", request);
+
+            result = DynamicResultFactory.CreateFailureResult<TResponse>(ErrorCode.Unknown, e);
+        }
+
+        return result as TResponse;
+    }
+}
