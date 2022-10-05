@@ -34,7 +34,9 @@ services
     .AddHttpLogging(
         options =>
         {
-            options.RequestHeaders.Add("X-REQUEST-SIGN");
+            foreach (var allowedHeader in StartupConstants.AllowedHeaders)
+                options.RequestHeaders.Add(allowedHeader);
+            
             options.LoggingFields = HttpLoggingFields.All;
             options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
             options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
