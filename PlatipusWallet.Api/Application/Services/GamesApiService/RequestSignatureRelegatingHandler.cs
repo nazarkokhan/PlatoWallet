@@ -10,16 +10,19 @@ using Infrastructure.Persistence;
 public class RequestSignatureRelegatingHandler : DelegatingHandler
 {
     private readonly WalletDbContext _context;
+    private readonly ILogger<RequestSignatureRelegatingHandler> _logger;
 
-    public RequestSignatureRelegatingHandler(WalletDbContext context)
+    public RequestSignatureRelegatingHandler(WalletDbContext context, ILogger<RequestSignatureRelegatingHandler> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
+        //TODO move logging to filter
         var requestBytes = await request.Content!.ReadAsByteArrayAsync(cancellationToken);
 
         const string casinoPropertyName = "casino_id";
@@ -42,10 +45,20 @@ public class RequestSignatureRelegatingHandler : DelegatingHandler
 
         var signatureKeyBytes = Encoding.UTF8.GetBytes(casino.SignatureKey);
         var hashedRequest = HMACSHA256.HashData(signatureKeyBytes, requestBytes);
-        var xRequestSign = Convert.ToHexString(hashedRequest);
+        var xRequestSign = Convert.ToHexString(hashedRequest).ToLower();
 
-        request.Headers.Add("X-REQUEST-SIGN", xRequestSign.ToLower());
+        request.Headers.Add("X-REQUEST-SIGN", xRequestSign);
 
-        return await base.SendAsync(request, cancellationToken);
+        _logger.LogInformation(
+            "GamesApi Request: {GamesApiRequest}, X-REQUEST-SIGN: {GamesApi.RequestSign}", 
+            Encoding.UTF8.GetString(requestBytes),
+            xRequestSign);
+
+        var response = await base.SendAsync(request, cancellationToken);
+
+        var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
+        _logger.LogInformation("GamesApi Request: {GamesApiResponse}", responseString);
+
+        return response;
     }
 }
