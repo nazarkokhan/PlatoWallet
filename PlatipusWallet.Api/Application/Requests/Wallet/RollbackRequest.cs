@@ -44,30 +44,31 @@ public record RollbackRequest(
             if (round is null)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.BadParametersInTheRequest);
 
-            var transaction = round.Transactions.FirstOrDefault(t => t.Id == request.TransactionId);
-            
-            if(transaction is null)
-                return ResultFactory.Failure<BalanceResponse>(ErrorCode.TransactionDoesNotExist);
-            
             if (round.Finished)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.Unknown);
-            
-            if (round.User.Currency.Name != request.Currency)
+
+            var lastTransaction = round.Transactions.MaxBy(t => t.CreatedDate);
+            if (lastTransaction is null || lastTransaction.Id != request.TransactionId)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.TransactionDoesNotExist);
+
+            var user = round.User;
+            if (user.Currency.Name != request.Currency)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
 
-            round.User.Balance += request.Amount;
+            user.Balance += request.Amount;
+            _context.Update(user);
 
-            round.Transactions.Remove(transaction);
-            
+            round.Transactions.Remove(lastTransaction);
             _context.Update(round);
+
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new BalanceResponse(round.User.Balance);
+            var response = new BalanceResponse(user.Balance);
 
             return ResultFactory.Success(response);
         }
     }
-    
+
     public class Validator : AbstractValidator<RollbackRequest>
     {
         public Validator()

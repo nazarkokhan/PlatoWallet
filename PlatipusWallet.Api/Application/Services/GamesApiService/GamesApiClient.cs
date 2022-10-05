@@ -3,7 +3,6 @@ namespace PlatipusWallet.Api.Application.Services.GamesApiService;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using DTOs;
 using DTOs.Base;
 using DTOs.Responses;
 using Microsoft.AspNetCore.Http.Json;

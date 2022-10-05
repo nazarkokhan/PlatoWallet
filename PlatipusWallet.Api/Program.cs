@@ -11,6 +11,7 @@ using PlatipusWallet.Api.Application.Services.GamesApiService;
 using PlatipusWallet.Api.Extensions;
 using PlatipusWallet.Api.Filters;
 using PlatipusWallet.Api.Options;
+using PlatipusWallet.Api.StartupSettings;
 using PlatipusWallet.Api.StartupSettings.Extensions;
 using PlatipusWallet.Api.StartupSettings.JsonConverters;
 using PlatipusWallet.Api.StartupSettings.Middlewares;

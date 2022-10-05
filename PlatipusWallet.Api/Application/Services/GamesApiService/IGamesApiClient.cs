@@ -1,6 +1,5 @@
 namespace PlatipusWallet.Api.Application.Services.GamesApiService;
 
-using DTOs;
 using DTOs.Responses;
 using Results.Common.Result.WithData;
 
