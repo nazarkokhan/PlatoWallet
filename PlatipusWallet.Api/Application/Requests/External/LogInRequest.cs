@@ -87,7 +87,7 @@ public record LogInRequest(
                 launchUrl = string.Empty;
             }
 
-            var result = new Response(session.Id, user.Balance, launchUrl);
+            var result = new Response(session.Id, user.Balance, getGameLinkResult?.Data.LaunchUrl ?? "");
 
             return ResultFactory.Success(result);
         }
