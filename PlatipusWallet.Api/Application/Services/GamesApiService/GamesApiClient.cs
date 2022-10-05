@@ -29,10 +29,10 @@ public class GamesApiClient : IGamesApiClient
         Guid sessionId,
         string user,
         string currency,
-        string game = "extragems",
-        string locale = "en",
-        string lobby = "",
-        string launchMode = "url",
+        string game,
+        string locale,
+        string lobby,
+        string launchMode,
         CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(

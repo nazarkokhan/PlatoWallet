@@ -16,7 +16,8 @@ using Services.GamesApiService;
 public record LogInRequest(
     string UserName,
     string Password,
-    string CasinoId) : IRequest<IResult<LogInRequest.Response>>
+    string CasinoId,
+    string Game) : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
@@ -74,6 +75,7 @@ public record LogInRequest(
                 session.Id,
                 user.UserName,
                 user.Currency.Name,
+                request.Game,
                 cancellationToken: cancellationToken);
 
             string launchUrl;

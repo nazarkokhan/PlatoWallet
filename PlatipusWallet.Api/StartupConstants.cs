@@ -2,7 +2,18 @@ public static class StartupConstants
 {
     public static readonly List<string> AllowedHeaders = new List<string>
     {
-        "X-REQUEST-SIGN", "X-Real-IP", "X-Forwarded-Proto", "X-Forwarded-For",
-        "Refer"
+        "X-REQUEST-SIGN",
+        "X-Real-IP",
+        "X-Forwarded-Proto",
+        "X-Forwarded-For",
+        "Refer",
+        "Origin",
+        "Referer",
+        "sec-ch-ua",
+        "sec-ch-ua-mobile",
+        "sec-ch-ua-platform",
+        "Sec-Fetch-Site",
+        "Sec-Fetch-Mode",
+        "Sec-Fetch-Dest"
     };
 }

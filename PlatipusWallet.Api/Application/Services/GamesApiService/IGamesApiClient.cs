@@ -11,7 +11,7 @@ public interface IGamesApiClient
         Guid sessionId,
         string user,
         string currency,
-        string game = "extragems",
+        string game,
         string locale = "en",
         string lobby = "",
         string launchMode = "url",
