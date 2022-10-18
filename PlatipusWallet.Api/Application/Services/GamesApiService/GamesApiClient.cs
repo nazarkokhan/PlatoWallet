@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 using Results.Common;
 using Results.Common.Result;
+using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
 using Results.External.Enums;
 
@@ -129,13 +130,13 @@ public static class HttpClientExtensions
 
             if (responseStatusString is null)
                 return ResultFactory.Failure<T>(ErrorCode.Unknown);
-
+            
             var responseStatus = Enum.Parse<Status>(responseStatusString);
 
             if (responseStatus is Status.ERROR)
             {
                 var errorModel = jsonNode.Deserialize<BaseGamesApiErrorResponseDto>(jsonSerializerOptions)!;
-                return ResultFactory.Failure<T>(errorModel.Error, errorModel.Description);
+                return ResultFactory.Failure<T>(errorModel.Error);
             }
 
             var successModel = jsonNode.Deserialize<T>(jsonSerializerOptions)!;

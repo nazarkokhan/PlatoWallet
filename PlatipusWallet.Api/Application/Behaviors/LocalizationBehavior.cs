@@ -26,11 +26,11 @@ public class LocalizationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
         if (response.IsSuccess)
             return response;
 
-        var errorCode = ((int) response.ErrorCode).ToString();
-
-        if (string.IsNullOrEmpty(response.ErrorDescription))
-            // response.ErrorDescription = _stringLocalizer[errorCode].Value;
-            response.ErrorDescription = response.ErrorCode.ToString();
+        // var errorCode = ((int) response.ErrorCode).ToString(); //TODO
+        //
+        // if (string.IsNullOrEmpty(response.ErrorDescription))
+        //     // response.ErrorDescription = _stringLocalizer[errorCode].Value;
+        //     response.ErrorDescription = response.ErrorCode.ToString();
 
         return response;
     }

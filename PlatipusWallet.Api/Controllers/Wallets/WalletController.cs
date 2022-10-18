@@ -1,16 +1,17 @@
-namespace PlatipusWallet.Api.Controllers;
+// ReSharper disable UnusedParameter.Global
+namespace PlatipusWallet.Api.Controllers.Wallets;
 
-using Abstract;
-using Application.Requests.Base.Responses;
-using Application.Requests.Wallet;
-using Extensions;
-using Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Application.Requests.Base.Responses;
+using Application.Requests.Wallet;
+using Abstract;
+using Extensions;
+using Filters;
 
 [Route("wallet")]
-// [Route("")]
 [ErrorMockActionFilter]
+// [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)] //TODO
 public class WalletController : ApiController
 {
     private readonly IMediator _mediator;

@@ -1,8 +1,11 @@
 namespace PlatipusWallet.Api.Filters;
 
 using Application.Requests.Base.Responses;
+using Application.Requests.Base.Responses.Databet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Results.Common;
+using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Results.External;
 using Results.External.ActionResults;
@@ -12,14 +15,22 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
-        if (context.Cancel || context.Result is not ExternalActionResult actionResult)
+        if (context.Cancel || context.Result is not ExternalActionResult<object> actionResult)
             return;
 
         if (actionResult.Result.IsSuccess)
         {
-            if (actionResult.Result is IResult<object> objectResult)
+            if (actionResult.Result is IBaseResult<object, object> objectResult)
+                // if (actionResult.Result is IResult<object> objectResult)
             {
                 context.Result = new OkObjectResult(objectResult.Data);
+                return;
+            }
+
+            if (actionResult.Result is IDatabetResult)
+            {
+                const DatabetErrorCode databetErrorCode = DatabetErrorCode.Success;
+                context.Result = new OkObjectResult(new DatabetBaseResponse(databetErrorCode, databetErrorCode.ToString()));
                 return;
             }
 
@@ -29,21 +40,30 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
         var services = context.HttpContext.RequestServices;
         var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
-        
+
         logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
+        // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
 
-        var errorCode = (int) actionResult.Result.ErrorCode;
+        if (actionResult.Result is IDatabetResult)
+        {
+            var errorCode = (int) actionResult.Result.ErrorCode;
 
-        // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>();
+            var errorResponse = new DatabetErrorResponse(
+                (DatabetErrorCode) errorCode,
+                errorCode.ToString());
 
-        var description = actionResult.Result.ErrorDescription;
-        var errorResponse = new ErrorResponse(
-            Status.ERROR,
-            errorCode,
-            description
-            // stringLocalizer[errorCode.ToString()]
-        );
+            context.Result = new OkObjectResult(errorResponse);
+        }
+        else
+        {
+            var errorCode = (int) actionResult.Result.ErrorCode;
 
-        context.Result = new OkObjectResult(errorResponse);
+            var errorResponse = new ErrorResponse(
+                Status.ERROR,
+                errorCode,
+                errorCode.ToString());
+
+            context.Result = new OkObjectResult(errorResponse);
+        }
     }
 }

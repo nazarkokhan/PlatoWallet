@@ -1,11 +1,9 @@
-using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlatipusWallet.Api.Application.Services.GamesApiService;
 using PlatipusWallet.Api.Extensions;
@@ -37,7 +35,7 @@ services
         {
             foreach (var allowedHeader in StartupConstants.AllowedHeaders)
                 options.RequestHeaders.Add(allowedHeader);
-            
+
             options.LoggingFields = HttpLoggingFields.All;
             options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
             options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
@@ -48,7 +46,6 @@ services
         options =>
         {
             options.Filters.Add<ActionResultFilterAttribute>();
-            options.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json));
         })
     .AddJsonOptions(
         options =>
@@ -58,6 +55,7 @@ services
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
         })
+    // .AddXmlSerializerFormatters()
     .Services
     .Configure<JsonOptions>(
         options =>
@@ -96,6 +94,8 @@ services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
+
+app.UseExceptionHandler(exceptionAppBuilder => { exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>(); });
 
 if (!app.Environment.IsProduction())
 {

@@ -9,6 +9,7 @@ using Results.Common;
 using Results.Common.Result;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Results.Common.Result.Factories;
 
 public record CreateErrorMockRequest(
     Guid SessionId,

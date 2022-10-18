@@ -2,25 +2,51 @@ namespace PlatipusWallet.Api.Results.Common.Result;
 
 using System;
 
-public record Result : IResult
+public record Result : BaseResult<ErrorCode>, IResult
 {
     public Result()
     {
-        IsSuccess = true;
-        ErrorCode = ErrorCode.Unknown;
-        Exception = null;
         ErrorDescription = string.Empty;
     }
 
-    public Result(ErrorCode errorCode, string? description = null) : this(errorCode, null, description)
+    public Result(
+        ErrorCode errorCode,
+        Exception? exception = null,
+        string? description = null) : base(errorCode, exception)
     {
-        
+        ErrorDescription = description ?? string.Empty;
     }
-    public Result(ErrorCode errorCode, Exception? exception = null, string? description = null)
+
+    public string ErrorDescription { get; set; }
+}
+
+public record DatabetResult : BaseResult<DatabetErrorCode>, IDatabetResult
+{
+    public DatabetResult()
+    {
+    }
+
+    public DatabetResult(
+        DatabetErrorCode errorCode,
+        Exception? exception = null,
+        string? description = null) : base(errorCode, exception)
+    {
+    }
+}
+
+public record BaseResult<TError> : IBaseResult<TError>
+{
+    public BaseResult()
+    {
+        IsSuccess = true;
+        ErrorCode = default!;
+        Exception = null;
+    }
+
+    public BaseResult(TError errorCode, Exception? exception = null)
     {
         IsSuccess = false;
         ErrorCode = errorCode;
-        ErrorDescription = description ?? string.Empty;
         Exception = exception;
     }
 
@@ -28,9 +54,17 @@ public record Result : IResult
 
     public bool IsFailure => !IsSuccess;
 
-    public ErrorCode ErrorCode { get; }
-    
-    public string ErrorDescription { get; set; }
+    public TError ErrorCode { get; }
 
     public Exception? Exception { get; }
+    
+    public IBaseResult<T> ConvertResult<T>(T error)
+    {
+        return new BaseResult<T>(error, Exception);
+    }
+    
+    public IBaseResult<T> ConvertResult<T>()
+    {
+        return new BaseResult<T>();
+    }
 }

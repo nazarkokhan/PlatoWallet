@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Results.Common;
 using Results.Common.Result;
+using Results.Common.Result.Factories;
 
 public record CreateCasinoRequest(
     string CasinoId,

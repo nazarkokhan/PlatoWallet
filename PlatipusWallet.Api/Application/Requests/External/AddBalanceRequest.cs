@@ -9,6 +9,7 @@ using Results.Common.Result.WithData;
 using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
+using Results.Common.Result.Factories;
 
 public record AddBalanceRequest(
     Guid SessionId,

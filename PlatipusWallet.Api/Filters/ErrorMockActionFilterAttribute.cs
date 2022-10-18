@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Results.Common;
-using Results.Common.Result;
+using Results.Common.Result.Factories;
 
 public class ErrorMockActionFilterAttribute : ActionFilterAttribute
 {
@@ -23,10 +23,9 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
         var executedContext = await next();
         // After controller action
         
-        var (_, baseRequestObject) = context.ActionArguments.FirstOrDefault(a => a.Value?.GetType().IsAssignableTo(typeof(BaseRequest)) ?? false);
-        // logger.LogInformation("{@RequestBody}", baseRequestObject, executedContext);
+        var baseRequest = context.ActionArguments.Select(a => a.Value as BaseRequest).SingleOrDefault(a => a is not null);
 
-        if (baseRequestObject is not BaseRequest baseRequest)
+        if (baseRequest is null)
         {
             logger.LogCritical("Can not mock error for request not assignable to BaseRequest {BaseRequestTypeName}", typeof(BaseRequest).FullName);
             executedContext.Result = ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError).ToActionResult();

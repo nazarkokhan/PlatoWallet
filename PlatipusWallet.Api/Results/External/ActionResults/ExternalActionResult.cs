@@ -1,13 +1,14 @@
 namespace PlatipusWallet.Api.Results.External.ActionResults;
 
+using Common.Result;
 using Microsoft.AspNetCore.Mvc;
 
-public class ExternalActionResult : ActionResult
+public class ExternalActionResult<TError> : ActionResult
 {
-    public ExternalActionResult(IResult result)
+    public ExternalActionResult(IBaseResult<TError> result)
     {
         Result = result;
     }
 
-    public IResult Result { get; }
+    public IBaseResult<TError> Result { get; }
 }

@@ -13,6 +13,7 @@ using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Results.Common.Result.Factories;
 
 public record SignUpRequest(
     string UserName,

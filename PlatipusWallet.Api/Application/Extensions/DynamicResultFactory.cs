@@ -2,6 +2,7 @@ namespace PlatipusWallet.Api.Application.Extensions;
 
 using Results.Common;
 using Results.Common.Result;
+using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
 
 public static class DynamicResultFactory
@@ -27,7 +28,7 @@ public static class DynamicResultFactory
                 exception) as TResponse)!;
         }
 
-        return ResultFactory.Failure(errorCode, exception) as TResponse ?? throw new InvalidOperationException();
+        return ResultFactory.Failure<TResponse>(errorCode, exception) as TResponse ?? throw new InvalidOperationException();
     }
 
     public static TResponse CreateSuccessResult<TResponse>()

@@ -1,10 +1,12 @@
 namespace PlatipusWallet.Api.Controllers.Abstract;
 
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using Results.External;
 
-[ApiController]
-[ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-public abstract class ApiController : Controller
+[Produces(MediaTypeNames.Application.Json)]
+[Consumes(MediaTypeNames.Application.Json)]
+[ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)] //TODO
+public abstract class ApiController : BaseApiController
 {
 }

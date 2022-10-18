@@ -1,15 +1,22 @@
 ﻿namespace PlatipusWallet.Api.Results.Common.Result;
 
-public interface IResult
+public interface IResult : IBaseResult<ErrorCode>
+{
+}
+
+public interface IDatabetResult : IBaseResult<DatabetErrorCode>
+{
+}
+
+public interface IBaseResult<out TError>
 {
     bool IsSuccess { get; }
 
     bool IsFailure { get; }
 
-    public ErrorCode ErrorCode { get; }
-    
-    string ErrorDescription { get; set; }
+    TError ErrorCode { get; }
 
     Exception? Exception { get; }
 
+    IBaseResult<TNewError> ConvertResult<TNewError>(TNewError error);
 }

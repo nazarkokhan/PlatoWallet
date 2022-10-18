@@ -8,6 +8,7 @@ using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Results.Common.Result;
+using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
 
 public record GetCasinoUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetCasinoUsersPageRequest.Response>>>
