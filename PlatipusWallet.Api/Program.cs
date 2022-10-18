@@ -1,11 +1,15 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
+using System.Web;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
-using PlatipusWallet.Api.Application.Services.GamesApiService;
+using PlatipusWallet.Api.Application.Services.DatabetGamesApi;
+using PlatipusWallet.Api.Application.Services.GamesApi;
 using PlatipusWallet.Api.Extensions;
 using PlatipusWallet.Api.Filters;
 using PlatipusWallet.Api.Options;
@@ -29,6 +33,7 @@ builder.Host.UseSerilog(
 var builderConfiguration = builder.Configuration;
 var services = builder.Services;
 
+const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO to config
 services
     .AddHttpLogging(
         options =>
@@ -42,11 +47,8 @@ services
         })
     .AddTransient<VerifySignatureMiddleware>()
     .AddTransient<TestBodyHashingMiddleware>()
-    .AddControllers(
-        options =>
-        {
-            options.Filters.Add<ActionResultFilterAttribute>();
-        })
+    .AddTransient<ExceptionHandlerMiddleware>()
+    .AddControllers(options => { options.Filters.Add<ActionResultFilterAttribute>(); })
     .AddJsonOptions(
         options =>
         {
@@ -88,8 +90,11 @@ services
         })
     .AddSingleton<IGamesApiClient, GamesApiClient>()
     .AddTransient<RequestSignatureRelegatingHandler>()
-    .AddHttpClient<IGamesApiClient, GamesApiClient>(options => { options.BaseAddress = new Uri("https://test.platipusgaming.com/psw/"); })
+    .AddHttpClient<IGamesApiClient, GamesApiClient>(options => { options.BaseAddress = new Uri($"{gamesApiUrl}psw/"); })
     .AddHttpMessageHandler<RequestSignatureRelegatingHandler>()
+    .Services
+    .AddSingleton<IDatabetGamesApiClient, DatabetGamesApiClient>()
+    .AddHttpClient<IDatabetGamesApiClient, DatabetGamesApiClient>(options => { options.BaseAddress = new Uri($"{gamesApiUrl}dafabet/"); })
     .Services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 

@@ -1,7 +1,7 @@
-namespace PlatipusWallet.Api.Application.Services.GamesApiService;
+namespace PlatipusWallet.Api.Application.Services.GamesApi;
 
 using DTOs.Responses;
-using Results.Common.Result.WithData;
+using PlatipusWallet.Api.Results.Common.Result.WithData;
 
 public interface IGamesApiClient
 {
@@ -19,7 +19,7 @@ public interface IGamesApiClient
     Task<IResult<GetCasinoGamesListResponseDto>> GetCasinoGamesAsync(
         string casinoId,
         CancellationToken cancellationToken = default);
-    
+
     Task<IResult<CreateFreebetAwardResponseDto>> CreateFreebetAwardAsync(
         string casinoId,
         string user,

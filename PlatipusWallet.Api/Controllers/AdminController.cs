@@ -33,4 +33,8 @@ public class AdminController : ApiController
     [HttpPost("award")]
     public async Task<IActionResult> CreateAward(CreateAwardRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPut("casino/set-databet-provider")]
+    public async Task<IActionResult> SetDatabetCasinoProvider(SetDatabetCasinoProviderRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

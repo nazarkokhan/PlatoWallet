@@ -12,7 +12,7 @@ using Results.Common.Result.WithData;
 
 public record DatabetAuthorizeRequest(
     string PlayerId,
-    string PlayerToken,
+    Guid PlayerToken,
     string Hash) : DatabetBaseRequest(PlayerId, Hash), IRequest<IDatabetResult<DatabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DatabetAuthorizeRequest, IDatabetResult<DatabetBalanceResponse>>
@@ -31,18 +31,30 @@ public record DatabetAuthorizeRequest(
             var user = await _context.Set<User>()
                 .Where(u => u.UserName == request.PlayerId)
                 .Select(
-                    s => new
+                    u => new
                     {
-                        s.Id,
-                        s.UserName,
-                        s.Balance,
-                        CurrencyName = s.Currency.Name,
-                        s.IsDisabled
+                        u.Id,
+                        u.UserName,
+                        u.Balance,
+                        CurrencyName = u.Currency.Name,
+                        u.IsDisabled,
+                        Sessions = u.Sessions
+                            .Where(s => s.ExpirationDate > DateTime.UtcNow)
+                            .Select(
+                                s => new
+                                {
+                                    s.Id,
+                                    s.ExpirationDate
+                                })
+                            .ToList()
                     })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null || user.IsDisabled)
                 return DatabetResultFactory.Failure<DatabetBalanceResponse>(DatabetErrorCode.PlayerNotFound);
+
+            if (user.Sessions.All(s => s.Id != request.PlayerToken))
+                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DatabetErrorCode.InvalidToken);
 
             var response = new DatabetBalanceResponse(user.UserName, user.CurrencyName, user.Balance);
 

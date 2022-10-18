@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Application.Requests.External;
 
+using Api.Extensions;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +11,11 @@ using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
-using Services.GamesApiService;
+using Services.DatabetGamesApi;
+using Services.GamesApi;
 
 public record LogInRequest(
     string UserName,
@@ -24,13 +27,16 @@ public record LogInRequest(
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
+        private readonly IDatabetGamesApiClient _databetGamesApiClient;
         private readonly ILogger<Handler> _logger;
 
         public Handler(WalletDbContext context, IGamesApiClient gamesApiClient,
+            IDatabetGamesApiClient databetGamesApiClient,
             ILogger<Handler> logger)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
+            _databetGamesApiClient = databetGamesApiClient;
             _logger = logger;
         }
 
@@ -71,24 +77,35 @@ public record LogInRequest(
             _context.Add(session);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var getGameLinkResult = await _gamesApiClient.GetGameLinkAsync(
-                user.Casino.Id,
-                session.Id,
-                user.UserName,
-                user.Currency.Name,
-                request.Game,
-                cancellationToken: cancellationToken);
-
             string launchUrl;
-            if (getGameLinkResult.IsSuccess)
-                launchUrl = getGameLinkResult.Data.LaunchUrl;
+
+            if (casino.Provider is CasinoProvider.Databet)
+            {
+                var launchResult = await _databetGamesApiClient.DatabetLaunchGameAsync(
+                    request.Game,
+                    user.UserName,
+                    session.Id,
+                    user.Currency.Name,
+                    null,
+                    DatabetHash.Compute($"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}", casino.SignatureKey),
+                    cancellationToken: cancellationToken);
+
+                launchUrl = launchResult.Data?.LaunchUrl ?? "";
+            }
             else
             {
-                _logger.LogWarning("Launch url not created: {GetGameLinkResult}", getGameLinkResult);
-                launchUrl = string.Empty;
-            }
+                var getGameLinkResult = await _gamesApiClient.GetGameLinkAsync(
+                    user.Casino.Id,
+                    session.Id,
+                    user.UserName,
+                    user.Currency.Name,
+                    request.Game,
+                    cancellationToken: cancellationToken);
 
-            var result = new Response(session.Id, user.Balance, getGameLinkResult.Data?.LaunchUrl ?? "");
+                launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
+            }
+            
+            var result = new Response(session.Id, user.Balance, launchUrl);
 
             return ResultFactory.Success(result);
         }

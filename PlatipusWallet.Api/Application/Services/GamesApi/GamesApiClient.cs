@@ -1,4 +1,4 @@
-namespace PlatipusWallet.Api.Application.Services.GamesApiService;
+namespace PlatipusWallet.Api.Application.Services.GamesApi;
 
 using System.Net;
 using System.Text.Json;
@@ -7,11 +7,10 @@ using DTOs.Base;
 using DTOs.Responses;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
-using Results.Common;
-using Results.Common.Result;
-using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
-using Results.External.Enums;
+using PlatipusWallet.Api.Results.Common;
+using PlatipusWallet.Api.Results.Common.Result.Factories;
+using PlatipusWallet.Api.Results.Common.Result.WithData;
+using PlatipusWallet.Api.Results.External.Enums;
 
 public class GamesApiClient : IGamesApiClient
 {
@@ -51,11 +50,28 @@ public class GamesApiClient : IGamesApiClient
             _jsonSerializerOptions,
             cancellationToken);
 
-        var responseResult = await response.GetResponseResult<GetLaunchUrlResponseDto>(
-            _jsonSerializerOptions,
-            cancellationToken);
+        if (response.StatusCode is not HttpStatusCode.OK)
+            return ResultFactory.Failure<GetLaunchUrlResponseDto>(ErrorCode.Unknown);
 
-        return responseResult;
+        var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        var jsonNode = JsonNode.Parse(responseString);
+        var responseStatusString = jsonNode?["status"]?.GetValue<string>();
+
+        if (responseStatusString is not null)
+        {
+            var responseStatus = Enum.Parse<Status>(responseStatusString);
+
+            if (responseStatus is not Status.ERROR)
+                return ResultFactory.Failure<GetLaunchUrlResponseDto>(ErrorCode.Unknown);
+            
+            var errorModel = jsonNode.Deserialize<BaseGamesApiErrorResponseDto>(_jsonSerializerOptions)!;
+            return ResultFactory.Failure<GetLaunchUrlResponseDto>(errorModel.Error);
+        }
+
+        var successModel = jsonNode.Deserialize<GetLaunchUrlResponseDto>(_jsonSerializerOptions)!;
+
+        return ResultFactory.Success(successModel);
     }
 
     public async Task<IResult<GetCasinoGamesListResponseDto>> GetCasinoGamesAsync(
@@ -130,7 +146,7 @@ public static class HttpClientExtensions
 
             if (responseStatusString is null)
                 return ResultFactory.Failure<T>(ErrorCode.Unknown);
-            
+
             var responseStatus = Enum.Parse<Status>(responseStatusString);
 
             if (responseStatus is Status.ERROR)

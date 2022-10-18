@@ -23,5 +23,6 @@ public enum ErrorCode
     AwardIsAlreadyCanceled = 19,
     AwardDoesNotExist = 20,
     Unknown = 100,
+    InvalidHash = 101,
     CouldNotTryToMockSessionError = 1000
 }

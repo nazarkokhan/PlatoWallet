@@ -1,11 +1,11 @@
-namespace PlatipusWallet.Api.Application.Services.GamesApiService;
+namespace PlatipusWallet.Api.Application.Services.GamesApi;
 
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
-using Domain.Entities;
-using Infrastructure.Persistence;
+using PlatipusWallet.Domain.Entities;
+using PlatipusWallet.Infrastructure.Persistence;
 
 public class RequestSignatureRelegatingHandler : DelegatingHandler
 {

@@ -1,4 +1,4 @@
-namespace PlatipusWallet.Api.Application.Services.GamesApiService.DTOs.Responses;
+namespace PlatipusWallet.Api.Application.Services.GamesApi.DTOs.Responses;
 
 using PlatipusWallet.Api.Application.Requests.Base.Responses;
 

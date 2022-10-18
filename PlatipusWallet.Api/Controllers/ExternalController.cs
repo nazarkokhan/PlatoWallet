@@ -4,7 +4,7 @@ using Abstract;
 using Application.Requests.Base.Responses;
 using Application.Requests.DTOs;
 using Application.Requests.External;
-using Application.Services.GamesApiService.DTOs.Responses;
+using Application.Services.GamesApi.DTOs.Responses;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

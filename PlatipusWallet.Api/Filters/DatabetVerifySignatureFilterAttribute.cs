@@ -1,9 +1,12 @@
 namespace PlatipusWallet.Api.Filters;
 
 using Application.Requests.Base.Requests;
+using Domain.Entities;
+using Domain.Entities.Enums;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Results.Common;
 using Results.Common.Result.Factories;
 
@@ -19,34 +22,26 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var requestPath = context.HttpContext.Request.Path;
+        var requestRoute = context.HttpContext.Request.Path.Value!.Replace("/databet/", null);
 
-        var contextRouteData = context.RouteData;
-        var source = $"{requestPath}{baseRequest.GetSource()}";
-        
+        var source = $"{requestRoute}{baseRequest.GetSource()}";
+
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<WalletDbContext>();
+        var databetCasino = await dbContext.Set<Casino>()
+            .Where(c => c.Provider == CasinoProvider.Databet)
+            .Select(c => new
+            {
+                c.SignatureKey
+            })
+            .FirstAsync(context.HttpContext.RequestAborted);
 
-        var secretKey = "secret";
-        // var databetCasino = await dbContext.Set<Casino>() //TODO
-        //     .Where(c => c.Id == "databetCasino")
-        //     .Select(c => new
-        //     {
-        //         c.SignatureKey
-        //     })
-        //     .FirstOrDefaultAsync(context.HttpContext.RequestAborted);
-        //
-        // if (databetCasino is null)
-        // {
-        //     context.Result = DatabetResultFactory.Failure(DatabetErrorCode.SystemError).ToActionResult();
-        //     return;
-        // }
-        // secretKey = databetCasino.SignatureKey;
+        var secretKey = databetCasino.SignatureKey;
         
         var isValidJSysHash = baseRequest.IsValidDatabetHash(source, secretKey);
 
         if (!isValidJSysHash)
         {
-            context.Result = DatabetResultFactory.Failure(DatabetErrorCode.SystemError).ToActionResult();
+            context.Result = DatabetResultFactory.Failure(DatabetErrorCode.InvalidHash).ToActionResult();
             return;
         }
         

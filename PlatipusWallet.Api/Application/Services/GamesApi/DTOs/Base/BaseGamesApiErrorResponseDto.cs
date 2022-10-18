@@ -1,7 +1,7 @@
-namespace PlatipusWallet.Api.Application.Services.GamesApiService.DTOs.Base;
+namespace PlatipusWallet.Api.Application.Services.GamesApi.DTOs.Base;
 
 using PlatipusWallet.Api.Application.Requests.Base.Responses;
-using Results.Common;
+using PlatipusWallet.Api.Results.Common;
 using PlatipusWallet.Api.Results.External.Enums;
 
 public record BaseGamesApiErrorResponseDto(

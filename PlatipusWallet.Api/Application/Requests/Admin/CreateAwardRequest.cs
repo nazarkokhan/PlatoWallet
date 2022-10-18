@@ -9,7 +9,7 @@ using Results.Common.Result.WithData;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
-using Services.GamesApiService;
+using Services.GamesApi;
 
 public record CreateAwardRequest(
     //TODO by user or session? Guid SessionId,

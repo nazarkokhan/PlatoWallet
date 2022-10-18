@@ -4,5 +4,5 @@ using Application.Requests.Base.Responses.Databet;
 using Common;
 
 public record DatabetErrorResponse(
-    DatabetErrorCode Status,
+    int Status,
     string Message) : DatabetBaseResponse(Status, Message);

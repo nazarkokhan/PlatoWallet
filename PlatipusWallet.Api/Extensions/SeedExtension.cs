@@ -63,7 +63,7 @@ public static class SeedExtension
             .Generate(20)
             .DistinctBy(x => x.Id)
             .ToList();
-        
+
         casinos.ForEach(x => x.CasinoCurrencies = new Faker<CasinoCurrencies>()
             .RuleFor(c => c.CurrencyId, c => c.PickRandom(currencies).Id)
             .Generate(5)

@@ -136,3 +136,4 @@
    at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
    at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
    at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2022-10-18T19:36:45.1668040Z Ignoring added logger provider Microsoft.EntityFrameworkCore.Design.Internal.OperationLoggerProvider

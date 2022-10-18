@@ -8,8 +8,8 @@ using Results.Common;
 using Results.Common.Result;
 using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
-using Services.GamesApiService;
-using Services.GamesApiService.DTOs.Responses;
+using Services.GamesApi;
+using Services.GamesApi.DTOs.Responses;
 
 public record GetCasinoGamesRequest(string CasinoId) : IRequest<IResult<GetCasinoGamesListResponseDto>>
 {
