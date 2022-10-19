@@ -11,11 +11,11 @@ using Filters;
 [Route("wallet/dafabet")]
 [ProducesResponseType(typeof(DatabetBaseResponse), StatusCodes.Status200OK)]
 [DatabetVerifySignatureFilter]
-public class DatabetWalletController : ApiController
+public class WalletDafabetController : ApiController
 {
     private readonly IMediator _mediator;
 
-    public DatabetWalletController(IMediator mediator) => _mediator = mediator;
+    public WalletDafabetController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("authorize")]
     [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
@@ -52,7 +52,7 @@ public class DatabetWalletController : ApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("cansel")]
+    [HttpPost("cancel")]
     [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CanselBet(
         DatabetCancelBetRequest request,

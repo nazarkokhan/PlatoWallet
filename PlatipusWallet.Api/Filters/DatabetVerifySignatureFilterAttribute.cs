@@ -22,7 +22,7 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var requestRoute = context.HttpContext.Request.Path.Value!.Replace("/wallet/datafet/", null);
+        var requestRoute = context.HttpContext.Request.Path.Value!.Replace("/wallet/dafafet/", null);
 
         var source = $"{requestRoute}{baseRequest.GetSource()}";
 

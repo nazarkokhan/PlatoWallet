@@ -9,14 +9,14 @@ using Abstract;
 using Extensions;
 using Filters;
 
-[Route("wallet/psv")]
+[Route("wallet/psw")]
 [ErrorMockActionFilter]
 // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)] //TODO
-public class WalletController : ApiController
+public class WalletPswController : ApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletController(IMediator mediator) => _mediator = mediator;
+    public WalletPswController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("balance")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
