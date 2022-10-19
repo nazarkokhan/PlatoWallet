@@ -35,7 +35,7 @@ public class VerifySignatureMiddleware : IMiddleware
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (!context.Request.Path.StartsWithSegments("/wallet"))
+        if (!context.Request.Path.StartsWithSegments("/wallet/psv"))
         {
             await next(context);
             return;

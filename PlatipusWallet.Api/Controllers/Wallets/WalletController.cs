@@ -9,7 +9,7 @@ using Abstract;
 using Extensions;
 using Filters;
 
-[Route("wallet")]
+[Route("wallet/psv")]
 [ErrorMockActionFilter]
 // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)] //TODO
 public class WalletController : ApiController

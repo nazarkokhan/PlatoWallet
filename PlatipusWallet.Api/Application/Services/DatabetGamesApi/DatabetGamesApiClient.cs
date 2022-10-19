@@ -29,6 +29,7 @@ public class DatabetGamesApiClient : IDatabetGamesApiClient
     {
         var queryParameters = new Dictionary<string, string?>()
         {
+            {"brand", "dafabet"},
             {nameof(gameCode), gameCode},
             {nameof(playerId), playerId},
             {nameof(playerToken), playerToken.ToString()},

@@ -8,7 +8,7 @@ using Application.Requests.Base.Responses.Databet;
 using Extensions;
 using Filters;
 
-[Route("databet")]
+[Route("wallet/dafabet")]
 [ProducesResponseType(typeof(DatabetBaseResponse), StatusCodes.Status200OK)]
 [DatabetVerifySignatureFilter]
 public class DatabetWalletController : ApiController
