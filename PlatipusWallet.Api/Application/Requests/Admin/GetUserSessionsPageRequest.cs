@@ -7,7 +7,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Extensions;
 using Base.Page;
-using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Domain.Entities;
 using Infrastructure.Persistence;

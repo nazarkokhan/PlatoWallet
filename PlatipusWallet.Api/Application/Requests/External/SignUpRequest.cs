@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Base.Responses;
 using Options;
 using Results.Common;
-using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Domain.Entities;
 using Infrastructure.Persistence;

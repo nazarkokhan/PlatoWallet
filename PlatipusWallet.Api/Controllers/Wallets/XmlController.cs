@@ -1,12 +1,5 @@
 namespace PlatipusWallet.Api.Controllers.Wallets;
 
-using System.Net.Mime;
-using Abstract;
-using Application.Requests.Test;
-using Extensions;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-
 // [Produces(MediaTypeNames.Application.Xml)]
 // [Consumes(MediaTypeNames.Application.Xml)]
 // public class XmlController : BaseApiController

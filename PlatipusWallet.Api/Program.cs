@@ -1,8 +1,5 @@
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Web;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
@@ -57,6 +54,14 @@ services
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
         })
+    // .AddJsonOptions(
+    //     "132", options =>
+    //     {
+    //         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
+    //         options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+    //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    //         options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
+    //     })
     // .AddXmlSerializerFormatters()
     .Services
     .Configure<JsonOptions>(
@@ -107,6 +112,8 @@ if (!app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.EnableBuffering();
 
 app.UseHttpLogging();
 

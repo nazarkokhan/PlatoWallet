@@ -43,7 +43,7 @@ public static class SeedExtension
             dbContext.SaveChanges();
 
             app.SeedFakeData(dbContext);
-            
+
             dbContextTransaction.Commit();
         }
 
@@ -64,11 +64,12 @@ public static class SeedExtension
             .DistinctBy(x => x.Id)
             .ToList();
 
-        casinos.ForEach(x => x.CasinoCurrencies = new Faker<CasinoCurrencies>()
-            .RuleFor(c => c.CurrencyId, c => c.PickRandom(currencies).Id)
-            .Generate(5)
-            .DistinctBy(d => d.CurrencyId)
-            .ToList());
+        casinos.ForEach(
+            x => x.CasinoCurrencies = new Faker<CasinoCurrencies>()
+                .RuleFor(c => c.CurrencyId, c => c.PickRandom(currencies).Id)
+                .Generate(5)
+                .DistinctBy(d => d.CurrencyId)
+                .ToList());
 
         var users = new Faker<User>()
             .RuleFor(u => u.UserName, u => u.Person.UserName.ToLower())
@@ -78,7 +79,7 @@ public static class SeedExtension
             .Generate(1000)
             .DistinctBy(u => u.UserName)
             .ToList();
-        
+
         users.ForEach(
             u => u.CurrencyId = new Faker()
                 .PickRandom(
@@ -86,7 +87,7 @@ public static class SeedExtension
                         .First(x => x.Id == u.CasinoId)
                         .CasinoCurrencies)
                 .CurrencyId);
-        
+
         dbContext.AddRange(casinos);
         dbContext.AddRange(users);
         dbContext.SaveChanges();

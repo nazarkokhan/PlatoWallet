@@ -5,7 +5,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using DTOs;
 using Results.Common;
-using Results.Common.Result;
 using Results.Common.Result.WithData;
 using Domain.Entities;
 using Infrastructure.Persistence;

@@ -8,7 +8,6 @@ using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Results.Common;
-using Results.Common.Result;
 using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
 

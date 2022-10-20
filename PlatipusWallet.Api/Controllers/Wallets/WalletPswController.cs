@@ -1,4 +1,5 @@
 // ReSharper disable UnusedParameter.Global
+
 namespace PlatipusWallet.Api.Controllers.Wallets;
 
 using MediatR;
@@ -21,7 +22,8 @@ public class WalletPswController : ApiController
     [HttpPost("balance")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
-        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        [FromHeader(Name = PswHeaders.XRequestSign)]
+        string sign,
         GetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -29,7 +31,8 @@ public class WalletPswController : ApiController
     [HttpPost("bet")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        [FromHeader(Name = PswHeaders.XRequestSign)]
+        string sign,
         BetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -37,15 +40,17 @@ public class WalletPswController : ApiController
     [HttpPost("win")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
-        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        [FromHeader(Name = PswHeaders.XRequestSign)]
+        string sign,
         WinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpPost("rollback")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
-        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        [FromHeader(Name = PswHeaders.XRequestSign)]
+        string sign,
         RollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -53,7 +58,8 @@ public class WalletPswController : ApiController
     [HttpPost("award")]
     [ProducesResponseType(typeof(BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Award(
-        [FromHeader(Name = "X-REQUEST-SIGN")] string sign,
+        [FromHeader(Name = PswHeaders.XRequestSign)]
+        string sign,
         AwardRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

@@ -1,7 +1,7 @@
 namespace PlatipusWallet.Api.Application.Services.DatabetGamesApi;
 
 using GamesApi.DTOs.Responses;
-using PlatipusWallet.Api.Results.Common.Result.WithData;
+using Results.Common.Result.WithData;
 
 public interface IDatabetGamesApiClient
 {

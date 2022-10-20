@@ -11,6 +11,7 @@ using Results.Common;
 using PlatipusWallet.Api.Results.External.Enums;
 using Domain.Entities;
 using DTOs;
+using Filters;
 using Infrastructure.Persistence;
 using LazyCache;
 using Microsoft.Extensions.Caching.Memory;
@@ -41,7 +42,7 @@ public class VerifySignatureMiddleware : IMiddleware
             return;
         }
 
-        if (!context.Request.Headers.TryGetValue("X-REQUEST-SIGN", out var requestSignature))
+        if (!context.Request.Headers.TryGetValue(PswHeaders.XRequestSign, out var requestSignature))
         {
             const ErrorCode errorCode = ErrorCode.MissingSignature;
             var response = new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());

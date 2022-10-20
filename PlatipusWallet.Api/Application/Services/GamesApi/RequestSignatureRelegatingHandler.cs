@@ -4,8 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
-using PlatipusWallet.Domain.Entities;
-using PlatipusWallet.Infrastructure.Persistence;
+using Domain.Entities;
+using Filters;
+using Infrastructure.Persistence;
 
 public class RequestSignatureRelegatingHandler : DelegatingHandler
 {
@@ -47,7 +48,7 @@ public class RequestSignatureRelegatingHandler : DelegatingHandler
         var hashedRequest = HMACSHA256.HashData(signatureKeyBytes, requestBytes);
         var xRequestSign = Convert.ToHexString(hashedRequest).ToLower();
 
-        request.Headers.Add("X-REQUEST-SIGN", xRequestSign);
+        request.Headers.Add(PswHeaders.XRequestSign, xRequestSign);
 
         _logger.LogInformation(
             "GamesApi Request: {GamesApiRequest}, X-REQUEST-SIGN: {GamesApi.RequestSign}", 

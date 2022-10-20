@@ -5,7 +5,7 @@ using GamesApi;
 using GamesApi.DTOs.Responses;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
-using PlatipusWallet.Api.Results.Common.Result.WithData;
+using Results.Common.Result.WithData;
 
 public class DatabetGamesApiClient : IDatabetGamesApiClient
 {
