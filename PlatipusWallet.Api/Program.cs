@@ -59,7 +59,7 @@ services
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
         })
     .AddJsonOptions(nameof(CasinoProvider.Dafabet), options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); })
-    .AddXmlSerializerFormatters()
+    // .AddXmlSerializerFormatters()
     .Services
     .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
     .Configure<SupportedCountriesOptions>(builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind)
