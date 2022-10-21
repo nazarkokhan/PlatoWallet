@@ -78,7 +78,7 @@ public record LogInRequest(
 
             string launchUrl;
 
-            if (casino.Provider is CasinoProvider.Databet)
+            if (casino.Provider is CasinoProvider.Dafabet)
             {
                 var launchResult = await _databetGamesApiClient.DatabetLaunchGameAsync(
                     request.Game,

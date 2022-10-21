@@ -1,10 +1,14 @@
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PlatipusWallet.Api.Application.Services.DatabetGamesApi;
 using PlatipusWallet.Api.Application.Services.GamesApi;
 using PlatipusWallet.Api.Extensions;
@@ -15,9 +19,9 @@ using PlatipusWallet.Api.StartupSettings.Extensions;
 using PlatipusWallet.Api.StartupSettings.JsonConverters;
 using PlatipusWallet.Api.StartupSettings.Middlewares;
 using PlatipusWallet.Api.StartupSettings.ServicesRegistrations;
+using PlatipusWallet.Domain.Entities.Enums;
 using PlatipusWallet.Infrastructure.Persistence;
 using Serilog;
-using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog(
@@ -54,24 +58,9 @@ services
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
         })
-    // .AddJsonOptions(
-    //     "132", options =>
-    //     {
-    //         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
-    //         options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
-    //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    //         options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
-    //     })
-    // .AddXmlSerializerFormatters()
+    .AddJsonOptions(nameof(CasinoProvider.Dafabet), options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); })
+    .AddXmlSerializerFormatters()
     .Services
-    .Configure<JsonOptions>(
-        options =>
-        {
-            options.SerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
-            options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
-            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            options.SerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
-        })
     .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
     .Configure<SupportedCountriesOptions>(builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind)
     .AddEndpointsApiExplorer()

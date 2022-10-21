@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 using Application.Requests.JSysWallet;
 using Abstract;
 using Application.Requests.Base.Responses.Databet;
+using Domain.Entities.Enums;
 using Extensions;
 using Filters;
+using StartupSettings;
 
 [Route("wallet/dafabet")]
 [ProducesResponseType(typeof(DatabetBaseResponse), StatusCodes.Status200OK)]
 [DatabetVerifySignatureFilter]
+[JsonSettingsName(nameof(CasinoProvider.Dafabet))]
 public class WalletDafabetController : ApiController
 {
     private readonly IMediator _mediator;

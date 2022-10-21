@@ -38,7 +38,7 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
 
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<WalletDbContext>();
         var databetCasino = await dbContext.Set<Casino>()
-            .Where(c => c.Provider == CasinoProvider.Databet)
+            .Where(c => c.Provider == CasinoProvider.Dafabet)
             .Select(
                 c => new
                 {

@@ -24,7 +24,7 @@ public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IResul
             CancellationToken cancellationToken)
         {
             var databetCasinos = await _context.Set<Casino>()
-                .Where(c => c.Provider == CasinoProvider.Databet)
+                .Where(c => c.Provider == CasinoProvider.Dafabet)
                 .ToListAsync(cancellationToken);
 
             foreach (var databetCasino in databetCasinos)
@@ -39,7 +39,7 @@ public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IResul
             if (casino is null)
                 return ResultFactory.Failure(ErrorCode.InvalidCasinoId);
 
-            casino.Provider = CasinoProvider.Databet;
+            casino.Provider = CasinoProvider.Dafabet;
 
             await _context.SaveChangesAsync(cancellationToken);
 
