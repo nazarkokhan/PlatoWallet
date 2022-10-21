@@ -97,13 +97,14 @@ services
 var app = builder.Build();
 
 app.UseExceptionHandler(exceptionAppBuilder => { exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>(); });
-app.UseMiddleware<LoggingMiddleware>();
 
 if (!app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<LoggingMiddleware>();
 
 app.EnableBuffering();
 

@@ -4,10 +4,10 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class ErrorMockConfiguration : IEntityTypeConfiguration<ErrorMock>
+public class MockedErrorConfiguration : IEntityTypeConfiguration<MockedError>
 {
-    public void Configure(EntityTypeBuilder<ErrorMock> builder)
+    public void Configure(EntityTypeBuilder<MockedError> builder)
     {
-        builder.ToTable("ErrorMocks");
+        builder.ToTable("MockedErrors");
     }
 }

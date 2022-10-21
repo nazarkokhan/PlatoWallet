@@ -24,5 +24,5 @@ public class User : Entity
     
     public List<Award> Awards { get; set; } = new();
     
-    // public List<MockedError> MockedErrors { get; set; } = new();
+    public List<MockedError> MockedErrors { get; set; } = new();
 }

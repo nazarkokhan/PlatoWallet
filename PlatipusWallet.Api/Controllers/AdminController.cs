@@ -14,7 +14,7 @@ public class AdminController : ApiController
 
     public AdminController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("mock-error")]
+    [HttpPost("error-mock")]
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
@@ -22,12 +22,12 @@ public class AdminController : ApiController
     public async Task<IActionResult> CreateCasino(CreateCasinoRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("casino/get-page")]
-    public async Task<IActionResult> GetCasinosPage(GetCasinosPageRequest request, CancellationToken cancellationToken)
+    [HttpGet("casino/page")]
+    public async Task<IActionResult> GetCasinosPage([FromQuery] GetCasinosPageRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("casino/user/get-page")]
-    public async Task<IActionResult> GetCasinoUsersPage(GetCasinoUsersPageRequest request, CancellationToken cancellationToken)
+    [HttpGet("casino/user/page")]
+    public async Task<IActionResult> GetCasinoUsersPage([FromQuery] GetCasinoUsersPageRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("award")]

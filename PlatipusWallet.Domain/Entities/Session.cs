@@ -8,6 +8,4 @@ public class Session : Entity
     public User User { get; set; } = null!;
 
     public DateTime ExpirationDate { get; set; }
-
-    public ErrorMock? ErrorMock { get; set; } = null!;
 }

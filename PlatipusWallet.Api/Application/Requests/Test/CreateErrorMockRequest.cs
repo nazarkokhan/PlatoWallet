@@ -1,6 +1,7 @@
 namespace PlatipusWallet.Api.Application.Requests.Test;
 
 using System.Net;
+using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -12,10 +13,12 @@ using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
 
 public record CreateErrorMockRequest(
-    Guid SessionId,
-    string MethodPath,
+    string UserName,
+    ErrorMockMethod Method,
     string Body,
-    HttpStatusCode HttpStatusCode) : IRequest<IResult>
+    HttpStatusCode HttpStatusCode,
+    string ContentType,
+    int Count) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<CreateErrorMockRequest, IResult>
     {
@@ -30,25 +33,39 @@ public record CreateErrorMockRequest(
             CreateErrorMockRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
-                .Where(e => e.Id == request.SessionId)
+            var user = await _context.Set<User>()
+                .Where(e => e.UserName == request.UserName)
+                .Include(u => u.MockedErrors)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (session is null)
+            if (user is null)
                 return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
 
-            if (session.ErrorMock is not null)
-                return ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError);
+            if (user.MockedErrors.Any(m => m.Method == request.Method))
+                return ResultFactory.Failure(ErrorCode.Duplication);
 
-            var errorMock = new ErrorMock
+            var allowedMediaTypes = new List<string>
             {
-                MethodPath = request.MethodPath,
-                Body = request.Body,
-                HttpStatusCode = request.HttpStatusCode,
-                SessionId = request.SessionId
+                MediaTypeNames.Application.Json,
+                MediaTypeNames.Text.Plain,
+                MediaTypeNames.Text.Xml,
+                MediaTypeNames.Text.Html
             };
 
-            _context.Add(errorMock);
+            var mockedError = new MockedError
+            {
+                Method = request.Method,
+                Body = request.Body,
+                HttpStatusCode = request.HttpStatusCode,
+                ContentType = allowedMediaTypes.Contains(request.ContentType)
+                    ? request.ContentType
+                    : MediaTypeNames.Application.Json,
+                Count = request.Count <= 0 ? 1 : request.Count
+            };
+
+            user.MockedErrors.Add(mockedError);
+            _context.Update(user);
+
             await _context.SaveChangesAsync(cancellationToken);
 
             return ResultFactory.Success();

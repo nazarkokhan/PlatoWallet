@@ -5,12 +5,12 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using DTOs.Base;
 using DTOs.Responses;
-using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Results.Common;
 using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
-using PlatipusWallet.Api.Results.External.Enums;
+using Results.External.Enums;
 
 public class GamesApiClient : IGamesApiClient
 {
@@ -20,7 +20,7 @@ public class GamesApiClient : IGamesApiClient
     public GamesApiClient(HttpClient httpClient, IOptions<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonSerializerOptions.Value.SerializerOptions;
+        _jsonSerializerOptions = jsonSerializerOptions.Value.JsonSerializerOptions;
     }
 
     public async Task<IResult<GetLaunchUrlResponseDto>> GetGameLinkAsync(

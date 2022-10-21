@@ -24,5 +24,6 @@ public enum ErrorCode
     AwardDoesNotExist = 20,
     Unknown = 100,
     InvalidHash = 101,
-    CouldNotTryToMockSessionError = 1000
+    CouldNotTryToMockSessionError = 1000,
+    Duplication = 1001
 }

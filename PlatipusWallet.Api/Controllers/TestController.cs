@@ -13,10 +13,6 @@ public class TestController : ApiController
 
     public TestController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("error-mock")]
-    public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
     [HttpPost("psw/get-hash-body")]
     public Task<IActionResult> PsvSignature(
         [FromBody] object request,

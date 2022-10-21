@@ -47,14 +47,7 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User) : IReque
                             .Select(
                                 s => new SessionDto(
                                     s.Id,
-                                    s.ExpirationDate,
-                                    s.ErrorMock == null
-                                        ? null
-                                        : new ErrorMockDto(
-                                            s.ErrorMock.Id,
-                                            s.ErrorMock.MethodPath,
-                                            s.ErrorMock.Body,
-                                            s.ErrorMock.HttpStatusCode)))
+                                    s.ExpirationDate))
                             .ToList()))
                 .ToListAsync(cancellationToken);
 
@@ -73,12 +66,5 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User) : IReque
 
     public record SessionDto(
         Guid Id,
-        DateTime ExpirationDate,
-        ErrorMockDto? ErrorMock);
-
-    public record ErrorMockDto(
-        Guid Id,
-        string MethodPath,
-        string Body,
-        HttpStatusCode HttpStatusCode);
+        DateTime ExpirationDate);
 }
