@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using PlatipusWallet.Api.Application.Services.DatabetGamesApi;
 using PlatipusWallet.Api.Application.Services.GamesApi;
@@ -32,25 +31,16 @@ var services = builder.Services;
 
 const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO to config
 services
-    // .AddHttpLogging(
-    //     options =>
-    //     {
-    //         foreach (var allowedHeader in StartupConstants.AllowedHeaders)
-    //             options.RequestHeaders.Add(allowedHeader);
-    //
-    //         options.LoggingFields = HttpLoggingFields.All;
-    //         options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
-    //         options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
-    //     })
     .AddTransient<VerifySignatureMiddleware>()
-    .AddTransient<TestBodyHashingMiddleware>()
     .AddTransient<ExceptionHandlerMiddleware>()
     .AddTransient<LoggingMiddleware>()
     .AddControllers(
         options =>
         {
+            options.Filters.Add<SaveRequestFilterAttribute>(1);
+
             options.Filters.Add<ActionResultFilterAttribute>(1);
-            // options.Filters.Add<LoggingFilterAttribute>(2);
+            options.Filters.Add<LoggingFilterAttribute>(2);
         })
     .AddJsonOptions(
         options =>
@@ -104,14 +94,9 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<LoggingMiddleware>();
-
 app.EnableBuffering();
 
 app.UseRequestLocalization();
-
-app.UseMiddleware<TestBodyHashingMiddleware>();
-app.UseMiddleware<VerifySignatureMiddleware>();
 
 app.MapControllers();
 

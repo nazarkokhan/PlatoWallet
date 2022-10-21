@@ -28,7 +28,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
         }
 
         var sessionId = context.ActionArguments
-            .Select(a => a.Value as BaseRequest)
+            .Select(a => a.Value as PswBaseRequest)
             .SingleOrDefault(a => a is not null)
             ?.SessionId; //TODO condition access code style settings
 
@@ -89,6 +89,6 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
 
         httpContext.Request.Body.Position = 0;
 
-        await next();
+        var executedContext = await next();
     }
 }

@@ -1,6 +1,5 @@
 namespace PlatipusWallet.Api.Filters;
 
-using System.Net.Mime;
 using Application.Requests.Base.Requests;
 using Controllers.Wallets;
 using Domain.Entities;
@@ -14,12 +13,12 @@ using Microsoft.EntityFrameworkCore;
 using Results.Common;
 using Results.Common.Result.Factories;
 
-public class ErrorMockActionFilterAttribute : ActionFilterAttribute
+public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var services = context.HttpContext.RequestServices;
-        var logger = services.GetRequiredService<ILogger<ErrorMockActionFilterAttribute>>();
+        var logger = services.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
         logger.LogInformation("Handling request with possible mocked error");
 
@@ -29,7 +28,7 @@ public class ErrorMockActionFilterAttribute : ActionFilterAttribute
 
         var username = context.Controller is WalletDafabetController
             ? context.ActionArguments.Select(a => a.Value as DatabetBaseRequest).SingleOrDefault(a => a is not null)?.PlayerId
-            : context.ActionArguments.Select(a => a.Value as BaseRequest).SingleOrDefault(a => a is not null)?.User;
+            : context.ActionArguments.Select(a => a.Value as PswBaseRequest).SingleOrDefault(a => a is not null)?.User;
 
         if (username is null)
         {

@@ -1,6 +1,6 @@
 namespace PlatipusWallet.Api.Application.Requests.External;
 
-using Api.Extensions;
+using Api.Extensions;using Base.Requests;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +19,7 @@ public record LogInRequest(
     string UserName,
     string Password,
     string CasinoId,
-    string Game) : IRequest<IResult<LogInRequest.Response>>
+    string Game) : BaseRequest, IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {

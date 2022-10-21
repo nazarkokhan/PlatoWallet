@@ -14,7 +14,7 @@ public record GetBalanceRequest(
     Guid SessionId,
     string User,
     string Currency,
-    string Game) : BaseRequest(SessionId, User), IRequest<IResult<BalanceResponse>>
+    string Game) : PswBaseRequest(SessionId, User), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<GetBalanceRequest, IResult<BalanceResponse>>
     {

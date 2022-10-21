@@ -76,6 +76,8 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
+            
+            context.HttpContext.Items.Add("response", errorResponse);
         }
     }
 }

@@ -11,8 +11,8 @@ using Extensions;
 using Filters;
 
 [Route("wallet/psw")]
-[ErrorMockActionFilter(Order = 1)]
-// [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)] //TODO
+[MockedErrorActionFilter(Order = 1)]
+[PswVerifySignatureFilter(Order = 2)]
 public class WalletPswController : ApiController
 {
     private readonly IMediator _mediator;

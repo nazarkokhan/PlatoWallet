@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
 
-public record GetCasinoUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetCasinoUsersPageRequest.Response>>>
+public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetUsersPageRequest.Response>>>
 {
-    public class Handler : IRequestHandler<GetCasinoUsersPageRequest, IResult<IPage<Response>>>
+    public class Handler : IRequestHandler<GetUsersPageRequest, IResult<IPage<Response>>>
     {
         private readonly WalletDbContext _context;
 
@@ -22,7 +22,7 @@ public record GetCasinoUsersPageRequest(PageRequest Page, string CasinoId) : IRe
         }
 
         public async Task<IResult<IPage<Response>>> Handle(
-            GetCasinoUsersPageRequest request,
+            GetUsersPageRequest request,
             CancellationToken cancellationToken)
         {
             var usersQuery = _context.Set<User>()

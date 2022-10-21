@@ -19,7 +19,7 @@ public record WinRequest(
     string RoundId,
     string TransactionId,
     bool Finished,
-    decimal Amount) : BaseRequest(SessionId, User), IRequest<IResult<BalanceResponse>>
+    decimal Amount) : PswBaseRequest(SessionId, User), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<WinRequest, IResult<BalanceResponse>>
     {

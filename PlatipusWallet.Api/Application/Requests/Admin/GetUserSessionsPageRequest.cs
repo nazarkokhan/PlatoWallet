@@ -1,6 +1,5 @@
 namespace PlatipusWallet.Api.Application.Requests.Admin;
 
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;

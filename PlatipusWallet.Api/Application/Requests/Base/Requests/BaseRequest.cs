@@ -1,3 +1,3 @@
 namespace PlatipusWallet.Api.Application.Requests.Base.Requests;
 
-public abstract record BaseRequest(Guid SessionId, string User);
+public abstract record BaseRequest;

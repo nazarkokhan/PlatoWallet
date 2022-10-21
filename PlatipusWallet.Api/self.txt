@@ -1,8 +1,0 @@
-2022-10-21T15:01:26.9875340Z Ignoring added logger provider Microsoft.EntityFrameworkCore.Design.Internal.OperationLoggerProvider
-2022-10-21T15:04:30.7423980Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.UnexpectedElasticsearchClientException: No nodes were attempted, this can happen when a node predicate does not match any nodes
- ---> Elasticsearch.Net.ElasticsearchClientException: No nodes were attempted, this can happen when a node predicate does not match any nodes
-   --- End of inner exception stack trace ---
-   at Elasticsearch.Net.RequestPipeline.ThrowNoNodesAttempted(RequestData requestData, List`1 seenExceptions)
-   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
-   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
-   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
