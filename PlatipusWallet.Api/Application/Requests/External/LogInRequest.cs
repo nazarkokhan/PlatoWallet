@@ -26,17 +26,13 @@ public record LogInRequest(
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
-        private readonly IDatabetGamesApiClient _databetGamesApiClient;
-        private readonly ILogger<Handler> _logger;
 
-        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient,
-            IDatabetGamesApiClient databetGamesApiClient,
-            ILogger<Handler> logger)
+        public Handler(
+            WalletDbContext context,
+            IGamesApiClient gamesApiClient)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
-            _databetGamesApiClient = databetGamesApiClient;
-            _logger = logger;
         }
 
         public async Task<IResult<Response>> Handle(
@@ -80,16 +76,13 @@ public record LogInRequest(
 
             if (casino.Provider is CasinoProvider.Dafabet)
             {
-                var launchResult = await _databetGamesApiClient.DatabetLaunchGameAsync(
+                launchUrl = GetDatabetLaunchUrl(
                     request.Game,
                     user.UserName,
                     session.Id,
                     user.Currency.Name,
                     null,
-                    DatabetHash.Compute($"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}", casino.SignatureKey),
-                    cancellationToken: cancellationToken);
-
-                launchUrl = launchResult.Data?.LaunchUrl ?? "";
+                    DatabetHash.Compute($"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}", casino.SignatureKey));
             }
             else
             {
@@ -103,11 +96,40 @@ public record LogInRequest(
 
                 launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
             }
-            
+
             var result = new Response(session.Id, user.Balance, launchUrl);
 
             return ResultFactory.Success(result);
         }
+    }
+
+    private static string GetDatabetLaunchUrl(
+        string gameCode,
+        string playerId,
+        Guid playerToken,
+        string currency,
+        string? language,
+        string hash)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            { "brand", "dafabet" },
+            { nameof(gameCode), gameCode },
+            { nameof(playerId), playerId },
+            { nameof(playerToken), playerToken.ToString() },
+            { nameof(currency), currency },
+        };
+
+        if (language is not null)
+            queryParameters.Add(nameof(language), language);
+
+        queryParameters.Add(nameof(hash), hash);
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"dafabet/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
     }
 
     public record Response(

@@ -1,14 +1,10 @@
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
 using MediatR;
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using PlatipusWallet.Api.Application.Services.DatabetGamesApi;
 using PlatipusWallet.Api.Application.Services.GamesApi;
 using PlatipusWallet.Api.Extensions;

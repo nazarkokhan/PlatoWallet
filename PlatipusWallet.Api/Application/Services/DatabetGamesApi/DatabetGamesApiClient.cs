@@ -44,7 +44,7 @@ public class DatabetGamesApiClient : IDatabetGamesApiClient
         var queryString = QueryString.Create(queryParameters);
 
         var response = await _httpClient.PostAsJsonAsync(
-            $"dafabet/launch{queryString.ToUriComponent()}",
+            $"launch{queryString.ToUriComponent()}",
             new { },
             _jsonSerializerOptions,
             cancellationToken);
