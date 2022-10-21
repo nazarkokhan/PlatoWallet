@@ -72,6 +72,6 @@ public record DatabetBetResultRequest(
 
     public override string GetSource()
     {
-        return PlayerId + Amount + GameCode + RoundId + TransactionId + EndRound;
+        return PlayerId + Amount + GameCode + RoundId + TransactionId + EndRound.ToString().ToLower();
     }
 }

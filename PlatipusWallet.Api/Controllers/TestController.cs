@@ -17,8 +17,8 @@ public class TestController : ApiController
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("get-hash-body")]
-    public Task<IActionResult> MockError(
+    [HttpPost("psw/get-hash-body")]
+    public Task<IActionResult> PsvSignature(
         [FromBody] object request,
         [FromQuery(Name = "signature_key")] string signatureKey,
         CancellationToken cancellationToken)
@@ -29,4 +29,25 @@ public class TestController : ApiController
                     Request = request,
                     SignatureKey = signatureKey
                 }));
+
+    [HttpPost("dafabet/get-hash-body")]
+    public Task<IActionResult> DafabetSignature(
+        [FromBody] Dictionary<string, string> request,
+        [FromQuery] string method,
+        [FromQuery(Name = "signature_key")] string signatureKey,
+        CancellationToken cancellationToken)
+    {
+        // var items = request
+        //     .OrderBy(x => x.Key)
+        //     .Select(x => x.Value)
+        //     .ToList();
+
+        var source = string.Concat(request.Values);
+        var result = new
+        {
+            Hash = DatabetHash.Compute($"{method}{source}", signatureKey)
+        };
+
+        return Task.FromResult<IActionResult>(Ok(result.Hash));
+    }
 }
