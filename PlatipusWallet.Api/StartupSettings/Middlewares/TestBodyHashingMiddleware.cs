@@ -8,7 +8,7 @@ public class TestBodyHashingMiddleware : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (context.Request.Path != "/test/get-hash-body")
+        if (context.Request.Path != "/test/psw/get-hash-body")
         {
             await next(context);
             return;
@@ -27,6 +27,6 @@ public class TestBodyHashingMiddleware : IMiddleware
 
         var validSignature = Convert.ToHexString(hmac);
 
-        await context.Response.WriteAsJsonAsync(validSignature.ToLower());
+        await context.Response.WriteAsJsonAsync(new { Signature = validSignature.ToLower() });
     }
 }

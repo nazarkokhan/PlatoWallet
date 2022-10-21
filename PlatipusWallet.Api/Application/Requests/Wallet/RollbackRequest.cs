@@ -18,7 +18,7 @@ public record RollbackRequest(
     string Game,
     string RoundId,
     string TransactionId,
-    decimal Amount) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
+    decimal Amount) : BaseRequest(SessionId, User), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<RollbackRequest, IResult<BalanceResponse>>
     {

@@ -13,7 +13,6 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
-using Services.DatabetGamesApi;
 using Services.GamesApi;
 
 public record LogInRequest(

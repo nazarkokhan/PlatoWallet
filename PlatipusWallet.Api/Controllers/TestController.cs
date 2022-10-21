@@ -48,6 +48,6 @@ public class TestController : ApiController
             Hash = DatabetHash.Compute($"{method}{source}", signatureKey)
         };
 
-        return Task.FromResult<IActionResult>(Ok(result.Hash));
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

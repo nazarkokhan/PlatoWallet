@@ -19,7 +19,7 @@ public record AwardRequest(
     string RoundId,
     string TransactionId,
     decimal Amount,
-    string AwardId) : BaseRequest(SessionId), IRequest<IResult<BalanceResponse>>
+    string AwardId) : BaseRequest(SessionId, User), IRequest<IResult<BalanceResponse>>
 {
     public class Handler : IRequestHandler<AwardRequest, IResult<BalanceResponse>>
     {

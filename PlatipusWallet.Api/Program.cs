@@ -32,20 +32,26 @@ var services = builder.Services;
 
 const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO to config
 services
-    .AddHttpLogging(
-        options =>
-        {
-            foreach (var allowedHeader in StartupConstants.AllowedHeaders)
-                options.RequestHeaders.Add(allowedHeader);
-
-            options.LoggingFields = HttpLoggingFields.All;
-            options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
-            options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
-        })
+    // .AddHttpLogging(
+    //     options =>
+    //     {
+    //         foreach (var allowedHeader in StartupConstants.AllowedHeaders)
+    //             options.RequestHeaders.Add(allowedHeader);
+    //
+    //         options.LoggingFields = HttpLoggingFields.All;
+    //         options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
+    //         options.RequestBodyLogLimit = 1 * 1024 * 1024; //1 MB
+    //     })
     .AddTransient<VerifySignatureMiddleware>()
     .AddTransient<TestBodyHashingMiddleware>()
     .AddTransient<ExceptionHandlerMiddleware>()
-    .AddControllers(options => { options.Filters.Add<ActionResultFilterAttribute>(); })
+    .AddTransient<LoggingMiddleware>()
+    .AddControllers(
+        options =>
+        {
+            options.Filters.Add<ActionResultFilterAttribute>(1);
+            // options.Filters.Add<LoggingFilterAttribute>(2);
+        })
     .AddJsonOptions(
         options =>
         {
@@ -91,6 +97,7 @@ services
 var app = builder.Build();
 
 app.UseExceptionHandler(exceptionAppBuilder => { exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>(); });
+app.UseMiddleware<LoggingMiddleware>();
 
 if (!app.Environment.IsProduction())
 {
@@ -99,8 +106,6 @@ if (!app.Environment.IsProduction())
 }
 
 app.EnableBuffering();
-
-app.UseHttpLogging();
 
 app.UseRequestLocalization();
 

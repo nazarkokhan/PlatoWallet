@@ -23,4 +23,6 @@ public class User : Entity
     public List<Session> Sessions { get; set; } = new();
     
     public List<Award> Awards { get; set; } = new();
+    
+    // public List<MockedError> MockedErrors { get; set; } = new();
 }

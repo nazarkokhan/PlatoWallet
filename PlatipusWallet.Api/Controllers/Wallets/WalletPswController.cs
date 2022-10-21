@@ -11,7 +11,7 @@ using Extensions;
 using Filters;
 
 [Route("wallet/psw")]
-[ErrorMockActionFilter]
+[ErrorMockActionFilter(Order = 1)]
 // [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)] //TODO
 public class WalletPswController : ApiController
 {
