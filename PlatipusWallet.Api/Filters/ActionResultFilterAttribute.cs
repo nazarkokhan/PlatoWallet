@@ -27,7 +27,8 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                context.Result = new OkObjectResult(new BaseResponse(Status.OK));
+                var baseResponse = new BaseResponse(Status.OK);
+                context.Result = new OkObjectResult(baseResponse);
                 return;
             }
 
@@ -51,14 +52,14 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
         {
             if (actionDatabetResult.Result.IsSuccess)
             {
-                const DatabetErrorCode databetErrorCode = DatabetErrorCode.Success;
-                var databetBaseResponse = new DatabetBaseResponse(databetErrorCode, databetErrorCode.ToString());
                 if (actionDatabetResult.Result is IDatabetResult<object> objectResult)
                 {
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
 
+                const DatabetErrorCode databetErrorCode = DatabetErrorCode.Success;
+                var databetBaseResponse = new DatabetBaseResponse(databetErrorCode, databetErrorCode.ToString());
                 context.Result = new OkObjectResult(databetBaseResponse);
                 return;
             }

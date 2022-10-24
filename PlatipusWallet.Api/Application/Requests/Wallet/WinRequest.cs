@@ -42,10 +42,7 @@ public record WinRequest(
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (round is null)
-                return ResultFactory.Failure<BalanceResponse>(ErrorCode.BadParametersInTheRequest);
-
-            if (round.Transactions.Any(t => t.Id == request.TransactionId))
+            if (round is null || round.Transactions.Any(t => t.Id == request.TransactionId))
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
 
             if (round.Finished)

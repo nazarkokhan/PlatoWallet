@@ -1,8 +1,12 @@
 namespace PlatipusWallet.Api.Filters;
 
 using System.Text;
+using System.Text.Json;
+using Controllers.Wallets;
+using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Results.External;
 
 public class LoggingFilterAttribute : ResultFilterAttribute
 {
@@ -19,14 +23,28 @@ public class LoggingFilterAttribute : ResultFilterAttribute
         var requestHeaders = httpContext.Request.Headers.ToDictionary(x => x.Key, x => x.Value);
         var responseHeaders = httpContext.Response.Headers.ToDictionary(x => x.Key, x => x.Value);
 
-        logger.LogInformation(
+        var isError = response is ErrorResponse or DatabetErrorResponse;
+
+        var provider = context.Controller switch
+        {
+            WalletPswController => CasinoProvider.Psv.ToString(),
+            WalletDafabetController => CasinoProvider.Dafabet.ToString(),
+            _ => "Other"
+        };
+        
+        logger.Log(
+            isError ? LogLevel.Error : LogLevel.Information,
+            "Provider: {Provider} \n" +
             "RawRequestBody: {RawRequestBody} \n" +
             "RequestBody: {@RequestBody} \n" +
+            "RawResponseBody: {RawResponseBody} \n" +
             "ResponseBody: {@ResponseBody} \n" +
             "RequestHeaders: {@RequestHeaders} \n" +
             "ResponseHeaders: {@ResponseHeaders} \n",
+            provider,
             Encoding.UTF8.GetString(rawRequestBytes),
             request,
+            JsonSerializer.Serialize(response),
             response,
             requestHeaders,
             responseHeaders);
