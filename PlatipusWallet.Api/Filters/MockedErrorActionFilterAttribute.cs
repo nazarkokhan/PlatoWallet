@@ -17,14 +17,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var services = context.HttpContext.RequestServices;
+        var httpContext = context.HttpContext;
+        var services = httpContext.RequestServices;
         var logger = services.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
         logger.LogInformation("Handling request with possible mocked error");
 
-        // Before controller action
         var executedContext = await next();
-        // After controller action
 
         var username = context.Controller is WalletDafabetController
             ? context.ActionArguments.Select(a => a.Value as DatabetBaseRequest).SingleOrDefault(a => a is not null)?.PlayerId
@@ -86,7 +85,16 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
         else
         {
-            logger.LogInformation("Executing mocked error {@MockedError}", mockedError);
+            logger.LogInformation(
+                "Executing mocked error {@MockedError}", new
+                {
+                    mockedError.Method,
+                    mockedError.Body,
+                    mockedError.HttpStatusCode,
+                    mockedError.ContentType,
+                    mockedError.Count,
+                    mockedError.UserId
+                });
 
             executedContext.Result = new ObjectResult(mockedError.Body)
             {
