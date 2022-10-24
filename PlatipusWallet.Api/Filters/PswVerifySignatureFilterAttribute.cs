@@ -75,6 +75,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
+        httpContext.Request.Body.Position = 0; //TODO get from HttpContext.Items
         var buffer = new byte[Convert.ToInt32(httpContext.Request.ContentLength)];
         _ = await httpContext.Request.Body.ReadAsync(buffer);
 
@@ -87,8 +88,6 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
             context.Result = ResultFactory.Failure(ErrorCode.InvalidSignature).ToActionResult();
             return;
         }
-
-        httpContext.Request.Body.Position = 0;
 
         var executedContext = await next();
     }
