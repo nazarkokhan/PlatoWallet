@@ -14,7 +14,7 @@ public static class MiddlewareExtension
                 _ = await context.Request.Body.ReadAsync(requestBytes);
                 context.Request.Body.Position = 0;
                 
-                context.Items.Add("rawRequest", Encoding.UTF8.GetString(requestBytes));
+                context.Items.Add("rawRequestBytes", requestBytes);
                 await next();
             });
 }

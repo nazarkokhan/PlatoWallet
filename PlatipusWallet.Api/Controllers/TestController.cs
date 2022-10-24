@@ -33,11 +33,10 @@ public class TestController : ApiController
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.InvalidCasinoId).ToActionResult();
 
-        var buffer = new byte[Convert.ToInt32(HttpContext.Request.ContentLength)];
-        _ = await HttpContext.Request.Body.ReadAsync(buffer, cancellationToken);
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
         var signatureKeyBytes = Encoding.UTF8.GetBytes(casino.SignatureKey);
-        var hmac = HMACSHA256.HashData(signatureKeyBytes, buffer);
+        var hmac = HMACSHA256.HashData(signatureKeyBytes, rawRequestBytes);
         var validSignature = Convert.ToHexString(hmac);
 
         var result = new { Signature = validSignature.ToLower() };

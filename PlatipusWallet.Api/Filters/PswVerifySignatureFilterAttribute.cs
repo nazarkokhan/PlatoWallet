@@ -75,12 +75,10 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        httpContext.Request.Body.Position = 0; //TODO get from HttpContext.Items
-        var buffer = new byte[Convert.ToInt32(httpContext.Request.ContentLength)];
-        _ = await httpContext.Request.Body.ReadAsync(buffer);
+        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
 
         var signatureKeyBytes = Encoding.UTF8.GetBytes(session.CasinoSignatureKey);
-        var hmac = HMACSHA256.HashData(signatureKeyBytes, buffer);
+        var hmac = HMACSHA256.HashData(signatureKeyBytes, rawRequestBytes);
         var ownSignature = Convert.ToHexString(hmac);
 
         if (!ownSignature.Equals(xRequestSign, StringComparison.InvariantCultureIgnoreCase))

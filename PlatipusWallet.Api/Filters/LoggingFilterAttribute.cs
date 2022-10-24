@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Filters;
 
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -11,7 +12,7 @@ public class LoggingFilterAttribute : ResultFilterAttribute
 
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
-        var rawRequest = httpContext.Items["rawRequest"];
+        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
         var request = httpContext.Items["request"];
         var response = (context.Result as OkObjectResult)?.Value;
 
@@ -24,7 +25,7 @@ public class LoggingFilterAttribute : ResultFilterAttribute
             "ResponseBody: {@ResponseBody} \n" +
             "RequestHeaders: {@RequestHeaders} \n" +
             "ResponseHeaders: {@ResponseHeaders} \n",
-            rawRequest,
+            Encoding.UTF8.GetString(rawRequestBytes),
             request,
             response,
             requestHeaders,
