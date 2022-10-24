@@ -7,7 +7,7 @@ public class Casino : Entity<string>
 {
     public string SignatureKey { get; set; } = null!;
 
-    public CasinoProvider? Provider { get; set; } = null!;
+    public CasinoProvider? Provider { get; set; }
     
     public List<User> Users { get; set; } = new();
     

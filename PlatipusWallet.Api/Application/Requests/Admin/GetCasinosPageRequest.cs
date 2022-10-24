@@ -2,6 +2,7 @@ namespace PlatipusWallet.Api.Application.Requests.Admin;
 
 using Base.Page;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using DTOs;
 using Extensions;
 using Infrastructure.Persistence;
@@ -10,7 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Results.Common.Result.Factories;
 using Results.Common.Result.WithData;
 
-public record GetCasinosPageRequest(PageRequest Page) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
+public record GetCasinosPageRequest(
+    PageRequest Page,
+    string? CasinoId,
+    CasinoProvider? Provider) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
 {
     public class Handler : IRequestHandler<GetCasinosPageRequest, IResult<IPage<Response>>>
     {
@@ -28,6 +32,14 @@ public record GetCasinosPageRequest(PageRequest Page) : IRequest<IResult<IPage<G
             var casinosQuery = _context.Set<Casino>()
                 .AsNoTracking();
 
+            if (request.CasinoId is not null)
+                casinosQuery = casinosQuery
+                    .Where(c => c.Id == request.CasinoId);
+
+            if (request.Provider is not null)
+                casinosQuery = casinosQuery
+                    .Where(c => c.Provider == request.Provider);
+            
             var totalCount = await casinosQuery.CountAsync(cancellationToken);
 
             casinosQuery = casinosQuery
@@ -39,6 +51,7 @@ public record GetCasinosPageRequest(PageRequest Page) : IRequest<IResult<IPage<G
                     c => new Response(
                         c.Id,
                         c.SignatureKey,
+                        c.Provider,
                         c.CasinoCurrencies
                             .Select(cu => cu.Currency)
                             .Select(cu => new GetCurrencyDto(cu.Id, cu.Name))
@@ -54,5 +67,6 @@ public record GetCasinosPageRequest(PageRequest Page) : IRequest<IResult<IPage<G
     public record Response(
         string Id,
         string SignatureKey,
+        CasinoProvider? Provider,
         List<GetCurrencyDto> Currencies);
 }

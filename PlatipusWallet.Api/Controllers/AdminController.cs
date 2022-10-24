@@ -18,19 +18,15 @@ public class AdminController : ApiController
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
-    // [HttpGet("usererror-mock")]
-    // public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
     [HttpPost("casino")]
     public async Task<IActionResult> CreateCasino(CreateCasinoRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpGet("casino/page")]
+    [HttpGet("casinos/page")]
     public async Task<IActionResult> GetCasinosPage([FromQuery] GetCasinosPageRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpGet("user/page")]
+    [HttpGet("users/page")]
     public async Task<IActionResult> GetUsersPage([FromQuery] GetUsersPageRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
@@ -38,7 +34,7 @@ public class AdminController : ApiController
     public async Task<IActionResult> CreateAward(CreateAwardRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPut("casino/set-databet-provider")]
+    [HttpPut("casinos/set-databet-provider")]
     public async Task<IActionResult> SetDatabetCasinoProvider(SetDatabetCasinoProviderRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

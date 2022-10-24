@@ -1,4 +1,4 @@
-namespace PlatipusWallet.Api.Filters;
+namespace PlatipusWallet.Api.StartupSettings;
 
 public static class PswHeaders
 {

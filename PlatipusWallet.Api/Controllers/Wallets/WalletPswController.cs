@@ -9,6 +9,7 @@ using Application.Requests.Wallet;
 using Abstract;
 using Extensions;
 using Filters;
+using StartupSettings;
 
 [Route("wallet/psw")]
 [MockedErrorActionFilter(Order = 1)]

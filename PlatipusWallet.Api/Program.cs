@@ -94,7 +94,7 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-app.EnableBuffering();
+app.EnableBufferingAndSaveRawRequest();
 
 app.UseRequestLocalization();
 

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Filters;
 using Infrastructure.Persistence;
+using StartupSettings;
 
 public class RequestSignatureRelegatingHandler : DelegatingHandler
 {

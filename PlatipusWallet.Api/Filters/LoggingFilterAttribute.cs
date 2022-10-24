@@ -11,6 +11,7 @@ public class LoggingFilterAttribute : ResultFilterAttribute
 
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
+        var rawRequest = httpContext.Items["rawRequest"];
         var request = httpContext.Items["request"];
         var response = (context.Result as OkObjectResult)?.Value;
 
@@ -18,10 +19,12 @@ public class LoggingFilterAttribute : ResultFilterAttribute
         var responseHeaders = httpContext.Response.Headers.ToDictionary(x => x.Key, x => x.Value);
 
         logger.LogInformation(
+            "RawRequestBody: {@RequestBody.Raw} \n" +
             "RequestBody: {@RequestBody} \n" +
             "ResponseBody: {@ResponseBody} \n" +
             "RequestHeaders: {@RequestHeaders} \n" +
             "ResponseHeaders: {@ResponseHeaders} \n",
+            rawRequest,
             request,
             response,
             requestHeaders,
