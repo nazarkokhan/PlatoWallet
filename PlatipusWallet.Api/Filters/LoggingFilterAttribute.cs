@@ -19,7 +19,7 @@ public class LoggingFilterAttribute : ResultFilterAttribute
         var responseHeaders = httpContext.Response.Headers.ToDictionary(x => x.Key, x => x.Value);
 
         logger.LogInformation(
-            "RawRequestBody: {@RawRequestBody} \n" +
+            "RawRequestBody: {RawRequestBody} \n" +
             "RequestBody: {@RequestBody} \n" +
             "ResponseBody: {@ResponseBody} \n" +
             "RequestHeaders: {@RequestHeaders} \n" +
