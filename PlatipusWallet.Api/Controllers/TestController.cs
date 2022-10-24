@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Abstract;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -45,15 +46,27 @@ public class TestController : ApiController
     }
 
     [HttpPost("dafabet/get-hash-body")]
-    public Task<IActionResult> DafabetSignature(
+    public async Task<IActionResult> DafabetSignature(
         [FromBody] Dictionary<string, string> request,
         [FromQuery] string method,
-        [FromQuery(Name = "signature_key")] string signatureKey,
+        [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
-        var source = string.Concat(request.Values);
-        var result = new { Hash = DatabetHash.Compute($"{method}{source}", signatureKey) };
+        var casino = await dbContext.Set<Casino>()
+            .Where(c => c.Provider == CasinoProvider.Dafabet)
+            .Select(
+                c => new
+                {
+                    c.SignatureKey
+                })
+            .FirstOrDefaultAsync(cancellationToken);
 
-        return Task.FromResult<IActionResult>(Ok(result));
+        if (casino is null)
+            return ResultFactory.Failure(ErrorCode.InvalidCasinoId).ToActionResult();
+        
+        var source = string.Concat(request.Values);
+        var result = new { Hash = DatabetHash.Compute($"{method}{source}", casino.SignatureKey) };
+
+        return Ok(result);
     }
 }
