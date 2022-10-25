@@ -53,11 +53,9 @@ public static class SerilogElasticsearchConfigurationExtensions
         return options;
     }
 
-    public static LoggerConfiguration ConfigurationWithElasticsearch(this LoggerSettingsConfiguration readFrom, IConfiguration configuration)
-        => readFrom.Configuration(configuration)
-            .RemoveElasticsearchSinkOptionsTypeNameIfExist();
-
-    public static LoggerConfiguration OverrideElasticsearchSinkOptions(this LoggerConfiguration configuration, Action<ElasticsearchSinkOptions> options)
+    public static LoggerConfiguration ConfigureElasticsearchSinkOptions(
+        this LoggerConfiguration configuration,
+        Action<ElasticsearchSinkOptions> options)
     {
         var elasticsearchSinkOptions = configuration.GetElasticsearchSinkOptions();
 
@@ -67,10 +65,5 @@ public static class SerilogElasticsearchConfigurationExtensions
         options(elasticsearchSinkOptions);
 
         return configuration;
-    }
-
-    public static LoggerConfiguration RemoveElasticsearchSinkOptionsTypeNameIfExist(this LoggerConfiguration configuration)
-    {
-        return configuration.OverrideElasticsearchSinkOptions(options => options.TypeName = null);
     }
 }
