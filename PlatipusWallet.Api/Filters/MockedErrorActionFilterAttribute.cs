@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Filters;
 
+using System.Text.Json;
 using Application.Requests.Base.Requests;
 using Controllers.Wallets;
 using Domain.Entities;
@@ -96,7 +97,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     mockedError.UserId
                 });
 
-            executedContext.Result = new ObjectResult(mockedError.Body)
+            // executedContext.Result = new ContentResult()
+            // {
+            //     Content = mockedError.Body,
+            //     StatusCode = (int?)mockedError.HttpStatusCode,
+            //     ContentType =  mockedError.ContentType 
+            // };
+            executedContext.Result = new ObjectResult(JsonSerializer.Deserialize<object>(mockedError.Body))
             {
                 StatusCode = (int?)mockedError.HttpStatusCode,
                 ContentTypes = new MediaTypeCollection { mockedError.ContentType }
@@ -106,5 +113,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
 
         await dbContext.SaveChangesAsync();
+
+        // executedContext.Canceled = true; // TODO
     }
 }

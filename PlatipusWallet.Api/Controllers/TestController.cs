@@ -2,6 +2,7 @@ namespace PlatipusWallet.Api.Controllers;
 
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Abstract;
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -15,6 +16,16 @@ using Results.Common.Result.Factories;
 [Route("test")]
 public class TestController : ApiController
 {
+    [HttpPost("stringify")]
+    public async Task<IActionResult> Stringify(
+        [FromBody] object request,
+        CancellationToken cancellationToken)
+    {
+        var result = new { JsonString = JsonSerializer.Serialize(request) };
+
+        return Ok(result);
+    }
+
     [HttpPost("psw/get-hash-body")]
     public async Task<IActionResult> PsvSignature(
         string casinoId,
