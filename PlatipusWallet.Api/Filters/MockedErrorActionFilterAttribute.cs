@@ -78,38 +78,36 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        if (mockedError.Count is 0)
+        logger.LogInformation(
+            "Executing mocked error {@MockedError}", new
+            {
+                mockedError.Method,
+                mockedError.Body,
+                mockedError.HttpStatusCode,
+                mockedError.ContentType,
+                mockedError.Count,
+                mockedError.UserId
+            });
+
+        // executedContext.Result = new ContentResult()
+        // {
+        //     Content = mockedError.Body,
+        //     StatusCode = (int?)mockedError.HttpStatusCode,
+        //     ContentType =  mockedError.ContentType 
+        // };
+        executedContext.Result = new ObjectResult(JsonSerializer.Deserialize<object>(mockedError.Body))
+        {
+            StatusCode = (int?)mockedError.HttpStatusCode,
+            ContentTypes = new MediaTypeCollection { mockedError.ContentType }
+        };
+
+        mockedError.Count -= 1;
+
+        if (mockedError.Count <= 0)
         {
             logger.LogInformation("Mocked error count is 0, deleting it");
             dbContext.Remove(mockedError);
             logger.LogInformation("Mocked error deleted");
-        }
-        else
-        {
-            logger.LogInformation(
-                "Executing mocked error {@MockedError}", new
-                {
-                    mockedError.Method,
-                    mockedError.Body,
-                    mockedError.HttpStatusCode,
-                    mockedError.ContentType,
-                    mockedError.Count,
-                    mockedError.UserId
-                });
-
-            // executedContext.Result = new ContentResult()
-            // {
-            //     Content = mockedError.Body,
-            //     StatusCode = (int?)mockedError.HttpStatusCode,
-            //     ContentType =  mockedError.ContentType 
-            // };
-            executedContext.Result = new ObjectResult(JsonSerializer.Deserialize<object>(mockedError.Body))
-            {
-                StatusCode = (int?)mockedError.HttpStatusCode,
-                ContentTypes = new MediaTypeCollection { mockedError.ContentType }
-            };
-
-            mockedError.Count -= 1;
         }
 
         await dbContext.SaveChangesAsync();
