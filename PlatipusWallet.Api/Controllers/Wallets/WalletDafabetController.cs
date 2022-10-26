@@ -12,7 +12,8 @@ using StartupSettings;
 
 [Route("wallet/dafabet")]
 [ProducesResponseType(typeof(DatabetBaseResponse), StatusCodes.Status200OK)]
-[DatabetVerifySignatureFilter(Order = 1)]
+[MockedErrorActionFilter(Order = 1)]
+[DatabetVerifySignatureFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Dafabet))]
 public class WalletDafabetController : ApiController
 {
