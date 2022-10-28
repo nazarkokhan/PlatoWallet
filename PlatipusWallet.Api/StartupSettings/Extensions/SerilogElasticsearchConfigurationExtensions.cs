@@ -2,7 +2,6 @@ namespace PlatipusWallet.Api.StartupSettings.Extensions;
 
 using System.Reflection;
 using Serilog;
-using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Sinks.Elasticsearch;

@@ -30,6 +30,7 @@ public record GetBalanceRequest(
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
+                .TagWith("GetUserBalance")
                 .Where(u => u.UserName == request.User &&
                             u.Sessions
                                 .Select(s => s.Id)

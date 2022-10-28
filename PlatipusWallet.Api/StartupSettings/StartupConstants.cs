@@ -1,7 +1,5 @@
 namespace PlatipusWallet.Api.StartupSettings;
 
-using Filters;
-
 public static class StartupConstants
 {
     public static readonly List<string> AllowedHeaders = new()

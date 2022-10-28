@@ -25,7 +25,11 @@
         <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.9" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
         <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+        <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
+        <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" />
+        <PackageReference Include="Serilog.Enrichers.EC2" Version="0.0.19" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+        <PackageReference Include="Serilog.Enrichers.WithCaller" Version="1.2.0" />
         <PackageReference Include="Serilog.Formatting.Elasticsearch" Version="9.0.0-beta7" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
@@ -43,6 +47,10 @@
     <ItemGroup>
       <None Remove="logs\log-20220929.txt" />
       <None Remove="self.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="logs" />
     </ItemGroup>
 
 </Project>

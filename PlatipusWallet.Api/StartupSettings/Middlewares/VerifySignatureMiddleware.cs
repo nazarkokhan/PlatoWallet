@@ -11,7 +11,6 @@ using Results.Common;
 using PlatipusWallet.Api.Results.External.Enums;
 using Domain.Entities;
 using DTOs;
-using Filters;
 using Infrastructure.Persistence;
 using LazyCache;
 using Microsoft.Extensions.Caching.Memory;

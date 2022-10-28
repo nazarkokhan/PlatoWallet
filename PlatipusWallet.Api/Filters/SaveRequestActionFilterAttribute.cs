@@ -2,7 +2,7 @@ namespace PlatipusWallet.Api.Filters;
 
 using Microsoft.AspNetCore.Mvc.Filters;
 
-public class SaveRequestFilterAttribute : ActionFilterAttribute
+public class SaveRequestActionFilterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {

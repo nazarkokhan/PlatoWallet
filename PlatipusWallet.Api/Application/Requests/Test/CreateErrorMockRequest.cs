@@ -34,6 +34,7 @@ public record CreateErrorMockRequest(
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
+                .TagWith("GetUserWithMockedError")
                 .Where(e => e.UserName == request.UserName)
                 .Include(u => u.MockedErrors)
                 .FirstOrDefaultAsync(cancellationToken);

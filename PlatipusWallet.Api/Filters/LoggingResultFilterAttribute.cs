@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Results.External;
 
-public class LoggingFilterAttribute : ResultFilterAttribute
+public class LoggingResultFilterAttribute : ResultFilterAttribute
 {
     public override void OnResultExecuted(ResultExecutedContext context)
     {

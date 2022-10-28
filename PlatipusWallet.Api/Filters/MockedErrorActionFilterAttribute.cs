@@ -1,5 +1,6 @@
 namespace PlatipusWallet.Api.Filters;
 
+using System.Net.Mime;
 using System.Text.Json;
 using Application.Requests.Base.Requests;
 using Controllers.Wallets;
@@ -8,7 +9,6 @@ using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Results.Common;
@@ -89,17 +89,26 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 mockedError.UserId
             });
 
-        // executedContext.Result = new ContentResult()
-        // {
-        //     Content = mockedError.Body,
-        //     StatusCode = (int?)mockedError.HttpStatusCode,
-        //     ContentType =  mockedError.ContentType 
-        // };
-        executedContext.Result = new ObjectResult(JsonSerializer.Deserialize<object>(mockedError.Body))
+        switch (mockedError.ContentType)
         {
-            StatusCode = (int?)mockedError.HttpStatusCode,
-            ContentTypes = new MediaTypeCollection { mockedError.ContentType }
-        };
+            case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html:
+                context.HttpContext.Items.Add("response", mockedError.Body);
+                executedContext.Result = new ContentResult
+                {
+                    Content = mockedError.Body,
+                    StatusCode = (int?)mockedError.HttpStatusCode,
+                    ContentType = mockedError.ContentType
+                };
+                break;
+            case MediaTypeNames.Application.Json or _:
+                var response = JsonSerializer.Deserialize<object>(mockedError.Body);
+                context.HttpContext.Items.Add("response", response);
+                executedContext.Result = new ObjectResult(response)
+                {
+                    StatusCode = (int?)mockedError.HttpStatusCode,
+                };
+                break;
+        }
 
         mockedError.Count -= 1;
 
@@ -111,7 +120,5 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
 
         await dbContext.SaveChangesAsync();
-
-        // executedContext.Canceled = true; // TODO
     }
 }

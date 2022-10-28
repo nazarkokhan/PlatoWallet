@@ -1,7 +1,5 @@
 namespace PlatipusWallet.Api.Extensions;
 
-using System.Text;
-
 public static class MiddlewareExtension
 {
     public static IApplicationBuilder EnableBufferingAndSaveRawRequest(this IApplicationBuilder app)

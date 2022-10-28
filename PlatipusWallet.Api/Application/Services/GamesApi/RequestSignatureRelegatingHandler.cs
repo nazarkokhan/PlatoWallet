@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
-using Filters;
 using Infrastructure.Persistence;
 using StartupSettings;
 

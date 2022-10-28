@@ -37,10 +37,11 @@ services
     .AddControllers(
         options =>
         {
-            options.Filters.Add<SaveRequestFilterAttribute>(1);
+            // options.Filters.Add<EnrichActionFilterAttribute>(1);
+            options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
             options.Filters.Add<ActionResultFilterAttribute>(1);
-            options.Filters.Add<LoggingFilterAttribute>(2);
+            options.Filters.Add<LoggingResultFilterAttribute>(2);
         })
     .AddJsonOptions(
         options =>

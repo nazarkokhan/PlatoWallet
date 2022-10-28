@@ -8,8 +8,8 @@ public static class BehaviorExtensions
 {
     public static IServiceCollection AddAllBehaviors(this IServiceCollection services)
         => services
-            .AddLoggingBehavior()
-            .AddLocalizationBehavior()
+            // .AddLoggingBehavior()
+            // .AddLocalizationBehavior()
             .AddValidationBehavior()
             .AddExceptionBehavior();
 

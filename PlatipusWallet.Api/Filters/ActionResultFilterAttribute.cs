@@ -35,7 +35,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             var services = context.HttpContext.RequestServices;
             var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
 
-            logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
+            // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
             // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
 
             var errorCode = actionResult.Result.ErrorCode;
@@ -67,7 +67,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             var services = context.HttpContext.RequestServices;
             var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
 
-            logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);
+            // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);
             // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
 
             var errorCode = actionDatabetResult.Result.ErrorCode;
