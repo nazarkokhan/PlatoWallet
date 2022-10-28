@@ -2,6 +2,7 @@ namespace PlatipusWallet.Api.Filters;
 
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Controllers.Wallets;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,18 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             _ => "Other"
         };
         
+        if (response is JsonNode responseJsonNode)
+        {
+            try
+            {
+                response = responseJsonNode.Deserialize<Dictionary<string, string>>() ?? new Dictionary<string, string>();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed serializing mocked error {MockedErrorResponse}", response);
+            }
+        }
+        
         logger.Log(
             isError ? LogLevel.Error : LogLevel.Information,
             "Provider: {Provider} \n" +
@@ -45,7 +58,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             Encoding.UTF8.GetString(rawRequestBytes),
             request,
             JsonSerializer.Serialize(response),
-            response,
+            (response),
             requestHeaders,
             responseHeaders);
     }
