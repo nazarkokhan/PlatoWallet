@@ -1,0 +1,10 @@
+namespace Platipus.Wallet.Domain.Entities;
+
+public enum ErrorMockMethod
+{
+    Balance,
+    Bet,
+    Win,
+    Award,
+    Rollback
+}
