@@ -6,7 +6,6 @@ using Application.Requests.DTOs;
 using Application.Requests.External;
 using Application.Services.GamesApi.DTOs.Responses;
 using Extensions;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("external")]

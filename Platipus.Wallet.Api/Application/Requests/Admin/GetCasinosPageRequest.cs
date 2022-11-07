@@ -5,11 +5,9 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using DTOs;
 using Extensions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record GetCasinosPageRequest(
     PageRequest Page,

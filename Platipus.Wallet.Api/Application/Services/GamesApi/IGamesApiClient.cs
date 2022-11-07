@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Services.GamesApi;
 
 using DTOs.Responses;
-using Results.Common.Result.WithData;
 
 public interface IGamesApiClient
 {

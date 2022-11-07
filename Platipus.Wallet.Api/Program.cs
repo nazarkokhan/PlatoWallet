@@ -2,15 +2,14 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Platipus.Serilog;
 using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Filters;
 using Platipus.Wallet.Api.Options;
 using Platipus.Wallet.Api.StartupSettings;
-using Platipus.Wallet.Api.StartupSettings.Extensions;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
 using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
@@ -50,6 +49,7 @@ services
             options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
+            options.JsonSerializerOptions.Converters.Add(new JsonDateTimeAsMillisecondsNumberStringConverter());
         })
     .AddJsonOptions(nameof(CasinoProvider.Dafabet), options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); })
     // .AddXmlSerializerFormatters()
@@ -86,6 +86,7 @@ services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
 var app = builder.Build();
+
 
 app.UseExceptionHandler(exceptionAppBuilder => { exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>(); });
 

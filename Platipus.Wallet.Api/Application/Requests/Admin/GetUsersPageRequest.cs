@@ -4,11 +4,9 @@ using Base.Page;
 using Domain.Entities;
 using DTOs;
 using Extensions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetUsersPageRequest.Response>>>
 {

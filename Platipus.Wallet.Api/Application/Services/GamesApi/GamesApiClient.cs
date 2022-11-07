@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 using Results.External.Enums;
 
 public class GamesApiClient : IGamesApiClient

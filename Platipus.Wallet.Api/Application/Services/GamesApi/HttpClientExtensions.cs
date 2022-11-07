@@ -6,7 +6,6 @@ using System.Text.Json.Nodes;
 using DTOs.Base;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 using Results.External.Enums;
 
 public static class HttpClientExtensions

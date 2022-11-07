@@ -4,7 +4,6 @@ using Abstract;
 using Application.Requests.Admin;
 using Application.Requests.Test;
 using Extensions;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("admin")]

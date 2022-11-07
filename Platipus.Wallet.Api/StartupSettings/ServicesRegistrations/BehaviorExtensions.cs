@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
 
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Behaviors;
 

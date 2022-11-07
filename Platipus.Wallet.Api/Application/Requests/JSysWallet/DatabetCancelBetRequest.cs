@@ -4,11 +4,9 @@ using Base.Requests;
 using Base.Responses.Databet;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using MediatR;
 using Infrastructure.Persistence;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record DatabetCancelBetRequest(
     string PlayerId,

@@ -5,7 +5,6 @@ using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Results.Common;
 using Results.Common.Result;

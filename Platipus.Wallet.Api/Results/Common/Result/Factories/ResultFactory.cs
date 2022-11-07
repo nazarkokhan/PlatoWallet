@@ -1,7 +1,5 @@
 namespace Platipus.Wallet.Api.Results.Common.Result.Factories;
 
-using WithData;
-
 public static class ResultFactory
 {
     public static Result Success() => new();

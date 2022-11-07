@@ -1,12 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Domain.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 using Services.GamesApi;
 using Services.GamesApi.DTOs.Responses;
 

@@ -3,12 +3,10 @@ namespace Platipus.Wallet.Api.Application.Requests.JSysWallet;
 using Base.Requests;
 using Base.Responses.Databet;
 using Domain.Entities;
-using MediatR;
 using Results.Common;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record DatabetBetResultRequest(
     string PlayerId,

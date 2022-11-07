@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Extensions;
 
 using Microsoft.AspNetCore.Mvc;
 using Results.Common.Result;
-using Results.Common.Result.WithData;
 using Results.External.ActionResults;
 
 public static class ActionResultExtensions

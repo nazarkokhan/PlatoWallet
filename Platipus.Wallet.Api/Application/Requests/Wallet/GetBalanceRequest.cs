@@ -3,12 +3,10 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallet;
 using Base.Requests;
 using Base.Responses;
 using Domain.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record GetBalanceRequest(
     Guid SessionId,

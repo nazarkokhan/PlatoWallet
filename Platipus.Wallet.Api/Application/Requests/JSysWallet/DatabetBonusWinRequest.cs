@@ -4,11 +4,9 @@ using Base.Requests;
 using Microsoft.EntityFrameworkCore;
 using Base.Responses.Databet;
 using Domain.Entities;
-using MediatR;
 using Infrastructure.Persistence;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record DatabetBonusWinRequest(
     string PlayerId,

@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Api.Extensions;using Base.Requests;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Base.Responses;
@@ -10,7 +9,6 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using Options;
 using Results.Common;
-using Results.Common.Result.WithData;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
 using Services.GamesApi;

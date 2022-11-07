@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Behaviors;
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Results.Common.Result;
 

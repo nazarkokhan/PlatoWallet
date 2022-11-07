@@ -3,7 +3,6 @@ namespace Platipus.Wallet.Api.Application.Behaviors;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Extensions;
 using Results.Common;

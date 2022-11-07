@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using Domain.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common;

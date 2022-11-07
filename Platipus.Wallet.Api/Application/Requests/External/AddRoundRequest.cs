@@ -2,12 +2,10 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Base.Responses;
 using Domain.Entities;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
 using Results.Common;
 using Results.Common.Result.Factories;
-using Results.Common.Result.WithData;
 
 public record AddRoundRequest(
     string User,

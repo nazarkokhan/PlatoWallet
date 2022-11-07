@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.Controllers.Wallets;
 
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Application.Requests.JSysWallet;
 using Abstract;

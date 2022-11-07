@@ -21,6 +21,7 @@ public class TestController : ApiController
         [FromBody] object request,
         CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         var result = new { JsonString = JsonSerializer.Serialize(request) };
 
         return Ok(result);

@@ -2,7 +2,6 @@
 
 namespace Platipus.Wallet.Api.Controllers.Wallets;
 
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Application.Requests.Base.Responses;
 using Application.Requests.Wallet;

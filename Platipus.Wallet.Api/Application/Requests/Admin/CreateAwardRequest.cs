@@ -1,11 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Base.Responses;
 using Domain.Entities;
 using Results.Common;
-using Results.Common.Result.WithData;
 using Infrastructure.Persistence;
 using Results.Common.Result.Factories;
 using Services.GamesApi;

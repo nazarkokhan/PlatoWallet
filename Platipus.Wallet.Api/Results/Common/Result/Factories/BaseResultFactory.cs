@@ -1,7 +1,5 @@
 namespace Platipus.Wallet.Api.Results.Common.Result.Factories;
 
-using WithData;
-
 public static class BaseResultFactory
 {
     public static BaseResult<TError> Success<TError>() => new();
