@@ -1,6 +1,6 @@
 ﻿namespace Platipus.Wallet.Infrastructure.EntityConfigurations;
 
-using Platipus.Wallet.Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

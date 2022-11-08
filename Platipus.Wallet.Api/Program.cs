@@ -7,11 +7,11 @@ using Platipus.Serilog;
 using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
 using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.Filters;
-using Platipus.Wallet.Api.Options;
-using Platipus.Wallet.Api.StartupSettings;
+using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
+using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
+using Platipus.Wallet.Api.StartupSettings.Options;
 using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
 using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Infrastructure.Persistence;
@@ -30,13 +30,10 @@ var services = builder.Services;
 
 const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO to config
 services
-    .AddTransient<VerifySignatureMiddleware>()
     .AddTransient<ExceptionHandlerMiddleware>()
-    .AddTransient<LoggingMiddleware>()
     .AddControllers(
         options =>
         {
-            // options.Filters.Add<EnrichActionFilterAttribute>(1);
             options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
             options.Filters.Add<ActionResultFilterAttribute>(1);
@@ -49,10 +46,18 @@ services
             options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
-            options.JsonSerializerOptions.Converters.Add(new JsonDateTimeAsMillisecondsNumberStringConverter());
         })
-    .AddJsonOptions(nameof(CasinoProvider.Dafabet), options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); })
-    // .AddXmlSerializerFormatters()
+    .AddJsonOptions(nameof(CasinoProvider.Dafabet),
+        options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        })
+    .AddJsonOptions(nameof(CasinoProvider.Openbox),
+        options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
+        })
     .Services
     .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
     .Configure<SupportedCountriesOptions>(builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind)
@@ -85,8 +90,8 @@ services
     .Services
     .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
 
-var app = builder.Build();
 
+var app = builder.Build();
 
 app.UseExceptionHandler(exceptionAppBuilder => { exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>(); });
 

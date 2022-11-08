@@ -2,8 +2,7 @@ namespace Platipus.Wallet.Api.Application.Behaviors;
 
 using Extensions;
 using Microsoft.Extensions.Logging;
-using Results.Common;
-using Results.Common.Result;
+using Results.Psw;
 
 public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

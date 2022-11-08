@@ -7,7 +7,8 @@ using DTOs;
 using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 
 public record GetCasinosPageRequest(
     PageRequest Page,

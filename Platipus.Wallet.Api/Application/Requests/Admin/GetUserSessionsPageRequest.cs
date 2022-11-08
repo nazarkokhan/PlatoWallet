@@ -7,7 +7,8 @@ using Extensions;
 using Base.Page;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 
 public record GetUserSessionsPageRequest(PageRequest Page, string User) : IRequest<IResult<IPage<GetUserSessionsPageRequest.Response>>>
 {

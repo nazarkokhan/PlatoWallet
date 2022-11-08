@@ -1,21 +1,21 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using Microsoft.EntityFrameworkCore;
-using Base.Responses;
 using Domain.Entities;
-using Results.Common;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 using Services.GamesApi;
+using Wallets.Psw.Base.Response;
 
 public record CreateAwardRequest(
     //TODO by user or session? Guid SessionId,
     string User,
     DateTime ValidUntil,
     string Game,
-    string AwardId) : IRequest<IResult<BaseResponse>>
+    string AwardId) : IRequest<IResult<PswBaseResponse>>
 {
-    public class Handler : IRequestHandler<CreateAwardRequest, IResult<BaseResponse>>
+    public class Handler : IRequestHandler<CreateAwardRequest, IResult<PswBaseResponse>>
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
@@ -28,7 +28,7 @@ public record CreateAwardRequest(
             _gamesApiClient = gamesApiClient;
         }
 
-        public async Task<IResult<BaseResponse>> Handle(
+        public async Task<IResult<PswBaseResponse>> Handle(
             CreateAwardRequest request,
             CancellationToken cancellationToken)
         {
@@ -40,10 +40,10 @@ public record CreateAwardRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.InvalidUser);
+                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.InvalidUser);
 
             if (user.Awards.Any(a => a.Id == request.AwardId))
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.DuplicateAward);
+                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.DuplicateAward);
 
             var award = new Award
             {

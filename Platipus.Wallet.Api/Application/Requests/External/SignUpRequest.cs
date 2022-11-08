@@ -5,21 +5,21 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Base.Responses;
 using Domain.Entities;
-using Options;
-using Results.Common;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
+using StartupSettings.Options;
+using Wallets.Psw.Base.Response;
 
 public record SignUpRequest(
     string UserName,
     string Password,
     string CasinoId,
     string Currency,
-    decimal Balance) : IRequest<IResult<BaseResponse>>
+    decimal Balance) : IRequest<IResult<PswBaseResponse>>
 {
-    public class Handler : IRequestHandler<SignUpRequest, IResult<BaseResponse>>
+    public class Handler : IRequestHandler<SignUpRequest, IResult<PswBaseResponse>>
     {
         private readonly WalletDbContext _context;
         
@@ -28,7 +28,7 @@ public record SignUpRequest(
             _context = context;
         }
 
-        public async Task<IResult<BaseResponse>> Handle(
+        public async Task<IResult<PswBaseResponse>> Handle(
             SignUpRequest request,
             CancellationToken cancellationToken)
         {
@@ -37,7 +37,7 @@ public record SignUpRequest(
                 .AnyAsync(cancellationToken);
             
             if(!casinoExist)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.InvalidCasinoId);
+                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.InvalidCasinoId);
 
             var user = await _context.Set<User>()
                 .Where(u => u.UserName == request.UserName &&
@@ -46,7 +46,7 @@ public record SignUpRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is not null)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.Unknown);
+                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.Unknown);
 
             var casinoCurrency = await _context.Set<CasinoCurrencies>()
                 .Where(c => c.CasinoId == request.CasinoId &&
@@ -55,7 +55,7 @@ public record SignUpRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casinoCurrency is null)
-                return ResultFactory.Failure<BaseResponse>(ErrorCode.WrongCurrency);
+                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.WrongCurrency);
             
             user = new User
             {
@@ -70,7 +70,7 @@ public record SignUpRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
             
-            var result = new BalanceResponse(user.Balance);
+            var result = new PswBalanceResponse(user.Balance);
 
             return ResultFactory.Success(result);
         }

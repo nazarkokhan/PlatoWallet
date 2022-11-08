@@ -6,7 +6,8 @@ using DTOs;
 using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 
 public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetUsersPageRequest.Response>>>
 {

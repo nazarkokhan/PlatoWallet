@@ -1,8 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Extensions;
 
-using Results.Common;
-using Results.Common.Result;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 
 public static class DynamicResultFactory
 {

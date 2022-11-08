@@ -4,13 +4,11 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
-using Results.Common;
-using Results.Common.Result;
-using Results.Common.Result.Factories;
+using Results.Psw;
 
-public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<Results.Common.Result.IResult>
+public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<SetDatabetCasinoProviderRequest, Results.Common.Result.IResult>
+    public class Handler : IRequestHandler<SetDatabetCasinoProviderRequest, IResult>
     {
         private readonly WalletDbContext _context;
 

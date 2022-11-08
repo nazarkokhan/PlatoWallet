@@ -1,17 +1,18 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
-using Api.Extensions;using Base.Requests;
+using Api.Extensions.SecuritySign;
+using Base;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Base.Responses;
 using Domain.Entities;
 using Domain.Entities.Enums;
-using Options;
-using Results.Common;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 using Services.GamesApi;
+using StartupSettings.Options;
+using Wallets.Psw.Base.Response;
 
 public record LogInRequest(
     string UserName,
@@ -132,7 +133,7 @@ public record LogInRequest(
     public record Response(
         Guid SessionId,
         decimal Balance,
-        string LaunchUrl) : BalanceResponse(Balance);
+        string LaunchUrl) : PswBalanceResponse(Balance);
 
     public class Validator : AbstractValidator<SignUpRequest>
     {

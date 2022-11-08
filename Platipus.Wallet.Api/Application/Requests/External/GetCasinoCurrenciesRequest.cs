@@ -1,12 +1,12 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
-using Base.Responses;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using DTOs;
-using Results.Common;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
+using Wallets.Psw.Base.Response;
 
 public record GetCasinoCurrenciesRequest(
     string CasinoId) : IRequest<IResult<GetCasinoCurrenciesRequest.Response>>
@@ -47,5 +47,5 @@ public record GetCasinoCurrenciesRequest(
         }
     }
     
-    public record Response(List<GetCurrencyDto> Items) : BaseResponse;
+    public record Response(List<GetCurrencyDto> Items) : PswBaseResponse;
 }

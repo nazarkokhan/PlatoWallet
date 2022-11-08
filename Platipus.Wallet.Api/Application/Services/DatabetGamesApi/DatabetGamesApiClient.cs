@@ -5,6 +5,7 @@ using GamesApi;
 using GamesApi.DTOs.Responses;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
+using Results.Psw.WithData;
 
 public class DatabetGamesApiClient : IDatabetGamesApiClient
 {

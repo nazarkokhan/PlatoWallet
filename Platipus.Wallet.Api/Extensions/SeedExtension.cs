@@ -4,8 +4,8 @@ using Bogus;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Options;
 using Infrastructure.Persistence;
+using StartupSettings.Options;
 
 public static class SeedExtension
 {

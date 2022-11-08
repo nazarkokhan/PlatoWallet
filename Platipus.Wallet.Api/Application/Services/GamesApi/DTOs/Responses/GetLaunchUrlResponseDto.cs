@@ -1,5 +1,5 @@
 namespace Platipus.Wallet.Api.Application.Services.GamesApi.DTOs.Responses;
 
-using Requests.Base.Responses;
+using Requests.Wallets.Psw.Base.Response;
 
-public record GetLaunchUrlResponseDto(string LaunchUrl) : BaseResponse;
+public record GetLaunchUrlResponseDto(string LaunchUrl) : PswBaseResponse;

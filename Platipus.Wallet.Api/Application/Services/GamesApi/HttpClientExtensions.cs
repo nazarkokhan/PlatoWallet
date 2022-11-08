@@ -4,9 +4,8 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DTOs.Base;
-using Results.Common;
-using Results.Common.Result.Factories;
-using Results.External.Enums;
+using Results.Psw;
+using Results.Psw.WithData;
 
 public static class HttpClientExtensions
 {
@@ -32,7 +31,7 @@ public static class HttpClientExtensions
 
             if (responseStatus is Status.ERROR)
             {
-                var errorModel = jsonNode.Deserialize<BaseGamesApiErrorResponseDto>(jsonSerializerOptions)!;
+                var errorModel = jsonNode.Deserialize<PswBaseGamesApiErrorResponseDto>(jsonSerializerOptions)!;
                 return ResultFactory.Failure<T>(errorModel.Error);
             }
 

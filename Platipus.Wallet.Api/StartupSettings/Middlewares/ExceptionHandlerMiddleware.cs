@@ -1,8 +1,9 @@
 namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 
-using Results.Common;
-using Results.External;
-using Results.External.Enums;
+using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Results.Dafabet;
+using Application.Results.Psw;
 
 public class ExceptionHandlerMiddleware : IMiddleware
 {
@@ -17,10 +18,11 @@ public class ExceptionHandlerMiddleware : IMiddleware
     {
         _logger.LogCritical("Unhandled exception occured");
 
-        var unexpectedErrorResponseBody = context.Request.Path.Value switch
+        var unexpectedErrorResponseBody = context.Request.Path.Value?.Replace("wallet/", "") switch
         {
             "databet" => GetDatabetErrorResponse(),
-            "wallet" or _ => GetErrorResponse()
+            //TODO "openbox" => GetDatabetErrorResponse(),
+            "psw" or _ => GetErrorResponse()
         };
 
         context.Response.StatusCode = 200; 
@@ -32,12 +34,12 @@ public class ExceptionHandlerMiddleware : IMiddleware
     private object GetErrorResponse()
     {
         const ErrorCode errorCode = ErrorCode.Unknown;
-        return new ErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+        return new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
     }
 
     private object GetDatabetErrorResponse()
     {
-        const DatabetErrorCode errorCode = DatabetErrorCode.SystemError;
+        const DafabetErrorCode errorCode = DafabetErrorCode.SystemError;
         return new DatabetErrorResponse((int) errorCode, errorCode.ToString());
     }
 }

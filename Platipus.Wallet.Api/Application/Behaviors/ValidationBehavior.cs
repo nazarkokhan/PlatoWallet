@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Extensions;
-using Results.Common;
-using Results.Common.Result;
+using Results.Psw;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

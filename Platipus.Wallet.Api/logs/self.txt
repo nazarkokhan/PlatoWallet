@@ -1,0 +1,5 @@
+2022-11-08T08:24:01.0884600Z The value  is not a valid Serilog level.
+2022-11-08T08:24:01.0893560Z The value  is not a valid Serilog level.
+2022-11-08T08:24:01.0896820Z The value  is not a valid Serilog level.
+2022-11-08T08:24:01.0897600Z The value  is not a valid Serilog level.
+2022-11-08T08:24:01.0898020Z The value  is not a valid Serilog level.

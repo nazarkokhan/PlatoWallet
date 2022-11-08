@@ -3,9 +3,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Admin;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
-using Results.Common;
-using Results.Common.Result;
-using Results.Common.Result.Factories;
+using Results.Psw;
 
 public record CreateCasinoRequest(
     string CasinoId,

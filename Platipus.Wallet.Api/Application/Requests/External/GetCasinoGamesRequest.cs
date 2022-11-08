@@ -3,8 +3,8 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
-using Results.Common;
-using Results.Common.Result.Factories;
+using Results.Psw;
+using Results.Psw.WithData;
 using Services.GamesApi;
 using Services.GamesApi.DTOs.Responses;
 

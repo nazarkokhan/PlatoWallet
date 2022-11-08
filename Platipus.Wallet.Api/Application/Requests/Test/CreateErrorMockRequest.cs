@@ -6,10 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Results.Common;
-using Results.Common.Result;
 using Infrastructure.Persistence;
-using Results.Common.Result.Factories;
+using Results.Psw;
 
 public record CreateErrorMockRequest(
     string UserName,

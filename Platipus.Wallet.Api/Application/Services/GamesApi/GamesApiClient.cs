@@ -7,9 +7,8 @@ using DTOs.Base;
 using DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Results.Common;
-using Results.Common.Result.Factories;
-using Results.External.Enums;
+using Results.Psw;
+using Results.Psw.WithData;
 
 public class GamesApiClient : IGamesApiClient
 {
@@ -64,7 +63,7 @@ public class GamesApiClient : IGamesApiClient
             if (responseStatus is not Status.ERROR)
                 return ResultFactory.Failure<GetLaunchUrlResponseDto>(ErrorCode.Unknown);
             
-            var errorModel = jsonNode.Deserialize<BaseGamesApiErrorResponseDto>(_jsonSerializerOptions)!;
+            var errorModel = jsonNode.Deserialize<PswBaseGamesApiErrorResponseDto>(_jsonSerializerOptions)!;
             return ResultFactory.Failure<GetLaunchUrlResponseDto>(errorModel.Error);
         }
 

@@ -3,5 +3,7 @@ namespace Platipus.Wallet.Domain.Entities.Enums;
 public enum CasinoProvider
 {
     Psv,
-    Dafabet
+    Dafabet,
+    Openbox,
+    Hub88
 }

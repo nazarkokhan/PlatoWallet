@@ -3,7 +3,6 @@ namespace Platipus.Wallet.Api.Application.Behaviors;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Results.Common.Result;
 
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
