@@ -14,6 +14,8 @@ using Infrastructure.Persistence;
 [Route("test")]
 public class TestController : ApiController
 {
+    private const string key = "1234567890123456";
+
     [HttpPost("stringify")]
     public async Task<IActionResult> Stringify(
         [FromBody] object request,
@@ -74,6 +76,65 @@ public class TestController : ApiController
 
         var source = string.Concat(request.Values);
         var result = new { Hash = DatabetHash.Compute($"{method}{source}", casino.SignatureKey) };
+
+        return Ok(result);
+    }
+
+    [HttpPost("openbox/encrypt-payload")]
+    public async Task<IActionResult> OpenboxEncryptPayload(
+        string casinoId,
+        [FromBody] object request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        // var casino = await dbContext.Set<Casino>()
+        //     .Where(c => c.Id == casinoId)
+        //     .Select(
+        //         c => new
+        //         {
+        //             c.SignatureKey
+        //         })
+        //     .FirstOrDefaultAsync(cancellationToken);
+        //
+        // if (casino is null)
+        //     return ResultFactory.Failure(ErrorCode.InvalidCasinoId).ToActionResult();
+
+        // var signatureKey = casino.SignatureKey;
+        var signatureKey = key;
+
+        var serialize = JsonSerializer.Serialize(request);
+        var encryptedPayload = OpenboxPayload.Encrypt(serialize, signatureKey);
+
+        var result = new { EncryptedPayload = encryptedPayload };
+
+        return Ok(result);
+    }
+
+    [HttpPost("openbox/decrypt-payload")]
+    public async Task<IActionResult> OpenboxDecryptPayload(
+        string casinoId,
+        string request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        // var casino = await dbContext.Set<Casino>()
+        //     .Where(c => c.Id == casinoId)
+        //     .Select(
+        //         c => new
+        //         {
+        //             c.SignatureKey
+        //         })
+        //     .FirstOrDefaultAsync(cancellationToken);
+        //
+        // if (casino is null)
+        //     return ResultFactory.Failure(ErrorCode.InvalidCasinoId).ToActionResult();
+
+        // var signatureKey = casino.SignatureKey;
+        var signatureKey = key;
+
+        var decryptedPayload = OpenboxPayload.Decrypt(request, signatureKey);
+
+        var result = new { DecryptedPayload = decryptedPayload };
 
         return Ok(result);
     }

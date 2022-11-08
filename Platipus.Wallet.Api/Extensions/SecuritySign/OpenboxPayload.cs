@@ -12,17 +12,19 @@ public static class OpenboxPayload
 
         using (var aesAlg = Aes.Create())
         {
-            Array.Clear(aesAlg.IV); // = new byte[16];
+            Array.Clear(aesAlg.IV);
             aesAlg.Mode = CipherMode.ECB;
             aesAlg.Padding = PaddingMode.PKCS7;
             aesAlg.Key = keyBytes;
 
-            // AES/ECB/PKCS7Padding
             var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
             using (var msEncrypt = new MemoryStream())
             {
-                using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                using (var csEncrypt = new CryptoStream(
+                           msEncrypt,
+                           encryptor,
+                           CryptoStreamMode.Write))
                 {
                     using (var swEncrypt = new StreamWriter(csEncrypt))
                     {
@@ -34,38 +36,32 @@ public static class OpenboxPayload
             }
         }
 
-        return Convert.ToBase64String(encrypted);
+        var base64 = Convert.ToBase64String(encrypted);
+
+        return base64;
     }
-    
+
     public static string Decrypt(string data, string key)
     {
+        var cipherText = Convert.FromBase64String(data);
         var keyBytes = Encoding.UTF8.GetBytes(key);
-        byte[] encrypted;
 
-        using (var aesAlg = Aes.Create())
-        {
-            Array.Clear(aesAlg.IV); // = new byte[16];
-            aesAlg.Mode = CipherMode.ECB;
-            aesAlg.Padding = PaddingMode.PKCS7;
-            aesAlg.Key = keyBytes;
+        using var aesAlg = Aes.Create();
+        Array.Clear(aesAlg.IV);
+        aesAlg.Mode = CipherMode.ECB;
+        aesAlg.Padding = PaddingMode.PKCS7;
+        aesAlg.Key = keyBytes;
 
-            // AES/ECB/PKCS7Padding
-            var encryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+        var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-            using (var msEncrypt = new MemoryStream())
-            {
-                using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                {
-                    using (var swEncrypt = new StreamWriter(csEncrypt))
-                    {
-                        swEncrypt.Write(data);
-                    }
+        using var msDecrypt = new MemoryStream(cipherText);
+        using var csDecrypt = new CryptoStream(
+            msDecrypt,
+            decryptor,
+            CryptoStreamMode.Read);
+        using var srDecrypt = new StreamReader(csDecrypt);
+        var plaintext = srDecrypt.ReadToEnd();
 
-                    encrypted = msEncrypt.ToArray();
-                }
-            }
-        }
-
-        return Convert.ToBase64String(encrypted);
+        return plaintext;
     }
 }

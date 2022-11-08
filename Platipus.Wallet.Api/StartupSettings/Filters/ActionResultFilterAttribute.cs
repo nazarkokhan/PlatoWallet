@@ -80,5 +80,39 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             
             context.HttpContext.Items.Add("response", errorResponse);
         }
+        
+        //TODO
+        if (context.Result is OpenboxExternalActionResult actionOpenboxResult)
+        {
+            if (actionOpenboxResult.Result.IsSuccess)
+            {
+                if (actionOpenboxResult.Result is IDafabetResult<object> objectResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                const DafabetErrorCode databetErrorCode = DafabetErrorCode.Success;
+                var databetBaseResponse = new DatabetBaseResponse(databetErrorCode, databetErrorCode.ToString());
+                context.Result = new OkObjectResult(databetBaseResponse);
+                return;
+            }
+
+            var services = context.HttpContext.RequestServices;
+            var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
+
+            // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);
+            // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
+
+            var errorCode = actionOpenboxResult.Result.ErrorCode;
+
+            var errorResponse = new DatabetErrorResponse(
+                (int) errorCode,
+                errorCode.ToString());
+
+            context.Result = new OkObjectResult(errorResponse);
+            
+            context.HttpContext.Items.Add("response", errorResponse);
+        }
     }
 }
