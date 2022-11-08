@@ -7,12 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record GetPlayerInfoVerifyPlayerRequest(
+public record OpenboxGetPlayerInfoRequest(
         Guid Token,
         OpenboxSingleRequest Request)
-    : OpenboxBaseRequest(Token, Request), IRequest<IOpenboxResult<GetPlayerInfoVerifyPlayerRequest.Response>>
+    : OpenboxBaseRequest(Token, Request), IRequest<IOpenboxResult<OpenboxGetPlayerInfoRequest.Response>>
 {
-    public class Handler : IRequestHandler<GetPlayerInfoVerifyPlayerRequest, IOpenboxResult<Response>>
+    public class Handler : IRequestHandler<OpenboxGetPlayerInfoRequest, IOpenboxResult<Response>>
     {
         private readonly WalletDbContext _context;
 
@@ -22,7 +22,7 @@ public record GetPlayerInfoVerifyPlayerRequest(
         }
 
         public async Task<IOpenboxResult<Response>> Handle(
-            GetPlayerInfoVerifyPlayerRequest request,
+            OpenboxGetPlayerInfoRequest request,
             CancellationToken cancellationToken)
         {
             var session = await _context.Set<Session>()
@@ -40,7 +40,8 @@ public record GetPlayerInfoVerifyPlayerRequest(
                         }
                     })
                 .FirstOrDefaultAsync(cancellationToken);
-
+            
+            //TODO validate should be 2 token
             if (session is null)
                 return OpenboxResultFactory.Failure<Response>(OpenboxErrorCode.TokenRelatedErrors);
 

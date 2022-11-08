@@ -43,7 +43,7 @@ public record OpenboxVerifyPlayerRequest(
 
             if (session.ExpirationDate <= DateTime.UtcNow)
                 return OpenboxResultFactory.Failure<OpenboxTokenResponse>(OpenboxErrorCode.TokenRelatedErrors);
-            
+                    //TODO return new token
             var response = new OpenboxTokenResponse(session.Id);
 
             return OpenboxResultFactory.Success(response);

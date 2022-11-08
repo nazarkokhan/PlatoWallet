@@ -42,8 +42,8 @@ public class WalletOpenboxController : ApiController
 
         var payloadType = request.Method.ToString() switch
         {
-            VerifyPlayer => typeof(OpenboxBalanceRequest),
-            GetPlayerInformation => typeof(OpenboxBalanceRequest),
+            VerifyPlayer => typeof(OpenboxVerifyPlayerRequest),
+            GetPlayerInformation => typeof(OpenboxGetPlayerInfoRequest),
             GetPlayerBalance => typeof(OpenboxBalanceRequest),
             MoneyTransactions => typeof(OpenboxBalanceRequest),
             CancelTransaction => typeof(OpenboxBalanceRequest),
