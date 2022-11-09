@@ -59,14 +59,18 @@ try
         .AddJsonOptions(
             options =>
             {
-                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
+                options.JsonSerializerOptions.NumberHandling
+                    = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
         .AddJsonOptions(
             nameof(CasinoProvider.Dafabet),
-            options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); })
+            options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
         .AddJsonOptions(
             nameof(CasinoProvider.Openbox),
             options =>
@@ -99,18 +103,34 @@ try
             })
         .AddSingleton<IGamesApiClient, GamesApiClient>()
         .AddTransient<RequestSignatureRelegatingHandler>()
-        .AddHttpClient<IGamesApiClient, GamesApiClient>(options => { options.BaseAddress = new Uri($"{gamesApiUrl}psw/"); })
+        .AddHttpClient<IGamesApiClient, GamesApiClient>(
+            options =>
+            {
+                options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
+            })
         .AddHttpMessageHandler<RequestSignatureRelegatingHandler>()
         .Services
         .AddSingleton<IDatabetGamesApiClient, DatabetGamesApiClient>()
-        .AddHttpClient<IDatabetGamesApiClient, DatabetGamesApiClient>(options => { options.BaseAddress = new Uri($"{gamesApiUrl}dafabet/"); })
+        .AddHttpClient<IDatabetGamesApiClient, DatabetGamesApiClient>(
+            options =>
+            {
+                options.BaseAddress = new Uri($"{gamesApiUrl}dafabet/");
+            })
         .Services
-        .AddStackExchangeRedisCache(r => { r.Configuration = builderConfiguration.GetConnectionString("RedisCache"); });
+        .AddStackExchangeRedisCache(
+            r =>
+            {
+                r.Configuration = builderConfiguration.GetConnectionString("RedisCache");
+            });
 
 
     var app = builder.Build();
 
-    app.UseExceptionHandler(exceptionAppBuilder => { exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>(); });
+    app.UseExceptionHandler(
+        exceptionAppBuilder =>
+        {
+            exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>();
+        });
 
     if (!app.Environment.IsProduction())
     {
