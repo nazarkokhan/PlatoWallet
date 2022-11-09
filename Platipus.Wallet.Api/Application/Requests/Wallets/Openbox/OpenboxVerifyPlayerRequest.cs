@@ -40,7 +40,8 @@ public record OpenboxVerifyPlayerRequest(Guid Token) : OpenboxBaseRequest(Token)
                 UserId = session.UserId
             };
             _context.Add(newSession);
-            
+
+
             await _context.SaveChangesAsync(cancellationToken);
 
             var response = new OpenboxTokenResponse(newSession.Id);
