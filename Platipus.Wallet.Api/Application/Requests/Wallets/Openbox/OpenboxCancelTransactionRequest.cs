@@ -54,7 +54,7 @@ public record OpenboxCancelTransactionRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxBalanceResponse(user.Balance);
+            var response = new OpenboxBalanceResponse(user.Balance * 100);
 
             return OpenboxResultFactory.Success(response);
         }
