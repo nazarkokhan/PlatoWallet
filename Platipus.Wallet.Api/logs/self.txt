@@ -1,0 +1,10 @@
+2022-11-09T13:46:54.8807300Z Unable to find a method called WithEnvironmentName. Candidate methods are:
+Serilog.LoggerConfiguration WithHttpContext(Serilog.Configuration.LoggerEnrichmentConfiguration, System.IServiceProvider)
+Serilog.LoggerConfiguration With(Serilog.Configuration.LoggerEnrichmentConfiguration, Serilog.Core.ILogEventEnricher)
+Serilog.LoggerConfiguration AtLevel(Serilog.Configuration.LoggerEnrichmentConfiguration, System.Action`1[Serilog.Configuration.LoggerEnrichmentConfiguration], Serilog.Events.LogEventLevel, Serilog.Core.LoggingLevelSwitch)
+Serilog.LoggerConfiguration FromLogContext(Serilog.Configuration.LoggerEnrichmentConfiguration)
+2022-11-09T13:46:54.8842050Z Unable to find a method called WithMachineName. Candidate methods are:
+Serilog.LoggerConfiguration WithHttpContext(Serilog.Configuration.LoggerEnrichmentConfiguration, System.IServiceProvider)
+Serilog.LoggerConfiguration With(Serilog.Configuration.LoggerEnrichmentConfiguration, Serilog.Core.ILogEventEnricher)
+Serilog.LoggerConfiguration AtLevel(Serilog.Configuration.LoggerEnrichmentConfiguration, System.Action`1[Serilog.Configuration.LoggerEnrichmentConfiguration], Serilog.Events.LogEventLevel, Serilog.Core.LoggingLevelSwitch)
+Serilog.LoggerConfiguration FromLogContext(Serilog.Configuration.LoggerEnrichmentConfiguration)

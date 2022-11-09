@@ -21,6 +21,7 @@ using Serilog.Sinks.Elasticsearch;
 try
 {
     Log.Logger = new LoggerConfiguration()
+        .Enrich.WithMachineName()
         .WriteTo.Elasticsearch(
             nodeUris: "http://10.0.3.46:9200;",
             indexFormat: "platipus-wallet",
@@ -137,5 +138,5 @@ finally
 
 public static class App
 {
-    public const string Version = "2.2";
+    public const string Version = "3.0";
 }
