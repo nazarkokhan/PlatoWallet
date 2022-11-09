@@ -31,6 +31,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
         {
             WalletPswController => CasinoProvider.Psv.ToString(),
             WalletDafabetController => CasinoProvider.Dafabet.ToString(),
+            WalletOpenboxController => CasinoProvider.Openbox.ToString(),
             _ => "Other"
         };
         
@@ -45,7 +46,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
                 logger.LogError(e, "Failed serializing mocked error {@MockedErrorResponse}", response);
             }
         }
-        
+        // logger.LogInformation();
         logger.Log(
             isError ? LogLevel.Error : LogLevel.Information,
             "Provider: {Provider} \n" +

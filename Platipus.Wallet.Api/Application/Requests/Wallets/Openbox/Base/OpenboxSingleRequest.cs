@@ -3,8 +3,8 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Openbox.Base;
 using Requests.Base;
 
 public record OpenboxSingleRequest(
-    Guid Type,
-    Guid Method,
-    Guid VendorUid,
+    string Type,
+    string Method,
+    string VendorUid,
     DateTime Timestamp,
     string Payload) : BaseRequest;

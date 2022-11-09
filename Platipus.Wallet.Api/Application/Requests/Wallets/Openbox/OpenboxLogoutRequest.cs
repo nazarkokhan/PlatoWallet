@@ -7,10 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxLogoutRequest(
-        Guid Token,
-        OpenboxSingleRequest Request)
-    : OpenboxBaseRequest(Token, Request), IRequest<IOpenboxResult<OpenboxLogoutRequest.Response>>
+public record OpenboxLogoutRequest(Guid Token)
+    : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxLogoutRequest.Response>>
 {
     public class Handler : IRequestHandler<OpenboxLogoutRequest, IOpenboxResult<Response>>
     {
@@ -21,9 +19,7 @@ public record OpenboxLogoutRequest(
             _context = context;
         }
 
-        public async Task<IOpenboxResult<Response>> Handle(
-            OpenboxLogoutRequest request,
-            CancellationToken cancellationToken)
+        public async Task<IOpenboxResult<Response>> Handle(OpenboxLogoutRequest request, CancellationToken cancellationToken)
         {
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
@@ -35,7 +31,7 @@ public record OpenboxLogoutRequest(
 
             _context.Remove(session);
             await _context.SaveChangesAsync(cancellationToken);
-            
+
             var response = new Response();
 
             return OpenboxResultFactory.Success(response);

@@ -8,5 +8,4 @@ public static class PswHeaders
     {
         return headers.TryGetValue(XRequestSign, out var xRequestSign) ? xRequestSign.ToString() : null;
     }
-    
 }

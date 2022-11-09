@@ -8,10 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxVerifyPlayerRequest(
-        Guid Token,
-        OpenboxSingleRequest Request)
-    : OpenboxBaseRequest(Token, Request), IRequest<IOpenboxResult<OpenboxTokenResponse>>
+public record OpenboxVerifyPlayerRequest(Guid Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxTokenResponse>>
 {
     public class Handler : IRequestHandler<OpenboxVerifyPlayerRequest, IOpenboxResult<OpenboxTokenResponse>>
     {
@@ -29,13 +26,6 @@ public record OpenboxVerifyPlayerRequest(
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
                 .Where(u => u.Id == request.Token)
-                .Select(
-                    s => new
-                    {
-                        s.Id,
-                        s.ExpirationDate,
-                        s.User.UserName
-                    })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null)
@@ -43,8 +33,17 @@ public record OpenboxVerifyPlayerRequest(
 
             if (session.ExpirationDate <= DateTime.UtcNow)
                 return OpenboxResultFactory.Failure<OpenboxTokenResponse>(OpenboxErrorCode.TokenRelatedErrors);
-                    //TODO return new token
-            var response = new OpenboxTokenResponse(session.Id);
+
+            //TODO session.IsMainToken = false;
+            var newSession = new Session
+            {
+                UserId = session.UserId
+            };
+            _context.Add(newSession);
+            
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var response = new OpenboxTokenResponse(newSession.Id);
 
             return OpenboxResultFactory.Success(response);
         }

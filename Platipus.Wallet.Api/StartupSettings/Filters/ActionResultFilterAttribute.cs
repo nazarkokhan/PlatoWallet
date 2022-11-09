@@ -1,11 +1,15 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using System.Text.Json;
 using ActionResults;
 using Application.Results.Psw;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Results.Openbox.WithData;
+using Controllers;
 using Platipus.Wallet.Api.Application.Results.Dafabet;
 using Platipus.Wallet.Api.Application.Results.Dafabet.WithData;
 using Platipus.Wallet.Api.Application.Results.Psw.WithData;
@@ -40,10 +44,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = actionResult.Result.ErrorCode;
 
-            var errorResponse = new PswErrorResponse(
-                Status.ERROR,
-                (int) errorCode,
-                errorCode.ToString());
+            var errorResponse = new PswErrorResponse(Status.ERROR, (int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
         }
@@ -72,29 +73,28 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = actionDatabetResult.Result.ErrorCode;
 
-            var errorResponse = new DatabetErrorResponse(
-                (int) errorCode,
-                errorCode.ToString());
+            var errorResponse = new DatabetErrorResponse((int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
-            
+
             context.HttpContext.Items.Add("response", errorResponse);
         }
-        
+
         //TODO
         if (context.Result is OpenboxExternalActionResult actionOpenboxResult)
         {
             if (actionOpenboxResult.Result.IsSuccess)
             {
-                if (actionOpenboxResult.Result is IDafabetResult<object> objectResult)
+                if (actionOpenboxResult.Result is IOpenboxResult<object> objectResult)
                 {
-                    context.Result = new OkObjectResult(objectResult.Data);
+                    var payload = JsonSerializer.Serialize(objectResult.Data, OpenboxSerializer.Value);
+                    var openboxObjResponse = new OpenboxSingleResponse(payload);
+                    context.Result = new OkObjectResult(openboxObjResponse);
                     return;
                 }
 
-                const DafabetErrorCode databetErrorCode = DafabetErrorCode.Success;
-                var databetBaseResponse = new DatabetBaseResponse(databetErrorCode, databetErrorCode.ToString());
-                context.Result = new OkObjectResult(databetBaseResponse);
+                var openboxResponse = new OpenboxSingleResponse(string.Empty);
+                context.Result = new OkObjectResult(openboxResponse);
                 return;
             }
 
@@ -106,12 +106,10 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = actionOpenboxResult.Result.ErrorCode;
 
-            var errorResponse = new DatabetErrorResponse(
-                (int) errorCode,
-                errorCode.ToString());
+            var errorResponse = new OpenboxSingleResponse(errorCode);
 
             context.Result = new OkObjectResult(errorResponse);
-            
+
             context.HttpContext.Items.Add("response", errorResponse);
         }
     }

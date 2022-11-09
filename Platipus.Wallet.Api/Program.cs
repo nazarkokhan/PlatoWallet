@@ -71,6 +71,7 @@ try
             nameof(CasinoProvider.Openbox),
             options =>
             {
+                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
             })

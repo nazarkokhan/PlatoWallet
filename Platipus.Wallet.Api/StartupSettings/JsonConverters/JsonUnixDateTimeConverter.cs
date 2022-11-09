@@ -6,20 +6,15 @@ using System.Text.Json.Serialization;
 
 public class JsonUnixDateTimeConverter : JsonConverter<DateTime>
 {
-    public override DateTime Read(
-        ref Utf8JsonReader reader,
-        Type typeToConvert,
-        JsonSerializerOptions options)
+    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var milliseconds = reader.GetInt64();
+        var millisecondsString = reader.GetString();
+        var milliseconds = long.Parse(millisecondsString!);
         var result = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
         return result.DateTime.ToUniversalTime();
     }
 
-    public override void Write(
-        Utf8JsonWriter writer,
-        DateTime value,
-        JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
     {
         var milliseconds = new DateTimeOffset(value).ToUnixTimeMilliseconds();
         var millisecondsString = milliseconds.ToString(CultureInfo.InvariantCulture);

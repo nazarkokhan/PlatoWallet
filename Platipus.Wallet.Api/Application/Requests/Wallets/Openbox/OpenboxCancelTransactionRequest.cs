@@ -9,13 +9,11 @@ using Results.Openbox;
 using Results.Openbox.WithData;
 
 public record OpenboxCancelTransactionRequest(
-        Guid Token,
-        string GameUid, //TODO redundant?
-        string GameCycleUid,
-        string OrderUid,
-        string OrderUidCancel, //TODO what?
-        OpenboxSingleRequest Request)
-    : OpenboxBaseRequest(Token, Request), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
+    Guid Token,
+    string GameUid,
+    string GameCycleUid,
+    string OrderUid,
+    string OrderUidCancel) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
 {
     public class Handler : IRequestHandler<OpenboxCancelTransactionRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
@@ -31,9 +29,7 @@ public record OpenboxCancelTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(
-                    r => r.Id == request.GameCycleUid
-                         && r.User.Sessions.Any(s => s.Id == request.Token))
+                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -50,7 +46,7 @@ public record OpenboxCancelTransactionRequest(
 
             var user = round.User;
 
-            user.Balance += lastTransaction.Amount;
+            user.Balance += lastTransaction.Amount / 100;
             _context.Update(user);
 
             round.Transactions.Remove(lastTransaction);

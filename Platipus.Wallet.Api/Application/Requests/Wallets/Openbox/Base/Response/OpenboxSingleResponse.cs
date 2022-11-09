@@ -5,7 +5,7 @@ using Platipus.Wallet.Api.Application.Results.Openbox;
 
 public record OpenboxSingleResponse(
     bool IsSuccess,
-    OpenboxErrorCode ErrorCode,
+    int ErrorCode,
     string ErrorMsg,
     DateTime Timestamp,
     string Payload) : BaseResponse
@@ -27,6 +27,21 @@ public record OpenboxSingleResponse(
             errorCode.ToString(),
             DateTime.UtcNow,
             "")
+    {
+    }
+
+    public OpenboxSingleResponse(
+        bool isSuccess,
+        OpenboxErrorCode errorCode,
+        string errorMsg,
+        DateTime timestamp,
+        string payload)
+        : this(
+            isSuccess,
+            (int)errorCode,
+            errorMsg,
+            timestamp,
+            payload)
     {
     }
 }

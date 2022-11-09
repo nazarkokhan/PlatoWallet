@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Openbox;
 
+using Api.Extensions;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -7,49 +8,46 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxGetPlayerInfoRequest(
-        Guid Token,
-        OpenboxSingleRequest Request)
-    : OpenboxBaseRequest(Token, Request), IRequest<IOpenboxResult<OpenboxGetPlayerInfoRequest.Response>>
+public record OpenboxGetPlayerInfoRequest(Guid Token)
+    : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxGetPlayerInfoRequest.Response>>
 {
     public class Handler : IRequestHandler<OpenboxGetPlayerInfoRequest, IOpenboxResult<Response>>
     {
         private readonly WalletDbContext _context;
+        private readonly ILogger<Handler> _logger;
 
-        public Handler(WalletDbContext context)
+        public Handler(WalletDbContext context, ILogger<Handler> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IOpenboxResult<Response>> Handle(
             OpenboxGetPlayerInfoRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
-                .TagWith("GetSession")
-                .Where(u => u.Id == request.Token)
+            var user = await _context.Set<User>()
+                .TagWith("GetUser")
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
                 .Select(
                     s => new
                     {
                         s.Id,
-                        User = new
-                        {
-                            s.User.Id,
-                            s.User.UserName,
-                            Currency = s.User.Currency.Name
-                        }
+                        s.UserName,
+                        Currency = s.Currency.Name
                     })
                 .FirstOrDefaultAsync(cancellationToken);
-            
+
             //TODO validate should be 2 token
-            if (session is null)
+            if (user is null)
                 return OpenboxResultFactory.Failure<Response>(OpenboxErrorCode.TokenRelatedErrors);
 
-            var response = new Response(
-                session.User.Id,
-                session.User.UserName,
-                //TODO session.User.Currency
-                0);
+            var currencyCode = OpenboxHelpers.ToCurrencyCode(user.Currency);
+
+            if (currencyCode is null)
+                _logger.LogWarning("Currency code not mapped from {CurrencyName}", user.Currency);
+
+            var response = new Response(user.Id, user.UserName, currencyCode ?? -1);
 
             return OpenboxResultFactory.Success(response);
         }

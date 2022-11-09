@@ -25,29 +25,21 @@ public record LogInRequest(
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
 
-        public Handler(
-            WalletDbContext context,
-            IGamesApiClient gamesApiClient)
+        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
         }
 
-        public async Task<IResult<Response>> Handle(
-            LogInRequest request,
-            CancellationToken cancellationToken)
+        public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
         {
-            var casino = await _context.Set<Casino>()
-                .Where(c => c.Id == request.CasinoId)
-                .FirstOrDefaultAsync(cancellationToken);
+            var casino = await _context.Set<Casino>().Where(c => c.Id == request.CasinoId).FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
                 return ResultFactory.Failure<Response>(ErrorCode.InvalidCasinoId);
 
             var user = await _context.Set<User>()
-                .Where(
-                    u => u.UserName == request.UserName &&
-                         u.CasinoId == request.CasinoId)
+                .Where(u => u.UserName == request.UserName && u.CasinoId == request.CasinoId)
                 .Include(u => u.Casino)
                 .Include(u => u.Currency)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -72,7 +64,18 @@ public record LogInRequest(
 
             string launchUrl;
 
-            if (casino.Provider is CasinoProvider.Dafabet)
+            //TODO refactor
+            if (casino.Provider is CasinoProvider.Openbox)
+            {
+                launchUrl = GetOpenboxLaunchUrl(
+                    session.Id,
+                    user.CasinoId,
+                    user.Id,
+                    user.UserName,
+                    request.Game,
+                    user.Currency.Name);
+            }
+            else if (casino.Provider is CasinoProvider.Dafabet)
             {
                 launchUrl = GetDatabetLaunchUrl(
                     request.Game,
@@ -80,7 +83,9 @@ public record LogInRequest(
                     session.Id,
                     user.Currency.Name,
                     null,
-                    DatabetHash.Compute($"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}", casino.SignatureKey));
+                    DatabetHash.Compute(
+                        $"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
+                        casino.SignatureKey));
             }
             else
             {
@@ -111,11 +116,11 @@ public record LogInRequest(
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            { "brand", "dafabet" },
-            { nameof(gameCode), gameCode },
-            { nameof(playerId), playerId },
-            { nameof(playerToken), playerToken.ToString() },
-            { nameof(currency), currency },
+            {"brand", "dafabet"},
+            {nameof(gameCode), gameCode},
+            {nameof(playerId), playerId},
+            {nameof(playerToken), playerToken.ToString()},
+            {nameof(currency), currency},
         };
 
         if (language is not null)
@@ -130,10 +135,40 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    public record Response(
-        Guid SessionId,
-        decimal Balance,
-        string LaunchUrl) : PswBalanceResponse(Balance);
+    private static string GetOpenboxLaunchUrl(
+        Guid token,
+        string agencyUid,
+        Guid playerUid,
+        string playerId,
+        string gameId,
+        string currency)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            // { "brand", "openbox" },//TODO need?
+            {nameof(token), token.ToString("N")},
+            {"agency-uid", agencyUid},
+            {"player-uid", playerUid.ToString("N")},
+            {"player-type", "2"},
+            {"player-id", agencyUid},
+            {"game-id", gameId},
+            {"country", "CN"},
+            {"language", "zh"},
+            {nameof(currency), currency},
+            {"backurl", "http://wallet-api-test.aws.intra/wallet/openbox/"},
+            {"backUri", "http://wallet-api-test.aws.intra/wallet/openbox/"},
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(
+            new Uri("https://test01.platipusgaming.com/onlinecasino/"),
+            $"openbox/launcher{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
+    public record Response(Guid SessionId, decimal Balance, string LaunchUrl) : PswBalanceResponse(Balance);
 
     public class Validator : AbstractValidator<SignUpRequest>
     {
@@ -141,16 +176,11 @@ public record LogInRequest(
         {
             var currenciesOptionsValue = currenciesOptions.Value;
 
-            RuleFor(
-                x => currenciesOptionsValue.Fiat.Contains(x.Currency) ||
-                     currenciesOptionsValue.Crypto.Contains(x.Currency));
+            RuleFor(x => currenciesOptionsValue.Fiat.Contains(x.Currency) || currenciesOptionsValue.Crypto.Contains(x.Currency));
 
-            RuleFor(p => p.Password)
-                .MinimumLength(6)
-                .MaximumLength(8);
+            RuleFor(p => p.Password).MinimumLength(6).MaximumLength(8);
 
-            RuleFor(p => p.Balance)
-                .ScalePrecision(2, 38);
+            RuleFor(p => p.Balance).ScalePrecision(2, 38);
         }
     }
 }

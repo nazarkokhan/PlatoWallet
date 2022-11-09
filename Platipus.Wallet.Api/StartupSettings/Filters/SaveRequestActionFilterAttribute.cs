@@ -6,9 +6,10 @@ public class SaveRequestActionFilterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        var request = context.ActionArguments
-            .SingleOrDefault(a => a.Key is "request");
+        const string requestParamName = "request";
+        var hasRequestBody = context.ActionArguments.TryGetValue(requestParamName, out var request);
 
-        context.HttpContext.Items.Add(request.Key, request.Value);
+        if (hasRequestBody)
+            context.HttpContext.Items.Add(requestParamName, request);
     }
 }
