@@ -37,8 +37,8 @@ try
     builder.Host.UseSerilog(
         (context, configuration) =>
         {
-            configuration.EnableSelfLog(context).WriteTo.Console();
-            // .ReadFrom.Configuration(context.Configuration);
+            configuration.EnableSelfLog(context)
+                .ReadFrom.Configuration(context.Configuration);
         });
 
     var builderConfiguration = builder.Configuration;
