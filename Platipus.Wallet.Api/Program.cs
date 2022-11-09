@@ -37,10 +37,10 @@ try
     builder.Host.UseSerilog(
         (context, configuration) =>
         {
-            configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration);
+            configuration.EnableSelfLog(context).WriteTo.Console();
+            // .ReadFrom.Configuration(context.Configuration);
         });
-    throw new Exception("bad exception");
+
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
 
