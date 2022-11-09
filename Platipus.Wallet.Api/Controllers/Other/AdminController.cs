@@ -6,7 +6,6 @@ using Application.Requests.Test;
 using Abstract;
 using Application.Results.Psw;
 using Extensions;
-using StartupSettings.Constants;
 
 [Route("admin")]
 public class AdminController : ApiController

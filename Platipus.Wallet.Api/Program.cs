@@ -7,7 +7,6 @@ using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
 using Platipus.Wallet.Api.BugFix;
 using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.StartupSettings.Constants;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
