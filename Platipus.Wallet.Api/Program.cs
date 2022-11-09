@@ -22,6 +22,7 @@ try
 {
     Log.Logger = new LoggerConfiguration()
         .Enrich.WithMachineName()
+        .Enrich.WithProperty("AppVersion", App.Version, true)
         .WriteTo.Elasticsearch(
             nodeUris: "http://10.0.3.46:9200;",
             indexFormat: "platipus-wallet",
@@ -31,7 +32,7 @@ try
             typeName: null)
         .CreateLogger();
 
-    Log.Warning("Starting version {VersionId}", App.Version);
+    Log.Warning("Starting app");
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog(
