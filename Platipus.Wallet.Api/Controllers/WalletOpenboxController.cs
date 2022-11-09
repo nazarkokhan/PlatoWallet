@@ -46,7 +46,7 @@ public class WalletOpenboxController : ApiController
     {
         var casinoId = request.VendorUid switch
         {
-            "00000000000000000000000000000001" => "openbox",
+            "00000000000000000000000000000001" => "openbox", //TODO move to db
             _ => null
         };
         if (casinoId is null)
