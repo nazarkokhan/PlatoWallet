@@ -135,3 +135,8 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+public static class App
+{
+    public const string Version = "2.2";
+}
