@@ -30,7 +30,7 @@ try
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
             batchAction: ElasticOpType.Create,
             typeName: null)
-        .CreateLogger();
+        .CreateBootstrapLogger();
 
     Log.Warning("Starting app");
 
