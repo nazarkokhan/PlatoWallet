@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 using StartupSettings.ControllerSpecificJsonOptions;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
-[Route("wallet/openbox")]
+[Route("wallet/openbox/api/v1")]
 [JsonSettingsName(nameof(CasinoProvider.Openbox))]
 public class WalletOpenboxController : ApiController
 {
