@@ -31,7 +31,7 @@ try
             typeName: null)
         .CreateLogger();
     
-    Log.Warning("Starting version {VersionId}", 1.0);
+    Log.Warning("Starting version {VersionId}", 1.2);
     
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog(
@@ -40,7 +40,7 @@ try
             configuration.EnableSelfLog(context)
                 .ReadFrom.Configuration(context.Configuration);
         });
-
+    throw new Exception("bad exception");
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
 
