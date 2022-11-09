@@ -3,9 +3,10 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
 using Microsoft.EntityFrameworkCore;
+using Platipus.Serilog;
 using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
-using Platipus.Wallet.Api.BugFix;
+// using Platipus.Wallet.Api.BugFix;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
@@ -139,5 +140,5 @@ finally
 
 public static class App
 {
-    public const string Version = "3.0";
+    public const string Version = "4.0";
 }

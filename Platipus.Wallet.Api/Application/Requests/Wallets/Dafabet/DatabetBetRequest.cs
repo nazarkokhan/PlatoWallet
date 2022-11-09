@@ -30,9 +30,7 @@ public record DatabetBetRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(
-                    r => r.Id == request.RoundId &&
-                         r.User.UserName == request.PlayerId)
+                .Where(r => r.Id == request.RoundId && r.User.UserName == request.PlayerId)
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
