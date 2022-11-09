@@ -59,8 +59,8 @@ try
         .AddJsonOptions(
             options =>
             {
-                options.JsonSerializerOptions.NumberHandling
-                    = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString;
+                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
+                                                             | JsonNumberHandling.AllowReadingFromString;
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
