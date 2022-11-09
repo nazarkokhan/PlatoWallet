@@ -5,7 +5,7 @@ using JorgeSerrano.Json;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
-using Platipus.Wallet.Api.BugFIx;
+// using Platipus.Wallet.Api.BugFIx;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
@@ -15,31 +15,30 @@ using Platipus.Wallet.Api.StartupSettings.Options;
 using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
 using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Infrastructure.Persistence;
-using Serilog;
-using Serilog.Sinks.Elasticsearch;
-
+// using Serilog;
+// using Serilog.Sinks.Elasticsearch;
 
 try
 {
-    Log.Logger = new LoggerConfiguration()
-        .WriteTo.Elasticsearch(
-            nodeUris: "http://10.0.3.46:9200;",
-            indexFormat: "platipus-wallet",
-            connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
-            autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
-            batchAction: ElasticOpType.Create,
-            typeName: null)
-        .CreateLogger();
-    
-    Log.Warning("Starting version {VersionId}", 1.2);
+    // Log.Logger = new LoggerConfiguration()
+    //     .WriteTo.Elasticsearch(
+    //         nodeUris: "http://10.0.3.46:9200;",
+    //         indexFormat: "platipus-wallet",
+    //         connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
+    //         autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
+    //         batchAction: ElasticOpType.Create,
+    //         typeName: null)
+    //     .CreateLogger();
+    //
+    // Log.Warning("Starting version {VersionId}", 1.2);
     
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog(
-        (context, configuration) =>
-        {
-            configuration.EnableSelfLog(context).WriteTo.Console();
-            // .ReadFrom.Configuration(context.Configuration);
-        });
+    // builder.Host.UseSerilog(
+    //     (context, configuration) =>
+    //     {
+    //         configuration.EnableSelfLog(context).WriteTo.Console();
+    //         // .ReadFrom.Configuration(context.Configuration);
+    //     });
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
@@ -129,9 +128,9 @@ try
 
 catch (Exception ex)
 {
-    Log.Fatal(ex, "FAILED!!!! on startup");
+    // Log.Fatal(ex, "FAILED!!!! on startup");
 }
 finally
 {
-    Log.CloseAndFlush();
+    // Log.CloseAndFlush();
 }

@@ -24,10 +24,6 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.9" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
-        <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
-        <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
-        <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.0-beta7" />
         <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
         <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5" />
         <PackageReference Include="StackExchange.Redis.Extensions.System.Text.Json" Version="8.0.5" />
