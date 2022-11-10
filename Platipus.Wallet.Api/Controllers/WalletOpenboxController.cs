@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 using StartupSettings.ControllerSpecificJsonOptions;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
-[Route("wallet/openbox/api/v1")]
+[Route("wallet/openbox/")]
 [JsonSettingsName(nameof(CasinoProvider.Openbox))]
 public class WalletOpenboxController : ApiController
 {
@@ -40,7 +40,7 @@ public class WalletOpenboxController : ApiController
         _context = context;
     }
 
-    [HttpPost]
+    [HttpPost("main")]
     [ProducesResponseType(typeof(OpenboxSingleResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(OpenboxSingleRequest request, CancellationToken cancellationToken)
     {

@@ -2,12 +2,12 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Api.Extensions.SecuritySign;
 using Base;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Domain.Entities;
 using Domain.Entities.Enums;
+using FluentValidation;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Results.Psw;
 using Results.Psw.WithData;
 using Services.GamesApi;
@@ -33,7 +33,9 @@ public record LogInRequest(
 
         public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
         {
-            var casino = await _context.Set<Casino>().Where(c => c.Id == request.CasinoId).FirstOrDefaultAsync(cancellationToken);
+            var casino = await _context.Set<Casino>()
+                .Where(c => c.Id == request.CasinoId)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
                 return ResultFactory.Failure<Response>(ErrorCode.InvalidCasinoId);
