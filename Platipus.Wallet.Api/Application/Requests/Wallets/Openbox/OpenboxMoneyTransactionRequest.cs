@@ -84,7 +84,7 @@ public record OpenboxMoneyTransactionRequest(
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxBalanceResponse(round.User.Balance * 100);
+            var response = new OpenboxBalanceResponse((long) (round.User.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }
@@ -125,7 +125,7 @@ public record OpenboxMoneyTransactionRequest(
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxBalanceResponse(round.User.Balance * 100);
+            var response = new OpenboxBalanceResponse((long) (round.User.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }
