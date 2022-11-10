@@ -108,6 +108,39 @@ public record LogInRequest(
         }
     }
 
+    private static string GetOpenboxLaunchUrl(
+        Guid token,
+        string agencyUid,
+        Guid playerUid,
+        string playerId,
+        string gameId,
+        string currency)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            // { "brand", "openbox" },//TODO need?
+            {nameof(token), token.ToString("N")},
+            {"agency-uid", agencyUid},
+            {"player-uid", playerUid.ToString("N")},
+            {"player-type", "1"},
+            {"player-id", playerId},
+            {"game-id", gameId},
+            {"country", "CN"},
+            {"language", "en"},
+            {nameof(currency), currency},
+            // {"backurl", "zero"},
+            // {"backUri", "zero"},
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(
+            new Uri("https://test.platipusgaming.com/onlinecasino/"),
+            $"openbox/launcher{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
     private static string GetDatabetLaunchUrl(
         string gameCode,
         string playerId,
@@ -133,39 +166,6 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"dafabet/launch{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
-    private static string GetOpenboxLaunchUrl(
-        Guid token,
-        string agencyUid,
-        Guid playerUid,
-        string playerId,
-        string gameId,
-        string currency)
-    {
-        var queryParameters = new Dictionary<string, string?>()
-        {
-            // { "brand", "openbox" },//TODO need?
-            {nameof(token), token.ToString("N")},
-            {"agency-uid", agencyUid},
-            {"player-uid", playerUid.ToString("N")},
-            {"player-type", "2"},
-            {"player-id", agencyUid},
-            {"game-id", gameId},
-            {"country", "CN"},
-            {"language", "zh"},
-            {nameof(currency), currency},
-            {"backurl", "http://wallet-api-test.aws.intra/wallet/openbox/main"},
-            {"backUri", "http://wallet-api-test.aws.intra/wallet/openbox/main"},
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(
-            new Uri("https://test01.platipusgaming.com/onlinecasino/"),
-            $"openbox/launcher{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

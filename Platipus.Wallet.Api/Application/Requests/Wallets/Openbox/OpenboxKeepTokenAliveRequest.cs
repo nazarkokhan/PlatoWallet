@@ -31,7 +31,7 @@ public record OpenboxKeepTokenAliveRequest(Guid Token)
             if (session is null)
                 return OpenboxResultFactory.Failure<Response>(OpenboxErrorCode.TokenRelatedErrors);
 
-            session.ExpirationDate = session.ExpirationDate.AddMinutes(35);
+            session.ExpirationDate = session.ExpirationDate.AddMinutes(35).ToUniversalTime();
 
             _context.Update(session);
             await _context.SaveChangesAsync(cancellationToken);

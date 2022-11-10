@@ -94,7 +94,9 @@ public record OpenboxMoneyTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
+                .Where(
+                    r => r.Id == request.GameCycleUid
+                      && r.User.Sessions.Any(s => s.Id == request.Token))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -108,7 +110,7 @@ public record OpenboxMoneyTransactionRequest(
             if (round.Finished)
                 return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
 
-            round.User.Balance += request.OrderAmount;
+            round.User.Balance += request.OrderAmount / 100m;
 
             round.Finished = true; //TODO when is finished?
 
