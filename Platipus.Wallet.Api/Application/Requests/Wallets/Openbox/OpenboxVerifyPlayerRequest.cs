@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxVerifyPlayerRequest(Guid Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxTokenResponse>>
+public record OpenboxVerifyPlayerRequest(string Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxTokenResponse>>
 {
     public class Handler : IRequestHandler<OpenboxVerifyPlayerRequest, IOpenboxResult<OpenboxTokenResponse>>
     {
@@ -25,7 +25,7 @@ public record OpenboxVerifyPlayerRequest(Guid Token) : OpenboxBaseRequest(Token)
         {
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
-                .Where(u => u.Id == request.Token)
+                .Where(u => u.Id == new Guid(request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null)
@@ -35,10 +35,7 @@ public record OpenboxVerifyPlayerRequest(Guid Token) : OpenboxBaseRequest(Token)
                 return OpenboxResultFactory.Failure<OpenboxTokenResponse>(OpenboxErrorCode.TokenRelatedErrors);
 
             //TODO session.IsMainToken = false;
-            var newSession = new Session
-            {
-                UserId = session.UserId
-            };
+            var newSession = new Session {UserId = session.UserId};
             _context.Add(newSession);
 
 

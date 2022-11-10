@@ -9,7 +9,7 @@ using Results.Openbox;
 using Results.Openbox.WithData;
 
 public record OpenboxMoneyTransactionRequest(
-    Guid Token,
+    string Token,
     string GameUid,
     string GameCycleUid,
     string OrderUid,
@@ -42,7 +42,7 @@ public record OpenboxMoneyTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
+                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == new Guid(request.Token)))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -50,7 +50,7 @@ public record OpenboxMoneyTransactionRequest(
             if (round is null)
             {
                 var user = await _context.Set<User>()
-                    .Where(u => u.Sessions.Any(s => s.Id == request.Token))
+                    .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Token)))
                     .Include(u => u.Currency)
                     .FirstAsync(cancellationToken);
 
@@ -96,7 +96,7 @@ public record OpenboxMoneyTransactionRequest(
             var round = await _context.Set<Round>()
                 .Where(
                     r => r.Id == request.GameCycleUid
-                      && r.User.Sessions.Any(s => s.Id == request.Token))
+                      && r.User.Sessions.Any(s => s.Id == new Guid(request.Token)))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);

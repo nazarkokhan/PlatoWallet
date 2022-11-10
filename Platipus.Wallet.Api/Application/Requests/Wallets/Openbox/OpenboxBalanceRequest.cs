@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxBalanceRequest(Guid Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
+public record OpenboxBalanceRequest(string Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
 {
     public class Handler : IRequestHandler<OpenboxBalanceRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
@@ -25,7 +25,7 @@ public record OpenboxBalanceRequest(Guid Token) : OpenboxBaseRequest(Token), IRe
         {
             var user = await _context.Set<User>()
                 .TagWith("GetUserBalance")
-                .Where(u => u.Sessions.Select(s => s.Id).Contains(request.Token))
+                .Where(u => u.Sessions.Select(s => s.Id).Contains(new Guid(request.Token)))
                 .Select(
                     s => new
                     {

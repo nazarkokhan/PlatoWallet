@@ -9,7 +9,7 @@ using Results.Openbox;
 using Results.Openbox.WithData;
 
 public record OpenboxCancelTransactionRequest(
-    Guid Token,
+    string Token,
     string GameUid,
     string GameCycleUid,
     string OrderUid,
@@ -29,7 +29,7 @@ public record OpenboxCancelTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
+                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == new Guid(request.Token)))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);

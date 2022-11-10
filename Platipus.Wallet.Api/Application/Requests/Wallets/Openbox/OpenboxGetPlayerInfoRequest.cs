@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxGetPlayerInfoRequest(Guid Token)
+public record OpenboxGetPlayerInfoRequest(string Token)
     : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxGetPlayerInfoRequest.Response>>
 {
     public class Handler : IRequestHandler<OpenboxGetPlayerInfoRequest, IOpenboxResult<Response>>
@@ -28,7 +28,7 @@ public record OpenboxGetPlayerInfoRequest(Guid Token)
         {
             var user = await _context.Set<User>()
                 .TagWith("GetUser")
-                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
+                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Token)))
                 .Select(
                     s => new
                     {

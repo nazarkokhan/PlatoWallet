@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Results.Openbox;
 using Results.Openbox.WithData;
 
-public record OpenboxKeepTokenAliveRequest(Guid Token)
+public record OpenboxKeepTokenAliveRequest(string Token)
     : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxKeepTokenAliveRequest.Response>>
 {
     public class Handler : IRequestHandler<OpenboxKeepTokenAliveRequest, IOpenboxResult<Response>>
@@ -25,7 +25,7 @@ public record OpenboxKeepTokenAliveRequest(Guid Token)
         {
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
-                .Where(u => u.Id == request.Token)
+                .Where(u => u.Id == new Guid(request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null)
