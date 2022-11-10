@@ -160,5 +160,5 @@ finally
 
 public static class App
 {
-    public const string Version = "6.0";
+    public const string Version = "7.0";
 }
