@@ -157,8 +157,8 @@ public record LogInRequest(
             {"country", "CN"},
             {"language", "zh"},
             {nameof(currency), currency},
-            {"backurl", "http://wallet-api-test.aws.intra/wallet/openbox/"},
-            {"backUri", "http://wallet-api-test.aws.intra/wallet/openbox/"},
+            {"backurl", "http://wallet-api-test.aws.intra/wallet/openbox/main"},
+            {"backUri", "http://wallet-api-test.aws.intra/wallet/openbox/main"},
         };
 
         var queryString = QueryString.Create(queryParameters);
