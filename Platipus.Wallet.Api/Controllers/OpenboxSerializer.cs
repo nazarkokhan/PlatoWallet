@@ -15,8 +15,6 @@ public static class OpenboxSerializer
         {
             new JsonStringEnumConverter(),
             new JsonUnixDateTimeConverter()
-        },
-        NumberHandling = JsonNumberHandling.WriteAsString
-                       | JsonNumberHandling.AllowReadingFromString
+        }
     };
 }
