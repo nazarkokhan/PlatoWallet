@@ -38,7 +38,6 @@ public record OpenboxVerifyPlayerRequest(string Token) : OpenboxBaseRequest(Toke
             var newSession = new Session {UserId = session.UserId};
             _context.Add(newSession);
 
-
             await _context.SaveChangesAsync(cancellationToken);
 
             var response = new OpenboxTokenResponse(newSession.Id);

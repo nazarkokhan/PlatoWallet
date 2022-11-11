@@ -119,9 +119,9 @@ public record LogInRequest(
         var queryParameters = new Dictionary<string, string?>()
         {
             // { "brand", "openbox" },//TODO need?
-            {nameof(token), token.ToString("N")},
+            {nameof(token), token.ToString()},
             {"agency-uid", agencyUid},
-            {"player-uid", playerUid.ToString("N")},
+            {"player-uid", playerUid.ToString()},
             {"player-type", "1"},
             {"player-id", playerId},
             {"game-id", gameId},
