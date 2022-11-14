@@ -18,7 +18,8 @@ public record LogInRequest(
     string UserName,
     string Password,
     string CasinoId,
-    string Game) : BaseRequest, IRequest<IResult<LogInRequest.Response>>
+    string Game,
+    string Device) : BaseRequest, IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
@@ -79,12 +80,13 @@ public record LogInRequest(
             }
             else if (casino.Provider is CasinoProvider.Dafabet)
             {
-                launchUrl = GetDatabetLaunchUrl(
+                launchUrl = GetDafabetLaunchUrl(
                     request.Game,
                     user.UserName,
                     session.Id,
                     user.Currency.Name,
-                    null,
+                    request.Device,
+                    "en",
                     DatabetHash.Compute(
                         $"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
                         casino.SignatureKey));
@@ -141,11 +143,12 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    private static string GetDatabetLaunchUrl(
+    private static string GetDafabetLaunchUrl(
         string gameCode,
         string playerId,
         Guid playerToken,
         string currency,
+        string device,
         string? language,
         string hash)
     {
@@ -156,6 +159,7 @@ public record LogInRequest(
             {nameof(playerId), playerId},
             {nameof(playerToken), playerToken.ToString()},
             {nameof(currency), currency},
+            {nameof(device), device},
         };
 
         if (language is not null)

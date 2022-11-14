@@ -2,9 +2,9 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Dafabet;
 
 using Base;
 using Base.Response;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Dafabet;
 using Results.Dafabet.WithData;
 
@@ -14,6 +14,7 @@ public record DatabetBonusWinRequest(
     string GameCode,
     string RoundId,
     string TransactionId,
+    string Device,
     string Hash) : DatabetBaseRequest(PlayerId, Hash), IRequest<IDafabetResult<DatabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DatabetBonusWinRequest, IDafabetResult<DatabetBalanceResponse>>
@@ -61,10 +62,7 @@ public record DatabetBonusWinRequest(
                         Amount = request.Amount
                     }
                 },
-                AwardRound = new AwardRound
-                {
-                    Award = award
-                }
+                AwardRound = new AwardRound {Award = award}
             };
             _context.Add(round);
 
@@ -81,9 +79,9 @@ public record DatabetBonusWinRequest(
             return DatabetResultFactory.Success(response);
         }
     }
-    
+
     public override string GetSource()
     {
-        return PlayerId + Amount + GameCode + RoundId + TransactionId;
+        return PlayerId + Amount + GameCode + RoundId + TransactionId + Device;
     }
 }
