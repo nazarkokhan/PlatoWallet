@@ -2,9 +2,9 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Dafabet;
 
 using Base;
 using Base.Response;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Dafabet;
 using Results.Dafabet.WithData;
 
@@ -15,6 +15,7 @@ public record DatabetBetResultRequest(
     string RoundId,
     string TransactionId,
     bool EndRound,
+    string? Device,
     string Hash) : DatabetBaseRequest(PlayerId, Hash), IRequest<IDafabetResult<DatabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DatabetBetResultRequest, IDafabetResult<DatabetBalanceResponse>>
@@ -31,9 +32,7 @@ public record DatabetBetResultRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(
-                    r => r.Id == request.RoundId &&
-                         r.User.UserName == request.PlayerId)
+                .Where(r => r.Id == request.RoundId && r.User.UserName == request.PlayerId)
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
