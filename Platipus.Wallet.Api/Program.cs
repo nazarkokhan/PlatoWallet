@@ -4,8 +4,10 @@ using FluentValidation;
 using JorgeSerrano.Json;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Serilog;
+using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
@@ -47,6 +49,7 @@ try
 
     const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO to config
     services
+        .AddScoped<IWalletService, WalletService>()
         .AddTransient<ExceptionHandlerMiddleware>()
         .AddControllers(
             options =>
@@ -75,11 +78,19 @@ try
             nameof(CasinoProvider.Openbox),
             options =>
             {
+                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
+            })
+        .AddJsonOptions(
+            nameof(CasinoProvider.Hub88),
+            options =>
+            {
                 // options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
                 //                                              | JsonNumberHandling.AllowReadingFromString;
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
+                options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
@@ -125,7 +136,6 @@ try
                 r.Configuration = builderConfiguration.GetConnectionString("RedisCache");
             });
 
-
     var app = builder.Build();
 
     app.UseExceptionHandler(
@@ -160,7 +170,10 @@ finally
     Log.CloseAndFlush();
 }
 
-public static class App
+namespace Platipus.Wallet.Api
 {
-    public const string Version = "8.0";
+    public static class App
+    {
+        public const string Version = "8.0";
+    }
 }

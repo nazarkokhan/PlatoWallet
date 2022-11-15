@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Behaviors;
 
 using Extensions;
-using Microsoft.Extensions.Logging;
 using Results.Psw;
 
 public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
@@ -28,7 +27,7 @@ public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest
         {
             _logger.LogError(e, "Request {@Request} was handled with unexpected error", request);
 
-            return DynamicResultFactory.CreateFailureResult<TResponse>(ErrorCode.Unknown, e);
+            return DynamicResultFactory.CreateFailureResult<TResponse>(PswErrorCode.Unknown, e);
         }
     }
 }

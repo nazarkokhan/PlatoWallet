@@ -8,7 +8,6 @@ using DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Results.Psw;
-using Results.Psw.WithData;
 
 public class GamesApiClient : IGamesApiClient
 {
@@ -21,7 +20,7 @@ public class GamesApiClient : IGamesApiClient
         _jsonSerializerOptions = jsonSerializerOptions.Value.JsonSerializerOptions;
     }
 
-    public async Task<IResult<GetLaunchUrlResponseDto>> GetGameLinkAsync(
+    public async Task<IPswResult<GetLaunchUrlResponseDto>> GetGameLinkAsync(
         string casinoId,
         Guid sessionId,
         string user,
@@ -49,7 +48,7 @@ public class GamesApiClient : IGamesApiClient
             cancellationToken);
 
         if (response.StatusCode is not HttpStatusCode.OK)
-            return ResultFactory.Failure<GetLaunchUrlResponseDto>(ErrorCode.Unknown);
+            return PswResultFactory.Failure<GetLaunchUrlResponseDto>(PswErrorCode.Unknown);
 
         var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -58,30 +57,27 @@ public class GamesApiClient : IGamesApiClient
 
         if (responseStatusString is not null)
         {
-            var responseStatus = Enum.Parse<Status>(responseStatusString);
+            var responseStatus = Enum.Parse<PswStatus>(responseStatusString);
 
-            if (responseStatus is not Status.ERROR)
-                return ResultFactory.Failure<GetLaunchUrlResponseDto>(ErrorCode.Unknown);
-            
+            if (responseStatus is not PswStatus.ERROR)
+                return PswResultFactory.Failure<GetLaunchUrlResponseDto>(PswErrorCode.Unknown);
+
             var errorModel = jsonNode.Deserialize<PswBaseGamesApiErrorResponseDto>(_jsonSerializerOptions)!;
-            return ResultFactory.Failure<GetLaunchUrlResponseDto>(errorModel.Error);
+            return PswResultFactory.Failure<GetLaunchUrlResponseDto>(errorModel.Error);
         }
 
         var successModel = jsonNode.Deserialize<GetLaunchUrlResponseDto>(_jsonSerializerOptions)!;
 
-        return ResultFactory.Success(successModel);
+        return PswResultFactory.Success(successModel);
     }
 
-    public async Task<IResult<GetCasinoGamesListResponseDto>> GetCasinoGamesAsync(
+    public async Task<IPswResult<GetCasinoGamesListResponseDto>> GetCasinoGamesAsync(
         string casinoId,
         CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(
             "game/list",
-            new
-            {
-                casinoId
-            },
+            new {casinoId},
             _jsonSerializerOptions,
             cancellationToken);
 
@@ -92,7 +88,7 @@ public class GamesApiClient : IGamesApiClient
         return responseResult;
     }
 
-    public async Task<IResult<CreateFreebetAwardResponseDto>> CreateFreebetAwardAsync(
+    public async Task<IPswResult<CreateFreebetAwardResponseDto>> CreateFreebetAwardAsync(
         string casinoId,
         string user,
         string awardId,

@@ -2,14 +2,13 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Psw;
 
 using Base;
 using Base.Response;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 
-public record BetRequest(
+public record PswBetRequest(
     Guid SessionId,
     string User,
     string Currency,
@@ -17,9 +16,9 @@ public record BetRequest(
     string RoundId,
     string TransactionId,
     bool Finished,
-    decimal Amount) : PswBaseRequest(SessionId, User), IRequest<IResult<PswBalanceResponse>>
+    decimal Amount) : PswBaseRequest(SessionId, User), IRequest<IPswResult<PswBalanceResponse>>
 {
-    public class Handler : IRequestHandler<BetRequest, IResult<PswBalanceResponse>>
+    public class Handler : IRequestHandler<PswBetRequest, IPswResult<PswBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -28,14 +27,12 @@ public record BetRequest(
             _context = context;
         }
 
-        public async Task<IResult<PswBalanceResponse>> Handle(
-            BetRequest request,
+        public async Task<IPswResult<PswBalanceResponse>> Handle(
+            PswBetRequest request,
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(
-                    r => r.Id == request.RoundId &&
-                         r.User.UserName == request.User)
+                .Where(r => r.Id == request.RoundId && r.User.UserName == request.User)
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -59,13 +56,13 @@ public record BetRequest(
             }
 
             if (round.Transactions.Any(t => t.Id == request.TransactionId))
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.DuplicateTransaction);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.DuplicateTransaction);
 
             if (round.Finished)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.Unknown);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.Unknown);
 
             if (round.User.Currency.Name != request.Currency)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.WrongCurrency);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.WrongCurrency);
 
             round.User.Balance -= request.Amount;
             if (request.Finished)
@@ -84,11 +81,11 @@ public record BetRequest(
 
             var response = new PswBalanceResponse(round.User.Balance);
 
-            return ResultFactory.Success(response);
+            return PswResultFactory.Success(response);
         }
     }
-    
-    public class Validator : AbstractValidator<BetRequest>
+
+    public class Validator : AbstractValidator<PswBetRequest>
     {
         public Validator()
         {

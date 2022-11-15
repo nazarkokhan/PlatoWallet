@@ -5,11 +5,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using DTOs.Base;
 using Results.Psw;
-using Results.Psw.WithData;
 
 public static class HttpClientExtensions
 {
-    public static async Task<IResult<T>> GetResponseResult<T>(
+    public static async Task<IPswResult<T>> GetResponseResult<T>(
         this HttpResponseMessage response,
         JsonSerializerOptions jsonSerializerOptions,
         CancellationToken cancellationToken)
@@ -17,7 +16,7 @@ public static class HttpClientExtensions
         try
         {
             if (response.StatusCode is not HttpStatusCode.OK)
-                return ResultFactory.Failure<T>(ErrorCode.Unknown);
+                return PswResultFactory.Failure<T>(PswErrorCode.Unknown);
 
             var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -25,23 +24,23 @@ public static class HttpClientExtensions
             var responseStatusString = jsonNode?["status"]?.GetValue<string>();
 
             if (responseStatusString is null)
-                return ResultFactory.Failure<T>(ErrorCode.Unknown);
+                return PswResultFactory.Failure<T>(PswErrorCode.Unknown);
 
-            var responseStatus = Enum.Parse<Status>(responseStatusString);
+            var responseStatus = Enum.Parse<PswStatus>(responseStatusString);
 
-            if (responseStatus is Status.ERROR)
+            if (responseStatus is PswStatus.ERROR)
             {
                 var errorModel = jsonNode.Deserialize<PswBaseGamesApiErrorResponseDto>(jsonSerializerOptions)!;
-                return ResultFactory.Failure<T>(errorModel.Error);
+                return PswResultFactory.Failure<T>(errorModel.Error);
             }
 
             var successModel = jsonNode.Deserialize<T>(jsonSerializerOptions)!;
 
-            return ResultFactory.Success(successModel);
+            return PswResultFactory.Success(successModel);
         }
         catch (Exception e)
         {
-            return ResultFactory.Failure<T>(ErrorCode.Unknown, e);
+            return PswResultFactory.Failure<T>(PswErrorCode.Unknown, e);
         }
     }
 }

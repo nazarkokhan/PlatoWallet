@@ -1,10 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 using Services.GamesApi;
 using Wallets.Psw.Base.Response;
 
@@ -13,9 +12,9 @@ public record CreateAwardRequest(
     string User,
     DateTime ValidUntil,
     string Game,
-    string AwardId) : IRequest<IResult<PswBaseResponse>>
+    string AwardId) : IRequest<IPswResult<PswBaseResponse>>
 {
-    public class Handler : IRequestHandler<CreateAwardRequest, IResult<PswBaseResponse>>
+    public class Handler : IRequestHandler<CreateAwardRequest, IPswResult<PswBaseResponse>>
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
@@ -28,22 +27,23 @@ public record CreateAwardRequest(
             _gamesApiClient = gamesApiClient;
         }
 
-        public async Task<IResult<PswBaseResponse>> Handle(
+        public async Task<IPswResult<PswBaseResponse>> Handle(
             CreateAwardRequest request,
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
                 .Where(u => u.UserName == request.User)
-                .Include(u => u.Awards
-                    .Where(a => a.Id == request.AwardId))
+                .Include(
+                    u => u.Awards
+                        .Where(a => a.Id == request.AwardId))
                 .Include(u => u.Currency)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.InvalidUser);
+                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.InvalidUser);
 
             if (user.Awards.Any(a => a.Id == request.AwardId))
-                return ResultFactory.Failure<PswBaseResponse>(ErrorCode.DuplicateAward);
+                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.DuplicateAward);
 
             var award = new Award
             {

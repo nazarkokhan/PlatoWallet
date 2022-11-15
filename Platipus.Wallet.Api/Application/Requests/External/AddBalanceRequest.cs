@@ -1,56 +1,56 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 using Wallets.Psw.Base.Response;
 
 public record AddBalanceRequest(
     Guid SessionId,
-    decimal Balance) : IRequest<IResult<PswBaseResponse>>
+    decimal Balance) : IRequest<IPswResult<PswBaseResponse>>
 {
-    public class Handler : IRequestHandler<AddBalanceRequest, IResult<PswBaseResponse>>
+    public class Handler : IRequestHandler<AddBalanceRequest, IPswResult<PswBaseResponse>>
     {
         private readonly WalletDbContext _context;
-        
+
         public Handler(WalletDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IResult<PswBaseResponse>> Handle(
+        public async Task<IPswResult<PswBaseResponse>> Handle(
             AddBalanceRequest request,
             CancellationToken cancellationToken)
         {
             var session = await _context.Set<Session>()
                 .Where(s => s.Id == request.SessionId)
-                .Select(s => new
-                {
-                    s.Id,
-                    s.ExpirationDate,
-                    s.User
-                })
+                .Select(
+                    s => new
+                    {
+                        s.Id,
+                        s.ExpirationDate,
+                        s.User
+                    })
                 .FirstAsync(cancellationToken);
 
             var user = session.User;
             if (user.IsDisabled)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.UserDisabled);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.UserDisabled);
 
             user.Balance += request.Balance;
-            
+
             _context.Update(user);
 
             await _context.SaveChangesAsync(cancellationToken);
-            
+
             var result = new PswBalanceResponse(user.Balance);
 
-            return ResultFactory.Success(result);
+            return PswResultFactory.Success(result);
         }
     }
-    
+
     public class Validator : AbstractValidator<AddBalanceRequest>
     {
         public Validator()

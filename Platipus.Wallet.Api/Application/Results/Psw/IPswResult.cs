@@ -2,6 +2,6 @@
 
 using Base;
 
-public interface IResult : IBaseResult<ErrorCode>
+public interface IPswResult : IBaseResult<PswErrorCode>
 {
 }

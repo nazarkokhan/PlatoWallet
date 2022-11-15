@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Results.Psw;
+namespace Platipus.Wallet.Api.Application.Results.Common;
 
 public enum ErrorCode
 {

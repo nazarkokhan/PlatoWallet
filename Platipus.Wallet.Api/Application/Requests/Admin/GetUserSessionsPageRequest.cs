@@ -1,18 +1,16 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Extensions;
 using Base.Page;
 using Domain.Entities;
+using Extensions;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 
-public record GetUserSessionsPageRequest(PageRequest Page, string User) : IRequest<IResult<IPage<GetUserSessionsPageRequest.Response>>>
+public record GetUserSessionsPageRequest(PageRequest Page, string User)
+    : IRequest<IPswResult<IPage<GetUserSessionsPageRequest.Response>>>
 {
-    public class Handler : IRequestHandler<GetUserSessionsPageRequest, IResult<IPage<Response>>>
+    public class Handler : IRequestHandler<GetUserSessionsPageRequest, IPswResult<IPage<Response>>>
     {
         private readonly WalletDbContext _context;
 
@@ -21,7 +19,7 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User) : IReque
             _context = context;
         }
 
-        public async Task<IResult<IPage<Response>>> Handle(
+        public async Task<IPswResult<IPage<Response>>> Handle(
             GetUserSessionsPageRequest request,
             CancellationToken cancellationToken)
         {
@@ -51,7 +49,7 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User) : IReque
 
             var page = new Page<Response>(users, totalCount);
 
-            return ResultFactory.Success(page);
+            return PswResultFactory.Success(page);
         }
     }
 

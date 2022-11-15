@@ -1,16 +1,15 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 using Services.GamesApi;
 using Services.GamesApi.DTOs.Responses;
 
-public record GetCasinoGamesRequest(string CasinoId) : IRequest<IResult<GetCasinoGamesListResponseDto>>
+public record GetCasinoGamesRequest(string CasinoId) : IRequest<IPswResult<GetCasinoGamesListResponseDto>>
 {
-    public class Handler : IRequestHandler<GetCasinoGamesRequest, IResult<GetCasinoGamesListResponseDto>>
+    public class Handler : IRequestHandler<GetCasinoGamesRequest, IPswResult<GetCasinoGamesListResponseDto>>
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
@@ -21,7 +20,7 @@ public record GetCasinoGamesRequest(string CasinoId) : IRequest<IResult<GetCasin
             _gamesApiClient = gamesApiClient;
         }
 
-        public async Task<IResult<GetCasinoGamesListResponseDto>> Handle(
+        public async Task<IPswResult<GetCasinoGamesListResponseDto>> Handle(
             GetCasinoGamesRequest request,
             CancellationToken cancellationToken)
         {
@@ -30,7 +29,7 @@ public record GetCasinoGamesRequest(string CasinoId) : IRequest<IResult<GetCasin
                 .AnyAsync(cancellationToken);
 
             if (!casinoExist)
-                return ResultFactory.Failure<GetCasinoGamesListResponseDto>(ErrorCode.InvalidCasinoId);
+                return PswResultFactory.Failure<GetCasinoGamesListResponseDto>(PswErrorCode.InvalidCasinoId);
 
             var casinoGamesResponse = await _gamesApiClient.GetCasinoGamesAsync(request.CasinoId, cancellationToken);
 

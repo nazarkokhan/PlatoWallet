@@ -2,13 +2,13 @@ namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using Domain.Entities;
 using Domain.Entities.Enums;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
 
-public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IResult>
+public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IPswResult>
 {
-    public class Handler : IRequestHandler<SetDatabetCasinoProviderRequest, IResult>
+    public class Handler : IRequestHandler<SetDatabetCasinoProviderRequest, IPswResult>
     {
         private readonly WalletDbContext _context;
 
@@ -17,7 +17,7 @@ public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IResul
             _context = context;
         }
 
-        public async Task<IResult> Handle(
+        public async Task<IPswResult> Handle(
             SetDatabetCasinoProviderRequest request,
             CancellationToken cancellationToken)
         {
@@ -35,13 +35,13 @@ public record SetDatabetCasinoProviderRequest(string CasinoId) : IRequest<IResul
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
-                return ResultFactory.Failure(ErrorCode.InvalidCasinoId);
+                return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
 
             casino.Provider = CasinoProvider.Dafabet;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return ResultFactory.Success();
+            return PswResultFactory.Success();
         }
     }
 }

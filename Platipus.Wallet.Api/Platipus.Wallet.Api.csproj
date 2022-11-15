@@ -29,14 +29,18 @@
         <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
         <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.0-beta7" />
-        <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
-        <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5" />
-        <PackageReference Include="StackExchange.Redis.Extensions.System.Text.Json" Version="8.0.5" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="StackExchange.Redis" Version="2.6.66"/>
+        <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5"/>
+        <PackageReference Include="StackExchange.Redis.Extensions.System.Text.Json" Version="8.0.5"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Platipus.Wallet.Infrastructure\Platipus.Wallet.Infrastructure.csproj" />
+        <ProjectReference Include="..\Platipus.Wallet.Infrastructure\Platipus.Wallet.Infrastructure.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Extensions\SecuritySign\hub88.pem"/>
     </ItemGroup>
 
 </Project>

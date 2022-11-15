@@ -2,6 +2,6 @@
 
 using Base.WithData;
 
-public interface IResult<out TData> : IBaseResult<ErrorCode, TData>, IResult
+public interface IPswResult<out TData> : IBaseResult<PswErrorCode, TData>, IPswResult
 {
 }

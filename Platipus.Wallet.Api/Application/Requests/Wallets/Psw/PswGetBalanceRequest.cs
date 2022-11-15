@@ -2,19 +2,18 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Psw;
 
 using Base;
 using Base.Response;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 
-public record GetBalanceRequest(
+public record PswGetBalanceRequest(
     Guid SessionId,
     string User,
     string Currency,
-    string Game) : PswBaseRequest(SessionId, User), IRequest<IResult<PswBalanceResponse>>
+    string Game) : PswBaseRequest(SessionId, User), IRequest<IPswResult<PswBalanceResponse>>
 {
-    public class Handler : IRequestHandler<GetBalanceRequest, IResult<PswBalanceResponse>>
+    public class Handler : IRequestHandler<PswGetBalanceRequest, IPswResult<PswBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -23,15 +22,15 @@ public record GetBalanceRequest(
             _context = context;
         }
 
-        public async Task<IResult<PswBalanceResponse>> Handle(
-            GetBalanceRequest request,
+        public async Task<IPswResult<PswBalanceResponse>> Handle(
+            PswGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
                 .TagWith("GetUserBalance")
                 .Where(
                     u => u.UserName == request.User
-                         && u.Sessions
+                      && u.Sessions
                              .Select(s => s.Id)
                              .Contains(request.SessionId))
                 .Select(
@@ -44,14 +43,14 @@ public record GetBalanceRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.InvalidUser);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.InvalidUser);
 
             if (user.IsDisabled)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.UserDisabled);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.UserDisabled);
 
             var response = new PswBalanceResponse(user.Balance);
 
-            return ResultFactory.Success(response);
+            return PswResultFactory.Success(response);
         }
     }
 }

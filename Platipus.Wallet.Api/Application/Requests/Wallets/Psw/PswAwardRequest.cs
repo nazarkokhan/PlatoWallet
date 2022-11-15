@@ -2,14 +2,13 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Psw;
 
 using Base;
 using Base.Response;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 
-public record AwardRequest(
+public record PswAwardRequest(
     Guid SessionId,
     string User,
     string Currency,
@@ -17,9 +16,9 @@ public record AwardRequest(
     string RoundId,
     string TransactionId,
     decimal Amount,
-    string AwardId) : PswBaseRequest(SessionId, User), IRequest<IResult<PswBalanceResponse>>
+    string AwardId) : PswBaseRequest(SessionId, User), IRequest<IPswResult<PswBalanceResponse>>
 {
-    public class Handler : IRequestHandler<AwardRequest, IResult<PswBalanceResponse>>
+    public class Handler : IRequestHandler<PswAwardRequest, IPswResult<PswBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -28,8 +27,8 @@ public record AwardRequest(
             _context = context;
         }
 
-        public async Task<IResult<PswBalanceResponse>> Handle(
-            AwardRequest request,
+        public async Task<IPswResult<PswBalanceResponse>> Handle(
+            PswAwardRequest request,
             CancellationToken cancellationToken)
         {
             var award = await _context.Set<Award>()
@@ -39,10 +38,10 @@ public record AwardRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (award is null || award.User.UserName != request.User)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.AwardDoesNotExist);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.AwardDoesNotExist);
 
             if (award.AwardRound is not null)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.DuplicateTransaction);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.DuplicateTransaction);
 
             var round = await _context.Set<Round>()
                 .Where(r => r.Id == request.RoundId)
@@ -50,7 +49,7 @@ public record AwardRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (round is not null)
-                return ResultFactory.Failure<PswBalanceResponse>(ErrorCode.DuplicateTransaction);
+                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.DuplicateTransaction);
 
             round = new Round
             {
@@ -64,10 +63,7 @@ public record AwardRequest(
                         Amount = request.Amount
                     }
                 },
-                AwardRound = new AwardRound
-                {
-                    Award = award
-                }
+                AwardRound = new AwardRound {Award = award}
             };
             _context.Add(round);
 
@@ -81,11 +77,11 @@ public record AwardRequest(
 
             var result = new PswBalanceResponse(user.Balance);
 
-            return ResultFactory.Success(result);
+            return PswResultFactory.Success(result);
         }
     }
-    
-    public class Validator : AbstractValidator<AwardRequest>
+
+    public class Validator : AbstractValidator<PswAwardRequest>
     {
         public Validator()
         {

@@ -1,21 +1,18 @@
 ﻿namespace Platipus.Wallet.Api.Obsolete;
 
-using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Results.Psw;
+using Domain.Entities;
 using Extensions;
+using Infrastructure.Persistence;
 using LazyCache;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
-using Platipus.Wallet.Api.Application.Results.Psw;
-using Domain.Entities;
-using Infrastructure.Persistence;
 
 [Obsolete]
 public class VerifySignatureMiddleware : IMiddleware
@@ -44,8 +41,8 @@ public class VerifySignatureMiddleware : IMiddleware
 
         if (!context.Request.Headers.TryGetValue(PswHeaders.XRequestSign, out var requestSignature))
         {
-            const ErrorCode errorCode = ErrorCode.MissingSignature;
-            var response = new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+            const PswErrorCode errorCode = PswErrorCode.MissingSignature;
+            var response = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -60,8 +57,8 @@ public class VerifySignatureMiddleware : IMiddleware
 
         if (sessionIdString is null)
         {
-            const ErrorCode errorCode = ErrorCode.EmptySessionId;
-            var response = new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+            const PswErrorCode errorCode = PswErrorCode.EmptySessionId;
+            var response = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -73,7 +70,8 @@ public class VerifySignatureMiddleware : IMiddleware
         }
 
         var session = await _cache.GetOrAddAsync(
-            sessionIdString, async entry =>
+            sessionIdString,
+            async entry =>
             {
                 var session = await _dbContext.Set<Session>()
                     .Where(c => c.Id == sessionId)
@@ -84,13 +82,11 @@ public class VerifySignatureMiddleware : IMiddleware
                             s.User.IsDisabled,
                             s.User.Casino.SignatureKey))
                     .FirstOrDefaultAsync(context.RequestAborted);
-                
+
                 return session;
-            }, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
-            });
-        
+            },
+            new MemoryCacheEntryOptions {AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)});
+
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             await SessionExpired(context);
@@ -99,8 +95,8 @@ public class VerifySignatureMiddleware : IMiddleware
 
         if (session.UserIsDisabled)
         {
-            const ErrorCode errorCode = ErrorCode.UserDisabled;
-            var response = new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+            const PswErrorCode errorCode = PswErrorCode.UserDisabled;
+            var response = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -111,8 +107,8 @@ public class VerifySignatureMiddleware : IMiddleware
 
         if (!ownSignature.Equals(requestSignature, StringComparison.InvariantCultureIgnoreCase))
         {
-            const ErrorCode errorCode = ErrorCode.InvalidSignature;
-            var response = new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+            const PswErrorCode errorCode = PswErrorCode.InvalidSignature;
+            var response = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
             await context.Response.WriteAsJsonAsync(response);
             return;
         }
@@ -124,8 +120,8 @@ public class VerifySignatureMiddleware : IMiddleware
 
     private static async Task SessionExpired(HttpContext context)
     {
-        const ErrorCode errorCode = ErrorCode.SessionExpired;
-        var response = new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+        const PswErrorCode errorCode = PswErrorCode.SessionExpired;
+        var response = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
         await context.Response.WriteAsJsonAsync(response);
     }
 }

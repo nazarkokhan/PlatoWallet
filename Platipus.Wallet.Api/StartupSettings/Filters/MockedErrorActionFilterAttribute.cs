@@ -2,17 +2,17 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Net.Mime;
 using System.Text.Json;
+using Application.Requests.Wallets.Dafabet.Base;
+using Application.Requests.Wallets.Psw.Base;
+using Application.Results.Psw;
 using Controllers;
+using Domain.Entities;
 using Extensions;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
-using Application.Requests.Wallets.Dafabet.Base;
-using Application.Requests.Wallets.Psw.Base;
-using Platipus.Wallet.Api.Application.Results.Psw;
-using Domain.Entities;
-using Infrastructure.Persistence;
 
 public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 {
@@ -33,7 +33,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         if (username is null)
         {
             logger.LogCritical("Can not mock error for request because UserName is empty");
-            executedContext.Result = ResultFactory.Failure(ErrorCode.CouldNotTryToMockSessionError).ToActionResult();
+            executedContext.Result = PswResultFactory.Failure(PswErrorCode.CouldNotTryToMockSessionError).ToActionResult();
             return;
         }
 
@@ -67,9 +67,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         var dbContext = services.GetRequiredService<WalletDbContext>();
         var mockedError = await dbContext.Set<MockedError>()
-            .Where(
-                e => e.User.UserName == username &&
-                     e.Method == currentMethod)
+            .Where(e => e.User.UserName == username && e.Method == currentMethod)
             .FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (mockedError is null)
@@ -79,7 +77,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
 
         logger.LogInformation(
-            "Executing mocked error {@MockedError}", new
+            "Executing mocked error {@MockedError}",
+            new
             {
                 mockedError.Method,
                 mockedError.Body,
@@ -96,7 +95,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 executedContext.Result = new ContentResult
                 {
                     Content = mockedError.Body,
-                    StatusCode = (int?)mockedError.HttpStatusCode,
+                    StatusCode = (int?) mockedError.HttpStatusCode,
                     ContentType = mockedError.ContentType
                 };
                 break;
@@ -105,7 +104,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 context.HttpContext.Items.Add("response", response);
                 executedContext.Result = new ObjectResult(response)
                 {
-                    StatusCode = (int?)mockedError.HttpStatusCode,
+                    StatusCode = (int?) mockedError.HttpStatusCode,
                 };
                 break;
         }

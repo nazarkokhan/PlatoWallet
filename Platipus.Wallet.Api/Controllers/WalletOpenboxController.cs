@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StartupSettings.ControllerSpecificJsonOptions;
-using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 [Route("wallet/openbox/")]
 [JsonSettingsName(nameof(CasinoProvider.Openbox))]
@@ -30,13 +29,13 @@ public class WalletOpenboxController : ApiController
                          KeepTokenAlive = "09caee7b676f4c1c95050cd2e0bb5074";
 
     private readonly IMediator _mediator;
-    private readonly IOptions<JsonOptions> _options; //TODO try get from di
+    private readonly JsonSerializerOptions _jsonSerializerOptions; //TODO try get from di
     private readonly WalletDbContext _context;
 
-    public WalletOpenboxController(IMediator mediator, IOptions<JsonOptions> options, WalletDbContext context)
+    public WalletOpenboxController(IMediator mediator, IOptionsMonitor<JsonOptions> options, WalletDbContext context)
     {
         _mediator = mediator;
-        _options = options;
+        _jsonSerializerOptions = options.Get(CasinoProvider.Openbox.ToString()).JsonSerializerOptions;
         _context = context;
     }
 
@@ -74,7 +73,7 @@ public class WalletOpenboxController : ApiController
         if (payloadType is null)
             return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-        var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayload, payloadType, OpenboxSerializer.Value);
+        var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayload, payloadType, _jsonSerializerOptions);
         if (payloadRequestObj is null)
             return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 

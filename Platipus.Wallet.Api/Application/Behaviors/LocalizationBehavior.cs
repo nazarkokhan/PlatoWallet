@@ -1,12 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Behaviors;
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
 
 public class LocalizationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
-    where TResponse : class, IResult
+    where TResponse : class, IPswResult
 {
     private readonly IStringLocalizer<TRequest> _stringLocalizer;
 

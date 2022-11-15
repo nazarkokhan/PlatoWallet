@@ -2,11 +2,9 @@ namespace Platipus.Wallet.Api.Application.Requests.Test;
 
 using System.Net;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
 
 public record CreateErrorMockRequest(
@@ -15,9 +13,9 @@ public record CreateErrorMockRequest(
     string Body,
     HttpStatusCode HttpStatusCode,
     string ContentType,
-    int Count) : IRequest<IResult>
+    int Count) : IRequest<IPswResult>
 {
-    public class Handler : IRequestHandler<CreateErrorMockRequest, IResult>
+    public class Handler : IRequestHandler<CreateErrorMockRequest, IPswResult>
     {
         private readonly WalletDbContext _context;
 
@@ -26,7 +24,7 @@ public record CreateErrorMockRequest(
             _context = context;
         }
 
-        public async Task<IResult> Handle(
+        public async Task<IPswResult> Handle(
             CreateErrorMockRequest request,
             CancellationToken cancellationToken)
         {
@@ -37,10 +35,10 @@ public record CreateErrorMockRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
+                return PswResultFactory.Failure(PswErrorCode.BadParametersInTheRequest);
 
             if (user.MockedErrors.Any(m => m.Method == request.Method))
-                return ResultFactory.Failure(ErrorCode.Duplication);
+                return PswResultFactory.Failure(PswErrorCode.Duplication);
 
             var allowedMediaTypes = new List<string>
             {
@@ -66,7 +64,7 @@ public record CreateErrorMockRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return ResultFactory.Success();
+            return PswResultFactory.Success();
         }
     }
 }

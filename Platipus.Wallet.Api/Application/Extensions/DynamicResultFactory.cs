@@ -1,15 +1,14 @@
 namespace Platipus.Wallet.Api.Application.Extensions;
 
 using Results.Psw;
-using Results.Psw.WithData;
 
 public static class DynamicResultFactory
 {
-    private static readonly int InterfaceGenericResultArgumentsCount = typeof(IResult<>).GetGenericArguments().Length;
-    private static readonly Type GenericResultType = typeof(Result<>);
+    private static readonly int InterfaceGenericResultArgumentsCount = typeof(IPswResult<>).GetGenericArguments().Length;
+    private static readonly Type GenericResultType = typeof(PswResult<>);
 
     public static TResponse CreateFailureResult<TResponse>(
-        ErrorCode errorCode,
+        PswErrorCode errorCode,
         Exception? exception = null)
         where TResponse : class
     {
@@ -26,12 +25,12 @@ public static class DynamicResultFactory
                 exception) as TResponse)!;
         }
 
-        return ResultFactory.Failure<TResponse>(errorCode, exception) as TResponse ?? throw new InvalidOperationException();
+        return PswResultFactory.Failure<TResponse>(errorCode, exception) as TResponse ?? throw new InvalidOperationException();
     }
 
     public static TResponse CreateSuccessResult<TResponse>()
-        where TResponse : class, IResult
+        where TResponse : class, IPswResult
     {
-        return ResultFactory.Success() as TResponse ?? throw new InvalidOperationException();
+        return PswResultFactory.Success() as TResponse ?? throw new InvalidOperationException();
     }
 }

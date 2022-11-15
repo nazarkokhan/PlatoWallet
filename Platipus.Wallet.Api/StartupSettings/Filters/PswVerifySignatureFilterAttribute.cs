@@ -1,17 +1,16 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
-using System.Security.Cryptography;
-using System.Text;
+using Application.DTOs;
+using Application.Requests.Wallets.Psw.Base;
+using Application.Results.Psw;
+using Domain.Entities;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using LazyCache;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Application.DTOs;
-using Application.Requests.Wallets.Psw.Base;
-using Platipus.Wallet.Api.Application.Results.Psw;
-using Domain.Entities;
-using Infrastructure.Persistence;
 
 public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
 {
@@ -22,7 +21,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
         var xRequestSign = httpContext.Request.Headers.GetXRequestSign();
         if (xRequestSign is null)
         {
-            context.Result = ResultFactory.Failure(ErrorCode.MissingSignature).ToActionResult();
+            context.Result = PswResultFactory.Failure(PswErrorCode.MissingSignature).ToActionResult();
             return;
         }
 
@@ -33,7 +32,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
 
         if (sessionId is null)
         {
-            context.Result = ResultFactory.Failure(ErrorCode.EmptySessionId).ToActionResult();
+            context.Result = PswResultFactory.Failure(PswErrorCode.EmptySessionId).ToActionResult();
             return;
         }
 
@@ -42,7 +41,8 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
         var dbContext = services.GetRequiredService<WalletDbContext>();
 
         var session = await cache.GetOrAddAsync(
-            sessionId.ToString(), async _ =>
+            sessionId.ToString(),
+            async _ =>
             {
                 var session = await dbContext.Set<Session>()
                     .Where(c => c.Id == sessionId)
@@ -56,32 +56,27 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
 
                 return session;
             },
-            new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
-            });
+            new MemoryCacheEntryOptions {AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)});
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
-            context.Result = ResultFactory.Failure(ErrorCode.SessionExpired).ToActionResult();
+            context.Result = PswResultFactory.Failure(PswErrorCode.SessionExpired).ToActionResult();
             return;
         }
 
         if (session.UserIsDisabled)
         {
-            context.Result = ResultFactory.Failure(ErrorCode.UserDisabled).ToActionResult();
+            context.Result = PswResultFactory.Failure(PswErrorCode.UserDisabled).ToActionResult();
             return;
         }
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[]) httpContext.Items["rawRequestBytes"]!;
 
-        var signatureKeyBytes = Encoding.UTF8.GetBytes(session.CasinoSignatureKey);
-        var hmac = HMACSHA256.HashData(signatureKeyBytes, rawRequestBytes);
-        var ownSignature = Convert.ToHexString(hmac);
+        var isValidSign = PswRequestSign.IsValidSign(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 
-        if (!ownSignature.Equals(xRequestSign, StringComparison.InvariantCultureIgnoreCase))
+        if (!isValidSign)
         {
-            context.Result = ResultFactory.Failure(ErrorCode.InvalidSignature).ToActionResult();
+            context.Result = PswResultFactory.Failure(PswErrorCode.InvalidSignature).ToActionResult();
             return;
         }
 

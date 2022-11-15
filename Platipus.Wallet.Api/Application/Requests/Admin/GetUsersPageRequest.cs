@@ -4,14 +4,13 @@ using Base.Page;
 using Domain.Entities;
 using DTOs;
 using Extensions;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 
-public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IResult<IPage<GetUsersPageRequest.Response>>>
+public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IPswResult<IPage<GetUsersPageRequest.Response>>>
 {
-    public class Handler : IRequestHandler<GetUsersPageRequest, IResult<IPage<Response>>>
+    public class Handler : IRequestHandler<GetUsersPageRequest, IPswResult<IPage<Response>>>
     {
         private readonly WalletDbContext _context;
 
@@ -20,7 +19,7 @@ public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<
             _context = context;
         }
 
-        public async Task<IResult<IPage<Response>>> Handle(
+        public async Task<IPswResult<IPage<Response>>> Handle(
             GetUsersPageRequest request,
             CancellationToken cancellationToken)
         {
@@ -46,7 +45,7 @@ public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<
 
             var page = new Page<Response>(users, totalCount);
 
-            return ResultFactory.Success(page);
+            return PswResultFactory.Success(page);
         }
     }
 

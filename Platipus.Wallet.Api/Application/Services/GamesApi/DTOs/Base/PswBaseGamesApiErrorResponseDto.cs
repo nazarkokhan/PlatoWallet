@@ -4,6 +4,6 @@ using Requests.Wallets.Psw.Base.Response;
 using Results.Psw;
 
 public record PswBaseGamesApiErrorResponseDto(
-    Status Status,
-    ErrorCode Error,
+    PswStatus Status,
+    PswErrorCode Error,
     string Description) : PswBaseResponse(Status);

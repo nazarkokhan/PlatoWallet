@@ -1,19 +1,19 @@
 namespace Platipus.Wallet.Api.Application.Results.Psw;
 
-using System;
 using Base;
 
-public record Result : BaseResult<ErrorCode>, IResult
+public record PswResult : BaseResult<PswErrorCode>, IPswResult
 {
-    public Result()
+    public PswResult()
     {
         ErrorDescription = string.Empty;
     }
 
-    public Result(
-        ErrorCode errorCode,
+    public PswResult(
+        PswErrorCode errorCode,
         Exception? exception = null,
-        string? description = null) : base(errorCode, exception)
+        string? description = null)
+        : base(errorCode, exception)
     {
         ErrorDescription = description ?? string.Empty;
     }

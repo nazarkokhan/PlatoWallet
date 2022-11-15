@@ -2,17 +2,15 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Text.Json;
 using ActionResults;
-using Application.Results.Psw;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
-using Application.Results.Openbox.WithData;
-using Controllers;
-using Platipus.Wallet.Api.Application.Results.Dafabet;
-using Platipus.Wallet.Api.Application.Results.Dafabet.WithData;
-using Platipus.Wallet.Api.Application.Results.Psw.WithData;
+using Application.Results.Dafabet;
+using Application.Results.Psw;
+using Domain.Entities.Enums;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 
 public class ActionResultFilterAttribute : ResultFilterAttribute
 {
@@ -21,22 +19,22 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
         if (context.Cancel)
             return;
 
-        if (context.Result is ExternalActionResult actionResult)
+        var services = context.HttpContext.RequestServices;
+        if (context.Result is PswExternalActionResult actionResult)
         {
             if (actionResult.Result.IsSuccess)
             {
-                if (actionResult.Result is IResult<object> objectResult)
+                if (actionResult.Result is IPswResult<object> objectResult)
                 {
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
 
-                var baseResponse = new PswBaseResponse(Status.OK);
+                var baseResponse = new PswBaseResponse(PswStatus.OK);
                 context.Result = new OkObjectResult(baseResponse);
                 return;
             }
 
-            var services = context.HttpContext.RequestServices;
             var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
 
             // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
@@ -44,7 +42,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = actionResult.Result.ErrorCode;
 
-            var errorResponse = new PswErrorResponse(Status.ERROR, (int)errorCode, errorCode.ToString());
+            var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
         }
@@ -65,7 +63,6 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var services = context.HttpContext.RequestServices;
             var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
 
             // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);
@@ -73,7 +70,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = actionDatabetResult.Result.ErrorCode;
 
-            var errorResponse = new DatabetErrorResponse((int)errorCode, errorCode.ToString());
+            var errorResponse = new DatabetErrorResponse((int) errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
 
@@ -87,7 +84,10 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             {
                 if (actionOpenboxResult.Result is IOpenboxResult<object> objectResult)
                 {
-                    var payload = JsonSerializer.Serialize(objectResult.Data, OpenboxSerializer.Value);
+                    var jsonOptions = services.GetRequiredService<IOptionsMonitor<JsonOptions>>()
+                        .Get(CasinoProvider.Openbox.ToString())
+                        .JsonSerializerOptions;
+                    var payload = JsonSerializer.Serialize(objectResult.Data, jsonOptions);
                     var openboxObjResponse = new OpenboxSingleResponse(payload);
                     context.Result = new OkObjectResult(openboxObjResponse);
                     return;
@@ -98,7 +98,6 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var services = context.HttpContext.RequestServices;
             var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
 
             // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);

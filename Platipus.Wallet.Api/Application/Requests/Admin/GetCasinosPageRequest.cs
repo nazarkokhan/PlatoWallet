@@ -5,17 +5,16 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using DTOs;
 using Extensions;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 
 public record GetCasinosPageRequest(
     PageRequest Page,
     string? CasinoId,
-    CasinoProvider? Provider) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
+    CasinoProvider? Provider) : IRequest<IPswResult<IPage<GetCasinosPageRequest.Response>>>
 {
-    public class Handler : IRequestHandler<GetCasinosPageRequest, IResult<IPage<Response>>>
+    public class Handler : IRequestHandler<GetCasinosPageRequest, IPswResult<IPage<Response>>>
     {
         private readonly WalletDbContext _context;
 
@@ -24,7 +23,7 @@ public record GetCasinosPageRequest(
             _context = context;
         }
 
-        public async Task<IResult<IPage<Response>>> Handle(
+        public async Task<IPswResult<IPage<Response>>> Handle(
             GetCasinosPageRequest request,
             CancellationToken cancellationToken)
         {
@@ -38,7 +37,7 @@ public record GetCasinosPageRequest(
             if (request.Provider is not null)
                 casinosQuery = casinosQuery
                     .Where(c => c.Provider == request.Provider);
-            
+
             var totalCount = await casinosQuery.CountAsync(cancellationToken);
 
             casinosQuery = casinosQuery
@@ -59,7 +58,7 @@ public record GetCasinosPageRequest(
 
             var page = new Page<Response>(casinos, totalCount);
 
-            return ResultFactory.Success(page);
+            return PswResultFactory.Success(page);
         }
     }
 

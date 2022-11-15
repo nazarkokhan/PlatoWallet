@@ -1,11 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Services.GamesApi;
 
 using DTOs.Responses;
-using Results.Psw.WithData;
 
 public interface IGamesApiClient
 {
-    Task<IResult<GetLaunchUrlResponseDto>> GetGameLinkAsync(
+    Task<IPswResult<GetLaunchUrlResponseDto>> GetGameLinkAsync(
         string casinoId,
         Guid sessionId,
         string user,
@@ -16,11 +15,11 @@ public interface IGamesApiClient
         string launchMode = "url",
         CancellationToken cancellationToken = default);
 
-    Task<IResult<GetCasinoGamesListResponseDto>> GetCasinoGamesAsync(
+    Task<IPswResult<GetCasinoGamesListResponseDto>> GetCasinoGamesAsync(
         string casinoId,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<CreateFreebetAwardResponseDto>> CreateFreebetAwardAsync(
+    Task<IPswResult<CreateFreebetAwardResponseDto>> CreateFreebetAwardAsync(
         string casinoId,
         string user,
         string awardId,

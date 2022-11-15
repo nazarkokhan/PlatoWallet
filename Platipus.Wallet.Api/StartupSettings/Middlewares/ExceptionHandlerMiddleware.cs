@@ -25,7 +25,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
             "psw" or _ => GetErrorResponse()
         };
 
-        context.Response.StatusCode = 200; 
+        context.Response.StatusCode = 200;
         await context.Response.WriteAsJsonAsync(unexpectedErrorResponseBody);
 
         _logger.LogInformation("Returning unexpected error {UnexpectedErrorResponseBody}", unexpectedErrorResponseBody);
@@ -33,8 +33,8 @@ public class ExceptionHandlerMiddleware : IMiddleware
 
     private object GetErrorResponse()
     {
-        const ErrorCode errorCode = ErrorCode.Unknown;
-        return new PswErrorResponse(Status.ERROR, (int) errorCode, errorCode.ToString());
+        const PswErrorCode errorCode = PswErrorCode.Unknown;
+        return new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
     }
 
     private object GetDatabetErrorResponse()

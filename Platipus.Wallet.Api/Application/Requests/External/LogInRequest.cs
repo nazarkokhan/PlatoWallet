@@ -9,7 +9,6 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Results.Psw;
-using Results.Psw.WithData;
 using Services.GamesApi;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
@@ -18,9 +17,9 @@ public record LogInRequest(
     string UserName,
     string Password,
     string CasinoId,
-    string Game) : BaseRequest, IRequest<IResult<LogInRequest.Response>>
+    string Game) : BaseRequest, IRequest<IPswResult<LogInRequest.Response>>
 {
-    public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
+    public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
@@ -31,14 +30,14 @@ public record LogInRequest(
             _gamesApiClient = gamesApiClient;
         }
 
-        public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
+        public async Task<IPswResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
         {
             var casino = await _context.Set<Casino>()
                 .Where(c => c.Id == request.CasinoId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
-                return ResultFactory.Failure<Response>(ErrorCode.InvalidCasinoId);
+                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidCasinoId);
 
             var user = await _context.Set<User>()
                 .Where(u => u.UserName == request.UserName && u.CasinoId == request.CasinoId)
@@ -47,13 +46,13 @@ public record LogInRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return ResultFactory.Failure<Response>(ErrorCode.InvalidUser);
+                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidUser);
 
             if (user.IsDisabled)
-                return ResultFactory.Failure<Response>(ErrorCode.UserDisabled);
+                return PswResultFactory.Failure<Response>(PswErrorCode.UserDisabled);
 
             if (user.Password != request.Password)
-                return ResultFactory.Failure<Response>(ErrorCode.Unknown);
+                return PswResultFactory.Failure<Response>(PswErrorCode.Unknown);
 
             var session = new Session
             {
@@ -104,7 +103,7 @@ public record LogInRequest(
 
             var result = new Response(session.Id, user.Balance, launchUrl);
 
-            return ResultFactory.Success(result);
+            return PswResultFactory.Success(result);
         }
     }
 

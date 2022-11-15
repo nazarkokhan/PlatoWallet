@@ -1,16 +1,16 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
 
 public record CreateCasinoRequest(
     string CasinoId,
     string SignatureKey,
-    List<string> Currencies) : IRequest<IResult>
+    List<string> Currencies) : IRequest<IPswResult>
 {
-    public class Handler : IRequestHandler<CreateCasinoRequest, IResult>
+    public class Handler : IRequestHandler<CreateCasinoRequest, IPswResult>
     {
         private readonly WalletDbContext _context;
 
@@ -19,7 +19,7 @@ public record CreateCasinoRequest(
             _context = context;
         }
 
-        public async Task<IResult> Handle(
+        public async Task<IPswResult> Handle(
             CreateCasinoRequest request,
             CancellationToken cancellationToken)
         {
@@ -28,7 +28,7 @@ public record CreateCasinoRequest(
                 .AnyAsync(cancellationToken);
 
             if (casinoExist)
-                return ResultFactory.Failure(ErrorCode.InvalidCasinoId);
+                return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
 
             var supportedCurrencies = await _context.Set<Currency>()
                 .ToListAsync(cancellationToken);
@@ -38,24 +38,20 @@ public record CreateCasinoRequest(
                 .ToList();
 
             if (matchedCurrencies.Count != request.Currencies.Count)
-                return ResultFactory.Failure(ErrorCode.WrongCurrency);
+                return PswResultFactory.Failure(PswErrorCode.WrongCurrency);
 
             var casino = new Casino
             {
                 Id = request.CasinoId,
                 SignatureKey = request.SignatureKey,
-                CasinoCurrencies = matchedCurrencies.Select(
-                        c => new CasinoCurrencies
-                        {
-                            CurrencyId = c.Id
-                        })
+                CasinoCurrencies = matchedCurrencies.Select(c => new CasinoCurrencies {CurrencyId = c.Id})
                     .ToList()
             };
 
             _context.Add(casino);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return ResultFactory.Success();
+            return PswResultFactory.Success();
         }
     }
 }

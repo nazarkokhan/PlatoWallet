@@ -1,17 +1,16 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using DTOs;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Results.Psw.WithData;
 using Wallets.Psw.Base.Response;
 
 public record GetCasinoCurrenciesRequest(
-    string CasinoId) : IRequest<IResult<GetCasinoCurrenciesRequest.Response>>
+    string CasinoId) : IRequest<IPswResult<GetCasinoCurrenciesRequest.Response>>
 {
-    public class Handler : IRequestHandler<GetCasinoCurrenciesRequest, IResult<Response>>
+    public class Handler : IRequestHandler<GetCasinoCurrenciesRequest, IPswResult<Response>>
     {
         private readonly WalletDbContext _context;
 
@@ -20,7 +19,7 @@ public record GetCasinoCurrenciesRequest(
             _context = context;
         }
 
-        public async Task<IResult<Response>> Handle(
+        public async Task<IPswResult<Response>> Handle(
             GetCasinoCurrenciesRequest request,
             CancellationToken cancellationToken)
         {
@@ -39,13 +38,13 @@ public record GetCasinoCurrenciesRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
-                return ResultFactory.Failure<Response>(ErrorCode.InvalidCasinoId);
+                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidCasinoId);
 
             var result = new Response(casino.Currencies);
-            
-            return ResultFactory.Success(result);
+
+            return PswResultFactory.Success(result);
         }
     }
-    
+
     public record Response(List<GetCurrencyDto> Items) : PswBaseResponse;
 }

@@ -1,15 +1,12 @@
 namespace Platipus.Wallet.Api.Application.Behaviors;
 
-using System.Threading;
-using System.Threading.Tasks;
-using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
 using Extensions;
+using FluentValidation;
 using Results.Psw;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
-    where TResponse : class, IResult
+    where TResponse : class, IPswResult
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -18,7 +15,10 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        CancellationToken cancellationToken,
+        RequestHandlerDelegate<TResponse> next)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var validator = scope.ServiceProvider.GetService<IValidator<TRequest>>();
@@ -28,9 +28,9 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
         var result = await validator.ValidateAsync(request, cancellationToken);
 
-        if (result.IsValid) 
+        if (result.IsValid)
             return await next();
 
-        return DynamicResultFactory.CreateFailureResult<TResponse>(ErrorCode.BadParametersInTheRequest);
+        return DynamicResultFactory.CreateFailureResult<TResponse>(PswErrorCode.BadParametersInTheRequest);
     }
 }
