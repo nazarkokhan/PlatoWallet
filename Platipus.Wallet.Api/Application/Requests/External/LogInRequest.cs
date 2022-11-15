@@ -19,7 +19,7 @@ public record LogInRequest(
     string Password,
     string CasinoId,
     string Game,
-    string Device) : BaseRequest, IRequest<IResult<LogInRequest.Response>>
+    string? Device) : BaseRequest, IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {

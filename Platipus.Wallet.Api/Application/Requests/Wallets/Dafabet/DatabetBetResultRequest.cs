@@ -15,7 +15,7 @@ public record DatabetBetResultRequest(
     string RoundId,
     string TransactionId,
     bool EndRound,
-    string Device,
+    string? Device,
     string Hash) : DatabetBaseRequest(PlayerId, Hash), IRequest<IDafabetResult<DatabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DatabetBetResultRequest, IDafabetResult<DatabetBalanceResponse>>
@@ -69,6 +69,6 @@ public record DatabetBetResultRequest(
 
     public override string GetSource()
     {
-        return PlayerId + Amount + GameCode + RoundId + TransactionId + EndRound.ToString().ToLower() + Device;
+        return PlayerId + Amount + GameCode + RoundId + TransactionId + EndRound.ToString().ToLower();
     }
 }

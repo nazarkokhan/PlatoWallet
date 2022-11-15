@@ -14,7 +14,7 @@ public record DatabetBonusWinRequest(
     string GameCode,
     string RoundId,
     string TransactionId,
-    string Device,
+    string? Device,
     string Hash) : DatabetBaseRequest(PlayerId, Hash), IRequest<IDafabetResult<DatabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DatabetBonusWinRequest, IDafabetResult<DatabetBalanceResponse>>
@@ -82,6 +82,6 @@ public record DatabetBonusWinRequest(
 
     public override string GetSource()
     {
-        return PlayerId + Amount + GameCode + RoundId + TransactionId + Device;
+        return PlayerId + Amount + GameCode + RoundId + TransactionId;
     }
 }
