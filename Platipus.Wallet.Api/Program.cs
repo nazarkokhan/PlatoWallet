@@ -41,7 +41,9 @@ try
         (context, configuration) =>
         {
             configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration);
+                .ReadFrom.Configuration(context.Configuration)
+                .WriteTo.Elasticsearch()
+                .ConfigureElasticsearchSinkOptions(options => options.IndexDecider = null);
         });
 
     var builderConfiguration = builder.Configuration;

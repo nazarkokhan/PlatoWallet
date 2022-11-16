@@ -1,8 +1,8 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using Application.DTOs;
-using Application.Requests.Wallets.Psw.Base;
-using Application.Results.Psw;
+using Application.Requests.Wallets.Hub88.Base;
+using Application.Results.Hub88;
 using Domain.Entities;
 using Extensions;
 using Extensions.SecuritySign;
@@ -16,40 +16,47 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        var request = context.ActionArguments
+            .Select(a => a.Value as Hub88BaseRequest)
+            .Single(a => a is not null)!;
+
         var httpContext = context.HttpContext;
+        var cancellationToken = httpContext.RequestAborted;
+        var services = httpContext.RequestServices;
+        var dbContext = services.GetRequiredService<WalletDbContext>();
+
+        var requestExist = await dbContext.Set<Request>()
+            .Where(r => r.Id == request.RequestUuid)
+            .AnyAsync(cancellationToken);
+
+        if (requestExist)
+        {
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_UNKNOWN).ToActionResult();
+            return;
+        }
 
         var xRequestSign = httpContext.Request.Headers.GetXHub88Signature();
         if (xRequestSign is null)
         {
-            context.Result = PswResultFactory.Failure(PswErrorCode.MissingSignature).ToActionResult();
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_INVALID_SIGNATURE).ToActionResult();
             return;
         }
 
-        var sessionId = context.ActionArguments
-            .Select(a => a.Value as PswBaseRequest)
-            .SingleOrDefault(a => a is not null)
-            ?.SessionId; //TODO condition access code style settings
+        var sessionId = request.Token;
 
-        if (sessionId is null)
-        {
-            context.Result = PswResultFactory.Failure(PswErrorCode.EmptySessionId).ToActionResult();
-            return;
-        }
-
-        var services = httpContext.RequestServices;
         var cache = services.GetRequiredService<IAppCache>();
-        var dbContext = services.GetRequiredService<WalletDbContext>();
 
         var session = await cache.GetOrAddAsync(
-            sessionId.ToString(),
+            sessionId,
             async _ =>
             {
                 var session = await dbContext.Set<Session>()
-                    .Where(c => c.Id == sessionId)
+                    .Where(c => c.Id == new Guid(sessionId))
                     .Select(
                         s => new CachedSessionDto(
                             s.Id,
                             s.ExpirationDate,
+                            s.User.Id,
                             s.User.IsDisabled,
                             s.User.Casino.SignatureKey))
                     .FirstOrDefaultAsync(httpContext.RequestAborted);
@@ -58,15 +65,21 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
             },
             new MemoryCacheEntryOptions {AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)});
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null)
         {
-            context.Result = PswResultFactory.Failure(PswErrorCode.SessionExpired).ToActionResult();
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_INVALID_TOKEN).ToActionResult();
+            return;
+        }
+
+        if (session.ExpirationDate < DateTime.UtcNow)
+        {
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_TOKEN_EXPIRED).ToActionResult();
             return;
         }
 
         if (session.UserIsDisabled)
         {
-            context.Result = PswResultFactory.Failure(PswErrorCode.UserDisabled).ToActionResult();
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_USER_DISABLED).ToActionResult();
             return;
         }
 
@@ -76,9 +89,18 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
 
         if (!isValidSign)
         {
-            context.Result = PswResultFactory.Failure(PswErrorCode.InvalidSignature).ToActionResult();
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_INVALID_SIGNATURE).ToActionResult();
             return;
         }
+
+        var requestEntity = new Request
+        {
+            Id = request.RequestUuid,
+            UserId = session.UserId
+        };
+        dbContext.Add(requestEntity);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var executedContext = await next();
     }

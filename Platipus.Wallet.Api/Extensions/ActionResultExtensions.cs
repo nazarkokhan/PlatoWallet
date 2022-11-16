@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Extensions;
 
 using Application.Results.Dafabet;
+using Application.Results.Hub88;
 using Application.Results.Openbox;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ActionResults;
@@ -19,5 +20,6 @@ public static class ActionResultExtensions
     public static IActionResult ToActionResult(this IOpenboxResult result)
         => new OpenboxExternalActionResult(result);
 
-    // public static IActionResult ToActionResult(this IOpenboxResult result) => new OpenboxExternalActionResult(result);
+    public static IActionResult ToActionResult(this IHub88Result result)
+        => new Hub88ExternalActionResult(result);
 }

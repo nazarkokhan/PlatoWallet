@@ -3,9 +3,12 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 using System.Text.Json;
 using ActionResults;
 using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Application.Results.Dafabet;
+using Application.Results.Hub88;
+using Application.Results.Hub88.WithData;
 using Application.Results.Psw;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +23,13 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             return;
 
         var services = context.HttpContext.RequestServices;
-        if (context.Result is PswExternalActionResult actionResult)
+        var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
+
+        if (context.Result is PswExternalActionResult pswActionResult)
         {
-            if (actionResult.Result.IsSuccess)
+            if (pswActionResult.Result.IsSuccess)
             {
-                if (actionResult.Result is IPswResult<object> objectResult)
+                if (pswActionResult.Result is IPswResult<object> objectResult)
                 {
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
@@ -35,23 +40,18 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
-
-            // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionResult.Result.ErrorCode);
-            // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
-
-            var errorCode = actionResult.Result.ErrorCode;
+            var errorCode = pswActionResult.Result.ErrorCode;
 
             var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
         }
 
-        if (context.Result is DafabetExternalActionResult actionDatabetResult)
+        if (context.Result is DafabetExternalActionResult dafabetActionResult)
         {
-            if (actionDatabetResult.Result.IsSuccess)
+            if (dafabetActionResult.Result.IsSuccess)
             {
-                if (actionDatabetResult.Result is IDafabetResult<object> objectResult)
+                if (dafabetActionResult.Result is IDafabetResult<object> objectResult)
                 {
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
@@ -63,12 +63,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
-
-            // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);
-            // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
-
-            var errorCode = actionDatabetResult.Result.ErrorCode;
+            var errorCode = dafabetActionResult.Result.ErrorCode;
 
             var errorResponse = new DatabetErrorResponse((int) errorCode, errorCode.ToString());
 
@@ -77,12 +72,11 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             context.HttpContext.Items.Add("response", errorResponse);
         }
 
-        //TODO
-        if (context.Result is OpenboxExternalActionResult actionOpenboxResult)
+        if (context.Result is OpenboxExternalActionResult openboxActionResult)
         {
-            if (actionOpenboxResult.Result.IsSuccess)
+            if (openboxActionResult.Result.IsSuccess)
             {
-                if (actionOpenboxResult.Result is IOpenboxResult<object> objectResult)
+                if (openboxActionResult.Result is IOpenboxResult<object> objectResult)
                 {
                     var jsonOptions = services.GetRequiredService<IOptionsMonitor<JsonOptions>>()
                         .Get(CasinoProvider.Openbox.ToString())
@@ -98,14 +92,33 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
-
-            // logger.LogWarning("Request failed with ErrorCode: {ErrorCode}", actionDatabetResult.Result.ErrorCode);
-            // var stringLocalizer = services.GetRequiredService<IStringLocalizer<IResult>>(); //TODO
-
-            var errorCode = actionOpenboxResult.Result.ErrorCode;
+            var errorCode = openboxActionResult.Result.ErrorCode;
 
             var errorResponse = new OpenboxSingleResponse(errorCode);
+
+            context.Result = new OkObjectResult(errorResponse);
+
+            context.HttpContext.Items.Add("response", errorResponse);
+        }
+
+        if (context.Result is Hub88ExternalActionResult hub88ActionResult)
+        {
+            if (hub88ActionResult.Result.IsSuccess)
+            {
+                if (hub88ActionResult.Result is IHub88Result<object> objectResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                logger.LogWarning("We should not get here");
+                context.Result = new OkObjectResult(new Hub88ErrorResponse(Hub88ErrorCode.RS_ERROR_UNKNOWN));
+                return;
+            }
+
+            var errorCode = hub88ActionResult.Result.ErrorCode;
+
+            var errorResponse = new Hub88ErrorResponse(errorCode);
 
             context.Result = new OkObjectResult(errorResponse);
 

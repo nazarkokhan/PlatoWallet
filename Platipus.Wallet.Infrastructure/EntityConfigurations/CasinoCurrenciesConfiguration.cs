@@ -8,6 +8,6 @@ public class CasinoCurrenciesConfiguration : IEntityTypeConfiguration<CasinoCurr
 {
     public void Configure(EntityTypeBuilder<CasinoCurrencies> builder)
     {
-        builder.ToTable("CasinoCurrencies");
+        builder.ToTable("casino_currencies");
     }
 }

@@ -8,6 +8,6 @@ public class AwardRoundConfiguration : IEntityTypeConfiguration<AwardRound>
 {
     public void Configure(EntityTypeBuilder<AwardRound> builder)
     {
-        builder.ToTable("AwardRounds");
+        builder.ToTable("award_rounds");
     }
 }

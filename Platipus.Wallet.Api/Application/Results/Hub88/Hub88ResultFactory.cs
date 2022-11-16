@@ -18,8 +18,8 @@ public static class Hub88ResultFactory
         Exception? exception = null)
         => new(errorCode, exception);
 
-    public static Hub88Result<TData> Failure<TData, TSourceData>(IHub88Result<TSourceData> pswResult)
-        => pswResult.IsFailure
-            ? Failure<TData>(pswResult.ErrorCode, pswResult.Exception)
-            : throw new ArgumentException("Can not create failure result from success result", nameof(pswResult));
+    public static Hub88Result<TData> Failure<TData, TSourceData>(IHub88Result<TSourceData> result)
+        => result.IsFailure
+            ? Failure<TData>(result.ErrorCode, result.Exception)
+            : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

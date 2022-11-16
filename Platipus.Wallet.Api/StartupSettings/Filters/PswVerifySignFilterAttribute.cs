@@ -50,6 +50,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
                         s => new CachedSessionDto(
                             s.Id,
                             s.ExpirationDate,
+                            s.User.Id,
                             s.User.IsDisabled,
                             s.User.Casino.SignatureKey))
                     .FirstOrDefaultAsync(httpContext.RequestAborted);

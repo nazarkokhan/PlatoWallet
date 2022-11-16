@@ -8,6 +8,6 @@ public class RoundConfiguration : IEntityTypeConfiguration<Round>
 {
     public void Configure(EntityTypeBuilder<Round> builder)
     {
-        builder.ToTable("Rounds");
+        builder.ToTable("rounds");
     }
 }

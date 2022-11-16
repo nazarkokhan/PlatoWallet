@@ -8,8 +8,8 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
 {
     public void Configure(EntityTypeBuilder<Currency> builder)
     {
-        builder.ToTable("Currencies");
-        
+        builder.ToTable("currencies");
+
         builder.HasIndex(x => x.Name).IsUnique();
     }
 }

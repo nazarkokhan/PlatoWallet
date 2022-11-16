@@ -8,6 +8,6 @@ public class MockedErrorConfiguration : IEntityTypeConfiguration<MockedError>
 {
     public void Configure(EntityTypeBuilder<MockedError> builder)
     {
-        builder.ToTable("MockedErrors");
+        builder.ToTable("mocked_errors");
     }
 }

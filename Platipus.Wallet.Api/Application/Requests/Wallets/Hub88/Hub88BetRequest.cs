@@ -2,9 +2,12 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Hub88;
 
 using Base;
 using Base.Response;
-using Infrastructure.Persistence;
+using Extensions;
 using Results.Hub88;
 using Results.Hub88.WithData;
+using Results.Hub88.WithData.Mappers;
+using Services.Wallet;
+using Services.Wallet.DTOs;
 
 public record Hub88BetRequest(
     string SupplierUser,
@@ -24,22 +27,38 @@ public record Hub88BetRequest(
 {
     public class Handler : IRequestHandler<Hub88BetRequest, IHub88Result<Hub88BalanceResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IHub88Result<Hub88BalanceResponse>> Handle(
             Hub88BetRequest request,
             CancellationToken cancellationToken)
         {
-            var response = new Hub88BalanceResponse(
-                0,
-                request.SupplierUser,
-                request.RequestUuid,
-                request.Currency);
+            var walletRequest = request.Map(
+                r => new BetRequest(
+                    new Guid(r.Token),
+                    r.SupplierUser,
+                    r.Currency,
+                    r.GameCode,
+                    r.Round,
+                    r.TransactionUuid,
+                    r.RoundClosed,
+                    r.Amount));
+
+            var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
+            if (walletResult.IsFailure)
+                walletResult.ToHub88Result();
+
+            var response = walletResult.Data.Map(
+                d => new Hub88BalanceResponse(
+                    (int) (d.Balance * 100),
+                    request.SupplierUser,
+                    request.RequestUuid,
+                    d.Currency));
 
             return Hub88ResultFactory.Success(response);
         }

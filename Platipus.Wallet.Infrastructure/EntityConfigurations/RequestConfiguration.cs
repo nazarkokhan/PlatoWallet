@@ -4,10 +4,10 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class CasinoConfiguration : IEntityTypeConfiguration<Casino>
+public class RequestConfiguration : IEntityTypeConfiguration<Request>
 {
-    public void Configure(EntityTypeBuilder<Casino> builder)
+    public void Configure(EntityTypeBuilder<Request> builder)
     {
-        builder.ToTable("casinos");
+        builder.ToTable("requests");
     }
 }

@@ -27,11 +27,12 @@ public class WalletService : IWalletService
                          .Select(s => s.Id)
                          .Contains(request.SessionId))
             .Select(
-                s => new
+                u => new
                 {
-                    s.Id,
-                    s.Balance,
-                    s.IsDisabled
+                    u.Id,
+                    u.Balance,
+                    u.IsDisabled,
+                    Currency = u.Currency.Name
                 })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -41,7 +42,7 @@ public class WalletService : IWalletService
         if (user.IsDisabled)
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.UserDisabled);
 
-        var response = new BalanceResponse(user.Balance);
+        var response = new BalanceResponse(user.Balance, user.Currency);
 
         return ResultFactory.Success(response);
     }
@@ -58,7 +59,7 @@ public class WalletService : IWalletService
 
         if (round is null)
         {
-            var user = await _context.Set<User>()
+            var thisUser = await _context.Set<User>()
                 .Where(u => u.UserName == request.User)
                 .Include(u => u.Currency)
                 .FirstAsync(cancellationToken);
@@ -67,12 +68,14 @@ public class WalletService : IWalletService
             {
                 Id = request.RoundId,
                 Finished = false,
-                User = user
+                User = thisUser
             };
             _context.Add(round);
 
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        var user = round.User;
 
         if (round.Transactions.Any(t => t.Id == request.TransactionId))
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
@@ -80,10 +83,10 @@ public class WalletService : IWalletService
         if (round.Finished)
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.Unknown);
 
-        if (round.User.Currency.Name != request.Currency)
+        if (user.Currency.Name != request.Currency)
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
 
-        round.User.Balance -= request.Amount;
+        user.Balance -= request.Amount;
         if (request.Finished)
             round.Finished = request.Finished;
 
@@ -98,7 +101,7 @@ public class WalletService : IWalletService
         _context.Update(round);
         await _context.SaveChangesAsync(cancellationToken);
 
-        var response = new BalanceResponse(round.User.Balance);
+        var response = new BalanceResponse(user.Balance, user.Currency.Name);
 
         return ResultFactory.Success(response);
     }
@@ -108,7 +111,9 @@ public class WalletService : IWalletService
         CancellationToken cancellationToken)
     {
         var round = await _context.Set<Round>()
-            .Where(r => r.Id == request.RoundId && r.User.UserName == request.User)
+            .Where(
+                r => r.Id == request.RoundId
+                  && r.User.UserName == request.User)
             .Include(r => r.User.Currency)
             .Include(r => r.Transactions)
             .FirstOrDefaultAsync(cancellationToken);
@@ -118,11 +123,11 @@ public class WalletService : IWalletService
 
         if (round.Finished)
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.Unknown);
-
-        if (round.User.Currency.Name != request.Currency)
+        var user = round.User;
+        if (user.Currency.Name != request.Currency)
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
 
-        round.User.Balance += request.Amount;
+        user.Balance += request.Amount;
         if (request.Finished)
             round.Finished = request.Finished;
 
@@ -137,7 +142,7 @@ public class WalletService : IWalletService
         _context.Update(round);
         await _context.SaveChangesAsync(cancellationToken);
 
-        var response = new BalanceResponse(round.User.Balance);
+        var response = new BalanceResponse(user.Balance, user.Currency.Name);
 
         return ResultFactory.Success(response);
     }
@@ -147,7 +152,9 @@ public class WalletService : IWalletService
         CancellationToken cancellationToken)
     {
         var round = await _context.Set<Round>()
-            .Where(r => r.Id == request.RoundId && r.User.UserName == request.User)
+            .Where(
+                r => r.Id == request.RoundId
+                  && r.User.UserName == request.User)
             .Include(r => r.User.Currency)
             .Include(r => r.Transactions)
             .FirstOrDefaultAsync(cancellationToken);
@@ -163,10 +170,8 @@ public class WalletService : IWalletService
             return ResultFactory.Failure<BalanceResponse>(ErrorCode.TransactionDoesNotExist);
 
         var user = round.User;
-        if (user.Currency.Name != request.Currency)
-            return ResultFactory.Failure<BalanceResponse>(ErrorCode.WrongCurrency);
 
-        user.Balance += request.Amount;
+        user.Balance += lastTransaction.Amount;
         _context.Update(user);
 
         round.Transactions.Remove(lastTransaction);
@@ -174,7 +179,7 @@ public class WalletService : IWalletService
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        var response = new BalanceResponse(user.Balance);
+        var response = new BalanceResponse(user.Balance, user.Currency.Name);
 
         return ResultFactory.Success(response);
     }

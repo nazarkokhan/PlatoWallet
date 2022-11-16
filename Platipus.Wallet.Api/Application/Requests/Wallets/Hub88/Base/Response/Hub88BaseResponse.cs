@@ -5,7 +5,7 @@ using Results.Hub88;
 
 public record Hub88BaseResponse(
     string User,
-    string Status,
+    Hub88ErrorCode Status,
     string RequestUuid,
     string Currency) : BaseResponse
 {
@@ -15,7 +15,7 @@ public record Hub88BaseResponse(
         string requestUuid)
         : this(
             user,
-            Hub88ErrorCode.RS_OK.ToString(),
+            Hub88ErrorCode.RS_OK,
             requestUuid,
             currency)
     {
