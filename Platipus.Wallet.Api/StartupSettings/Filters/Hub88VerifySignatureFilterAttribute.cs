@@ -93,11 +93,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var requestEntity = new Request
-        {
-            Id = request.RequestUuid,
-            UserId = session.UserId
-        };
+        var requestEntity = new Request(request.RequestUuid) {UserId = session.UserId};
         dbContext.Add(requestEntity);
 
         await dbContext.SaveChangesAsync(cancellationToken);
