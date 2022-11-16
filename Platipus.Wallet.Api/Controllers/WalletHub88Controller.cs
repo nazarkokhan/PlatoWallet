@@ -3,8 +3,8 @@
 namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Wallets.Psw;
-using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Requests.Wallets.Hub88;
+using Application.Requests.Wallets.Hub88.Base.Response;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.Filters;
@@ -20,34 +20,34 @@ public class WalletHub88Controller : ApiController
         => _mediator = mediator;
 
     [HttpPost("balance")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        PswGetBalanceRequest request,
+        Hub88GetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        PswBetRequest request,
+        Hub88BetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("win")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        PswWinRequest request,
+        Hub88WinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("rollback")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        PswRollbackRequest request,
+        Hub88RollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using System.Text.Json;
 using Abstract;
+using Application.Results.Hub88;
 using Application.Results.Openbox;
 using Application.Results.Psw;
 using Domain.Entities;
@@ -143,6 +144,30 @@ public class TestController : ApiController
         var unixNow = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         var result = new {UnixNow = unixNow};
+
+        return Ok(result);
+    }
+
+    [HttpPost("hub88/get-hash-body")]
+    public async Task<IActionResult> Hub88Signature(
+        string casinoId,
+        [FromBody] object request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var casino = await dbContext.Set<Casino>()
+            .Where(c => c.Id == casinoId)
+            .Select(c => new {c.SignatureKey})
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (casino is null)
+            return Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX).ToActionResult();
+
+        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+
+        var validSignature = Hub88RequestSign.Compute(rawRequestBytes, casino.SignatureKey);
+
+        var result = new {Signature = validSignature};
 
         return Ok(result);
     }

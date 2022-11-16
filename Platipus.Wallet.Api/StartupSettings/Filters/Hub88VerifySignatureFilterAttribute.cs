@@ -31,7 +31,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
 
         if (requestExist)
         {
-            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_UNKNOWN).ToActionResult();
+            context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX).ToActionResult();
             return;
         }
 

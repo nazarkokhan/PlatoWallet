@@ -66,47 +66,94 @@ public record LogInRequest(
 
             string launchUrl;
 
-            //TODO refactor
-            if (casino.Provider is CasinoProvider.Openbox)
+            switch (casino.Provider)
             {
-                launchUrl = GetOpenboxLaunchUrl(
-                    session.Id,
-                    user.CasinoId,
-                    user.Id,
-                    user.UserName,
-                    request.Game,
-                    user.Currency.Name);
-            }
-            else if (casino.Provider is CasinoProvider.Dafabet)
-            {
-                launchUrl = GetDafabetLaunchUrl(
-                    request.Game,
-                    user.UserName,
-                    session.Id,
-                    user.Currency.Name,
-                    request.Device,
-                    "en",
-                    DatabetHash.Compute(
-                        $"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
-                        casino.SignatureKey));
-            }
-            else
-            {
-                var getGameLinkResult = await _gamesApiClient.GetGameLinkAsync(
-                    user.Casino.Id,
-                    session.Id,
-                    user.UserName,
-                    user.Currency.Name,
-                    request.Game,
-                    cancellationToken: cancellationToken);
+                //TODO refactor
+                case CasinoProvider.Psw:
+                {
+                    var getGameLinkResult = await _gamesApiClient.GetGameLinkAsync(
+                        user.Casino.Id,
+                        session.Id,
+                        user.UserName,
+                        user.Currency.Name,
+                        request.Game,
+                        cancellationToken: cancellationToken);
 
-                launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
+                    launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
+                    break;
+                }
+                case CasinoProvider.Openbox:
+                    launchUrl = GetOpenboxLaunchUrl(
+                        session.Id,
+                        user.CasinoId,
+                        user.Id,
+                        user.UserName,
+                        request.Game,
+                        user.Currency.Name);
+                    break;
+                case CasinoProvider.Dafabet:
+                    launchUrl = GetDafabetLaunchUrl(
+                        request.Game,
+                        user.UserName,
+                        session.Id,
+                        user.Currency.Name,
+                        request.Device,
+                        "en",
+                        DatabetHash.Compute(
+                            $"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
+                            casino.SignatureKey));
+                    break;
+                case CasinoProvider.Hub88:
+                    launchUrl = GetOpenboxLaunchUrl(
+                        session.Id,
+                        user.CasinoId,
+                        user.Id,
+                        user.UserName,
+                        request.Game,
+                        user.Currency.Name);
+                    break;
+                default:
+                    launchUrl = "";
+                    break;
             }
 
             var result = new Response(session.Id, user.Balance, launchUrl);
 
             return PswResultFactory.Success(result);
         }
+    }
+
+    private static string GetHub88LaunchUrl(
+        Guid token,
+        string agencyUid,
+        Guid playerUid,
+        string playerId,
+        string gameId,
+        string currency)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            // { "brand", "openbox" },//TODO need?
+            {nameof(token), token.ToString()},
+            {"agency-uid", agencyUid},
+            {"player-uid", playerUid.ToString()},
+            {"player-type", "1"},
+            {"player-id", playerId},
+            {"game-id", gameId},
+            {"country", "CN"},
+            {"language", "en"},
+            {nameof(currency), currency},
+            // {"backurl", "zero"},
+            // {"backUri", "zero"},
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(
+            new Uri("https://test.platipusgaming.com/onlinecasino/"),
+            $"hub88/launcher{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
     }
 
     private static string GetOpenboxLaunchUrl(
@@ -147,7 +194,7 @@ public record LogInRequest(
         string playerId,
         Guid playerToken,
         string currency,
-        string device,
+        string? device,
         string? language,
         string hash)
     {
@@ -157,9 +204,11 @@ public record LogInRequest(
             {nameof(gameCode), gameCode},
             {nameof(playerId), playerId},
             {nameof(playerToken), playerToken.ToString()},
-            {nameof(currency), currency},
-            {nameof(device), device},
+            {nameof(currency), currency}
         };
+
+        if (device is not null)
+            queryParameters.Add(nameof(device), device);
 
         if (language is not null)
             queryParameters.Add(nameof(language), language);

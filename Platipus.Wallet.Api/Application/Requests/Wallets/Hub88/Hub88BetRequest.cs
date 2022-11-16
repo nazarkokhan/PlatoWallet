@@ -47,7 +47,7 @@ public record Hub88BetRequest(
                     r.Round,
                     r.TransactionUuid,
                     r.RoundClosed,
-                    r.Amount));
+                    r.Amount / 100m));
 
             var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)

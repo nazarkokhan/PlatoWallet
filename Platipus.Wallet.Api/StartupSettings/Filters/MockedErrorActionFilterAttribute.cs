@@ -3,11 +3,11 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 using System.Net.Mime;
 using System.Text.Json;
 using Application.Requests.Wallets.Dafabet.Base;
+using Application.Requests.Wallets.Hub88.Base;
+using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Psw.Base;
-using Application.Results.Psw;
 using Controllers;
 using Domain.Entities;
-using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -25,17 +25,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         logger.LogInformation("Handling request with possible mocked error");
 
         var executedContext = await next();
-
-        var username = context.Controller is WalletDafabetController
-            ? context.ActionArguments.Select(a => a.Value as DatabetBaseRequest).SingleOrDefault(a => a is not null)?.PlayerId
-            : context.ActionArguments.Select(a => a.Value as PswBaseRequest).SingleOrDefault(a => a is not null)?.User;
-
-        if (username is null)
-        {
-            logger.LogCritical("Can not mock error for request because UserName is empty");
-            executedContext.Result = PswResultFactory.Failure(PswErrorCode.CouldNotTryToMockSessionError).ToActionResult();
-            return;
-        }
 
         var requestRoute = context.ActionDescriptor.EndpointMetadata
             .OfType<HttpMethodAttribute>()
@@ -65,10 +54,47 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
+        var username = context.Controller switch
+        {
+            WalletPswController => context.ActionArguments
+                .Select(a => a.Value as PswBaseRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.User,
+            WalletDafabetController => context.ActionArguments
+                .Select(a => a.Value as DatabetBaseRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.PlayerId,
+            WalletOpenboxController => context.ActionArguments
+                .Select(a => a.Value as OpenboxBaseRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.Token,
+            WalletHub88Controller => context.ActionArguments
+                .Select(a => a.Value as Hub88BaseRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.SupplierUser,
+            _ => null
+        };
+
+        if (username is null)
+        {
+            logger.LogCritical("Can not mock error for request because UserName is empty");
+            return;
+        }
+
         var dbContext = services.GetRequiredService<WalletDbContext>();
-        var mockedError = await dbContext.Set<MockedError>()
-            .Where(e => e.User.UserName == username && e.Method == currentMethod)
-            .FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
+
+        var mockedErrorQuery = dbContext.Set<MockedError>()
+            .Where(e => e.Method == currentMethod);
+
+        mockedErrorQuery = context.Controller switch
+        {
+            WalletOpenboxController => mockedErrorQuery
+                .Where(e => e.User.Sessions.Any(s => s.Id == new Guid(username))),
+            _ => mockedErrorQuery
+                .Where(e => e.User.UserName == username)
+        };
+
+        var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (mockedError is null)
         {

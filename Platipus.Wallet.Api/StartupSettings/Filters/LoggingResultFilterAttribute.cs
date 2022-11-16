@@ -6,9 +6,9 @@ using System.Text.Json.Nodes;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Controllers;
+using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Domain.Entities.Enums;
 
 public class LoggingResultFilterAttribute : ResultFilterAttribute
 {
@@ -18,7 +18,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
 
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[]) httpContext.Items["rawRequestBytes"]!;
         var request = httpContext.Items["request"];
         var response = (context.Result as OkObjectResult)?.Value;
 
@@ -29,12 +29,12 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
 
         var provider = context.Controller switch
         {
-            WalletPswController => CasinoProvider.Psv.ToString(),
+            WalletPswController => CasinoProvider.Psw.ToString(),
             WalletDafabetController => CasinoProvider.Dafabet.ToString(),
             WalletOpenboxController => CasinoProvider.Openbox.ToString(),
             _ => "Other"
         };
-        
+
         if (response is JsonNode responseJsonNode)
         {
             try
@@ -46,16 +46,17 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
                 logger.LogError(e, "Failed serializing mocked error {@MockedErrorResponse}", response);
             }
         }
+
         // logger.LogInformation();
         logger.Log(
             isError ? LogLevel.Error : LogLevel.Information,
-            "Provider: {Provider} \n" +
-            "RawRequestBody: {RawRequestBody} \n" +
-            "RequestBody: {@RequestBody} \n" +
-            "RawResponseBody: {RawResponseBody} \n" +
-            "ResponseBody: {@ResponseBody} \n" +
-            "RequestHeaders: {@RequestHeaders} \n" +
-            "ResponseHeaders: {@ResponseHeaders} \n",
+            "Provider: {Provider} \n"
+          + "RawRequestBody: {RawRequestBody} \n"
+          + "RequestBody: {@RequestBody} \n"
+          + "RawResponseBody: {RawResponseBody} \n"
+          + "ResponseBody: {@ResponseBody} \n"
+          + "RequestHeaders: {@RequestHeaders} \n"
+          + "ResponseHeaders: {@ResponseHeaders} \n",
             provider,
             Encoding.UTF8.GetString(rawRequestBytes),
             request,

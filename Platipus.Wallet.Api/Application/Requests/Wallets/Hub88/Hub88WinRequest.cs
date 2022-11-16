@@ -48,7 +48,7 @@ public record Hub88WinRequest(
                     r.Round,
                     r.TransactionUuid,
                     r.RoundClosed,
-                    r.Amount));
+                    r.Amount / 100m));
 
             var walletResult = await _wallet.WinAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
