@@ -26,7 +26,7 @@ try
         .Enrich.WithMachineName()
         .Enrich.WithProperty("AppVersion", App.Version, true)
         .WriteTo.Elasticsearch(
-            nodeUris: "http://10.0.3.46:9200;",
+            nodeUris: "http://elastic01.aws.intra:9200;http://elastic02.aws.intra:9200;",
             indexFormat: "platipus-wallet",
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
@@ -174,6 +174,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "8.0";
+        public const string Version = "9.0";
     }
 }
