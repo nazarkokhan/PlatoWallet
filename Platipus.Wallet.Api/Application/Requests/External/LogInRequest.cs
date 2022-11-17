@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Results.Psw;
 using Services.GamesApi;
 using StartupSettings.Options;
+using Wallets.Hub88.Base;
 using Wallets.Psw.Base.Response;
 
 public record LogInRequest(
@@ -71,7 +72,7 @@ public record LogInRequest(
                 //TODO refactor
                 case CasinoProvider.Psw:
                 {
-                    var getGameLinkResult = await _gamesApiClient.GetGameLinkAsync(
+                    var getGameLinkResult = await _gamesApiClient.GetPswGameLinkAsync(
                         user.Casino.Id,
                         session.Id,
                         user.UserName,
@@ -104,14 +105,30 @@ public record LogInRequest(
                             casino.SignatureKey));
                     break;
                 case CasinoProvider.Hub88:
-                    launchUrl = GetOpenboxLaunchUrl(
-                        session.Id,
-                        user.CasinoId,
-                        user.Id,
+                {
+                    var getHub88GameLinkRequestDto = new GetHub88GameLinkRequestDto(
                         user.UserName,
+                        session.Id.ToString(),
+                        user.CasinoId,
+                        request.Device ?? "GPL_DESKTOP",
+                        user.CasinoId,
+                        new Hub88GameServerMetaDto(10, "decimal"),
+                        "https://amazing-casino.com/lobby",
+                        "en",
+                        "142.245.172.168",
+                        556,
                         request.Game,
-                        user.Currency.Name);
+                        "https://amazing-casion.com/deposit",
+                        user.Currency.Name,
+                        "EE");
+
+                    var getGameLinkResult = await _gamesApiClient.GetHub88GameLinkAsync(
+                        getHub88GameLinkRequestDto,
+                        cancellationToken);
+
+                    launchUrl = getGameLinkResult.Data?.Url ?? "";
                     break;
+                }
                 default:
                     launchUrl = "";
                     break;

@@ -119,7 +119,7 @@ try
         .AddHttpClient<IGamesApiClient, GamesApiClient>(
             options =>
             {
-                options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
+                options.BaseAddress = new Uri($"{gamesApiUrl}");
             })
         .AddHttpMessageHandler<RequestSignatureRelegatingHandler>()
         .Services

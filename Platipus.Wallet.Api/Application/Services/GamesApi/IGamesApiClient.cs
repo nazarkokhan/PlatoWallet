@@ -1,10 +1,15 @@
 namespace Platipus.Wallet.Api.Application.Services.GamesApi;
 
 using DTOs.Responses;
+using Results.Hub88.WithData;
 
 public interface IGamesApiClient
 {
-    Task<IPswResult<GetLaunchUrlResponseDto>> GetGameLinkAsync(
+    Task<IHub88Result<GetHub88LaunchUrlResponseDto>> GetHub88GameLinkAsync(
+        GetHub88GameLinkRequestDto request,
+        CancellationToken cancellationToken = default);
+
+    Task<IPswResult<GetLaunchUrlResponseDto>> GetPswGameLinkAsync(
         string casinoId,
         Guid sessionId,
         string user,

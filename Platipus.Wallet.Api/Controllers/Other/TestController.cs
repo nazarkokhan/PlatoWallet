@@ -165,7 +165,9 @@ public class TestController : ApiController
 
         var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
 
-        var validSignature = Hub88RequestSign.Compute(rawRequestBytes, casino.SignatureKey);
+        var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.KeyForWalletItself);
+
+        var isValid = Hub88RequestSign.IsValidSign(validSignature, rawRequestBytes, casino.SignatureKey);
 
         var result = new {Signature = validSignature};
 
