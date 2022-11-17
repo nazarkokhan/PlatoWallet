@@ -48,7 +48,7 @@ public record Hub88RollbackRequest(
 
             var response = walletResult.Data.Map(
                 d => new Hub88BalanceResponse(
-                    (int) (d.Balance * 100),
+                    (int) (d.Balance * 100000),
                     request.SupplierUser,
                     request.RequestUuid,
                     d.Currency));
