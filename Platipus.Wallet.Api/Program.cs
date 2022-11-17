@@ -86,11 +86,8 @@ try
             nameof(CasinoProvider.Hub88),
             options =>
             {
-                // options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
-                //                                              | JsonNumberHandling.AllowReadingFromString;
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
@@ -174,6 +171,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "12.0";
+        public const string Version = "13.0";
     }
 }

@@ -5,13 +5,16 @@ namespace Platipus.Wallet.Api.Controllers;
 using Abstract;
 using Application.Requests.Wallets.Hub88;
 using Application.Requests.Wallets.Hub88.Base.Response;
+using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
+using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
 [Route("wallet/hub88")]
 [MockedErrorActionFilter(Order = 1)]
 [Hub88VerifySignatureFilter(Order = 2)]
+[JsonSettingsName(nameof(CasinoProvider.Hub88))]
 public class WalletHub88Controller : ApiController
 {
     private readonly IMediator _mediator;
