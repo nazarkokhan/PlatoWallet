@@ -5,13 +5,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
-using Domain.Entities;
 using Domain.Entities.Enums;
 using DTOs.Base;
 using DTOs.Responses;
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Requests.Wallets.Hub88.Base;
 using Results.Hub88;
@@ -39,12 +36,10 @@ public class GamesApiClient : IGamesApiClient
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _pswJsonSerializerOptions;
     private readonly JsonSerializerOptions _hub88JsonSerializerOptions;
-    private readonly WalletDbContext _context;
 
-    public GamesApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions, WalletDbContext context)
+    public GamesApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions)
     {
         _httpClient = httpClient;
-        _context = context;
         _pswJsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Psw)).JsonSerializerOptions;
         _hub88JsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Hub88)).JsonSerializerOptions;
     }
@@ -53,19 +48,6 @@ public class GamesApiClient : IGamesApiClient
         GetHub88GameLinkRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var casino = await _context.Set<Casino>()
-            .Where(c => c.Id == request.SubPartnerId)
-            .Select(
-                c => new
-                {
-                    c.Provider,
-                    c.SignatureKey
-                })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (casino is null)
-            return Hub88ResultFactory.Failure<GetHub88LaunchUrlResponseDto>(Hub88ErrorCode.RS_ERROR_UNKNOWN);
-
         var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
         var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
 
