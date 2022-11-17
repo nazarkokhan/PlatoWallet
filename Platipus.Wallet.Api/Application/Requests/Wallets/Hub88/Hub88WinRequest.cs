@@ -15,16 +15,16 @@ public record Hub88WinRequest(
     string Token,
     bool RoundClosed,
     string Round,
-    string RewardUuid,
+    string? RewardUuid,
     string RequestUuid,
     string ReferenceTransactionUuid,
     bool IsFree,
     int GameId,
     string GameCode,
     string Currency,
-    string Bet,
+    string? Bet,
     int Amount,
-    Hub88MetaDto Meta) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
+    Hub88MetaDto? Meta) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
 {
     public class Handler : IRequestHandler<Hub88WinRequest, IHub88Result<Hub88BalanceResponse>>
     {

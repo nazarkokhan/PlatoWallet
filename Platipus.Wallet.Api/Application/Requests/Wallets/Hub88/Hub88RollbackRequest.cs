@@ -19,7 +19,7 @@ public record Hub88RollbackRequest(
     string ReferenceTransactionUuid,
     int GameId,
     string GameCode,
-    Hub88MetaDto Meta) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
+    Hub88MetaDto? Meta) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
 {
     public class Handler : IRequestHandler<Hub88RollbackRequest, IHub88Result<Hub88BalanceResponse>>
     {
