@@ -19,7 +19,7 @@ public class WalletHub88Controller : ApiController
     public WalletHub88Controller(IMediator mediator)
         => _mediator = mediator;
 
-    [HttpPost("balance")]
+    [HttpPost("user/balance")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
@@ -27,7 +27,7 @@ public class WalletHub88Controller : ApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("bet")]
+    [HttpPost("transaction/bet")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
@@ -35,7 +35,7 @@ public class WalletHub88Controller : ApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("win")]
+    [HttpPost("transaction/win")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
@@ -43,7 +43,7 @@ public class WalletHub88Controller : ApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("rollback")]
+    [HttpPost("transaction/rollback")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
