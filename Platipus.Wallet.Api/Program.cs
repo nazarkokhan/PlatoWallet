@@ -114,7 +114,7 @@ try
                     optionsBuilder.EnableSensitiveDataLogging();
                 }
             })
-        .AddSingleton<IGamesApiClient, GamesApiClient>()
+        .AddTransient<IGamesApiClient, GamesApiClient>()
         .AddTransient<RequestSignatureRelegatingHandler>()
         .AddHttpClient<IGamesApiClient, GamesApiClient>(
             options =>
@@ -174,6 +174,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "11.0";
+        public const string Version = "12.0";
     }
 }
