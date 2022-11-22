@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.Base.Page;
+namespace Platipus.Wallet.Api.Application.Requests.Base.Common.Page;
 
 public interface IPage<out TItem>
 {

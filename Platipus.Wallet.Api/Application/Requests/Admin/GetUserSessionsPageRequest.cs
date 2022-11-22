@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
-using Base.Page;
+using Base.Common.Page;
 using Domain.Entities;
 using Extensions;
 using Infrastructure.Persistence;

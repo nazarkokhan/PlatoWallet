@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Text.Json;
 using ActionResults;
+using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
@@ -42,7 +43,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = pswActionResult.Result.ErrorCode;
 
-            var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
+            var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
         }
@@ -65,7 +66,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = dafabetActionResult.Result.ErrorCode;
 
-            var errorResponse = new DatabetErrorResponse((int) errorCode, errorCode.ToString());
+            var errorResponse = new DatabetErrorResponse((int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
 
@@ -121,6 +122,28 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             var errorResponse = new Hub88ErrorResponse(errorCode);
 
             context.Result = new OkObjectResult(errorResponse);
+
+            context.HttpContext.Items.Add("response", errorResponse);
+        }
+
+        if (context.Result is ExternalActionResult externalActionResult)
+        {
+            if (externalActionResult.Result.IsSuccess)
+            {
+                if (externalActionResult.Result is IResult<object> objectResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                return;
+            }
+
+            var errorCode = externalActionResult.Result.ErrorCode;
+
+            var errorResponse = new CommonErrorResponse(errorCode);
+
+            context.Result = new BadRequestObjectResult(errorResponse);
 
             context.HttpContext.Items.Add("response", errorResponse);
         }

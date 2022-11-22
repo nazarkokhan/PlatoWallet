@@ -47,7 +47,7 @@ public class TestController : ApiController
         if (casino is null)
             return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId).ToActionResult();
 
-        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = PswRequestSign.Compute(rawRequestBytes, casino.SignatureKey);
 
@@ -163,9 +163,9 @@ public class TestController : ApiController
         if (casino is null)
             return Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX).ToActionResult();
 
-        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
-        var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.KeyForWalletItself);
+        var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.PrivateKeyForWalletItself);
 
         var isValid = Hub88RequestSign.IsValidSign(validSignature, rawRequestBytes, casino.SignatureKey);
 

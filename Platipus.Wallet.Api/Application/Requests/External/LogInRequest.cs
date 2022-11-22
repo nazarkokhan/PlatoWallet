@@ -10,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Results.Psw;
 using Services.GamesApi;
+using Services.Hub88GamesApi;
+using Services.Hub88GamesApi.DTOs;
+using Services.Hub88GamesApi.DTOs.Requests;
 using StartupSettings.Options;
-using Wallets.Hub88.Base;
 using Wallets.Psw.Base.Response;
 
 public record LogInRequest(
@@ -25,11 +27,13 @@ public record LogInRequest(
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
+        private readonly IHub88GamesApiClient _hub88GamesApiClient;
 
-        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient)
+        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient, IHub88GamesApiClient hub88GamesApiClient)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
+            _hub88GamesApiClient = hub88GamesApiClient;
         }
 
         public async Task<IPswResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
@@ -106,7 +110,7 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.Hub88:
                 {
-                    var getHub88GameLinkRequestDto = new GetHub88GameLinkRequestDto(
+                    var getHub88GameLinkRequestDto = new Hub88GetGameLinkGamesApiRequestDto(
                         user.UserName,
                         session.Id.ToString(),
                         user.CasinoId,
@@ -122,7 +126,7 @@ public record LogInRequest(
                         user.Currency.Name,
                         "EE");
 
-                    var getGameLinkResult = await _gamesApiClient.GetHub88GameLinkAsync(
+                    var getGameLinkResult = await _hub88GamesApiClient.GetGameLinkAsync(
                         getHub88GameLinkRequestDto,
                         cancellationToken);
 

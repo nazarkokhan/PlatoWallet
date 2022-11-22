@@ -30,7 +30,7 @@ public static class Hub88RequestSign
         return validSignature;
     }
 
-    public const string KeyForWalletItself = @"-----BEGIN RSA PRIVATE KEY-----
+    public const string PrivateKeyForWalletItself = @"-----BEGIN RSA PRIVATE KEY-----
 MIICXAIBAAKBgQCnXQ7rU5lbYEGRSl4/PZVdAb9RTagu7k4M5m2sRg+x2c+vC6DY
 VWTs3JWIcR8WxBYCcXIs8v7r10o55OOGxYTFLsZq28B8m3mVONm9jmXmrCRZQdjw
 LLRt2wdTf3riMrdTbBs5BTWq3uq7eIx1wyTb2mVLhOnSeMqN2ug9ZzMsdwIDAQAB
@@ -46,7 +46,7 @@ yItjH+2t5gr45qbegaECQGHXR+M3KHTV1cxHIrmevs5CHylemSN2pS7WbovsdxHn
 6zmKAQ7i6rk4P7ezL9/rtd6adFEWG6SYnlCUgv9d7dk=
 -----END RSA PRIVATE KEY-----";
 
-    public const string KeyForGameServer = @"-----BEGIN RSA PRIVATE KEY-----
+    public const string PrivateKeyGameServer = @"-----BEGIN RSA PRIVATE KEY-----
 MIICWwIBAAKBgHi57tRMYFBfHa8ZN5NTTSsK/iOKUBmOjhzZKrrZiLjraL/U9edz
 ftNi5KaSoXOXLpiEOvaTD+fuuXGvDbME4+XBlfavFX8zza9FDLmERh9uhe+OLgwP
 u4AebHvwt8uMY2Eg5+EOc4m0uvlEDI09U54WaxgNw9k4n3mnHboXXVHxAgMBAAEC
@@ -61,4 +61,11 @@ hXEezf09DPLYynCXDIq1Z0jDvUOibS41c0Mxg0/P54pl3QE70kTXmhvZtadUxm9w
 r25namVTSirxUsNP4wJAMCOSoOD1vOIVlRQ+qyZm9lEZOGUlSdcx4QLzepNYbEK7
 8Dj8gIpH/b8QjPE2emdoYw1VDtUkWxj6dWu1wNLkBA==
 -----END RSA PRIVATE KEY-----";
+
+    public const string PublicKeyGameServer = @"-----BEGIN PUBLIC KEY-----
+MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHi57tRMYFBfHa8ZN5NTTSsK/iOK
+UBmOjhzZKrrZiLjraL/U9edzftNi5KaSoXOXLpiEOvaTD+fuuXGvDbME4+XBlfav
+FX8zza9FDLmERh9uhe+OLgwPu4AebHvwt8uMY2Eg5+EOc4m0uvlEDI09U54WaxgN
+w9k4n3mnHboXXVHxAgMBAAE=
+-----END PUBLIC KEY-----";
 }

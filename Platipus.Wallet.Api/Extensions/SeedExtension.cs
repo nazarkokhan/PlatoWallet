@@ -1,15 +1,24 @@
 namespace Platipus.Wallet.Api.Extensions;
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Bogus;
 using Domain.Entities;
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Infrastructure.Persistence;
 using StartupSettings.Options;
 
 public static class SeedExtension
 {
-    public static IApplicationBuilder Seed(this IApplicationBuilder app)
+    // ReSharper disable once ClassNeverInstantiated.Local
+    private record GameList(
+        [property: JsonPropertyName("id")] int Id,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("launch_name")] string LaunchName,
+        [property: JsonPropertyName("category_id")] int CategoryId);
+
+    public static async Task<IApplicationBuilder> SeedAsync(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
 
@@ -17,14 +26,14 @@ public static class SeedExtension
 
         dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
 
-        dbContext.Database.Migrate();
+        await dbContext.Database.MigrateAsync();
+
+        var dbContextTransaction = await dbContext.Database.BeginTransactionAsync();
 
         var any = dbContext.Set<Currency>().Any();
 
         if (!any)
         {
-            var dbContextTransaction = dbContext.Database.BeginTransaction();
-
             var supportedCurrencies = app.ApplicationServices
                 .GetRequiredService<IOptions<SupportedCurrenciesOptions>>()
                 .Value;
@@ -40,17 +49,40 @@ public static class SeedExtension
 
             dbContext.AddRange(currencies);
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
-            app.SeedFakeData(dbContext);
-
-            dbContextTransaction.Commit();
+            await app.SeedFakeDataAsync(dbContext);
         }
+
+        var anyGame = dbContext.Set<Game>().Any();
+
+        if (!anyGame)
+        {
+            var gameListText = await File.ReadAllTextAsync("StaticFiles/integration_gamelist_seed.json");
+
+            var gameList = JsonSerializer.Deserialize<GameList[]>(gameListText)!;
+
+            var games = gameList.Select(
+                    g => new Game
+                    {
+                        GameServerId = g.Id,
+                        Name = g.Name,
+                        LaunchName = g.LaunchName,
+                        CategoryId = g.CategoryId,
+                    })
+                .ToList();
+
+            dbContext.AddRange(games);
+
+            await dbContext.SaveChangesAsync();
+        }
+
+        await dbContextTransaction.CommitAsync();
 
         return app;
     }
 
-    private static IApplicationBuilder SeedFakeData(this IApplicationBuilder app, DbContext dbContext)
+    private static async Task<IApplicationBuilder> SeedFakeDataAsync(this IApplicationBuilder app, DbContext dbContext)
     {
         var currencies = dbContext.Set<Currency>()
             .ToList();
@@ -90,7 +122,7 @@ public static class SeedExtension
 
         dbContext.AddRange(casinos);
         dbContext.AddRange(users);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         return app;
     }

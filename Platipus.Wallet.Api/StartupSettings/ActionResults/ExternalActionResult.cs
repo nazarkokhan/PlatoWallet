@@ -2,12 +2,12 @@ namespace Platipus.Wallet.Api.StartupSettings.ActionResults;
 
 using Microsoft.AspNetCore.Mvc;
 
-public class PswExternalActionResult : ActionResult
+public class ExternalActionResult : ActionResult
 {
-    public PswExternalActionResult(IPswResult result)
+    public ExternalActionResult(IResult result)
     {
         Result = result;
     }
 
-    public IPswResult Result { get; }
+    public IResult Result { get; }
 }

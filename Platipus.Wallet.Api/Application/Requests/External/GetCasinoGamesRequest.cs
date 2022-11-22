@@ -1,39 +1,39 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Domain.Entities;
+using DTOs;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
-using Services.GamesApi;
-using Services.GamesApi.DTOs.Responses;
+using Results.Common;
 
-public record GetCasinoGamesRequest(string CasinoId) : IRequest<IPswResult<GetCasinoGamesListResponseDto>>
+public record GetCasinoGamesRequest(string? CasinoId) : IRequest<IResult<List<GetCommonGameDto>>>
 {
-    public class Handler : IRequestHandler<GetCasinoGamesRequest, IPswResult<GetCasinoGamesListResponseDto>>
+    public class Handler : IRequestHandler<GetCasinoGamesRequest, IResult<List<GetCommonGameDto>>>
     {
         private readonly WalletDbContext _context;
-        private readonly IGamesApiClient _gamesApiClient;
 
-        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient)
+        public Handler(WalletDbContext context)
         {
             _context = context;
-            _gamesApiClient = gamesApiClient;
         }
 
-        public async Task<IPswResult<GetCasinoGamesListResponseDto>> Handle(
+        public async Task<IResult<List<GetCommonGameDto>>> Handle(
             GetCasinoGamesRequest request,
             CancellationToken cancellationToken)
         {
-            var casinoExist = await _context.Set<Casino>()
-                .Where(c => c.Id == request.CasinoId)
-                .AnyAsync(cancellationToken);
+            var casinos = await _context.Set<Game>()
+                // .Where(c => c.CasinoId == request.CasinoId) //TODO need?
+                // .Select(c => c.Game)
+                .Select(
+                    c => new GetCommonGameDto(
+                        c.Id,
+                        c.GameServerId,
+                        c.Name,
+                        c.LaunchName,
+                        c.CategoryId))
+                .ToListAsync(cancellationToken);
 
-            if (!casinoExist)
-                return PswResultFactory.Failure<GetCasinoGamesListResponseDto>(PswErrorCode.InvalidCasinoId);
-
-            var casinoGamesResponse = await _gamesApiClient.GetCasinoGamesAsync(request.CasinoId, cancellationToken);
-
-            return casinoGamesResponse;
+            return ResultFactory.Success(casinos);
         }
     }
 }

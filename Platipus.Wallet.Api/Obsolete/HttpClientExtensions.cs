@@ -1,11 +1,12 @@
-namespace Platipus.Wallet.Api.Application.Services.GamesApi;
+namespace Platipus.Wallet.Api.Obsolete;
 
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using DTOs.Base;
-using Results.Psw;
+using Application.Results.Psw;
+using Application.Services.GamesApi.DTOs.Responses;
 
+[Obsolete]
 public static class HttpClientExtensions
 {
     public static async Task<IPswResult<T>> GetResponseResult<T>(
@@ -30,7 +31,7 @@ public static class HttpClientExtensions
 
             if (responseStatus is PswStatus.ERROR)
             {
-                var errorModel = jsonNode.Deserialize<PswBaseGamesApiErrorResponseDto>(jsonSerializerOptions)!;
+                var errorModel = jsonNode.Deserialize<PswGamesApiErrorResponseDto>(jsonSerializerOptions)!;
                 return PswResultFactory.Failure<T>(errorModel.Error);
             }
 

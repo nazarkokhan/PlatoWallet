@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Services.GamesApi.DTOs;
 
-public record GetGameDto(
+public record GetPswGameDto(
     string Id,
     string GameId,
     string Name,

@@ -1,0 +1,508 @@
+[
+  {
+    "id": 570,
+    "name": "Hallowin",
+    "launch_name": "hallowin",
+    "category_id": 1
+  },
+  {
+    "id": 569,
+    "name": "Coinfest",
+    "launch_name": "coinfest",
+    "category_id": 1
+  },
+  {
+    "id": 568,
+    "name": "Extra Gems",
+    "launch_name": "extragems",
+    "category_id": 1
+  },
+  {
+    "id": 567,
+    "name": "Book of Light",
+    "launch_name": "bookoflight",
+    "category_id": 1
+  },
+  {
+    "id": 565,
+    "name": "Pearls of the Ocean",
+    "launch_name": "pearlsoftheocean",
+    "category_id": 1
+  },
+  {
+    "id": 564,
+    "name": "Wild Crowns",
+    "launch_name": "wildcrowns",
+    "category_id": 1
+  },
+  {
+    "id": 563,
+    "name": "Ways of the Gauls",
+    "launch_name": "waysofthegauls",
+    "category_id": 1
+  },
+  {
+    "id": 561,
+    "name": "9 Gems",
+    "launch_name": "ninegems",
+    "category_id": 1
+  },
+  {
+    "id": 560,
+    "name": "9 Dragon Kings",
+    "launch_name": "ninedragonkings",
+    "category_id": 1
+  },
+  {
+    "id": 559,
+    "name": "Piedra del Sol",
+    "launch_name": "piedradelsol",
+    "category_id": 1
+  },
+  {
+    "id": 557,
+    "name": "Posh Cats",
+    "launch_name": "poshcats",
+    "category_id": 1
+  },
+  {
+    "id": 556,
+    "name": "Joker Chase",
+    "launch_name": "jokerchase",
+    "category_id": 1
+  },
+  {
+    "id": 555,
+    "name": "Diamond Hunt",
+    "launch_name": "diamondhunt",
+    "category_id": 1
+  },
+  {
+    "id": 554,
+    "name": "Frozen Mirror",
+    "launch_name": "frozenmirror",
+    "category_id": 1
+  },
+  {
+    "id": 553,
+    "name": "Un Dia de Muertos",
+    "launch_name": "undiademuertos",
+    "category_id": 1
+  },
+  {
+    "id": 552,
+    "name": "Little Witchy",
+    "launch_name": "littlewitchy",
+    "category_id": 1
+  },
+  {
+    "id": 551,
+    "name": "Wild Justice",
+    "launch_name": "wildjustice",
+    "category_id": 1
+  },
+  {
+    "id": 550,
+    "name": "Leprechaun's Coins",
+    "launch_name": "leprechauns",
+    "category_id": 1
+  },
+  {
+    "id": 549,
+    "name": "Bamboo Grove",
+    "launch_name": "bamboogrove",
+    "category_id": 1
+  },
+  {
+    "id": 548,
+    "name": "Might of Zeus",
+    "launch_name": "mightofzeus",
+    "category_id": 1
+  },
+  {
+    "id": 547,
+    "name": "Guises of Dracula",
+    "launch_name": "guisesofdracula",
+    "category_id": 1
+  },
+  {
+    "id": 546,
+    "name": "1001 spins",
+    "launch_name": "thousandonespins",
+    "category_id": 1
+  },
+  {
+    "id": 545,
+    "name": "7 & Hot Fruits",
+    "launch_name": "hotfruits",
+    "category_id": 1
+  },
+  {
+    "id": 544,
+    "name": "Lord of the Sun",
+    "launch_name": "lordofthesun",
+    "category_id": 1
+  },
+  {
+    "id": 543,
+    "name": "Hawaiian Night",
+    "launch_name": "hawaiiannight",
+    "category_id": 1
+  },
+  {
+    "id": 542,
+    "name": "Santa's Bag",
+    "launch_name": "santasbag",
+    "category_id": 1
+  },
+  {
+    "id": 541,
+    "name": "Royal Lotus",
+    "launch_name": "royallotus",
+    "category_id": 1
+  },
+  {
+    "id": 540,
+    "name": "Wealth of Wisdom",
+    "launch_name": "wealthofwisdom",
+    "category_id": 1
+  },
+  {
+    "id": 539,
+    "name": "Chilli Fiesta",
+    "launch_name": "chillifiesta",
+    "category_id": 1
+  },
+  {
+    "id": 538,
+    "name": "Dynasty Warriors",
+    "launch_name": "dynastywarriors",
+    "category_id": 1
+  },
+  {
+    "id": 537,
+    "name": "Da Ji Da Li",
+    "launch_name": "dajidali",
+    "category_id": 1
+  },
+  {
+    "id": 536,
+    "name": "Wild Spin",
+    "launch_name": "wildspin",
+    "category_id": 1
+  },
+  {
+    "id": 535,
+    "name": "The Ancient Four",
+    "launch_name": "theancientfour",
+    "category_id": 1
+  },
+  {
+    "id": 534,
+    "name": "Caishen's Gifts",
+    "launch_name": "caishensgifts",
+    "category_id": 1
+  },
+  {
+    "id": 533,
+    "name": "Dragon's Element",
+    "launch_name": "dragonselement",
+    "category_id": 1
+  },
+  {
+    "id": 532,
+    "name": "Pirate's Map",
+    "launch_name": "piratesmap",
+    "category_id": 1
+  },
+  {
+    "id": 531,
+    "name": "Jackpot Lab",
+    "launch_name": "jackpotlab",
+    "category_id": 1
+  },
+  {
+    "id": 530,
+    "name": "Chinese Tigers",
+    "launch_name": "chinesetigers",
+    "category_id": 1
+  },
+  {
+    "id": 529,
+    "name": "Aztec Coins",
+    "launch_name": "azteccoins",
+    "category_id": 1
+  },
+  {
+    "id": 528,
+    "name": "Rhino Mania",
+    "launch_name": "rhinomania",
+    "category_id": 1
+  },
+  {
+    "id": 527,
+    "name": "Lucky Cat",
+    "launch_name": "luckycat",
+    "category_id": 1
+  },
+  {
+    "id": 526,
+    "name": "Webby Heroes",
+    "launch_name": "webbyheroes",
+    "category_id": 1
+  },
+  {
+    "id": 492,
+    "name": "Pharaoh's Empire",
+    "launch_name": "pharaohsempire",
+    "category_id": 1
+  },
+  {
+    "id": 491,
+    "name": "Bison Trail",
+    "launch_name": "bisontrail",
+    "category_id": 1
+  },
+  {
+    "id": 488,
+    "name": "Neon Classic",
+    "launch_name": "neonclassic",
+    "category_id": 1
+  },
+  {
+    "id": 486,
+    "name": "Great Ocean",
+    "launch_name": "greatocean",
+    "category_id": 1
+  },
+  {
+    "id": 485,
+    "name": "Jade Valley",
+    "launch_name": "jadevalley",
+    "category_id": 1
+  },
+  {
+    "id": 483,
+    "name": "Power of Gods",
+    "launch_name": "powerofgods",
+    "category_id": 1
+  },
+  {
+    "id": 480,
+    "name": "Monkey's Journey",
+    "launch_name": "monkeysjourney",
+    "category_id": 1
+  },
+  {
+    "id": 477,
+    "name": "Cinderella",
+    "launch_name": "cinderella",
+    "category_id": 1
+  },
+  {
+    "id": 476,
+    "name": "Love Is",
+    "launch_name": "loveis",
+    "category_id": 1
+  },
+  {
+    "id": 475,
+    "name": "Lucky Money",
+    "launch_name": "luckymoney",
+    "category_id": 1
+  },
+  {
+    "id": 469,
+    "name": "Sakura Wind",
+    "launch_name": "sakurawind",
+    "category_id": 1
+  },
+  {
+    "id": 465,
+    "name": "Book of Egypt",
+    "launch_name": "bookofegypt",
+    "category_id": 1
+  },
+  {
+    "id": 452,
+    "name": "Power of Poseidon",
+    "launch_name": "powerofposeidon",
+    "category_id": 1
+  },
+  {
+    "id": 450,
+    "name": "Mega Drago",
+    "launch_name": "megadrago",
+    "category_id": 1
+  },
+  {
+    "id": 448,
+    "name": "Aztec Temple",
+    "launch_name": "aztectemple",
+    "category_id": 1
+  },
+  {
+    "id": 446,
+    "name": "Magical Mirror",
+    "launch_name": "magicalmirror",
+    "category_id": 1
+  },
+  {
+    "id": 444,
+    "name": "Triple Dragon",
+    "launch_name": "tripledragon",
+    "category_id": 1
+  },
+  {
+    "id": 443,
+    "name": "Crazy Jelly",
+    "launch_name": "crazyjelly",
+    "category_id": 1
+  },
+  {
+    "id": 442,
+    "name": "Legend of Atlantis",
+    "launch_name": "legendofatlantis",
+    "category_id": 1
+  },
+  {
+    "id": 429,
+    "name": "Richy Witchy",
+    "launch_name": "richywitchy",
+    "category_id": 1
+  },
+  {
+    "id": 428,
+    "name": "Juicy Spins",
+    "launch_name": "juicyspins",
+    "category_id": 1
+  },
+  {
+    "id": 427,
+    "name": "Lucky Dolphin",
+    "launch_name": "luckydolphin",
+    "category_id": 1
+  },
+  {
+    "id": 426,
+    "name": "Safari Adventures",
+    "launch_name": "safariadventures",
+    "category_id": 1
+  },
+  {
+    "id": 425,
+    "name": "Crystal Sevens",
+    "launch_name": "crystalsevens",
+    "category_id": 1
+  },
+  {
+    "id": 424,
+    "name": "Fruity Sevens",
+    "launch_name": "fruitysevens",
+    "category_id": 1
+  },
+  {
+    "id": 423,
+    "name": "Jungle Spin",
+    "launch_name": "junglespin",
+    "category_id": 1
+  },
+  {
+    "id": 417,
+    "name": "Arabian Tales",
+    "launch_name": "arabiantales",
+    "category_id": 1
+  },
+  {
+    "id": 409,
+    "name": "Crocoman",
+    "launch_name": "crocoman",
+    "category_id": 1
+  },
+  {
+    "id": 401,
+    "name": "Princess of Birds",
+    "launch_name": "princessofbirds",
+    "category_id": 1
+  },
+  {
+    "id": 400,
+    "name": "Fairy Forest",
+    "launch_name": "fairyforest",
+    "category_id": 1
+  },
+  {
+    "id": 395,
+    "name": "Jewel Bang",
+    "launch_name": "jewelbang",
+    "category_id": 1
+  },
+  {
+    "id": 394,
+    "name": "Magical Wolf",
+    "launch_name": "magicalwolf",
+    "category_id": 1
+  },
+  {
+    "id": 393,
+    "name": "Mistress of Amazon",
+    "launch_name": "mistressofamazon",
+    "category_id": 1
+  },
+  {
+    "id": 392,
+    "name": "Fiery Planet",
+    "launch_name": "fieryplanet",
+    "category_id": 1
+  },
+  {
+    "id": 386,
+    "name": "Cleo's Gold",
+    "launch_name": "cleosgold",
+    "category_id": 1
+  },
+  {
+    "id": 487,
+    "name": "Blackjack VIP",
+    "launch_name": "blackjackvip",
+    "category_id": 2
+  },
+  {
+    "id": 93,
+    "name": "Blackjack",
+    "launch_name": "blackjack",
+    "category_id": 2
+  },
+  {
+    "id": 110,
+    "name": "European Roulette",
+    "launch_name": "rouletteeuropean",
+    "category_id": 3
+  },
+  {
+    "id": 490,
+    "name": "Baccarat VIP",
+    "launch_name": "baccaratvip",
+    "category_id": 4
+  },
+  {
+    "id": 489,
+    "name": "Baccarat Mini",
+    "launch_name": "baccaratmini",
+    "category_id": 4
+  },
+  {
+    "id": 99,
+    "name": "Baccarat PRO",
+    "launch_name": "baccarat",
+    "category_id": 4
+  },
+  {
+    "id": 562,
+    "name": "Jacks or Better",
+    "launch_name": "jacksorbetter",
+    "category_id": 5
+  }
+]
+
+    

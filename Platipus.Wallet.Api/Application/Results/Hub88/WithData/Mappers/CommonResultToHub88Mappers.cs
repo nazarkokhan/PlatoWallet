@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Results.Hub88.WithData.Mappers;
 
 using Common;
 
-public static class ResultErrorCodeMappers
+public static class CommonResultToHub88Mappers
 {
     public static IHub88Result<TData> ToHub88Result<TData>(this IResult result)
         => result.IsFailure

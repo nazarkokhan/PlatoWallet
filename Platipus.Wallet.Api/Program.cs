@@ -5,8 +5,8 @@ using JorgeSerrano.Json;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Serilog;
 using Platipus.Wallet.Api;
-using Platipus.Wallet.Api.Application.Services.DatabetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
+using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
@@ -31,7 +31,8 @@ try
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
             batchAction: ElasticOpType.Create,
-            typeName: null)
+            typeName: null,
+            customFormatter: new TargetedElasticsearchJsonFormatter())
         .CreateBootstrapLogger();
 
     Log.Warning("Starting app");
@@ -111,20 +112,18 @@ try
                     optionsBuilder.EnableSensitiveDataLogging();
                 }
             })
-        .AddTransient<IGamesApiClient, GamesApiClient>()
-        .AddTransient<RequestSignatureRelegatingHandler>()
+        .AddSingleton<IGamesApiClient, GamesApiClient>()
         .AddHttpClient<IGamesApiClient, GamesApiClient>(
             options =>
             {
-                options.BaseAddress = new Uri($"{gamesApiUrl}");
+                options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
             })
-        .AddHttpMessageHandler<RequestSignatureRelegatingHandler>()
         .Services
-        .AddSingleton<IDatabetGamesApiClient, DatabetGamesApiClient>()
-        .AddHttpClient<IDatabetGamesApiClient, DatabetGamesApiClient>(
+        .AddSingleton<IHub88GamesApiClient, Hub88GamesApiClient>()
+        .AddHttpClient<IHub88GamesApiClient, Hub88GamesApiClient>(
             options =>
             {
-                options.BaseAddress = new Uri($"{gamesApiUrl}dafabet/");
+                options.BaseAddress = new Uri($"{gamesApiUrl}hub88/");
             })
         .Services
         .AddStackExchangeRedisCache(
@@ -153,7 +152,7 @@ try
 
     app.MapControllers();
 
-    app.Seed();
+    await app.SeedAsync();
 
     await app.RunAsync();
 }
