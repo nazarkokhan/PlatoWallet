@@ -103,27 +103,38 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         TRequest request,
         CancellationToken cancellationToken)
     {
-        var jsonContent = await CreateSignedContentAsync(request, cancellationToken);
+        try
+        {
+            var jsonContent = await CreateSignedContentAsync(request, cancellationToken);
 
-        var httpResponse = await _httpClient.PostAsync(requestUri, jsonContent, cancellationToken);
+            var httpResponse = await _httpClient.PostAsync(requestUri, jsonContent, cancellationToken);
 
-        var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-        var responseJsonNode = JsonNode.Parse(responseString);
+            var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
-        var error = responseJsonNode?["error"]?.GetValue<string>();
+            if (string.IsNullOrWhiteSpace(responseString))
+                return Hub88ResultFactory.Failure<TResponse>(Hub88ErrorCode.RS_ERROR_UNKNOWN);
 
-        if (error is not null)
-            return Hub88ResultFactory.Failure<TResponse>(Enum.Parse<Hub88ErrorCode>(error));
+            var responseJsonNode = JsonNode.Parse(responseString);
 
-        if (httpResponse.StatusCode is not HttpStatusCode.OK)
-            return Hub88ResultFactory.Failure<TResponse>(Hub88ErrorCode.RS_ERROR_UNKNOWN);
+            var error = responseJsonNode?["error"]?.GetValue<string>();
 
-        var response = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
+            if (error is not null)
+                return Hub88ResultFactory.Failure<TResponse>(Enum.Parse<Hub88ErrorCode>(error));
 
-        if (response is null)
-            return Hub88ResultFactory.Failure<TResponse>(Hub88ErrorCode.RS_ERROR_UNKNOWN);
+            if (httpResponse.StatusCode is not HttpStatusCode.OK)
+                return Hub88ResultFactory.Failure<TResponse>(Hub88ErrorCode.RS_ERROR_UNKNOWN);
 
-        return Hub88ResultFactory.Success(response);
+            var response = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
+
+            if (response is null)
+                return Hub88ResultFactory.Failure<TResponse>(Hub88ErrorCode.RS_ERROR_UNKNOWN);
+
+            return Hub88ResultFactory.Success(response);
+        }
+        catch (Exception e)
+        {
+            return Hub88ResultFactory.Failure<TResponse>(Hub88ErrorCode.RS_ERROR_UNKNOWN, e);
+        }
     }
 
     private async Task<JsonContent> CreateSignedContentAsync<T>(T request, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.External;
+namespace Platipus.Wallet.Api.Application.Requests.External.Hub88;
 
 using Domain.Entities;
 using Extensions;

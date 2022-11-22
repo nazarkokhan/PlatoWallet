@@ -1,8 +1,7 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
-using Application.Requests.External;
-using Application.Services.Hub88GamesApi.DTOs.Requests;
+using Application.Requests.External.Hub88;
 using Application.Services.Hub88GamesApi.DTOs.Responses;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +17,7 @@ public class ExternalHub88Controller : ApiController
     [HttpGet("gamelist")]
     [ProducesResponseType(typeof(List<Hub88GetGameDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Hub88Games(
-        [FromQuery] GetHub88CasinoGamesRequest request,
+        [FromQuery] ExternalHub88GetCasinoGamesRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 

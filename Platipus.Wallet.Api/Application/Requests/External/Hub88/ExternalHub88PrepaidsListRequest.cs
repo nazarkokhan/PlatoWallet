@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.External;
+namespace Platipus.Wallet.Api.Application.Requests.External.Hub88;
 
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -7,6 +7,7 @@ using Results.Hub88;
 using Results.Hub88.WithData;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs.Requests;
+using Services.Hub88GamesApi.DTOs.Responses;
 
 public record ExternalHub88PrepaidsListRequest(string CasinoId, string Game)
     : IRequest<IHub88Result<List<Hub88PrepaidGamesApiResponseDto>>>

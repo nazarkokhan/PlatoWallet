@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.External;
+namespace Platipus.Wallet.Api.Application.Requests.External.Hub88;
 
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -10,9 +10,9 @@ using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs.Requests;
 using Services.Hub88GamesApi.DTOs.Responses;
 
-public record GetHub88CasinoGamesRequest(string CasinoId) : IRequest<IHub88Result<List<Hub88GetGameDto>>>
+public record ExternalHub88GetCasinoGamesRequest(string CasinoId) : IRequest<IHub88Result<List<Hub88GetGameDto>>>
 {
-    public class Handler : IRequestHandler<GetHub88CasinoGamesRequest, IHub88Result<List<Hub88GetGameDto>>>
+    public class Handler : IRequestHandler<ExternalHub88GetCasinoGamesRequest, IHub88Result<List<Hub88GetGameDto>>>
     {
         private readonly WalletDbContext _context;
         private readonly IHub88GamesApiClient _gamesApiClient;
@@ -24,7 +24,7 @@ public record GetHub88CasinoGamesRequest(string CasinoId) : IRequest<IHub88Resul
         }
 
         public async Task<IHub88Result<List<Hub88GetGameDto>>> Handle(
-            GetHub88CasinoGamesRequest request,
+            ExternalHub88GetCasinoGamesRequest request,
             CancellationToken cancellationToken)
         {
             var casinoExist = await _context.Set<Casino>()

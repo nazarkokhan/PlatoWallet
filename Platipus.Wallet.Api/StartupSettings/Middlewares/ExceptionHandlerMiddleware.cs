@@ -1,7 +1,9 @@
 namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 
+using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Results.Common;
 using Application.Results.Dafabet;
 using Application.Results.Psw;
 
@@ -18,28 +20,37 @@ public class ExceptionHandlerMiddleware : IMiddleware
     {
         _logger.LogCritical("Unhandled exception occured");
 
+        context.Response.StatusCode = 200;
         var unexpectedErrorResponseBody = context.Request.Path.Value?.Replace("wallet/", "") switch
         {
             "databet" => GetDatabetErrorResponse(),
             //TODO "openbox" => GetDatabetErrorResponse(),
-            "psw" or _ => GetErrorResponse()
+            "psw" => GetPswErrorResponse(),
+            _ => GetCommonErrorResponse(context)
         };
 
-        context.Response.StatusCode = 200;
         await context.Response.WriteAsJsonAsync(unexpectedErrorResponseBody);
 
         _logger.LogInformation("Returning unexpected error {UnexpectedErrorResponseBody}", unexpectedErrorResponseBody);
     }
 
-    private object GetErrorResponse()
+    private static object GetCommonErrorResponse(HttpContext context)
     {
-        const PswErrorCode errorCode = PswErrorCode.Unknown;
-        return new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
+        context.Response.StatusCode = 400;
+
+        const ErrorCode errorCode = ErrorCode.Unknown;
+        return new CommonErrorResponse(errorCode);
     }
 
-    private object GetDatabetErrorResponse()
+    private static object GetPswErrorResponse()
+    {
+        const PswErrorCode errorCode = PswErrorCode.Unknown;
+        return new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
+    }
+
+    private static object GetDatabetErrorResponse()
     {
         const DafabetErrorCode errorCode = DafabetErrorCode.SystemError;
-        return new DatabetErrorResponse((int) errorCode, errorCode.ToString());
+        return new DatabetErrorResponse((int)errorCode, errorCode.ToString());
     }
 }
