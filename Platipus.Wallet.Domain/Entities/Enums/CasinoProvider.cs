@@ -5,5 +5,6 @@ public enum CasinoProvider
     Psw,
     Dafabet,
     Openbox,
-    Hub88
+    Hub88,
+    Softswiss
 }
