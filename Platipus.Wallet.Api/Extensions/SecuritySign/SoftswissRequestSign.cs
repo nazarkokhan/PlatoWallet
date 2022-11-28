@@ -3,7 +3,7 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class SoftSwissRequestSign
+public static class SoftswissRequestSign
 {
     public static bool IsValidSign(string requestSign, byte[] rawRequestBody, string signatureKey)
     {

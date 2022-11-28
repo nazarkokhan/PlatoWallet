@@ -13,7 +13,6 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Results.Psw;
 
 public class GamesApiClient : IGamesApiClient
 {
@@ -34,7 +33,7 @@ public class GamesApiClient : IGamesApiClient
         _pswJsonSerializerOptions = jsonOptions.CurrentValue.JsonSerializerOptions;
     }
 
-    public async Task<IPswResult<GetLaunchUrlResponseDto>> GetPswGameLinkAsync(
+    public async Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
         string casinoId,
         Guid sessionId,
         string user,

@@ -17,7 +17,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.ActionArguments
-            .Select(a => a.Value as Hub88BaseRequest)
+            .Select(a => a.Value as IHub88BaseRequest)
             .Single(a => a is not null)!;
 
         var httpContext = context.HttpContext;
@@ -47,11 +47,13 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
         var cache = services.GetRequiredService<IAppCache>();
 
         var session = await cache.GetOrAddAsync(
-            sessionId,
-            async _ =>
+            sessionId.ToString(),
+            async entry =>
             {
+                var sessionToFind = new Guid((string)entry.Key);
+
                 var session = await dbContext.Set<Session>()
-                    .Where(c => c.Id == new Guid(sessionId))
+                    .Where(c => c.Id == sessionToFind)
                     .Select(
                         s => new CachedSessionDto(
                             s.Id,
@@ -83,7 +85,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var rawRequestBytes = (byte[]) httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
 
         var isValidSign = Hub88RequestSign.IsValidSign(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 

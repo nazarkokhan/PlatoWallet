@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using JorgeSerrano.Json;
@@ -7,6 +8,7 @@ using Platipus.Serilog;
 using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
+using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
@@ -26,7 +28,7 @@ try
         .Enrich.WithMachineName()
         .Enrich.WithProperty("AppVersion", App.Version, true)
         .WriteTo.Elasticsearch(
-            nodeUris: "http://elastic01.aws.intra:9200;http://elastic02.aws.intra:9200;",
+            nodeUris: "http://elastic.aws.intra:9200;",
             indexFormat: "platipus-wallet",
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
@@ -90,9 +92,30 @@ try
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
+        .AddJsonOptions(
+            nameof(CasinoProvider.Softswiss),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
-        .Configure<SupportedCountriesOptions>(builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind)
+        .Configure<SupportedCountriesOptions>(
+            options => builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind(options))
+        .Configure(
+            () =>
+            {
+                var fullJson = File.ReadAllText("StaticFiles/softswiss_currency_mappers.json");
+                var jsonNode = JsonNode.Parse(fullJson)!;
+
+                var optionsValue = jsonNode.AsObject()
+                    .ToDictionary(
+                        x => x.Value!["iso_code"]!.GetValue<string>(),
+                        x => x.Value!["subunit_to_unit"]!.GetValue<long>());
+
+                return new SoftswissCurrenciesOptions {CountryIndexes = optionsValue};
+            })
         .AddEndpointsApiExplorer()
         .AddSwaggerGen()
         .AddMediatR(Assembly.GetExecutingAssembly())
@@ -124,6 +147,13 @@ try
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}hub88/");
+            })
+        .Services
+        .AddSingleton<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
+        .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
+            options =>
+            {
+                options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
         .Services
         .AddStackExchangeRedisCache(
@@ -170,6 +200,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "14.0";
+        public const string Version = "17.0";
     }
 }

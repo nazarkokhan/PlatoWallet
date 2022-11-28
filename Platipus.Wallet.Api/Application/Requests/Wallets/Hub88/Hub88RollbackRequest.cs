@@ -12,14 +12,14 @@ using Services.Wallet.DTOs;
 public record Hub88RollbackRequest(
     string SupplierUser,
     string TransactionUuid,
-    string Token,
+    Guid Token,
     bool RoundClosed,
     string Round,
     string RequestUuid,
     string ReferenceTransactionUuid,
     int GameId,
     string GameCode,
-    Hub88MetaDto? Meta) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
+    Hub88MetaDto? Meta) : IHub88BaseRequest, IRequest<IHub88Result<Hub88BalanceResponse>>
 {
     public class Handler : IRequestHandler<Hub88RollbackRequest, IHub88Result<Hub88BalanceResponse>>
     {
@@ -36,7 +36,7 @@ public record Hub88RollbackRequest(
         {
             var walletRequest = request.Map(
                 r => new RollbackRequest(
-                    new Guid(r.Token),
+                    r.Token,
                     r.SupplierUser,
                     r.GameCode,
                     r.Round,
@@ -48,7 +48,7 @@ public record Hub88RollbackRequest(
 
             var response = walletResult.Data.Map(
                 d => new Hub88BalanceResponse(
-                    (int) (d.Balance * 100000),
+                    (int)(d.Balance * 100000),
                     request.SupplierUser,
                     request.RequestUuid,
                     d.Currency));

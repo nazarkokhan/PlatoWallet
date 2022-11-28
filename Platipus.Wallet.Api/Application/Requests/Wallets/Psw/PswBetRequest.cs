@@ -6,7 +6,6 @@ using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
 
 public record PswBetRequest(
     Guid SessionId,
@@ -16,7 +15,7 @@ public record PswBetRequest(
     string RoundId,
     string TransactionId,
     bool Finished,
-    decimal Amount) : PswBaseRequest(SessionId, User), IRequest<IPswResult<PswBalanceResponse>>
+    decimal Amount) : IPswBaseRequest, IRequest<IPswResult<PswBalanceResponse>>
 {
     public class Handler : IRequestHandler<PswBetRequest, IPswResult<PswBalanceResponse>>
     {

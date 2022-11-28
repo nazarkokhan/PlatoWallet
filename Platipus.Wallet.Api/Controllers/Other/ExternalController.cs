@@ -8,7 +8,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("external")]
-public class ExternalController : ApiController
+public class ExternalController : RestApiController
 {
     private readonly IMediator _mediator;
 

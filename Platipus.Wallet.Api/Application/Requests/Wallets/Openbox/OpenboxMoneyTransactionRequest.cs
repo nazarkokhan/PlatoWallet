@@ -5,16 +5,14 @@ using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Openbox;
-using Results.Openbox.WithData;
 
 public record OpenboxMoneyTransactionRequest(
-    string Token,
+    Guid Token,
     string GameUid,
     string GameCycleUid,
     string OrderUid,
     int OrderType,
-    long OrderAmount) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
+    long OrderAmount) : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxBalanceResponse>>
 {
     public class Handler : IRequestHandler<OpenboxMoneyTransactionRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
@@ -42,7 +40,7 @@ public record OpenboxMoneyTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == new Guid(request.Token)))
+                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == (request.Token)))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -50,7 +48,7 @@ public record OpenboxMoneyTransactionRequest(
             if (round is null)
             {
                 var user = await _context.Set<User>()
-                    .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Token)))
+                    .Where(u => u.Sessions.Any(s => s.Id == request.Token))
                     .Include(u => u.Currency)
                     .FirstAsync(cancellationToken);
 
@@ -84,7 +82,7 @@ public record OpenboxMoneyTransactionRequest(
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxBalanceResponse((long) (round.User.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(round.User.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }
@@ -96,7 +94,7 @@ public record OpenboxMoneyTransactionRequest(
             var round = await _context.Set<Round>()
                 .Where(
                     r => r.Id == request.GameCycleUid
-                      && r.User.Sessions.Any(s => s.Id == new Guid(request.Token)))
+                      && r.User.Sessions.Any(s => s.Id == request.Token))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -112,7 +110,7 @@ public record OpenboxMoneyTransactionRequest(
 
             round.User.Balance += request.OrderAmount / 100m;
 
-            round.Finished = true; //TODO when is finished?
+            round.Finished = true;
 
             var transaction = new Transaction
             {
@@ -125,7 +123,7 @@ public record OpenboxMoneyTransactionRequest(
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxBalanceResponse((long) (round.User.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(round.User.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }

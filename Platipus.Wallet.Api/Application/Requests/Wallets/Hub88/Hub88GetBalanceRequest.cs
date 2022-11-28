@@ -11,10 +11,10 @@ using Services.Wallet.DTOs;
 
 public record Hub88GetBalanceRequest(
     string SupplierUser,
-    string Token,
+    Guid Token,
     string RequestUuid,
     int GameId,
-    string GameCode) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
+    string GameCode) : IHub88BaseRequest, IRequest<IHub88Result<Hub88BalanceResponse>>
 {
     public class Handler : IRequestHandler<Hub88GetBalanceRequest, IHub88Result<Hub88BalanceResponse>>
     {
@@ -29,7 +29,7 @@ public record Hub88GetBalanceRequest(
             Hub88GetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(r => new GetBalanceRequest(new Guid(r.Token), r.SupplierUser));
+            var walletRequest = request.Map(r => new GetBalanceRequest(r.Token, r.SupplierUser));
 
             var walletResult = await _wallet.GetBalanceAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
@@ -37,7 +37,7 @@ public record Hub88GetBalanceRequest(
 
             var response = walletResult.Data.Map(
                 d => new Hub88BalanceResponse(
-                    (int) (d.Balance * 100000),
+                    (int)(d.Balance * 100000),
                     request.SupplierUser,
                     request.RequestUuid,
                     d.Currency));

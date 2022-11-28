@@ -5,8 +5,6 @@ using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Dafabet;
-using Results.Dafabet.WithData;
 
 public record DatabetBetRequest(
     string PlayerId,
@@ -15,7 +13,7 @@ public record DatabetBetRequest(
     string RoundId,
     string TransactionId,
     string? Device,
-    string Hash) : DatabetBaseRequest(PlayerId, Hash), IRequest<IDafabetResult<DatabetBalanceResponse>>
+    string Hash) : IDatabetBaseRequest, IRequest<IDafabetResult<DatabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DatabetBetRequest, IDafabetResult<DatabetBalanceResponse>>
     {
@@ -79,7 +77,7 @@ public record DatabetBetRequest(
         }
     }
 
-    public override string GetSource()
+    public string GetSource()
     {
         return PlayerId + Amount + GameCode + RoundId + TransactionId;
     }

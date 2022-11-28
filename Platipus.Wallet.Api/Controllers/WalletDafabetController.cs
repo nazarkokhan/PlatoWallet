@@ -1,24 +1,25 @@
 namespace Platipus.Wallet.Api.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
+using Abstract;
 using Application.Requests.Wallets.Dafabet;
 using Application.Requests.Wallets.Dafabet.Base.Response;
-using Abstract;
+using Domain.Entities.Enums;
 using Extensions;
+using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
-using Domain.Entities.Enums;
 
 [Route("wallet/dafabet")]
 [ProducesResponseType(typeof(DatabetBaseResponse), StatusCodes.Status200OK)]
 [MockedErrorActionFilter(Order = 1)]
 [DatabetVerifySignatureFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Dafabet))]
-public class WalletDafabetController : ApiController
+public class WalletDafabetController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletDafabetController(IMediator mediator) => _mediator = mediator;
+    public WalletDafabetController(IMediator mediator)
+        => _mediator = mediator;
 
     [HttpPost("authorize")]
     [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]

@@ -6,7 +6,6 @@ using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
 
 public record PswRollbackRequest(
     Guid SessionId,
@@ -15,7 +14,7 @@ public record PswRollbackRequest(
     string Game,
     string RoundId,
     string TransactionId,
-    decimal Amount) : PswBaseRequest(SessionId, User), IRequest<IPswResult<PswBalanceResponse>>
+    decimal Amount) : IPswBaseRequest, IRequest<IPswResult<PswBalanceResponse>>
 {
     public class Handler : IRequestHandler<PswRollbackRequest, IPswResult<PswBalanceResponse>>
     {

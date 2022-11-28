@@ -5,10 +5,8 @@ using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Openbox;
-using Results.Openbox.WithData;
 
-public record OpenboxBalanceRequest(string Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
+public record OpenboxBalanceRequest(Guid Token) : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxBalanceResponse>>
 {
     public class Handler : IRequestHandler<OpenboxBalanceRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
@@ -25,7 +23,7 @@ public record OpenboxBalanceRequest(string Token) : OpenboxBaseRequest(Token), I
         {
             var user = await _context.Set<User>()
                 .TagWith("GetUserBalance")
-                .Where(u => u.Sessions.Select(s => s.Id).Contains(new Guid(request.Token)))
+                .Where(u => u.Sessions.Select(s => s.Id).Contains(request.Token))
                 .Select(
                     s => new
                     {
@@ -41,7 +39,7 @@ public record OpenboxBalanceRequest(string Token) : OpenboxBaseRequest(Token), I
             if (user.IsDisabled)
                 return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.TokenRelatedErrors);
 
-            var response = new OpenboxBalanceResponse((long) (user.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(user.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }

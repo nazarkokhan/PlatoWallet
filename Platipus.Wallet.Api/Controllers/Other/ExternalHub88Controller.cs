@@ -7,7 +7,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("external/hub88")]
-public class ExternalHub88Controller : ApiController
+public class ExternalHub88Controller : RestApiController
 {
     private readonly IMediator _mediator;
 

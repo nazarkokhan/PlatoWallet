@@ -8,11 +8,11 @@ using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Results.Psw;
 using Services.GamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
+using Services.SoftswissGamesApi;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
 
@@ -21,19 +21,25 @@ public record LogInRequest(
     string Password,
     string CasinoId,
     string Game,
-    string? Device) : BaseRequest, IRequest<IPswResult<LogInRequest.Response>>
+    string? Device) : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
 {
     public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
+        private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
 
-        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient, IHub88GamesApiClient hub88GamesApiClient)
+        public Handler(
+            WalletDbContext context,
+            IGamesApiClient gamesApiClient,
+            IHub88GamesApiClient hub88GamesApiClient,
+            ISoftswissGamesApiClient softswissGamesApiClient)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
             _hub88GamesApiClient = hub88GamesApiClient;
+            _softswissGamesApiClient = softswissGamesApiClient;
         }
 
         public async Task<IPswResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
@@ -76,7 +82,7 @@ public record LogInRequest(
                 //TODO refactor
                 case CasinoProvider.Psw:
                 {
-                    var getGameLinkResult = await _gamesApiClient.GetPswGameLinkAsync(
+                    var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
                         user.Casino.Id,
                         session.Id,
                         user.UserName,
@@ -97,7 +103,7 @@ public record LogInRequest(
                         user.Currency.Name);
                     break;
                 case CasinoProvider.Dafabet:
-                    launchUrl = GetDafabetLaunchUrl(
+                    launchUrl = GetDafabetLaunchUrlAsync(
                         request.Game,
                         user.UserName,
                         session.Id,
@@ -126,11 +132,25 @@ public record LogInRequest(
                         user.Currency.Name,
                         "EE");
 
-                    var getGameLinkResult = await _hub88GamesApiClient.GetGameLinkAsync(
+                    var getGameLinkResult = await _hub88GamesApiClient.GetLaunchUrlAsync(
                         getHub88GameLinkRequestDto,
                         cancellationToken);
 
                     launchUrl = getGameLinkResult.Data?.Url ?? "";
+                    break;
+                }
+                case CasinoProvider.Softswiss:
+                {
+                    var getGameLinkResult = await _softswissGamesApiClient.GetLaunchUrlAsync(
+                        user.CasinoId,
+                        user.UserName,
+                        session.Id,
+                        request.Game,
+                        user.Currency.Name,
+                        (long)user.Balance, //TODO
+                        cancellationToken);
+
+                    launchUrl = getGameLinkResult.Data?.Strategy ?? "";
                     break;
                 }
                 default:
@@ -142,6 +162,11 @@ public record LogInRequest(
 
             return PswResultFactory.Success(result);
         }
+    }
+
+    private async static Task<string> GetLaunchUrl()
+    {
+        return ""; //TODO
     }
 
     private static string GetHub88LaunchUrl(
@@ -210,7 +235,7 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    private static string GetDafabetLaunchUrl(
+    private static string GetDafabetLaunchUrlAsync(
         string gameCode,
         string playerId,
         Guid playerToken,

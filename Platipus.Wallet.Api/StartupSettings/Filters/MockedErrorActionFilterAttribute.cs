@@ -6,6 +6,7 @@ using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Hub88.Base;
 using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Psw.Base;
+using Application.Requests.Wallets.Softswiss.Base;
 using Controllers;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -54,28 +55,32 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var username = context.Controller switch
+        var usernameOrSession = context.Controller switch
         {
             WalletPswController => context.ActionArguments
-                .Select(a => a.Value as PswBaseRequest)
+                .Select(a => a.Value as IPswBaseRequest)
                 .SingleOrDefault(a => a is not null)
-                ?.User,
+                ?.SessionId.ToString(),
             WalletDafabetController => context.ActionArguments
-                .Select(a => a.Value as DatabetBaseRequest)
+                .Select(a => a.Value as IDatabetBaseRequest)
                 .SingleOrDefault(a => a is not null)
                 ?.PlayerId,
             WalletOpenboxController => context.ActionArguments
-                .Select(a => a.Value as OpenboxBaseRequest)
+                .Select(a => a.Value as IOpenboxBaseRequest)
                 .SingleOrDefault(a => a is not null)
-                ?.Token,
+                ?.Token.ToString(),
             WalletHub88Controller => context.ActionArguments
-                .Select(a => a.Value as Hub88BaseRequest)
+                .Select(a => a.Value as IHub88BaseRequest)
                 .SingleOrDefault(a => a is not null)
                 ?.SupplierUser,
+            WalletSoftswissController => context.ActionArguments
+                .Select(a => a.Value as ISoftswissBaseRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.SessionId.ToString(),
             _ => null
         };
 
-        if (username is null)
+        if (usernameOrSession is null)
         {
             logger.LogCritical("Can not mock error for request because UserName is empty");
             return;
@@ -89,9 +94,9 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         mockedErrorQuery = context.Controller switch
         {
             WalletOpenboxController => mockedErrorQuery
-                .Where(e => e.User.Sessions.Any(s => s.Id == new Guid(username))),
+                .Where(e => e.User.Sessions.Any(s => s.Id == new Guid(usernameOrSession))),
             _ => mockedErrorQuery
-                .Where(e => e.User.UserName == username)
+                .Where(e => e.User.UserName == usernameOrSession)
         };
 
         var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
@@ -121,7 +126,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 executedContext.Result = new ContentResult
                 {
                     Content = mockedError.Body,
-                    StatusCode = (int?) mockedError.HttpStatusCode,
+                    StatusCode = (int?)mockedError.HttpStatusCode,
                     ContentType = mockedError.ContentType
                 };
                 break;
@@ -130,7 +135,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 context.HttpContext.Items.Add("response", response);
                 executedContext.Result = new ObjectResult(response)
                 {
-                    StatusCode = (int?) mockedError.HttpStatusCode,
+                    StatusCode = (int?)mockedError.HttpStatusCode,
                 };
                 break;
         }

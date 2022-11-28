@@ -15,7 +15,7 @@ using StartupSettings.Filters;
 [MockedErrorActionFilter(Order = 1)]
 [Hub88VerifySignatureFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Hub88))]
-public class WalletHub88Controller : ApiController
+public class WalletHub88Controller : RestApiController
 {
     private readonly IMediator _mediator;
 

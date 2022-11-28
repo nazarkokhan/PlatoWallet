@@ -1,21 +1,20 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using Application.Requests.Wallets.Dafabet.Base;
+using Domain.Entities;
+using Domain.Entities.Enums;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
-using Application.Requests.Wallets.Dafabet.Base;
-using Platipus.Wallet.Api.Application.Results.Dafabet;
-using Domain.Entities;
-using Domain.Entities.Enums;
-using Extensions.SecuritySign;
-using Infrastructure.Persistence;
 
 public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var baseRequest = context.ActionArguments.Select(a => a.Value as DatabetBaseRequest).SingleOrDefault(a => a is not null);
+        var baseRequest = context.ActionArguments.Select(a => a.Value as IDatabetBaseRequest).SingleOrDefault(a => a is not null);
 
         if (baseRequest is null)
         {
@@ -25,7 +24,8 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
 
         var requestRoute = context.ActionDescriptor.EndpointMetadata
             .OfType<HttpMethodAttribute>()
-            .SingleOrDefault()?
+            .SingleOrDefault()
+            ?
             .Template;
 
         if (requestRoute is null)
@@ -39,11 +39,7 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<WalletDbContext>();
         var databetCasino = await dbContext.Set<Casino>()
             .Where(c => c.Provider == CasinoProvider.Dafabet)
-            .Select(
-                c => new
-                {
-                    c.SignatureKey
-                })
+            .Select(c => new {c.SignatureKey})
             .FirstAsync(context.HttpContext.RequestAborted);
 
         var secretKey = databetCasino.SignatureKey;

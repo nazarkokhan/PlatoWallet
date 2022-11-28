@@ -5,7 +5,6 @@ using Abstract;
 using Application.Requests.Wallets.Openbox;
 using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Openbox.Base.Response;
-using Application.Results.Openbox;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -18,7 +17,7 @@ using StartupSettings.ControllerSpecificJsonOptions;
 
 [Route("wallet/openbox/")]
 [JsonSettingsName(nameof(CasinoProvider.Openbox))]
-public class WalletOpenboxController : ApiController
+public class WalletOpenboxController : RestApiController
 {
     private const string VerifyPlayer = "e80355cb500e491f8ec067e54ba4e1e4",
                          GetPlayerInformation = "21a28abbc3744c47b03113e27b465475",

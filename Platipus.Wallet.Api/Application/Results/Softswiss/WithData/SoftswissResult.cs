@@ -11,8 +11,12 @@ public record SoftswissResult<TData> : BaseResult<SoftswissErrorCode, TData>, IS
 
     public SoftswissResult(
         SoftswissErrorCode errorCode,
+        long? balance = null,
         Exception? exception = null)
         : base(errorCode, exception)
     {
+        Balance = balance;
     }
+
+    public long? Balance { get; }
 }

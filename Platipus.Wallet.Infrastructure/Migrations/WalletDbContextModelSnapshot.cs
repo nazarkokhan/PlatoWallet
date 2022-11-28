@@ -274,6 +274,10 @@ namespace Platipus.Wallet.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("InternalId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("RoundId")
                         .IsRequired()
                         .HasColumnType("text");

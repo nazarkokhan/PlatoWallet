@@ -5,15 +5,13 @@ using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Openbox;
-using Results.Openbox.WithData;
 
 public record OpenboxCancelTransactionRequest(
-    string Token,
+    Guid Token,
     string GameUid,
     string GameCycleUid,
     string OrderUid,
-    string OrderUidCancel) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxBalanceResponse>>
+    string OrderUidCancel) : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxBalanceResponse>>
 {
     public class Handler : IRequestHandler<OpenboxCancelTransactionRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
@@ -29,7 +27,7 @@ public record OpenboxCancelTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == new Guid(request.Token)))
+                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -54,7 +52,7 @@ public record OpenboxCancelTransactionRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxBalanceResponse((long) (user.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(user.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }

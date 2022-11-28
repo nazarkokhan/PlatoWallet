@@ -5,13 +5,12 @@ using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
 
 public record PswGetBalanceRequest(
     Guid SessionId,
     string User,
     string Currency,
-    string Game) : PswBaseRequest(SessionId, User), IRequest<IPswResult<PswBalanceResponse>>
+    string Game) : IPswBaseRequest, IRequest<IPswResult<PswBalanceResponse>>
 {
     public class Handler : IRequestHandler<PswGetBalanceRequest, IPswResult<PswBalanceResponse>>
     {

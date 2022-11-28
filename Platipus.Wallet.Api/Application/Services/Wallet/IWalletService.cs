@@ -8,15 +8,19 @@ public interface IWalletService
         GetBalanceRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BalanceResponse>> BetAsync(
+    Task<IResult<BetOrWinResponse>> BetAsync(
         BetRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BalanceResponse>> WinAsync(
+    Task<IResult<BetOrWinResponse>> WinAsync(
         WinRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BalanceResponse>> RollbackAsync(
+    Task<IResult<BetOrWinResponse>> RollbackAsync(
         RollbackRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<IResult<BalanceResponse>> AwardAsync(
+        AwardRequest request,
         CancellationToken cancellationToken = default);
 }

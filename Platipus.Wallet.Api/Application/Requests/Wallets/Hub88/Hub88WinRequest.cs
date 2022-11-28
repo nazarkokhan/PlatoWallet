@@ -12,7 +12,7 @@ using Services.Wallet.DTOs;
 public record Hub88WinRequest(
     string SupplierUser,
     string TransactionUuid,
-    string Token,
+    Guid Token,
     bool RoundClosed,
     string Round,
     string? RewardUuid,
@@ -24,7 +24,7 @@ public record Hub88WinRequest(
     string Currency,
     string? Bet,
     int Amount,
-    Hub88MetaDto? Meta) : Hub88BaseRequest(SupplierUser, Token, RequestUuid), IRequest<IHub88Result<Hub88BalanceResponse>>
+    Hub88MetaDto? Meta) : IHub88BaseRequest, IRequest<IHub88Result<Hub88BalanceResponse>>
 {
     public class Handler : IRequestHandler<Hub88WinRequest, IHub88Result<Hub88BalanceResponse>>
     {
@@ -41,7 +41,7 @@ public record Hub88WinRequest(
         {
             var walletRequest = request.Map(
                 r => new WinRequest(
-                    new Guid(r.Token),
+                    r.Token,
                     r.SupplierUser,
                     r.Currency,
                     r.GameCode,
@@ -56,7 +56,7 @@ public record Hub88WinRequest(
 
             var response = walletResult.Data.Map(
                 d => new Hub88BalanceResponse(
-                    (int) (d.Balance * 100000),
+                    (int)(d.Balance * 100000),
                     request.SupplierUser,
                     request.RequestUuid,
                     d.Currency));

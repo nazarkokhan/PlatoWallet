@@ -7,7 +7,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("external/psw")]
-public class ExternalPswController : ApiController
+public class ExternalPswController : RestApiController
 {
     private readonly IMediator _mediator;
 

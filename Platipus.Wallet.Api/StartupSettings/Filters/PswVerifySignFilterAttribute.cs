@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using Application.DTOs;
 using Application.Requests.Wallets.Psw.Base;
-using Application.Results.Psw;
 using Domain.Entities;
 using Extensions;
 using Extensions.SecuritySign;
@@ -26,7 +25,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
         }
 
         var sessionId = context.ActionArguments
-            .Select(a => a.Value as PswBaseRequest)
+            .Select(a => a.Value as IPswBaseRequest)
             .SingleOrDefault(a => a is not null)
             ?.SessionId; //TODO condition access code style settings
 
@@ -71,7 +70,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var rawRequestBytes = (byte[]) httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
 
         var isValidSign = PswRequestSign.IsValidSign(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 

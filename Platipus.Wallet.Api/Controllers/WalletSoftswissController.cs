@@ -1,8 +1,9 @@
 namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Wallets.Hub88;
 using Application.Requests.Wallets.Hub88.Base.Response;
+using Application.Requests.Wallets.Softswiss;
+using Application.Requests.Wallets.Softswiss.Base;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -11,44 +12,45 @@ using StartupSettings.Filters;
 
 [Route("wallet/softswiss")]
 [MockedErrorActionFilter(Order = 1)]
-[PswVerifySignatureFilter(Order = 2)]
+[SoftswissVerifySignatureFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Softswiss))]
-public class WalletSoftswissController : ApiController
+[ProducesResponseType(typeof(SoftswissErrorResponse), StatusCodes.Status400BadRequest)]
+public class WalletSoftswissController : RestApiController
 {
     private readonly IMediator _mediator;
 
     public WalletSoftswissController(IMediator mediator)
         => _mediator = mediator;
 
-    [HttpPost("user/balance")]
+    [HttpPost("balance")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
-        [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        Hub88GetBalanceRequest request,
+        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        SoftswissGetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("transaction/bet")]
+    [HttpPost("play")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Bet(
-        [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        Hub88BetRequest request,
+    public async Task<IActionResult> Play(
+        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        SoftswissPlayRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("transaction/win")]
-    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Win(
-        [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        Hub88WinRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpPost("transaction/rollback")]
+    [HttpPost("rollback")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
-        [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-        Hub88RollbackRequest request,
+        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        SoftswissRollbackRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("freespins")]
+    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Freespins(
+        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        SoftswissFreespinsRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

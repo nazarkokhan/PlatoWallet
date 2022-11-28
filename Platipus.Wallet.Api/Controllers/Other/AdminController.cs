@@ -3,12 +3,11 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 using Abstract;
 using Application.Requests.Admin;
 using Application.Requests.Test;
-using Application.Results.Psw;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("admin")]
-public class AdminController : ApiController
+public class AdminController : RestApiController
 {
     private readonly IMediator _mediator;
 

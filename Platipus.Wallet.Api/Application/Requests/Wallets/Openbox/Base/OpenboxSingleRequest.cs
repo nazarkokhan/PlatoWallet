@@ -7,4 +7,4 @@ public record OpenboxSingleRequest(
     string Method,
     string VendorUid,
     DateTime Timestamp,
-    string Payload) : BaseRequest;
+    string Payload) : IBaseWalletRequest;

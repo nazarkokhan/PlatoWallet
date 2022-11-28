@@ -3,8 +3,6 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 using System.Text.Json;
 using Abstract;
 using Application.Results.Hub88;
-using Application.Results.Openbox;
-using Application.Results.Psw;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -14,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [Route("test")]
-public class TestController : ApiController
+public class TestController : RestApiController
 {
     private readonly WalletDbContext _context;
 
@@ -32,6 +30,7 @@ public class TestController : ApiController
         return Ok(result);
     }
 
+    [HttpPost("softswiss/get-hash-body")]
     [HttpPost("psw/get-hash-body")]
     public async Task<IActionResult> PsvSignature(
         string casinoId,
@@ -139,7 +138,7 @@ public class TestController : ApiController
     }
 
     [HttpGet("openbox/unix-now")]
-    public async Task<IActionResult> OpenboxUnixNow(CancellationToken cancellationToken)
+    public async Task<IActionResult> OpenboxUnixNow(DateTime? time, CancellationToken cancellationToken)
     {
         var unixNow = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 

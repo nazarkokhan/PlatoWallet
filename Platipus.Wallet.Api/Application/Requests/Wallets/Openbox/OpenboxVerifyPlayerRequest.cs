@@ -5,10 +5,8 @@ using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Openbox;
-using Results.Openbox.WithData;
 
-public record OpenboxVerifyPlayerRequest(string Token) : OpenboxBaseRequest(Token), IRequest<IOpenboxResult<OpenboxTokenResponse>>
+public record OpenboxVerifyPlayerRequest(Guid Token) : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxTokenResponse>>
 {
     public class Handler : IRequestHandler<OpenboxVerifyPlayerRequest, IOpenboxResult<OpenboxTokenResponse>>
     {
@@ -25,7 +23,7 @@ public record OpenboxVerifyPlayerRequest(string Token) : OpenboxBaseRequest(Toke
         {
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
-                .Where(u => u.Id == new Guid(request.Token))
+                .Where(u => u.Id == (request.Token))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null)

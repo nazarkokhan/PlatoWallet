@@ -4,4 +4,5 @@ using Base;
 
 public interface ISoftswissResult : IBaseResult<SoftswissErrorCode>
 {
+    long? Balance { get; }
 }

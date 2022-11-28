@@ -7,10 +7,9 @@ using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
-using Application.Results.Dafabet;
+using Application.Requests.Wallets.Softswiss.Base;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
-using Application.Results.Psw;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -20,6 +19,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
+        const string responseItemsKey = "response";
         if (context.Cancel)
             return;
 
@@ -46,6 +46,8 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
+
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is DafabetExternalActionResult dafabetActionResult)
@@ -70,7 +72,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add("response", errorResponse);
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is OpenboxExternalActionResult openboxActionResult)
@@ -99,7 +101,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add("response", errorResponse);
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is Hub88ExternalActionResult hub88ActionResult)
@@ -123,7 +125,40 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add("response", errorResponse);
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+        }
+
+        if (context.Result is SoftswissExternalActionResult softswissActionResult)
+        {
+            if (softswissActionResult.Result.IsSuccess)
+            {
+                if (softswissActionResult.Result is ISoftswissResult<object> objectResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                context.Result = new OkResult();
+                return;
+            }
+
+            var errorCode = softswissActionResult.Result.ErrorCode;
+
+            var statusCode = (int)errorCode;
+            var balance = softswissActionResult.Result.Balance;
+
+            if (statusCode is not (>= 400 and <= 599))
+            {
+                statusCode = 400;
+                if (balance is null)
+                    logger.LogWarning("Balance has to be present");
+            }
+
+            var errorResponse = new SoftswissErrorResponse(errorCode, balance);
+
+            context.Result = new BadRequestObjectResult(errorResponse) {StatusCode = statusCode};
+
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is ExternalActionResult externalActionResult)
@@ -145,7 +180,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             context.Result = new BadRequestObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add("response", errorResponse);
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
     }
 }

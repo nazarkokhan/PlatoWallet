@@ -7,7 +7,7 @@ using Results.Hub88.WithData;
 public interface IHub88GamesApiClient
 {
     //Game
-    Task<IHub88Result<Hub88GetLaunchUrlGamesApiResponseDto>> GetGameLinkAsync(
+    Task<IHub88Result<Hub88GetLaunchUrlGamesApiResponseDto>> GetLaunchUrlAsync(
         Hub88GetGameLinkGamesApiRequestDto request,
         CancellationToken cancellationToken = default);
 
