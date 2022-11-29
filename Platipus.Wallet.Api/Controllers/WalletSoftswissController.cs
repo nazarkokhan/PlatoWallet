@@ -23,6 +23,7 @@ public class WalletSoftswissController : RestApiController
         => _mediator = mediator;
 
     [HttpPost("balance")]
+    [Obsolete("Use play to get balance")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
         [FromHeader(Name = PswHeaders.XRequestSign)] string sign,

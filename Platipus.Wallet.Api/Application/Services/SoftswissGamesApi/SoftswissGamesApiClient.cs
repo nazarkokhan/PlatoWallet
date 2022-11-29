@@ -49,7 +49,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<SoftswissGetLaunchUrlGameApiRequest, SoftswissGetGameLinkGameApiResponse>(
-            "game/session",
+            "sessions",
             new SoftswissGetLaunchUrlGameApiRequest(
                 casinoId,
                 game,
@@ -99,7 +99,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<SoftswissRoundDetailsGameApiRequest, SoftswissRoundDetailsGameApiResponse>(
-            "round/details",
+            "rounds/details",
             request,
             cancellationToken);
 

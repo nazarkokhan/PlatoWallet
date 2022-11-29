@@ -150,7 +150,7 @@ public record LogInRequest(
                         (long)user.Balance, //TODO
                         cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.Strategy ?? "";
+                    launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
                     break;
                 }
                 default:
