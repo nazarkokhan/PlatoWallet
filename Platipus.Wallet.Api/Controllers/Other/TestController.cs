@@ -57,7 +57,7 @@ public class TestController : RestApiController
 
     [HttpPost("dafabet/get-hash-body")]
     public async Task<IActionResult> DafabetSignature(
-        [FromBody] Dictionary<string, string> request,
+        [FromBody] Dictionary<string, object> request,
         [FromQuery] string method,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
@@ -70,7 +70,15 @@ public class TestController : RestApiController
         if (casino is null)
             return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId).ToActionResult();
 
-        var source = string.Concat(request.Values);
+        var sourceValues = request.Values.Select(
+            v =>
+            {
+                if (bool.TryParse(v.ToString(), out var boolV))
+                    return boolV.ToString()?.ToLower();
+                return v.ToString();
+            });
+
+        var source = string.Concat(sourceValues);
         var result = new {Hash = DatabetHash.Compute($"{method}{source}", casino.SignatureKey)};
 
         return Ok(result);
