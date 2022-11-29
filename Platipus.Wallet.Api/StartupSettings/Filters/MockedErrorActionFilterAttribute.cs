@@ -131,9 +131,19 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 };
                 break;
             case MediaTypeNames.Application.Json or _:
-                var response = JsonSerializer.Deserialize<object>(mockedError.Body);
-                context.HttpContext.Items.Add("response", response);
-                executedContext.Result = new ObjectResult(response)
+                object? response = null;
+                try
+                {
+                    response = JsonSerializer.Deserialize<object>(mockedError.Body);
+                    context.HttpContext.Items.Add("response", response);
+                }
+                catch (Exception e)
+                {
+                    logger.LogWarning(e, "Error deserializing mocked error body");
+                    context.HttpContext.Items.Add("response", mockedError.Body);
+                }
+
+                executedContext.Result = new ObjectResult(response ?? mockedError.Body)
                 {
                     StatusCode = (int?)mockedError.HttpStatusCode,
                 };
