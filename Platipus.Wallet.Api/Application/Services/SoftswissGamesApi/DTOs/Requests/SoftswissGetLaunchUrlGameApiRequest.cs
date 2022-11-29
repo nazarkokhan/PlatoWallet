@@ -4,7 +4,7 @@ using Hub88GamesApi.DTOs.Requests;
 
 public record SoftswissGetLaunchUrlGameApiRequest(
     string CasinoId,
-    string Game,
+    int Game,
     string Currency,
     string Locale,
     string Ip,

@@ -48,11 +48,27 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         long balance,
         CancellationToken cancellationToken = default)
     {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WalletDbContext>();
+
+        var gameEntity = await dbContext.Set<Game>()
+            .Where(g => g.LaunchName == game)
+            .Select(
+                c => new
+                {
+                    c.GameServerId,
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (gameEntity is null)
+            return SoftswissResultFactory.Failure<SoftswissGetGameLinkGameApiResponse>(
+                SoftswissErrorCode.GameIsNotAvailableToYourCasino);
+
         var response = await PostSignedRequestAsync<SoftswissGetLaunchUrlGameApiRequest, SoftswissGetGameLinkGameApiResponse>(
             "sessions",
             new SoftswissGetLaunchUrlGameApiRequest(
                 casinoId,
-                game,
+                gameEntity.GameServerId,
                 currency,
                 "de",
                 "46.53.162.55",
