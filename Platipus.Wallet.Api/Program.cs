@@ -29,7 +29,7 @@ try
         .Enrich.WithProperty("AppVersion", App.Version, true)
         .WriteTo.Elasticsearch(
             nodeUris: "http://elastic.aws.intra:9200;",
-            indexFormat: "platipus-wallet",
+            indexFormat: "platipus-wallet-api",
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
             batchAction: ElasticOpType.Create,
