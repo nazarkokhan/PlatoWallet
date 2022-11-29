@@ -148,7 +148,7 @@ public class TestController : RestApiController
     [HttpGet("openbox/unix-now")]
     public async Task<IActionResult> OpenboxUnixNow(DateTime? time, CancellationToken cancellationToken)
     {
-        var unixNow = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var unixNow = (time ?? DateTimeOffset.UtcNow).ToUnixTimeMilliseconds();
 
         var result = new {UnixNow = unixNow};
 
