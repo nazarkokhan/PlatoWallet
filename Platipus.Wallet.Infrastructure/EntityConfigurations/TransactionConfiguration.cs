@@ -11,6 +11,6 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.ToTable("transactions");
 
         builder.Property(x => x.Amount).HasPrecision(38, 2);
-        builder.HasIndex(x => x.InternalId).IsUnique();
+        // builder.HasIndex(x => x.InternalId).IsUnique();
     }
 }

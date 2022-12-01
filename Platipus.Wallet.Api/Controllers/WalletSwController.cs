@@ -1,17 +1,22 @@
 namespace Platipus.Wallet.Api.Controllers;
 
+using System.Net.Mime;
 using Abstract;
-using Application.Requests.Wallets.Psw;
-using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Requests.Wallets.Sw;
+using Application.Requests.Wallets.Sw.Base.Response;
+using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
+using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
 [Route("wallet/sw")]
 [MockedErrorActionFilter(Order = 1)]
-[PswVerifySignatureFilter(Order = 2)]
-[ProducesResponseType(typeof(PswErrorResponse), StatusCodes.Status400BadRequest)]
+[SwVerifySignatureFilter(Order = 2)]
+[JsonSettingsName(nameof(CasinoProvider.Sw))]
+[ProducesResponseType(typeof(SwErrorResponse), StatusCodes.Status200OK)]
 [Consumes("application/x-www-form-urlencoded")]
+[Produces(MediaTypeNames.Application.Json)]
 public class WalletSwController : ApiController
 {
     private readonly IMediator _mediator;
@@ -19,43 +24,45 @@ public class WalletSwController : ApiController
     public WalletSwController(IMediator mediator)
         => _mediator = mediator;
 
-    [HttpPost("balance")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Balance(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswGetBalanceRequest request,
+    [HttpPost("balance-md5")]
+    [ProducesResponseType(typeof(SwBalanceResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> BalanceMd5(
+        [FromForm] SwGetBalanceMd5Request request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("bet")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Bet(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswBetRequest request,
+    [HttpPost("balance-hash")]
+    [ProducesResponseType(typeof(SwBalanceResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> BalanceHash(
+        [FromForm] SwGetBalanceHashRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("win")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Win(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswWinRequest request,
+    [HttpPost("bet-win")]
+    [ProducesResponseType(typeof(SwBetWinRefundFreespinResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> BetWin(
+        [FromForm] SwBetWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("rollback")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rollback(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswRollbackRequest request,
+    [HttpPost("username")]
+    [ProducesResponseType(typeof(SwGetUserNameRequest.SwUserNameResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Username(
+        [FromForm] SwGetUserNameRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("award")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Award(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswAwardRequest request,
+    [HttpPost("refund")]
+    [ProducesResponseType(typeof(SwBetWinRefundFreespinResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Refund(
+        [FromForm] SwRefundRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("freespin")]
+    [ProducesResponseType(typeof(SwBetWinRefundFreespinResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Freespin(
+        [FromForm] SwFreespinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

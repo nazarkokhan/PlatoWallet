@@ -3,7 +3,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Softswiss;
 using Base;
 using Extensions;
 using Microsoft.Extensions.Options;
-using Results.Hub88.WithData.Mappers;
+using Results.ResultToResultMappers;
 using Services.Wallet;
 using Services.Wallet.DTOs;
 using StartupSettings.Options;

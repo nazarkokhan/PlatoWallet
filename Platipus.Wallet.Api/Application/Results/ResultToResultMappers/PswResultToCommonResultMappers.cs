@@ -1,7 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Results.Hub88.WithData.Mappers;
-
-using Common;
-using Psw;
+namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
 public static class PswResultToCommonResultMappers
 {

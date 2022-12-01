@@ -18,7 +18,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
 
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
-        var rawRequestBytes = (byte[]) httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
         var request = httpContext.Items["request"];
         var response = (context.Result as OkObjectResult)?.Value;
 
@@ -32,6 +32,9 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             WalletPswController => CasinoProvider.Psw.ToString(),
             WalletDafabetController => CasinoProvider.Dafabet.ToString(),
             WalletOpenboxController => CasinoProvider.Openbox.ToString(),
+            WalletHub88Controller => CasinoProvider.Hub88.ToString(),
+            WalletSoftswissController => CasinoProvider.Softswiss.ToString(),
+            WalletSwController => CasinoProvider.Sw.ToString(),
             _ => "Other"
         };
 

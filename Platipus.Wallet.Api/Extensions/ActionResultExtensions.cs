@@ -1,11 +1,15 @@
 namespace Platipus.Wallet.Api.Extensions;
 
+using Application.Results.Base;
 using Application.Results.Hub88;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ActionResults;
 
 public static class ActionResultExtensions
 {
+    public static IActionResult ToActionResult(this IBaseResult result)
+        => new BaseExternalActionResult(result);
+
     public static IActionResult ToActionResult(this IResult result)
         => new ExternalActionResult(result);
 

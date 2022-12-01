@@ -6,7 +6,7 @@ using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Results.Hub88.WithData.Mappers;
+using Results.ResultToResultMappers;
 using Services.Wallet;
 using Services.Wallet.DTOs;
 using StartupSettings.Options;

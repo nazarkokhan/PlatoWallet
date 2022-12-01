@@ -9,6 +9,8 @@ public class Casino : Entity<string>
 
     public CasinoProvider? Provider { get; set; }
 
+    public int? SwProviderId { get; set; } = null!;
+
     public List<User> Users { get; set; } = new();
 
     public List<CasinoCurrencies> CasinoCurrencies { get; set; } = new();

@@ -22,15 +22,6 @@ public class WalletSoftswissController : RestApiController
     public WalletSoftswissController(IMediator mediator)
         => _mediator = mediator;
 
-    [HttpPost("balance")]
-    [Obsolete("Use play to get balance")]
-    [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Balance(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        SoftswissGetBalanceRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
     [HttpPost("play")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Play(

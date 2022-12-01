@@ -8,8 +8,11 @@ using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
+using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
+using Application.Results.Sw;
+using Application.Results.Sw.WithData;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -25,6 +28,29 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
         var services = context.HttpContext.RequestServices;
         var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
+
+        if (context.Result is BaseExternalActionResult baseExternalActionResult)
+        {
+            if (baseExternalActionResult.Result is ISwResult swResult)
+            {
+                if (swResult.IsSuccess)
+                {
+                    if (swResult is not ISwResult<object> objectResult)
+                        return;
+
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                var errorCode = swResult.ErrorCode;
+
+                var errorResponse = new SwErrorResponse(errorCode);
+
+                context.Result = new BadRequestObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+        }
 
         if (context.Result is PswExternalActionResult pswActionResult)
         {

@@ -4,13 +4,13 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
 
 public record CreateCasinoRequest(
     string CasinoId,
     string SignatureKey,
     CasinoProvider Provider,
-    List<string> Currencies) : IRequest<IPswResult>
+    List<string> Currencies,
+    int? SwProviderId) : IRequest<IPswResult>
 {
     public class Handler : IRequestHandler<CreateCasinoRequest, IPswResult>
     {
@@ -42,14 +42,20 @@ public record CreateCasinoRequest(
             if (matchedCurrencies.Count != request.Currencies.Count)
                 return PswResultFactory.Failure(PswErrorCode.WrongCurrency);
 
-            if (request.Provider is CasinoProvider.Dafabet)
+            switch (request.Provider)
             {
-                var dafabetCasinoExist = await _context.Set<Casino>()
-                    .Where(e => e.Provider == request.Provider)
-                    .AnyAsync(cancellationToken);
+                case CasinoProvider.Dafabet:
+                {
+                    var dafabetCasinoExist = await _context.Set<Casino>()
+                        .Where(e => e.Provider == request.Provider)
+                        .AnyAsync(cancellationToken);
 
-                if (dafabetCasinoExist)
-                    return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
+                    if (dafabetCasinoExist)
+                        return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
+                    break;
+                }
+                case CasinoProvider.Sw when request.SwProviderId is null:
+                    return PswResultFactory.Failure(PswErrorCode.BadParametersInTheRequest);
             }
 
             var casino = new Casino
@@ -57,6 +63,9 @@ public record CreateCasinoRequest(
                 Id = request.CasinoId,
                 SignatureKey = request.SignatureKey,
                 Provider = request.Provider,
+                SwProviderId = request.Provider is CasinoProvider.Sw
+                    ? request.SwProviderId
+                    : null,
                 CasinoCurrencies = matchedCurrencies.Select(c => new CasinoCurrencies {CurrencyId = c.Id})
                     .ToList()
             };

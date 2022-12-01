@@ -5,7 +5,7 @@ using Base.Response;
 using Extensions;
 using Results.Hub88;
 using Results.Hub88.WithData;
-using Results.Hub88.WithData.Mappers;
+using Results.ResultToResultMappers;
 using Services.Wallet;
 using Services.Wallet.DTOs;
 

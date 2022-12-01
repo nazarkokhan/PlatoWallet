@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Results.Hub88.WithData.Mappers;
+namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
 public static class CommonResultToSoftswissMappers
 {

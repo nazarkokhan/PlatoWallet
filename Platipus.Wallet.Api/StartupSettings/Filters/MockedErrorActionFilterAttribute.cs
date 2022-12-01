@@ -7,6 +7,7 @@ using Application.Requests.Wallets.Hub88.Base;
 using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Psw.Base;
 using Application.Requests.Wallets.Softswiss.Base;
+using Application.Requests.Wallets.Sw.Base;
 using Controllers;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -39,13 +40,14 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        ErrorMockMethod? currentMethod = requestRoute switch
+        var currentMethod = requestRoute switch
         {
-            "balance" => ErrorMockMethod.Balance,
-            "bet" => ErrorMockMethod.Bet,
-            "win" or "result" => ErrorMockMethod.Win,
-            "award" or "bonusWin" => ErrorMockMethod.Award,
-            "rollback" or "cancel" => ErrorMockMethod.Rollback,
+            "balance" or "balance-md5" or "balance-hash" or "user/balance" => ErrorMockMethod.Balance,
+            "bet" or "bet-win" or "play" or "transaction/bet" => ErrorMockMethod.Bet,
+            "win" or "result" or "transaction/win" => ErrorMockMethod.Win,
+            "award" or "bonusWin" or "freespin" or "freespins" => ErrorMockMethod.Award,
+            "rollback" or "cancel" or "refund" or "transaction/rollback" => ErrorMockMethod.Rollback,
+            "main" => GetOpenboxMethod(context),
             _ => null
         };
 
@@ -77,6 +79,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 .Select(a => a.Value as ISoftswissBaseRequest)
                 .SingleOrDefault(a => a is not null)
                 ?.SessionId.ToString(),
+            WalletSwController => context.ActionArguments
+                .Select(a => a.Value as ISwBaseRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.Token.ToString(),
             _ => null
         };
 
@@ -160,5 +166,20 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
 
         await dbContext.SaveChangesAsync();
+    }
+
+    private static ErrorMockMethod? GetOpenboxMethod(ActionExecutingContext context)
+    {
+        var request = context.ActionArguments
+            .Select(a => a.Value as OpenboxSingleRequest)
+            .Single(a => a is not null);
+
+        return request?.Method switch
+        {
+            OpenboxHelpers.GetPlayerBalance => ErrorMockMethod.Balance,
+            OpenboxHelpers.MoneyTransactions => ErrorMockMethod.Bet | ErrorMockMethod.Win,
+            OpenboxHelpers.CancelTransaction => ErrorMockMethod.Rollback,
+            _ => null
+        };
     }
 }

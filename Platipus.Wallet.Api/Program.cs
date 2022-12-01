@@ -57,6 +57,7 @@ try
         .AddControllers(
             options =>
             {
+                // options.ModelBinderProviders.Add(new FormCollectionModelBinderProvider()); // TODO check
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
                 options.Filters.Add<ActionResultFilterAttribute>(1);
@@ -98,6 +99,14 @@ try
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
+        .AddJsonOptions(
+            nameof(CasinoProvider.Sw),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonLowerCaseNamingPolicy();
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)

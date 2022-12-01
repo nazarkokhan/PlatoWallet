@@ -1,6 +1,7 @@
-namespace Platipus.Wallet.Api.Application.Results.Hub88.WithData.Mappers;
+namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
-using Common;
+using Hub88;
+using Hub88.WithData;
 
 public static class CommonResultToHub88Mappers
 {

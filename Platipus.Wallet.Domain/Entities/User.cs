@@ -6,11 +6,14 @@ public class User : Entity
 {
     public string UserName { get; set; } = null!;
 
+
     public string Password { get; set; } = null!;
 
     public decimal Balance { get; set; }
 
     public bool IsDisabled { get; set; }
+
+    public int? SwUserId { get; set; } = null!;
 
     public Guid CurrencyId { get; set; }
     public Currency Currency { get; set; } = null!;

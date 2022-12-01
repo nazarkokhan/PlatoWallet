@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Domain.Entities;
 
+[Flags]
 public enum ErrorMockMethod
 {
     Balance,

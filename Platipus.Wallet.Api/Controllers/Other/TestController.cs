@@ -2,7 +2,9 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using System.Text.Json;
 using Abstract;
+using Application.Extensions;
 using Application.Results.Hub88;
+using Application.Results.Sw;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -175,6 +177,66 @@ public class TestController : RestApiController
         var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.PrivateKeyForWalletItself);
 
         var isValid = Hub88RequestSign.IsValidSign(validSignature, rawRequestBytes, casino.SignatureKey);
+
+        var result = new {Signature = validSignature};
+
+        return Ok(result);
+    }
+
+    [HttpPost("sw/get-hash")]
+    public async Task<IActionResult> SwHash(
+        string userName,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.UserName == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.SwUserId,
+                    Casino = new
+                    {
+                        ProviderId = c.Casino.SwProviderId,
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
+
+        var validSignature = user.Map(u => SwRequestHash.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
+
+        var result = new {Signature = validSignature};
+
+        return Ok(result);
+    }
+
+    [HttpPost("sw/get-md5")]
+    public async Task<IActionResult> SwMd5(
+        string userName,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.UserName == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.SwUserId,
+                    Casino = new
+                    {
+                        ProviderId = c.Casino.SwProviderId,
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
+
+        var validSignature = user.Map(u => SwRequestMd5.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
 
         var result = new {Signature = validSignature};
 

@@ -1,11 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Domain.Entities;
+using Domain.Entities.Enums;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Results.Psw;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
 
@@ -14,7 +14,8 @@ public record SignUpRequest(
     string Password,
     string CasinoId,
     string Currency,
-    decimal Balance) : IRequest<IPswResult<PswBaseResponse>>
+    decimal Balance,
+    int? SwUserId) : IRequest<IPswResult<PswBaseResponse>>
 {
     public class Handler : IRequestHandler<SignUpRequest, IPswResult<PswBaseResponse>>
     {
@@ -29,11 +30,17 @@ public record SignUpRequest(
             SignUpRequest request,
             CancellationToken cancellationToken)
         {
-            var casinoExist = await _context.Set<Casino>()
+            var casino = await _context.Set<Casino>()
                 .Where(c => c.Id == request.CasinoId)
-                .AnyAsync(cancellationToken);
+                .Select(
+                    c => new
+                    {
+                        c.Id,
+                        c.Provider
+                    })
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (!casinoExist)
+            if (casino is null)
                 return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.InvalidCasinoId);
 
             var user = await _context.Set<User>()
@@ -52,13 +59,23 @@ public record SignUpRequest(
             if (casinoCurrency is null)
                 return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.WrongCurrency);
 
+            int? swUserId = null;
+
+            if (casino.Provider is CasinoProvider.Sw)
+            {
+                if (request.SwUserId is null)
+                    return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.BadParametersInTheRequest);
+                swUserId = request.SwUserId;
+            }
+
             user = new User
             {
                 UserName = request.UserName,
                 Password = request.Password,
                 Balance = request.Balance,
                 CasinoId = request.CasinoId,
-                CurrencyId = casinoCurrency.Id
+                CurrencyId = casinoCurrency.Id,
+                SwUserId = swUserId
             };
 
             _context.Add(user);
