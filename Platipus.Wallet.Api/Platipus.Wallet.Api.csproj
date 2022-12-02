@@ -11,6 +11,7 @@
         <PackageReference Include="Bogus" Version="34.0.2"/>
         <PackageReference Include="Bogus.Text" Version="34.0.2"/>
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2"/>
+        <PackageReference Include="Horizon.XmlRpc.AspNetCore" Version="2.5.0"/>
         <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0"/>
         <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0"/>
         <PackageReference Include="MediatR" Version="10.0.1"/>
@@ -33,6 +34,7 @@
         <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5"/>
         <PackageReference Include="StackExchange.Redis.Extensions.System.Text.Json" Version="8.0.5"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="XmlRpcMvc" Version="0.2.2"/>
     </ItemGroup>
 
     <ItemGroup>

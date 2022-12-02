@@ -2,7 +2,9 @@ using System.Reflection;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
+using Horizon.XmlRpc.AspNetCore.Extensions;
 using JorgeSerrano.Json;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Serilog;
 using Platipus.Wallet.Api;
@@ -49,6 +51,12 @@ try
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
+
+    services.Configure<KestrelServerOptions>(
+        options =>
+        {
+            options.AllowSynchronousIO = true;
+        });
 
     const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO to config
     services
@@ -171,6 +179,8 @@ try
                 r.Configuration = builderConfiguration.GetConnectionString("RedisCache");
             });
 
+    services.AddXmlRpc();
+
     var app = builder.Build();
 
     app.UseExceptionHandler(
@@ -189,6 +199,11 @@ try
 
     app.UseRequestLocalization();
 
+    app.UseXmlRpc(
+        x =>
+        {
+            x.MapService<AddService>("test");
+        });
     app.MapControllers();
 
     await app.SeedAsync();
@@ -207,6 +222,23 @@ finally
 
 namespace Platipus.Wallet.Api
 {
+    using Horizon.XmlRpc.AspNetCore;
+    using Horizon.XmlRpc.Core;
+
+    public interface IAddService
+    {
+        [XmlRpcMethod("Demo.addNumbers")]
+        int AddNumbers(int numberA, int numberB);
+    }
+
+    public class AddService : XmlRpcService, IAddService
+    {
+        public int AddNumbers(int numberA, int numberB)
+        {
+            return numberA + numberB;
+        }
+    }
+
     public static class App
     {
         public const string Version = "17.0";
