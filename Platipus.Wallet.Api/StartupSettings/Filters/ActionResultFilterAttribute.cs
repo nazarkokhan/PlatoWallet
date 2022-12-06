@@ -7,10 +7,13 @@ using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
+using Application.Results.ISoftBet;
+using Application.Results.ISoftBet.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
 using Domain.Entities.Enums;
@@ -45,6 +48,30 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 var errorCode = swResult.ErrorCode;
 
                 var errorResponse = new SwErrorResponse(errorCode);
+
+                context.Result = new BadRequestObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+
+            if (baseExternalActionResult.Result is ISoftBetResult softBetResult)
+            {
+                if (softBetResult.IsSuccess)
+                {
+                    if (softBetResult is not ISoftBetResult<object> objectResult)
+                        return;
+
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                var errorCode = softBetResult.ErrorCode;
+
+                var errorResponse = new SoftBetErrorResponse(
+                    errorCode.ToCode(),
+                    errorCode.ToString(),
+                    "action",
+                    true);
 
                 context.Result = new BadRequestObjectResult(errorResponse);
 
@@ -87,14 +114,14 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 }
 
                 const DafabetErrorCode databetErrorCode = DafabetErrorCode.Success;
-                var databetBaseResponse = new DatabetBaseResponse(databetErrorCode, databetErrorCode.ToString());
+                var databetBaseResponse = new DafabetBaseResponse(databetErrorCode, databetErrorCode.ToString());
                 context.Result = new OkObjectResult(databetBaseResponse);
                 return;
             }
 
             var errorCode = dafabetActionResult.Result.ErrorCode;
 
-            var errorResponse = new DatabetErrorResponse((int)errorCode, errorCode.ToString());
+            var errorResponse = new DafabetErrorResponse((int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
 

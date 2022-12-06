@@ -6,16 +6,16 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record DatabetBonusWinRequest(
+public record DafabetBonusWinRequest(
     string PlayerId,
     decimal Amount,
     string GameCode,
     string RoundId,
     string TransactionId,
     string? Device,
-    string Hash) : IDatabetBaseRequest, IRequest<IDafabetResult<DatabetBalanceResponse>>
+    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
-    public class Handler : IRequestHandler<DatabetBonusWinRequest, IDafabetResult<DatabetBalanceResponse>>
+    public class Handler : IRequestHandler<DafabetBonusWinRequest, IDafabetResult<DafabetBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -24,8 +24,8 @@ public record DatabetBonusWinRequest(
             _context = context;
         }
 
-        public async Task<IDafabetResult<DatabetBalanceResponse>> Handle(
-            DatabetBonusWinRequest request,
+        public async Task<IDafabetResult<DafabetBalanceResponse>> Handle(
+            DafabetBonusWinRequest request,
             CancellationToken cancellationToken)
         {
             var award = await _context.Set<Award>()
@@ -35,10 +35,10 @@ public record DatabetBonusWinRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (award is null || award.User.UserName != request.PlayerId)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
 
             if (award.AwardRound is not null)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.SystemError);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.SystemError);
 
             var round = await _context.Set<Round>()
                 .Where(r => r.Id == request.RoundId)
@@ -46,7 +46,7 @@ public record DatabetBonusWinRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (round is not null)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
 
             round = new Round
             {
@@ -72,9 +72,9 @@ public record DatabetBonusWinRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new DatabetBalanceResponse(user.UserName, user.Currency.Name, user.Balance);
+            var response = new DafabetBalanceResponse(user.UserName, user.Currency.Name, user.Balance);
 
-            return DatabetResultFactory.Success(response);
+            return DafabetResultFactory.Success(response);
         }
     }
 

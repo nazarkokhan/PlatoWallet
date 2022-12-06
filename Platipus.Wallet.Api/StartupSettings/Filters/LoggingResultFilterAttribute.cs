@@ -25,7 +25,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
         var requestHeaders = httpContext.Request.Headers.ToDictionary(x => x.Key, x => x.Value);
         var responseHeaders = httpContext.Response.Headers.ToDictionary(x => x.Key, x => x.Value);
 
-        var isError = response is PswErrorResponse or DatabetErrorResponse;
+        var isError = response is PswErrorResponse or DafabetErrorResponse;
 
         var provider = context.Controller switch
         {

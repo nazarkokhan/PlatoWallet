@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Abstract;
 using Application.Extensions;
 using Application.Results.Hub88;
@@ -242,4 +243,48 @@ public class TestController : RestApiController
 
         return Ok(result);
     }
+
+    [HttpPost("softbet/hash")]
+    public async Task<IActionResult> SoftBet(
+        string userName,
+        object request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.UserName == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.SwUserId,
+                    Casino = new
+                    {
+                        ProviderId = c.Casino.SwProviderId,
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
+
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+
+        var validSignature = user.Map(u => SoftBetRequestHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
+
+        var result = new {Signature = validSignature};
+
+        return Ok(result);
+    }
+
+    [HttpPost("softbet/dynamic")]
+    public async Task<IActionResult> SoftBet(
+        SomeTest request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        return Ok(request);
+    }
+
+    public record SomeTest(JsonNode SomeProp);
 }

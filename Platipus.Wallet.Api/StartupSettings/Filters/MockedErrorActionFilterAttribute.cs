@@ -64,7 +64,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 .SingleOrDefault(a => a is not null)
                 ?.SessionId.ToString(),
             WalletDafabetController => context.ActionArguments
-                .Select(a => a.Value as IDatabetBaseRequest)
+                .Select(a => a.Value as IDafabetBaseRequest)
                 .SingleOrDefault(a => a is not null)
                 ?.PlayerId,
             WalletOpenboxController => context.ActionArguments

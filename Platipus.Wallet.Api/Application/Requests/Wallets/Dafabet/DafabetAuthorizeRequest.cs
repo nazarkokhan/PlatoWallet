@@ -6,12 +6,12 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record DatabetAuthorizeRequest(
+public record DafabetAuthorizeRequest(
     string PlayerId,
     Guid PlayerToken,
-    string Hash) : IDatabetBaseRequest, IRequest<IDafabetResult<DatabetBalanceResponse>>
+    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
-    public class Handler : IRequestHandler<DatabetAuthorizeRequest, IDafabetResult<DatabetBalanceResponse>>
+    public class Handler : IRequestHandler<DafabetAuthorizeRequest, IDafabetResult<DafabetBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -20,8 +20,8 @@ public record DatabetAuthorizeRequest(
             _context = context;
         }
 
-        public async Task<IDafabetResult<DatabetBalanceResponse>> Handle(
-            DatabetAuthorizeRequest request,
+        public async Task<IDafabetResult<DafabetBalanceResponse>> Handle(
+            DafabetAuthorizeRequest request,
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
@@ -47,14 +47,14 @@ public record DatabetAuthorizeRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null || user.IsDisabled)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
 
             if (user.Sessions.All(s => s.Id != request.PlayerToken))
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.InvalidToken);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.InvalidToken);
 
-            var response = new DatabetBalanceResponse(user.UserName, user.CurrencyName, user.Balance);
+            var response = new DafabetBalanceResponse(user.UserName, user.CurrencyName, user.Balance);
 
-            return DatabetResultFactory.Success(response);
+            return DafabetResultFactory.Success(response);
         }
     }
 

@@ -87,7 +87,7 @@ public record SwBetWinRequest(
                             r.RoundId.ToString(),
                             r.RemotetranId,
                             r.Finished,
-                            r.Amount));
+                            -r.Amount));
 
                     var winResult = await _wallet.WinAsync(winRequest, cancellationToken);
                     if (winResult.IsFailure)

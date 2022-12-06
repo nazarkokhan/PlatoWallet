@@ -153,6 +153,13 @@ public record LogInRequest(
                     launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
                     break;
                 }
+                case CasinoProvider.SoftBet:
+                    launchUrl = GetSoftBetLaunchUrlAsync(
+                        request.Game,
+                        session.Id,
+                        user.UserName,
+                        user.Currency.Name);
+                    break;
                 default:
                     launchUrl = "";
                     break;
@@ -264,6 +271,45 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"dafabet/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
+    private static string GetSoftBetLaunchUrlAsync(
+            string providerGameId,
+            // string licenseeId,
+            // string @operator,
+            Guid token,
+            string username,
+            string currency)
+        // string country,
+        // string isbSkinId,
+        // string isbGameId,
+        // string mode,
+        // string extra)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            {"providergameid", providerGameId},
+            {"licenseeid", null},
+            {"operator", null},
+            {"playerid", username},
+            {"token", token.ToString()},
+            {"username", username},
+            {"currency", currency},
+            {"country", null},
+            {"ISBskinid", "1"},
+            {"ISBgameid", "1"},
+            {"mode", null},
+            {"launchercode", "1"},
+            {"language", "en"},
+            {"lobbyurl", null},
+            {"extra", null},
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"softbet/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

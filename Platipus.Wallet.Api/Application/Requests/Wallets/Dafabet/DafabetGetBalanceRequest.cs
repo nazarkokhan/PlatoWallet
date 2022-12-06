@@ -6,11 +6,11 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record DatabetGetBalanceRequest(
+public record DafabetGetBalanceRequest(
     string PlayerId,
-    string Hash) : IDatabetBaseRequest, IRequest<IDafabetResult<DatabetBalanceResponse>>
+    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
-    public class Handler : IRequestHandler<DatabetGetBalanceRequest, IDafabetResult<DatabetBalanceResponse>>
+    public class Handler : IRequestHandler<DafabetGetBalanceRequest, IDafabetResult<DafabetBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -19,8 +19,8 @@ public record DatabetGetBalanceRequest(
             _context = context;
         }
 
-        public async Task<IDafabetResult<DatabetBalanceResponse>> Handle(
-            DatabetGetBalanceRequest request,
+        public async Task<IDafabetResult<DafabetBalanceResponse>> Handle(
+            DafabetGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
@@ -37,11 +37,11 @@ public record DatabetGetBalanceRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null || user.IsDisabled)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
 
-            var response = new DatabetBalanceResponse(user.UserName, user.CurrencyName, user.Balance);
+            var response = new DafabetBalanceResponse(user.UserName, user.CurrencyName, user.Balance);
 
-            return DatabetResultFactory.Success(response);
+            return DafabetResultFactory.Success(response);
         }
     }
 

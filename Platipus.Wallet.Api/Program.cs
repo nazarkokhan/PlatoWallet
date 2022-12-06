@@ -108,6 +108,13 @@ try
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
+        .AddJsonOptions(
+            nameof(CasinoProvider.SoftBet),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonLowerCaseNamingPolicy();
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
         .Configure<SupportedCountriesOptions>(

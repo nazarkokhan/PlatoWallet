@@ -14,11 +14,11 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var baseRequest = context.ActionArguments.Select(a => a.Value as IDatabetBaseRequest).SingleOrDefault(a => a is not null);
+        var baseRequest = context.ActionArguments.Select(a => a.Value as IDafabetBaseRequest).SingleOrDefault(a => a is not null);
 
         if (baseRequest is null)
         {
-            context.Result = DatabetResultFactory.Failure(DafabetErrorCode.SystemError).ToActionResult();
+            context.Result = DafabetResultFactory.Failure(DafabetErrorCode.SystemError).ToActionResult();
             return;
         }
 
@@ -48,7 +48,7 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
 
         if (!isValidJSysHash)
         {
-            context.Result = DatabetResultFactory.Failure(DafabetErrorCode.InvalidHash).ToActionResult();
+            context.Result = DafabetResultFactory.Failure(DafabetErrorCode.InvalidHash).ToActionResult();
             return;
         }
 

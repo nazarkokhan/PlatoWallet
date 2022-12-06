@@ -6,15 +6,15 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record DatabetCancelBetRequest(
+public record DafabetCancelBetRequest(
     string PlayerId,
     decimal Amount,
     string GameCode,
     string RoundId,
     string OriginalTransactionId,
-    string Hash) : IDatabetBaseRequest, IRequest<IDafabetResult<DatabetBalanceResponse>>
+    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
-    public class Handler : IRequestHandler<DatabetCancelBetRequest, IDafabetResult<DatabetBalanceResponse>>
+    public class Handler : IRequestHandler<DafabetCancelBetRequest, IDafabetResult<DafabetBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -23,8 +23,8 @@ public record DatabetCancelBetRequest(
             _context = context;
         }
 
-        public async Task<IDafabetResult<DatabetBalanceResponse>> Handle(
-            DatabetCancelBetRequest request,
+        public async Task<IDafabetResult<DafabetBalanceResponse>> Handle(
+            DafabetCancelBetRequest request,
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
@@ -34,11 +34,11 @@ public record DatabetCancelBetRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (round is null || round.Finished)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
 
             var lastTransaction = round.Transactions.MaxBy(t => t.CreatedDate);
             if (lastTransaction is null || lastTransaction.Id != request.OriginalTransactionId)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.TransactionNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.TransactionNotFound);
 
             var user = round.User;
 
@@ -50,9 +50,9 @@ public record DatabetCancelBetRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new DatabetBalanceResponse(user.UserName, user.Currency.Name, user.Balance);
+            var response = new DafabetBalanceResponse(user.UserName, user.Currency.Name, user.Balance);
 
-            return DatabetResultFactory.Success(response);
+            return DafabetResultFactory.Success(response);
         }
     }
 
