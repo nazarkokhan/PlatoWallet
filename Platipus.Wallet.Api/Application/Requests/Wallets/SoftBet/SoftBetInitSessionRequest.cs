@@ -47,10 +47,10 @@ public record SoftBetInitSessionRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null || user.IsDisabled)
-                return SoftBetResultFactory.Failure<Response>(SoftBetError.PlayerAuthenticationFailed);
+                return SoftBetResultFactory.Failure<Response>(SoftBetErrorMessage.PlayerAuthenticationFailed);
 
             if (user.Sessions.All(s => s.Id != request.Token))
-                return SoftBetResultFactory.Failure<Response>(SoftBetError.PlayerAuthenticationFailed);
+                return SoftBetResultFactory.Failure<Response>(SoftBetErrorMessage.PlayerAuthenticationFailed);
 
             var newSession = new Session {UserId = user.Id};
             _context.Add(newSession);

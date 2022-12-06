@@ -46,7 +46,7 @@ public record SoftBetEndRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null)
-                return SoftBetResultFactory.Failure<SoftBetBalanceResponse>(SoftBetError.PlayerAuthenticationFailed);
+                return SoftBetResultFactory.Failure<SoftBetBalanceResponse>(SoftBetErrorMessage.PlayerAuthenticationFailed);
 
             _context.Remove(session);
             await _context.SaveChangesAsync(cancellationToken);

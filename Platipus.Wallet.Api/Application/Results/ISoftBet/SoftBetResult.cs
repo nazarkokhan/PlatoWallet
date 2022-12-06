@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Results.ISoftBet;
 
 using Base;
 
-public record SoftBetResult : BaseResult<SoftBetError>, ISoftBetResult
+public record SoftBetResult : BaseResult<SoftBetErrorMessage>, ISoftBetResult
 {
     public SoftBetResult()
     {
@@ -10,7 +10,7 @@ public record SoftBetResult : BaseResult<SoftBetError>, ISoftBetResult
     }
 
     public SoftBetResult(
-        SoftBetError errorCode,
+        SoftBetErrorMessage errorCode,
         Exception? exception = null,
         string? description = null)
         : base(errorCode, exception)

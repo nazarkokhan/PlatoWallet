@@ -15,7 +15,7 @@ public static class CommonResultToSoftBetMappers
             ? SoftBetResultFactory.Success()
             : SoftBetResultFactory.Failure(result.ErrorCode.ToSoftBetErrorCode(), result.Exception);
 
-    public static SoftBetError ToSoftBetErrorCode(this ErrorCode source)
+    public static SoftBetErrorMessage ToSoftBetErrorCode(this ErrorCode source)
     {
         return source switch
         {
@@ -32,7 +32,7 @@ public static class CommonResultToSoftBetMappers
             // ErrorCode.DuplicateTransaction => SoftBetErrorCode.RS_ERROR_DUPLICATE_TRANSACTION,
             // ErrorCode.TransactionDoesNotExist => SoftBetErrorCode.RS_ERROR_TRANSACTION_DOES_NOT_EXIST,
             // ErrorCode.InvalidSign => SoftBetErrorCode.RS_ERROR_INVALID_TOKEN,
-            ErrorCode.Unknown or _ => SoftBetError.GeneralRequestError
+            ErrorCode.Unknown or _ => SoftBetErrorMessage.GeneralRequestError
         };
     }
 }

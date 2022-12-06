@@ -2,6 +2,6 @@
 
 using Base;
 
-public interface ISoftBetResult : IBaseResult<SoftBetError>
+public interface ISoftBetResult : IBaseResult<SoftBetErrorMessage>
 {
 }

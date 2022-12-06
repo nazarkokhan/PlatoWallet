@@ -48,12 +48,12 @@ public class WalletSoftBetController : RestApiController
             .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
-            return SoftBetResultFactory.Failure(SoftBetError.IncorrectFormatOfParameters).ToActionResult();
+            return SoftBetResultFactory.Failure(SoftBetErrorMessage.IncorrectFormatOfParameters).ToActionResult();
 
         var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
         var isValidHash = SoftBetRequestHash.IsValidSign(hash, rawRequestBytes, casino.SignatureKey);
         if (!isValidHash)
-            return SoftBetResultFactory.Failure(SoftBetError.PlayerAuthenticationFailed).ToActionResult();
+            return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
         var action = request.Action;
         var actionParams = request.Action.Parameters;
@@ -65,7 +65,7 @@ public class WalletSoftBetController : RestApiController
             .FirstOrDefaultAsync(cancellationToken);
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
-            return SoftBetResultFactory.Failure(SoftBetError.PlayerAuthenticationFailed).ToActionResult();
+            return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
         object? payloadRequestObj = null;
         switch (action.Command)
@@ -118,11 +118,11 @@ public class WalletSoftBetController : RestApiController
         }
 
         if (payloadRequestObj is null)
-            return SoftBetResultFactory.Failure(SoftBetError.IncorrectFormatOfParameters).ToActionResult();
+            return SoftBetResultFactory.Failure(SoftBetErrorMessage.IncorrectFormatOfParameters).ToActionResult();
 
         var responseObj = await _mediator.Send(payloadRequestObj, cancellationToken);
         if (responseObj is not ISoftBetResult response)
-            return SoftBetResultFactory.Failure(SoftBetError.GeneralRequestError).ToActionResult();
+            return SoftBetResultFactory.Failure(SoftBetErrorMessage.GeneralRequestError).ToActionResult();
 
         return response.ToActionResult();
     }

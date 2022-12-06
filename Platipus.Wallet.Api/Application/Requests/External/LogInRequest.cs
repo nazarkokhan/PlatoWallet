@@ -75,6 +75,11 @@ public record LogInRequest(
             _context.Add(session);
             await _context.SaveChangesAsync(cancellationToken);
 
+            var game = await _context.Set<Game>()
+                .Where(g => g.LaunchName == request.Game)
+                .Select(g => new {g.GameServerId})
+                .FirstAsync(cancellationToken);
+
             string launchUrl;
 
             switch (casino.Provider)
@@ -156,6 +161,7 @@ public record LogInRequest(
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
                         request.Game,
+                        game.GameServerId,
                         session.Id,
                         user.UserName,
                         user.Currency.Name);
@@ -277,6 +283,7 @@ public record LogInRequest(
 
     private static string GetSoftBetLaunchUrlAsync(
             string providerGameId,
+            int gameId,
             // string licenseeId,
             // string @operator,
             Guid token,
@@ -291,20 +298,20 @@ public record LogInRequest(
         var queryParameters = new Dictionary<string, string?>()
         {
             {"providergameid", providerGameId},
-            {"licenseeid", null},
-            {"operator", null},
+            {"licenseeid", "134"},
+            {"operator", ""},
             {"playerid", username},
             {"token", token.ToString()},
             {"username", username},
             {"currency", currency},
-            {"country", null},
+            {"country", "ukraine"},
             {"ISBskinid", "1"},
             {"ISBgameid", "1"},
-            {"mode", null},
-            {"launchercode", "1"},
+            {"mode", "real"},
+            {"launchercode", "26"},
             {"language", "en"},
-            {"lobbyurl", null},
-            {"extra", null},
+            {"lobbyurl", ""},
+            {"extra", ""},
         };
 
         var queryString = QueryString.Create(queryParameters);

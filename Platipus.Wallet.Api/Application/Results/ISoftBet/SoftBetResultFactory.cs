@@ -10,11 +10,11 @@ public static class SoftBetResultFactory
     public static SoftBetResult<TData> Success<TData>(TData data)
         => new(data);
 
-    public static SoftBetResult Failure(SoftBetError errorCode, Exception? exception = null)
+    public static SoftBetResult Failure(SoftBetErrorMessage errorCode, Exception? exception = null)
         => new(errorCode, exception);
 
     public static SoftBetResult<TData> Failure<TData>(
-        SoftBetError errorCode,
+        SoftBetErrorMessage errorCode,
         Exception? exception = null)
         => new(errorCode, exception);
 

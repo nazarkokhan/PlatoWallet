@@ -2,7 +2,7 @@
 
 using Base.WithData;
 
-public record SoftBetResult<TData> : BaseResult<SoftBetError, TData>, ISoftBetResult<TData>
+public record SoftBetResult<TData> : BaseResult<SoftBetErrorMessage, TData>, ISoftBetResult<TData>
 {
     public SoftBetResult(TData data)
         : base(data)
@@ -10,7 +10,7 @@ public record SoftBetResult<TData> : BaseResult<SoftBetError, TData>, ISoftBetRe
     }
 
     public SoftBetResult(
-        SoftBetError errorCode,
+        SoftBetErrorMessage errorCode,
         Exception? exception = null)
         : base(errorCode, exception)
     {

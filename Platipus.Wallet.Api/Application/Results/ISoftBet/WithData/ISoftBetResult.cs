@@ -2,6 +2,6 @@
 
 using Base.WithData;
 
-public interface ISoftBetResult<out TData> : IBaseResult<SoftBetError, TData>, ISoftBetResult
+public interface ISoftBetResult<out TData> : IBaseResult<SoftBetErrorMessage, TData>, ISoftBetResult
 {
 }

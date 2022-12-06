@@ -47,7 +47,7 @@ namespace Platipus.Wallet.Api.Application.Results.ISoftBet;
 //     D_02, //Wallet doesn't support deposit money method
 // }
 
-public enum SoftBetError
+public enum SoftBetErrorMessage
 {
     GeneralRequestError,
     MissingRequiredParameters,
