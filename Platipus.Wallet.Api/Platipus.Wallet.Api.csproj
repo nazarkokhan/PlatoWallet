@@ -33,6 +33,7 @@
         <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="8.0.5"/>
         <PackageReference Include="StackExchange.Redis.Extensions.System.Text.Json" Version="8.0.5"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="XmlRpcMvc" Version="0.2.2"/>
     </ItemGroup>
 
     <ItemGroup>

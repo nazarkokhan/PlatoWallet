@@ -52,7 +52,7 @@ public record SoftBetInitSessionRequest(
             if (user.Sessions.All(s => s.Id != request.Token))
                 return SoftBetResultFactory.Failure<Response>(SoftBetErrorMessage.PlayerAuthenticationFailed);
 
-            var newSession = new Session {UserId = user.Id};
+            var newSession = new Session { UserId = user.Id };
             _context.Add(newSession);
             await _context.SaveChangesAsync(cancellationToken);
 
@@ -61,7 +61,7 @@ public record SoftBetInitSessionRequest(
                 request.UserName,
                 request.UserName,
                 user.CurrencyName,
-                user.Balance);
+                (int)(user.Balance / 100));
 
             return SoftBetResultFactory.Success(response);
         }
@@ -72,5 +72,5 @@ public record SoftBetInitSessionRequest(
         string PlayerId,
         string Username,
         string Currency,
-        decimal Balance) : SoftBetBaseResponse;
+        int Balance) : SoftBetBaseResponse;
 }
