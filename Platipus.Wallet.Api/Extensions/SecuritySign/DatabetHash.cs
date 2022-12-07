@@ -6,7 +6,7 @@ using Application.Requests.Wallets.Dafabet.Base;
 
 public static class DatabetHash
 {
-    public static bool IsValidHash(this IDatabetBaseRequest request, string source, string secretKey)
+    public static bool IsValidHash(this IDafabetBaseRequest request, string source, string secretKey)
     {
         var computedHash = Compute(source, secretKey);
 

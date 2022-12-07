@@ -7,5 +7,6 @@ public enum CasinoProvider
     Openbox,
     Hub88,
     Softswiss,
-    Sw
+    Sw,
+    SoftBet
 }

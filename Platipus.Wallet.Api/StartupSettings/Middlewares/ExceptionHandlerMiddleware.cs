@@ -3,9 +3,6 @@ namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
-using Application.Results.Common;
-using Application.Results.Dafabet;
-using Application.Results.Psw;
 
 public class ExceptionHandlerMiddleware : IMiddleware
 {
@@ -51,6 +48,6 @@ public class ExceptionHandlerMiddleware : IMiddleware
     private static object GetDatabetErrorResponse()
     {
         const DafabetErrorCode errorCode = DafabetErrorCode.SystemError;
-        return new DatabetErrorResponse((int)errorCode, errorCode.ToString());
+        return new DafabetErrorResponse((int)errorCode, errorCode.ToString());
     }
 }

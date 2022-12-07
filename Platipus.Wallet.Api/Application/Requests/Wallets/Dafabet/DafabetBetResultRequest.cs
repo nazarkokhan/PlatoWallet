@@ -6,7 +6,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record DatabetBetResultRequest(
+public record DafabetBetResultRequest(
     string PlayerId,
     decimal Amount,
     string GameCode,
@@ -14,9 +14,9 @@ public record DatabetBetResultRequest(
     string TransactionId,
     bool EndRound,
     string? Device,
-    string Hash) : IDatabetBaseRequest, IRequest<IDafabetResult<DatabetBalanceResponse>>
+    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
-    public class Handler : IRequestHandler<DatabetBetResultRequest, IDafabetResult<DatabetBalanceResponse>>
+    public class Handler : IRequestHandler<DafabetBetResultRequest, IDafabetResult<DafabetBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -25,8 +25,8 @@ public record DatabetBetResultRequest(
             _context = context;
         }
 
-        public async Task<IDafabetResult<DatabetBalanceResponse>> Handle(
-            DatabetBetResultRequest request,
+        public async Task<IDafabetResult<DafabetBalanceResponse>> Handle(
+            DafabetBetResultRequest request,
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
@@ -36,13 +36,13 @@ public record DatabetBetResultRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (round is null)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
 
             if (round.Transactions.Any(t => t.Id == request.TransactionId))
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.TransactionNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.TransactionNotFound);
 
             if (round.Finished)
-                return DatabetResultFactory.Failure<DatabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
+                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
 
             round.User.Balance += request.Amount;
             if (request.EndRound)
@@ -59,9 +59,9 @@ public record DatabetBetResultRequest(
             _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new DatabetBalanceResponse(round.User.UserName, round.User.Currency.Name, round.User.Balance);
+            var response = new DafabetBalanceResponse(round.User.UserName, round.User.Currency.Name, round.User.Balance);
 
-            return DatabetResultFactory.Success(response);
+            return DafabetResultFactory.Success(response);
         }
     }
 

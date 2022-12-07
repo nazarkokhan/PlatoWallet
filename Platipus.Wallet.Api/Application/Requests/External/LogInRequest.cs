@@ -75,6 +75,11 @@ public record LogInRequest(
             _context.Add(session);
             await _context.SaveChangesAsync(cancellationToken);
 
+            var game = await _context.Set<Game>()
+                .Where(g => g.LaunchName == request.Game)
+                .Select(g => new {g.GameServerId})
+                .FirstAsync(cancellationToken);
+
             string launchUrl;
 
             switch (casino.Provider)
@@ -153,6 +158,14 @@ public record LogInRequest(
                     launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
                     break;
                 }
+                case CasinoProvider.SoftBet:
+                    launchUrl = GetSoftBetLaunchUrlAsync(
+                        request.Game,
+                        game.GameServerId,
+                        session.Id,
+                        user.UserName,
+                        user.Currency.Name);
+                    break;
                 default:
                     launchUrl = "";
                     break;
@@ -264,6 +277,46 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"dafabet/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
+    private static string GetSoftBetLaunchUrlAsync(
+            string providerGameId,
+            int gameId,
+            // string licenseeId,
+            // string @operator,
+            Guid token,
+            string username,
+            string currency)
+        // string country,
+        // string isbSkinId,
+        // string isbGameId,
+        // string mode,
+        // string extra)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            {"providergameid", providerGameId},
+            {"licenseeid", "134"},
+            {"operator", ""},
+            {"playerid", username},
+            {"token", token.ToString()},
+            {"username", username},
+            {"currency", currency},
+            {"country", "ukraine"},
+            {"ISBskinid", "1"},
+            {"ISBgameid", "1"},
+            {"mode", "real"},
+            {"launchercode", "26"},
+            {"language", "en"},
+            {"lobbyurl", ""},
+            {"extra", ""},
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"softbet/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

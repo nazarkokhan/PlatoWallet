@@ -1,5 +1,5 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Dafabet.Base.Response;
 
-public record DatabetErrorResponse(
+public record DafabetErrorResponse(
     int Status,
-    string Message) : DatabetBaseResponse(Status, Message);
+    string Message) : DafabetBaseResponse(Status, Message);

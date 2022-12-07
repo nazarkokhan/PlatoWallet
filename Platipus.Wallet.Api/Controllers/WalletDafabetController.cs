@@ -10,7 +10,7 @@ using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
 [Route("wallet/dafabet")]
-[ProducesResponseType(typeof(DatabetBaseResponse), StatusCodes.Status200OK)]
+[ProducesResponseType(typeof(DafabetBaseResponse), StatusCodes.Status200OK)]
 [MockedErrorActionFilter(Order = 1)]
 [DatabetVerifySignatureFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Dafabet))]
@@ -22,44 +22,44 @@ public class WalletDafabetController : RestApiController
         => _mediator = mediator;
 
     [HttpPost("authorize")]
-    [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Authorize(
-        DatabetAuthorizeRequest request,
+        DafabetAuthorizeRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("balance")]
-    [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
-        DatabetGetBalanceRequest request,
+        DafabetGetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
-    [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        DatabetBetRequest request,
+        DafabetBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("result")]
-    [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> BetResult(
-        DatabetBetResultRequest request,
+        DafabetBetResultRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bonusWin")]
-    [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> BonusWin(
-        DatabetBonusWinRequest request,
+        DafabetBonusWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("cancel")]
-    [ProducesResponseType(typeof(DatabetBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CanselBet(
-        DatabetCancelBetRequest request,
+        DafabetCancelBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
