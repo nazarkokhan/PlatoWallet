@@ -61,7 +61,7 @@ public record SoftBetInitSessionRequest(
                 request.UserName,
                 request.UserName,
                 user.CurrencyName,
-                (int)(user.Balance / 100));
+                (int)(user.Balance * 100));
 
             return SoftBetResultFactory.Success(response);
         }
