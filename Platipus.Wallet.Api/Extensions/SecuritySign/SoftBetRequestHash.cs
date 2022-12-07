@@ -12,7 +12,7 @@ public static class SoftBetRequestHash
     {
         var hash = Compute(data, secretKey);
 
-        var isValid = externalHash.Equals(hash);
+        var isValid = externalHash.Equals(hash, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }
