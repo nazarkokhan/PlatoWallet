@@ -44,7 +44,7 @@ public class WalletSoftBetController : RestApiController
     {
         var casino = await _context.Set<Casino>()
             .Where(c => c.Users.Select(u => u.UserName).Contains(request.Username))
-            .Select(c => new {c.SignatureKey})
+            .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
@@ -61,7 +61,12 @@ public class WalletSoftBetController : RestApiController
         var validToken = action.Command is "initsession" ? request.Token : request.SessionId;
         var session = await _context.Set<Session>()
             .Where(c => c.Id == validToken)
-            .Select(c => new {c.ExpirationDate})
+            .Select(
+                c => new
+                {
+                    c.Id,
+                    c.ExpirationDate
+                })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
