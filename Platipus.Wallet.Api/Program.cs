@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Platipus.Serilog;
 using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
+using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
@@ -183,6 +184,13 @@ try
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
         .Services
+        .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
+        .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
+            options =>
+            {
+                options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
+            })
+        .Services
         .AddStackExchangeRedisCache(
             r =>
             {
@@ -213,7 +221,7 @@ try
     app.UseXmlRpc(
         configure =>
         {
-            configure.MapService<WalletGamesGlobalService>("wallet/games-global");
+            configure.MapService<WalletGamesGlobalService>("wallet/games-global/gaming");
             configure.MapService<WalletGamesGlobalAdminService>("wallet/games-global/admin");
         });
 

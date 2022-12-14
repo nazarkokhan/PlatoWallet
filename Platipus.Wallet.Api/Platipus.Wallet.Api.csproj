@@ -46,6 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Application\Requests\Wallets\GamesGlobal\Admin"/>
         <Folder Include="Application\Services\GamesApi\DTOs\Requests"/>
     </ItemGroup>
 

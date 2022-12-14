@@ -9,6 +9,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Services.GamesApi;
+using Services.GamesGlobalGamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
@@ -29,17 +30,20 @@ public record LogInRequest(
         private readonly IGamesApiClient _gamesApiClient;
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
+        private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
 
         public Handler(
             WalletDbContext context,
             IGamesApiClient gamesApiClient,
             IHub88GamesApiClient hub88GamesApiClient,
-            ISoftswissGamesApiClient softswissGamesApiClient)
+            ISoftswissGamesApiClient softswissGamesApiClient,
+            IGamesGlobalGamesApiClient globalGamesApiClient)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
             _hub88GamesApiClient = hub88GamesApiClient;
             _softswissGamesApiClient = softswissGamesApiClient;
+            _globalGamesApiClient = globalGamesApiClient;
         }
 
         public async Task<IPswResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
@@ -167,7 +171,11 @@ public record LogInRequest(
                         user.Currency.Name);
                     break;
                 case CasinoProvider.GamesGlobal:
-                    launchUrl = "need to implement on game server";
+                    var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
+                        session.Id,
+                        cancellationToken);
+
+                    launchUrl = getLaunchUrlResult.Data ?? "";
                     break;
                 default:
                     launchUrl = "";

@@ -15,7 +15,7 @@ public record GamesGlobalBaseResponse(
         string requestUuid)
         : this(
             user,
-            GamesGlobalErrorCode.Configuration,
+            GamesGlobalErrorCode.CacheError,
             requestUuid,
             currency)
     {
