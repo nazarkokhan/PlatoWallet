@@ -8,5 +8,6 @@ public enum CasinoProvider
     Hub88,
     Softswiss,
     Sw,
-    SoftBet
+    SoftBet,
+    GamesGlobal
 }

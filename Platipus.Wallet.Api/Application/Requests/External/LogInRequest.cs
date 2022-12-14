@@ -77,7 +77,7 @@ public record LogInRequest(
 
             var game = await _context.Set<Game>()
                 .Where(g => g.LaunchName == request.Game)
-                .Select(g => new {g.GameServerId})
+                .Select(g => new { g.GameServerId })
                 .FirstAsync(cancellationToken);
 
             string launchUrl;
@@ -166,6 +166,9 @@ public record LogInRequest(
                         user.UserName,
                         user.Currency.Name);
                     break;
+                case CasinoProvider.GamesGlobal:
+                    launchUrl = "need to implement on game server";
+                    break;
                 default:
                     launchUrl = "";
                     break;
@@ -193,15 +196,15 @@ public record LogInRequest(
         var queryParameters = new Dictionary<string, string?>()
         {
             // { "brand", "openbox" },//TODO need?
-            {nameof(token), token.ToString()},
-            {"agency-uid", agencyUid},
-            {"player-uid", playerUid.ToString()},
-            {"player-type", "1"},
-            {"player-id", playerId},
-            {"game-id", gameId},
-            {"country", "CN"},
-            {"language", "en"},
-            {nameof(currency), currency},
+            { nameof(token), token.ToString() },
+            { "agency-uid", agencyUid },
+            { "player-uid", playerUid.ToString() },
+            { "player-type", "1" },
+            { "player-id", playerId },
+            { "game-id", gameId },
+            { "country", "CN" },
+            { "language", "en" },
+            { nameof(currency), currency },
             // {"backurl", "zero"},
             // {"backUri", "zero"},
         };
@@ -226,15 +229,15 @@ public record LogInRequest(
         var queryParameters = new Dictionary<string, string?>()
         {
             // { "brand", "openbox" },//TODO need?
-            {nameof(token), token.ToString()},
-            {"agency-uid", agencyUid},
-            {"player-uid", playerUid.ToString()},
-            {"player-type", "1"},
-            {"player-id", playerId},
-            {"game-id", gameId},
-            {"country", "CN"},
-            {"language", "en"},
-            {nameof(currency), currency},
+            { nameof(token), token.ToString() },
+            { "agency-uid", agencyUid },
+            { "player-uid", playerUid.ToString() },
+            { "player-type", "1" },
+            { "player-id", playerId },
+            { "game-id", gameId },
+            { "country", "CN" },
+            { "language", "en" },
+            { nameof(currency), currency },
             // {"backurl", "zero"},
             // {"backUri", "zero"},
         };
@@ -259,11 +262,11 @@ public record LogInRequest(
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            {"brand", "dafabet"},
-            {nameof(gameCode), gameCode},
-            {nameof(playerId), playerId},
-            {nameof(playerToken), playerToken.ToString()},
-            {nameof(currency), currency}
+            { "brand", "dafabet" },
+            { nameof(gameCode), gameCode },
+            { nameof(playerId), playerId },
+            { nameof(playerToken), playerToken.ToString() },
+            { nameof(currency), currency }
         };
 
         if (device is not null)
@@ -297,21 +300,21 @@ public record LogInRequest(
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            {"providergameid", providerGameId},
-            {"licenseeid", "134"},
-            {"operator", ""},
-            {"playerid", username},
-            {"token", token.ToString()},
-            {"username", username},
-            {"currency", currency},
-            {"country", "ukraine"},
-            {"ISBskinid", "1"},
-            {"ISBgameid", "1"},
-            {"mode", "real"},
-            {"launchercode", "26"},
-            {"language", "en"},
-            {"lobbyurl", ""},
-            {"extra", ""},
+            { "providergameid", providerGameId },
+            { "licenseeid", "134" },
+            { "operator", "" },
+            { "playerid", username },
+            { "token", token.ToString() },
+            { "username", username },
+            { "currency", currency },
+            { "country", "ukraine" },
+            { "ISBskinid", "1" },
+            { "ISBgameid", "1" },
+            { "mode", "real" },
+            { "launchercode", "26" },
+            { "language", "en" },
+            { "lobbyurl", "" },
+            { "extra", "" },
         };
 
         var queryString = QueryString.Create(queryParameters);

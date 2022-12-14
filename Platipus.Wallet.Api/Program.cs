@@ -12,6 +12,7 @@ using Platipus.Wallet.Api.Application.Services.GamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
+using Platipus.Wallet.Api.Controllers.GamesGlobal;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
@@ -62,6 +63,7 @@ try
     services
         .AddScoped<IWalletService, WalletService>()
         .AddTransient<ExceptionHandlerMiddleware>()
+        .AddTransient<GamesGlobalMiddleware>()
         .AddControllers(
             options =>
             {
@@ -71,6 +73,7 @@ try
                 options.Filters.Add<ActionResultFilterAttribute>(1);
                 options.Filters.Add<LoggingResultFilterAttribute>(2);
             })
+        .AddXmlSerializerFormatters()
         .AddJsonOptions(
             options =>
             {
@@ -138,7 +141,7 @@ try
                         x => x.Value!["iso_code"]!.GetValue<string>(),
                         x => x.Value!["subunit_to_unit"]!.GetValue<long>());
 
-                return new SoftswissCurrenciesOptions {CountryIndexes = optionsValue};
+                return new SoftswissCurrenciesOptions { CountryIndexes = optionsValue };
             })
         .AddEndpointsApiExplorer()
         .AddSwaggerGen()
@@ -206,11 +209,14 @@ try
 
     app.UseRequestLocalization();
 
+    app.UseMiddleware<GamesGlobalMiddleware>();
     app.UseXmlRpc(
-        x =>
+        configure =>
         {
-            x.MapService<AddService>("test");
+            configure.MapService<WalletGamesGlobalService>("wallet/games-global");
+            configure.MapService<WalletGamesGlobalAdminService>("wallet/games-global/admin");
         });
+
     app.MapControllers();
 
     await app.SeedAsync();
@@ -229,25 +235,8 @@ finally
 
 namespace Platipus.Wallet.Api
 {
-    using Horizon.XmlRpc.AspNetCore;
-    using Horizon.XmlRpc.Core;
-
-    public interface IAddService
-    {
-        [XmlRpcMethod("Demo.addNumbers")]
-        int AddNumbers(int numberA, int numberB);
-    }
-
-    public class AddService : XmlRpcService, IAddService
-    {
-        public int AddNumbers(int numberA, int numberB)
-        {
-            return numberA + numberB;
-        }
-    }
-
     public static class App
     {
-        public const string Version = "17.0";
+        public const string Version = "19.0";
     }
 }
