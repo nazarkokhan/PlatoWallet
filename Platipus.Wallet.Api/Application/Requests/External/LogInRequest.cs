@@ -81,7 +81,12 @@ public record LogInRequest(
 
             var game = await _context.Set<Game>()
                 .Where(g => g.LaunchName == request.Game)
-                .Select(g => new { g.GameServerId })
+                .Select(
+                    g => new
+                    {
+                        g.GameServerId,
+                        g.LaunchName
+                    })
                 .FirstAsync(cancellationToken);
 
             string launchUrl;
@@ -173,6 +178,7 @@ public record LogInRequest(
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
                         session.Id,
+                        game.LaunchName,
                         cancellationToken);
 
                     launchUrl = getLaunchUrlResult.Data ?? "";

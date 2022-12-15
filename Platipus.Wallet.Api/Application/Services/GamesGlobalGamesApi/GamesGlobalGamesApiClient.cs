@@ -11,7 +11,7 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<IResult<string?>> GetLaunchUrlAsync(Guid token, CancellationToken cancellationToken = default)
+    public async Task<IResult<string?>> GetLaunchUrlAsync(Guid token, string game, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -20,7 +20,7 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
                 Token = token,
                 Lobby = "",
                 Locale = "en",
-                Game = ""
+                Game = game
             };
             var jsonContent = JsonContent.Create(requestBody);
 
