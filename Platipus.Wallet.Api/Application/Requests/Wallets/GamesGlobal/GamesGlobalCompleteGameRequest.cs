@@ -1,7 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.GamesGlobal;
 
 using Base;
+using Domain.Entities;
 using Horizon.XmlRpc.Core;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.GamesGlobal;
 using Results.GamesGlobal.WithData;
 using Services.Wallet;
@@ -20,39 +23,34 @@ public record GamesGlobalCompleteGameRequest(
     public class Handler : IRequestHandler<GamesGlobalCompleteGameRequest, IGamesGlobalResult<Response>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
             _wallet = wallet;
+            _context = context;
         }
 
         public async Task<IGamesGlobalResult<Response>> Handle(
             GamesGlobalCompleteGameRequest request,
             CancellationToken cancellationToken)
         {
-            // var walletRequest = request.Map(
-            //     r => new BetRequest(
-            //         r.Token,
-            //         r.SupplierUser,
-            //         r.Currency,
-            //         r.GameCode,
-            //         r.Round,
-            //         r.TransactionUuid,
-            //         r.RoundClosed,
-            //         r.Amount / 100000m));
-            //
-            // var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
-            // if (walletResult.IsFailure)
-            //     walletResult.ToGamesGlobalResult();
-            //
-            // var response = walletResult.Data.Map(
-            //     d => new GamesGlobalBalanceResponse(
-            //         (int)(d.Balance * 100000),
-            //         request.SupplierUser,
-            //         request.RequestUuid,
-            //         d.Currency));
+            var gameInfo = request.GameInfo;
 
-            var response = new Response(new RespDto[] { }, new ErrorDto[] { });
+            var game = await _context.Set<Round>()
+                .Where(r => r.Id == gameInfo.GameId.ToString())
+                .Select(r => new { r.Finished })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (game is null)
+                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.GameSettingsNotFound);
+
+            if (!game.Finished)
+                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.UnresolvedTicketsOnCompleteGame);
+
+            var resp = new RespDto(request.ServerIds.FirstOrDefault()?.ServerId ?? 0);
+
+            var response = new Response(new[] { resp }, new ErrorDto[] { });
             return GamesGlobalResultFactory.Success(response);
         }
     }

@@ -58,7 +58,6 @@ public record SoftswissPlayRequest(
                             r.SessionId,
                             r.UserId,
                             r.Currency,
-                            r.Game,
                             r.GameId,
                             action.ActionId,
                             r.Finished ?? false,
@@ -72,7 +71,7 @@ public record SoftswissPlayRequest(
                         d => new Response(
                             _currencyMultipliers.GetSumOut(request.Currency, d.Balance),
                             request.GameId,
-                            new List<PlayTransaction> {new(action.ActionId, d.InternalTransactionId, d.CreatedDate)}));
+                            new List<PlayTransaction> { new(action.ActionId, d.InternalTransactionId, d.CreatedDate) }));
                     break;
 
                 case "win":
@@ -95,7 +94,7 @@ public record SoftswissPlayRequest(
                         d => new Response(
                             _currencyMultipliers.GetSumOut(request.Currency, d.Balance),
                             request.GameId,
-                            new List<PlayTransaction> {new(action.ActionId, d.InternalTransactionId, d.CreatedDate)}));
+                            new List<PlayTransaction> { new(action.ActionId, d.InternalTransactionId, d.CreatedDate) }));
                     break;
 
                 default:

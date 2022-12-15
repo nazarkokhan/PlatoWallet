@@ -41,7 +41,7 @@ public record GamesGlobalGetBalanceRequest(GamesGlobalGetBalanceDto[] GetBalance
             var r = request.GetBalances.First();
 
             var user = await _context.Set<User>()
-                .Where(u => u.SwUserId == r.UserInfo.userId)
+                .Where(u => u.SwUserId == r.UserInfo.UserId)
                 .Select(
                     u => new
                     {

@@ -15,7 +15,14 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
     {
         try
         {
-            var jsonContent = JsonContent.Create(new { Token = token });
+            var requestBody = new
+            {
+                Token = token,
+                Lobby = "",
+                Locale = "en",
+                Game = ""
+            };
+            var jsonContent = JsonContent.Create(requestBody);
 
             var httpResponse = await _httpClient.PostAsync("", jsonContent, cancellationToken);
 

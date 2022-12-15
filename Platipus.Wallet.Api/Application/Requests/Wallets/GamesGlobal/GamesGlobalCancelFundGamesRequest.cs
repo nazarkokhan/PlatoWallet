@@ -1,7 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.GamesGlobal;
 
 using Base;
+using Domain.Entities;
 using Horizon.XmlRpc.Core;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.GamesGlobal;
 using Results.GamesGlobal.WithData;
 using Services.Wallet;
@@ -25,39 +28,48 @@ public record GamesGlobalCancelFundGamesRequest(GamesGlobalCancelFundGameDto[] C
     public class Handler : IRequestHandler<GamesGlobalCancelFundGamesRequest, IGamesGlobalResult<Response>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
             _wallet = wallet;
+            _context = context;
         }
 
         public async Task<IGamesGlobalResult<Response>> Handle(
             GamesGlobalCancelFundGamesRequest request,
             CancellationToken cancellationToken)
         {
-            // var walletRequest = request.Map(
-            //     r => new BetRequest(
-            //         r.Token,
-            //         r.SupplierUser,
-            //         r.Currency,
-            //         r.GameCode,
-            //         r.Round,
-            //         r.TransactionUuid,
-            //         r.RoundClosed,
-            //         r.Amount / 100000m));
-            //
-            // var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
-            // if (walletResult.IsFailure)
-            //     walletResult.ToGamesGlobalResult();
-            //
-            // var response = walletResult.Data.Map(
-            //     d => new GamesGlobalBalanceResponse(
-            //         (int)(d.Balance * 100000),
-            //         request.SupplierUser,
-            //         request.RequestUuid,
-            //         d.Currency));
+            var cancel = request.Cancels.First();
+            var userInfo = cancel.UserInfo;
 
-            var response = new Response(new RespDto[] { }, new ErrorDto[] { });
+            var user = await _context.Set<User>()
+                .Where(u => u.SwUserId == userInfo.UserId)
+                .Select(u => new { u.UserName })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.InvalidUserId);
+
+            return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.GameSettingsNotFound);
+
+            // var betTicket = Guid.NewGuid().ToString();
+            // var walletRequest = new RollbackRequest(
+            //     Guid.Empty,
+            //     user.UserName,
+            //     "USD",
+            //     gameInfo.GameId.ToString(),
+            //     betTicket,
+            //     false,
+            //     fund.DebitAmt / 100m);
+            //
+            // var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
+            // if (walletResult.IsFailure)
+            //     return walletResult.ToGamesGlobalResult<Response>();
+
+            var resp = new RespDto(cancel.RequestItemId);
+
+            var response = new Response(new[] { resp }, new ErrorDto[] { });
             return GamesGlobalResultFactory.Success(response);
         }
     }

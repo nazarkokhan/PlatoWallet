@@ -48,9 +48,9 @@ public record GamesGlobalGetLoginFromTokenRequest(Guid Token)
 
             var userInfo = new GamesGlobalUserInfoDto
             {
-                serverId = user.Casino.SwProviderId!.Value,
-                userId = user.SwUserId!.Value,
-                userName = user.UserName
+                ServerId = user.Casino.SwProviderId!.Value,
+                UserId = user.SwUserId!.Value,
+                UserName = user.UserName
             };
 
             var response = new Response(

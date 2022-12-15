@@ -43,7 +43,6 @@ public record Hub88BetRequest(
                     r.Token,
                     r.SupplierUser,
                     r.Currency,
-                    r.GameCode,
                     r.Round,
                     r.TransactionUuid,
                     r.RoundClosed,

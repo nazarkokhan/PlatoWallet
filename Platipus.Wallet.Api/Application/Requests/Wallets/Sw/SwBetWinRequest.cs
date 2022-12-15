@@ -64,7 +64,6 @@ public record SwBetWinRequest(
                             r.Token,
                             user.UserName,
                             user.Currency,
-                            r.GameName,
                             r.RoundId.ToString(),
                             r.RemotetranId,
                             r.Finished,

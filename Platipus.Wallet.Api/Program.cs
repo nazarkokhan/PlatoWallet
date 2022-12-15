@@ -65,6 +65,7 @@ try
         .AddScoped<IWalletService, WalletService>()
         .AddTransient<ExceptionHandlerMiddleware>()
         .AddTransient<GamesGlobalMiddleware>()
+        .AddTransient<GamesGlobalAuthMiddleware>()
         .AddControllers(
             options =>
             {

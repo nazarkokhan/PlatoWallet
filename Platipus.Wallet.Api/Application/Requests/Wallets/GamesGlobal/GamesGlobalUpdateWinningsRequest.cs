@@ -1,10 +1,15 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.GamesGlobal;
 
 using Base;
+using Domain.Entities;
 using Horizon.XmlRpc.Core;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.GamesGlobal;
 using Results.GamesGlobal.WithData;
+using Results.ResultToResultMappers;
 using Services.Wallet;
+using Services.Wallet.DTOs;
 
 public record GamesGlobalUpdateWinningDto
 {
@@ -42,39 +47,71 @@ public record GamesGlobalUpdateWinningsRequest(GamesGlobalUpdateWinningDto[] Win
     public class Handler : IRequestHandler<GamesGlobalUpdateWinningsRequest, IGamesGlobalResult<Response>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
             _wallet = wallet;
+            _context = context;
         }
 
         public async Task<IGamesGlobalResult<Response>> Handle(
             GamesGlobalUpdateWinningsRequest request,
             CancellationToken cancellationToken)
         {
-            // var walletRequest = request.Map(
-            //     r => new BetRequest(
-            //         r.Token,
-            //         r.SupplierUser,
-            //         r.Currency,
-            //         r.GameCode,
-            //         r.Round,
-            //         r.TransactionUuid,
-            //         r.RoundClosed,
-            //         r.Amount / 100000m));
-            //
-            // var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
-            // if (walletResult.IsFailure)
-            //     walletResult.ToGamesGlobalResult();
-            //
-            // var response = walletResult.Data.Map(
-            //     d => new GamesGlobalBalanceResponse(
-            //         (int)(d.Balance * 100000),
-            //         request.SupplierUser,
-            //         request.RequestUuid,
-            //         d.Currency));
+            var winning = request.Winnings.First();
 
-            var response = new Response(new RespDto[] { }, new ErrorDto[] { });
+            var user = await _context.Set<Transaction>()
+                .Where(t => t.Id == winning.BetTicket)
+                // .Select(t => t.Round.User)
+                .Select(
+                    u => new
+                    {
+                        u.RoundId,
+                        u.Round.User.UserName,
+                        UserId = u.Round.User.SwUserId,
+                        ServerId = u.Round.User.Casino.SwProviderId
+                    })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.InvalidTicketId);
+
+            var betTicket = Guid.NewGuid().ToString();
+            var walletRequest = new WinRequest(
+                Guid.Empty,
+                user.UserName,
+                "USD", //TODO save currency?
+                "",
+                user.RoundId,
+                betTicket,
+                winning.PunchTicket ?? false,
+                winning.CreditAmt / 100m);
+
+            var walletResult = await _wallet.WinAsync(walletRequest, cancellationToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToGamesGlobalResult<Response>();
+
+            var responseFund = walletResult.Data;
+            var bal = (long)(responseFund.Balance * 100);
+
+            var resp = new RespDto(
+                new GamesGlobalUserInfoDto()
+                {
+                    UserId = user.UserId!.Value,
+                    UserName = user.UserName,
+                    ServerId = user.ServerId!.Value
+                },
+                betTicket,
+                bal,
+                0,
+                bal,
+                0,
+                winning.CreditAmt,
+                0,
+                winning.RequestItemId);
+
+            var response = new Response(new[] { resp }, new ErrorDto[] { });
             return GamesGlobalResultFactory.Success(response);
         }
     }

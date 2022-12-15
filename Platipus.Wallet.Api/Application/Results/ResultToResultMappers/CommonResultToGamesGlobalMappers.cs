@@ -19,7 +19,17 @@ public static class CommonResultToGamesGlobalMappers
     {
         return source switch
         {
-            _ => GamesGlobalErrorCode.InvalidAPICredentials,
+            ErrorCode.NotEnoughMoney => GamesGlobalErrorCode.InvalidTransactionAmount,
+            ErrorCode.UserDisabled => GamesGlobalErrorCode.PlayerAccountClosed,
+            ErrorCode.SessionExpired => GamesGlobalErrorCode.PlayerIsNotLoggedInOrSessionHasExpired,
+            ErrorCode.MissingSignature or ErrorCode.InvalidSignature => GamesGlobalErrorCode.InvalidAPICredentials,
+            ErrorCode.BadParametersInTheRequest => GamesGlobalErrorCode.FreeGameInvalidParameters,
+            ErrorCode.InvalidCasinoId => GamesGlobalErrorCode.MissingServerConfiguration,
+            ErrorCode.InvalidGame => GamesGlobalErrorCode.InvalidGameName,
+            ErrorCode.WrongCurrency => GamesGlobalErrorCode.IncorrectCurrency,
+            ErrorCode.DuplicateTransaction => GamesGlobalErrorCode.UnresolvedTicketsOnCompleteGame,
+            ErrorCode.TransactionDoesNotExist => GamesGlobalErrorCode.InvalidTicketId,
+            ErrorCode.Unknown or _ => GamesGlobalErrorCode.UnknownServerError
         };
     }
 }

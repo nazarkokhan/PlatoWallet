@@ -35,7 +35,6 @@ public record SoftBetBetRequest(
                     r.SessionId,
                     r.UserName,
                     r.Currency,
-                    r.ProviderGameId,
                     r.RoundId,
                     r.TransactionId,
                     false,

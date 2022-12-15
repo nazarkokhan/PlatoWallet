@@ -1,9 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.GamesGlobal;
 
 using Base;
-using Base.Response;
-using Extensions;
+using Domain.Entities;
 using Horizon.XmlRpc.Core;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.GamesGlobal;
 using Results.GamesGlobal.WithData;
 using Results.ResultToResultMappers;
@@ -59,10 +60,12 @@ public record GamesGlobalFundGameRequest(
     public class Handler : IRequestHandler<GamesGlobalFundGameRequest, IGamesGlobalResult<Response>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
             _wallet = wallet;
+            _context = context;
         }
 
         public async Task<IGamesGlobalResult<Response>> Handle(
@@ -71,39 +74,42 @@ public record GamesGlobalFundGameRequest(
         {
             var fund = request.Funds.First();
             var gameInfo = request.GameInfo;
-            var walletRequest = fund.Map(
-                r => new BetRequest(
-                    Guid.Empty,
-                    r.UserInfo.userName!,
-                    r.GameCurrency,
-                    "r.GameCode",
-                    "r.Round",
-                    "r.TransactionUuid",
-                    true,
-                    r.DebitAmt / 100000m));
+            var userInfo = fund.UserInfo;
+
+            var user = await _context.Set<User>()
+                .Where(u => u.SwUserId == userInfo.UserId)
+                .Select(u => new { u.UserName })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.InvalidUserId);
+
+            var betTicket = Guid.NewGuid().ToString();
+            var walletRequest = new BetRequest(
+                Guid.Empty,
+                user.UserName,
+                fund.GameCurrency,
+                gameInfo.GameId.ToString(),
+                betTicket,
+                false,
+                fund.DebitAmt / 100m);
 
             var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
-                walletResult.ToGamesGlobalResult();
-
-            var responseFund = walletResult.Data.Map(
-                d => new GamesGlobalBalanceResponse(
-                    (int)(d.Balance * 100000),
-                    fund.UserInfo.userName!,
-                    fund.RequestItemId,
-                    d.Currency));
+                return walletResult.ToGamesGlobalResult<Response>();
+            var responseFund = walletResult.Data;
 
             var bal = (long)(responseFund.Balance * 100);
             var resp = new RespDto(
                 fund.UserInfo,
-                "",
+                betTicket,
                 bal,
                 0,
                 bal,
                 0,
+                fund.DebitAmt,
                 0,
-                0,
-                "",
+                fund.RequestItemId,
                 new GamesGlobalPlayerGroupDto[] { });
 
             var response = new Response(new[] { resp }, new ErrorDto[] { });
