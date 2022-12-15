@@ -246,6 +246,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "19.0";
+        public const string Version = "20.0";
     }
 }
