@@ -19,8 +19,9 @@ public record GamesGlobalGameInfoDto
     [XmlRpcMember("gameId")]
     public long GameId { get; init; }
 
+    [XmlRpcMissingMapping(MappingAction.Ignore)]
     [XmlRpcMember("externalProductId")]
-    public int ExternalProductId { get; init; }
+    public int? ExternalProductId { get; init; }
 }
 
 public record GamesGlobalFundGameDto
