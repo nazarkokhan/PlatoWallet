@@ -44,12 +44,12 @@ public record GamesGlobalGetLoginFromTokenRequest(Guid Token)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.UnknownServerError);
+                return GamesGlobalResultFactory.Failure<Response>(GamesGlobalErrorCode.InvalidUserId);
 
             var userInfo = new GamesGlobalUserInfoDto
             {
-                ServerId = user.Casino.SwProviderId!.Value,
-                UserId = user.SwUserId!.Value,
+                ServerId = user.Casino.SwProviderId ?? 0,
+                UserId = user.SwUserId ?? 0,
                 UserName = user.UserName
             };
 
