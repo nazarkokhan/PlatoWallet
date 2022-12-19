@@ -71,7 +71,7 @@ public record SwBetWinRequest(
 
                     var betResult = await _wallet.BetAsync(betRequest, cancellationToken);
                     if (betResult.IsFailure)
-                        betResult.ToSwResult();
+                        return betResult.ToSwResult<SwBetWinRefundFreespinResponse>();
 
                     response = betResult.Data.Map(d => new SwBetWinRefundFreespinResponse(d.Balance));
                     break;
@@ -90,7 +90,7 @@ public record SwBetWinRequest(
 
                     var winResult = await _wallet.WinAsync(winRequest, cancellationToken);
                     if (winResult.IsFailure)
-                        winResult.ToSwResult();
+                        return winResult.ToSwResult<SwBetWinRefundFreespinResponse>();
 
                     response = winResult.Data.Map(d => new SwBetWinRefundFreespinResponse(d.Balance));
                     break;

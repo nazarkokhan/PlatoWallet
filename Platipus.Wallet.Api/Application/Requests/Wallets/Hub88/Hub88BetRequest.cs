@@ -50,7 +50,7 @@ public record Hub88BetRequest(
 
             var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
-                walletResult.ToHub88Result();
+                return walletResult.ToHub88Result<Hub88BalanceResponse>();
 
             var response = walletResult.Data.Map(
                 d => new Hub88BalanceResponse(

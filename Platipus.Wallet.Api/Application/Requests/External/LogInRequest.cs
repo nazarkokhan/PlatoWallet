@@ -168,7 +168,11 @@ public record LogInRequest(
                     break;
                 }
                 case CasinoProvider.Sw:
-                    launchUrl = "TODO";
+                    launchUrl = GetSwLaunchUrl(
+                        session.Id,
+                        "",
+                        user.UserName,
+                        request.Game);
                     break;
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
@@ -197,40 +201,27 @@ public record LogInRequest(
         }
     }
 
-    private async static Task<string> GetLaunchUrl()
-    {
-        return ""; //TODO
-    }
-
-    private static string GetHub88LaunchUrl(
+    private static string GetSwLaunchUrl(
         Guid token,
-        string agencyUid,
-        Guid playerUid,
-        string playerId,
-        string gameId,
-        string currency)
+        string key,
+        string userId,
+        string game)
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            // { "brand", "openbox" },//TODO need?
-            { nameof(token), token.ToString() },
-            { "agency-uid", agencyUid },
-            { "player-uid", playerUid.ToString() },
-            { "player-type", "1" },
-            { "player-id", playerId },
-            { "game-id", gameId },
-            { "country", "CN" },
-            { "language", "en" },
-            { nameof(currency), currency },
-            // {"backurl", "zero"},
-            // {"backUri", "zero"},
+            { "key", key },
+            { "userid", userId },
+            { "gameconfig", game },
+            { "lang", "en" },
+            { "lobby", "" },
+            { "token", token.ToString() },
         };
 
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(
-            new Uri("https://test.platipusgaming.com/onlinecasino/"),
-            $"hub88/launcher{queryString.ToUriComponent()}");
+            new Uri("https://test.platipusgaming.com/"),
+            $"BIGBOSS/connect.do{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

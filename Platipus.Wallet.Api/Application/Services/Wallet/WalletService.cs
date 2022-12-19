@@ -231,7 +231,7 @@ public class WalletService : IWalletService
                     Amount = request.Amount
                 }
             },
-            AwardRound = new AwardRound {Award = award}
+            AwardRound = new AwardRound { Award = award }
         };
         _context.Add(round);
 

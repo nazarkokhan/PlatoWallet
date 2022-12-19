@@ -185,6 +185,13 @@ try
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
         .Services
+        // .AddSingleton<ISwGamesApiClient, SwGamesApiClient>()
+        // .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
+        //     options =>
+        //     {
+        //         options.BaseAddress = new Uri($"{gamesApiUrl}BIGBOSS/connect.do");
+        //     })
+        // .Services
         .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
         .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
             options =>
