@@ -9,5 +9,6 @@ public enum CasinoProvider
     Softswiss,
     Sw,
     SoftBet,
-    GamesGlobal
+    GamesGlobal,
+    Uis
 }

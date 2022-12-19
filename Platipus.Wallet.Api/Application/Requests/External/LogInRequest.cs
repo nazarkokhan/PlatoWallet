@@ -167,6 +167,9 @@ public record LogInRequest(
                     launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
                     break;
                 }
+                case CasinoProvider.Sw:
+                    launchUrl = "TODO";
+                    break;
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
                         request.Game,

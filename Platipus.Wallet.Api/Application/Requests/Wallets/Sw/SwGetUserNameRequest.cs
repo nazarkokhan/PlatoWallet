@@ -13,7 +13,7 @@ public record SwGetUserNameRequest(
         [property: BindProperty(Name = "providerid")] int ProviderId,
         [property: BindProperty(Name = "userid")] int UserId,
         [property: BindProperty(Name = "hash")] string Hash,
-        [property: BindProperty(Name = "amount")] Guid Token)
+        [property: BindProperty(Name = "token")] Guid Token)
     : ISwHashRequest, IRequest<ISwResult<SwGetUserNameRequest.SwUserNameResponse>>
 {
     public class Handler : IRequestHandler<SwGetUserNameRequest, ISwResult<SwUserNameResponse>>
