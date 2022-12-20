@@ -22,7 +22,9 @@ public class WalletSwController : ApiController
     private readonly IMediator _mediator;
 
     public WalletSwController(IMediator mediator)
-        => _mediator = mediator;
+    {
+        _mediator = mediator;
+    }
 
     [HttpPost("balance-md5")]
     [ProducesResponseType(typeof(SwBalanceResponse), StatusCodes.Status200OK)]

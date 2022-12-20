@@ -1,47 +1,47 @@
 namespace Platipus.Wallet.Api.Controllers;
 
-// [Route("wallet/uis")]
-// [MockedErrorActionFilter(Order = 1)]
+using System.Net.Mime;
+using Abstract;
+using Application.Requests.Wallets.Uis;
+using Extensions;
+using Microsoft.AspNetCore.Mvc;
+using StartupSettings.Filters;
+
+[Route("wallet/uis")]
+[MockedErrorActionFilter(Order = 1)]
 // [Hub88VerifySignatureFilter(Order = 2)]
-// [JsonSettingsName(nameof(CasinoProvider.Hub88))]
-// [Produces(MediaTypeNames.Application.Xml)]
-// [Consumes(MediaTypeNames.Application.Xml)]
-// public class WalletUisController : Controller
-// {
-//     private readonly IMediator _mediator;
-//
-//     public WalletUisController(IMediator mediator)
-//         => _mediator = mediator;
-//
-//     [HttpPost("user/balance")]
-//     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-//     public async Task<IActionResult> Balance(
-//         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-//         Hub88GetBalanceRequest request,
-//         CancellationToken cancellationToken)
-//         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-//
-//     [HttpPost("transaction/bet")]
-//     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-//     public async Task<IActionResult> Bet(
-//         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-//         Hub88BetRequest request,
-//         CancellationToken cancellationToken)
-//         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-//
-//     [HttpPost("transaction/win")]
-//     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-//     public async Task<IActionResult> Win(
-//         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-//         Hub88WinRequest request,
-//         CancellationToken cancellationToken)
-//         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-//
-//     [HttpPost("transaction/rollback")]
-//     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]
-//     public async Task<IActionResult> Rollback(
-//         [FromHeader(Name = Hub88Headers.XHub88Signature)] string sign,
-//         Hub88RollbackRequest request,
-//         CancellationToken cancellationToken)
-//         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-// }
+[Produces(MediaTypeNames.Application.Xml)]
+[Consumes(MediaTypeNames.Application.Xml)]
+public class WalletUisController : ApiController
+{
+    private readonly IMediator _mediator;
+
+    public WalletUisController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    [HttpPost("authenticate")]
+    public async Task<IActionResult> Authenticate(
+        [FromBody] UisAuthenticateRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("change-balance")]
+    public async Task<IActionResult> ChangeBalance(
+        [FromBody] UisChangeBalanceRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("status")]
+    public async Task<IActionResult> Status(
+        [FromBody] UisStatusRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("get-balance")]
+    public async Task<IActionResult> GetBalance(
+        [FromBody] UisGetBalanceRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}

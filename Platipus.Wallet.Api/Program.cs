@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
 using JorgeSerrano.Json;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Serilog;
@@ -69,7 +70,9 @@ try
         .AddControllers(
             options =>
             {
-                // options.ModelBinderProviders.Add(new FormCollectionModelBinderProvider()); // TODO check
+                options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
+                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
                 options.Filters.Add<ActionResultFilterAttribute>(1);
@@ -185,13 +188,6 @@ try
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
         .Services
-        // .AddSingleton<ISwGamesApiClient, SwGamesApiClient>()
-        // .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
-        //     options =>
-        //     {
-        //         options.BaseAddress = new Uri($"{gamesApiUrl}BIGBOSS/connect.do");
-        //     })
-        // .Services
         .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
         .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
             options =>

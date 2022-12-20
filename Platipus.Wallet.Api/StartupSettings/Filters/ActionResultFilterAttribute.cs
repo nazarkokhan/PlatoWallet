@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using System.Net.Mime;
 using System.Text.Json;
 using ActionResults;
 using Application.Requests.Base.Common;
@@ -10,15 +11,19 @@ using Application.Requests.Wallets.Psw.Base.Response;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
+using Application.Requests.Wallets.Uis.Base;
+using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
+using Application.Results.Uis.WithData;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 
 public class ActionResultFilterAttribute : ResultFilterAttribute
@@ -74,6 +79,33 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     true);
 
                 context.Result = new BadRequestObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+
+            if (baseExternalActionResult.Result is IUisResult<object> uisResult)
+            {
+                if (uisResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(uisResult.Data)
+                    {
+                        ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                    };
+                    return;
+                }
+
+                if (uisResult.Data is not UisResponseContainer container)
+                    return;
+
+                var errorCode = uisResult.ErrorCode;
+                var errorResponse = new UisErrorResponse(errorCode);
+
+                container.Response = errorResponse;
+
+                context.Result = new OkObjectResult(errorResponse)
+                {
+                    ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                };
 
                 context.HttpContext.Items.Add(responseItemsKey, errorResponse);
             }
@@ -209,7 +241,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorResponse = new SoftswissErrorResponse(errorCode, balance);
 
-            context.Result = new BadRequestObjectResult(errorResponse) {StatusCode = statusCode};
+            context.Result = new BadRequestObjectResult(errorResponse) { StatusCode = statusCode };
 
             context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
