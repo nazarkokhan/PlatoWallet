@@ -320,7 +320,7 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"softbet/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"isoftbet/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
