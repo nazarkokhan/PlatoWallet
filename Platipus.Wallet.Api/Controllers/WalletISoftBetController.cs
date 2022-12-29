@@ -21,13 +21,13 @@ using StartupSettings.Filters;
 [MockedErrorActionFilter(Order = 1)]
 [JsonSettingsName(nameof(CasinoProvider.SoftBet))]
 [ProducesResponseType(typeof(SoftBetErrorResponse), StatusCodes.Status400BadRequest)]
-public class WalletSoftBetController : RestApiController
+public class WalletISoftBetController : RestApiController
 {
     private readonly IMediator _mediator;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly WalletDbContext _context;
 
-    public WalletSoftBetController(IMediator mediator, IOptionsMonitor<JsonOptions> options, WalletDbContext context)
+    public WalletISoftBetController(IMediator mediator, IOptionsMonitor<JsonOptions> options, WalletDbContext context)
     {
         _mediator = mediator;
         _jsonSerializerOptions = options.Get(CasinoProvider.SoftBet.ToString()).JsonSerializerOptions;

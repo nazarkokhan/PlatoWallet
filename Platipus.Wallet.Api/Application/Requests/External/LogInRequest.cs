@@ -170,7 +170,7 @@ public record LogInRequest(
                 case CasinoProvider.Sw:
                     launchUrl = GetSwLaunchUrl(
                         session.Id,
-                        "",
+                        $"{casino.Id} {user.Currency.Name}",
                         user.UserName,
                         request.Game);
                     break;

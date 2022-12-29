@@ -6,6 +6,7 @@ using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Hub88.Base;
 using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Psw.Base;
+using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
 using Controllers;
@@ -83,6 +84,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 .Select(a => a.Value as ISwBaseRequest)
                 .SingleOrDefault(a => a is not null)
                 ?.Token.ToString(),
+            WalletISoftBetController => context.ActionArguments
+                .Select(a => a.Value as SoftBetSingleRequest)
+                .SingleOrDefault(a => a is not null)
+                ?.SessionId.ToString(),
             _ => null
         };
 
