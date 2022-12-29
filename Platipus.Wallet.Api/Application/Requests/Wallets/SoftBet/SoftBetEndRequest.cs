@@ -38,7 +38,7 @@ public record SoftBetEndRequest(
 
             var walletResult = await _wallet.GetBalanceAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
-                walletResult.ToSoftBetResult();
+                return walletResult.ToSoftBetResult<SoftBetBalanceResponse>();
 
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")

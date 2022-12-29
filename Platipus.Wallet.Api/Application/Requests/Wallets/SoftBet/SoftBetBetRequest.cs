@@ -42,7 +42,7 @@ public record SoftBetBetRequest(
 
             var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
-                walletResult.ToSoftBetResult();
+                return walletResult.ToSoftBetResult<SoftBetBalanceResponse>();
 
             var response = walletResult.Data.Map(
                 d => new SoftBetBalanceResponse(
