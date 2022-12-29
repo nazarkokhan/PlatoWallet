@@ -83,9 +83,6 @@ public class WalletSoftBetController : RestApiController
         object? payloadRequestObj = null;
         switch (action.Command)
         {
-            case "initsession":
-                payloadRequestObj = new SoftBetInitSessionRequest(request.Token, request.Username);
-                break;
             case "balance":
                 payloadRequestObj = new SoftBetGetBalanceRequest(request.SessionId, request.Username);
                 break;
