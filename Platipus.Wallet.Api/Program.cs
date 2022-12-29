@@ -131,6 +131,15 @@ try
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonLowerCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
+        .AddJsonOptions(
+            nameof(CasinoProvider.Everymatrix),
+            options =>
+            {
+                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
+                                                             | JsonNumberHandling.AllowReadingFromString;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
         .Configure<SupportedCountriesOptions>(

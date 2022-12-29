@@ -10,5 +10,6 @@ public enum CasinoProvider
     Sw,
     SoftBet,
     GamesGlobal,
-    Uis
+    Uis,
+    Everymatrix
 }
