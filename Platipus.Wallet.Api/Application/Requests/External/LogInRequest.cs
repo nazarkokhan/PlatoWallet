@@ -176,11 +176,11 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
-                        request.Game,
                         game.GameServerId,
-                        session.Id,
+                        casino.SignatureKey,
                         user.UserName,
-                        user.Currency.Name);
+                        user.Currency.Name,
+                        casino.Id);
                     break;
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
@@ -293,26 +293,19 @@ public record LogInRequest(
     }
 
     private static string GetSoftBetLaunchUrlAsync(
-            string providerGameId,
-            int gameId,
-            // string licenseeId,
-            // string @operator,
-            Guid token,
-            string username,
-            string currency)
-        // string country,
-        // string isbSkinId,
-        // string isbGameId,
-        // string mode,
-        // string extra)
+        int gameId,
+        string token,
+        string username,
+        string currency,
+        string licenseeid)
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            { "providergameid", providerGameId },
-            { "licenseeid", "134" },
+            { "providergameid", gameId.ToString() },
+            { "licenseeid", licenseeid }, //provider
             { "operator", "" },
             { "playerid", username },
-            { "token", token.ToString() },
+            { "token", token },
             { "username", username },
             { "currency", currency },
             { "country", "ukraine" },
@@ -322,7 +315,7 @@ public record LogInRequest(
             { "launchercode", "26" },
             { "language", "en" },
             { "lobbyurl", "" },
-            { "extra", "" },
+            { "extra", "multi" },
         };
 
         var queryString = QueryString.Create(queryParameters);

@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
-[Route("wallet/softbet")]
+[Route("wallet/isoftbet")]
 [MockedErrorActionFilter(Order = 1)]
 [JsonSettingsName(nameof(CasinoProvider.SoftBet))]
 [ProducesResponseType(typeof(SoftBetErrorResponse), StatusCodes.Status400BadRequest)]
@@ -43,7 +43,9 @@ public class WalletSoftBetController : RestApiController
         CancellationToken cancellationToken)
     {
         var casino = await _context.Set<Casino>()
-            .Where(c => c.Users.Select(u => u.UserName).Contains(request.Username))
+            .Where(
+                c => c.Id == providerId
+                  && c.Users.Select(u => u.UserName).Contains(request.Username))
             .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -58,9 +60,15 @@ public class WalletSoftBetController : RestApiController
         var action = request.Action;
         var actionParams = request.Action.Parameters;
 
-        var validToken = action.Command is "initsession" ? request.Token : request.SessionId;
+        if (action.Command is "initsession")
+        {
+            var initSessionRequest = new SoftBetInitSessionRequest(request.Token, request.Username);
+            var initSessionResponse = await _mediator.Send(initSessionRequest, cancellationToken);
+            return initSessionResponse.ToActionResult();
+        }
+
         var session = await _context.Set<Session>()
-            .Where(c => c.Id == validToken)
+            .Where(c => c.Id == request.SessionId)
             .Select(
                 c => new
                 {
@@ -85,7 +93,7 @@ public class WalletSoftBetController : RestApiController
                 var betParams = actionParams.Deserialize<BetParameters>(_jsonSerializerOptions)!;
                 payloadRequestObj = new SoftBetBetRequest(
                     request.SessionId,
-                    request.Username,
+                    request.PlayerId,
                     request.Currency,
                     request.ProviderGameId,
                     betParams.Amount,
@@ -96,7 +104,7 @@ public class WalletSoftBetController : RestApiController
                 var winParams = actionParams.Deserialize<WinParameters>(_jsonSerializerOptions)!;
                 payloadRequestObj = new SoftBetWinRequest(
                     request.SessionId,
-                    request.Username,
+                    request.PlayerId,
                     request.Currency,
                     request.ProviderGameId,
                     winParams.Amount,
@@ -108,7 +116,7 @@ public class WalletSoftBetController : RestApiController
                 var cancelParams = actionParams.Deserialize<CancelParameters>(_jsonSerializerOptions)!;
                 payloadRequestObj = new SoftBetCancelRequest(
                     request.SessionId,
-                    request.Username,
+                    request.PlayerId,
                     request.ProviderGameId,
                     cancelParams.RoundId,
                     cancelParams.TransactionId);
@@ -117,7 +125,7 @@ public class WalletSoftBetController : RestApiController
                 var endParams = actionParams.Deserialize<EndParameters>(_jsonSerializerOptions)!;
                 payloadRequestObj = new SoftBetEndRequest(
                     request.SessionId,
-                    request.Username,
+                    request.PlayerId,
                     endParams.SessionStatus);
                 break;
         }
