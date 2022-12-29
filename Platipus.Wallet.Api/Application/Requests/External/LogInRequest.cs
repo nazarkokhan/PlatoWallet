@@ -180,7 +180,7 @@ public record LogInRequest(
                         casino.SignatureKey,
                         user.UserName,
                         user.Currency.Name,
-                        casino.Id);
+                        casino.SwProviderId!.Value);
                     break;
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
@@ -297,12 +297,12 @@ public record LogInRequest(
         string token,
         string username,
         string currency,
-        string licenseeid)
+        int licenseeid)
     {
         var queryParameters = new Dictionary<string, string?>()
         {
             { "providergameid", gameId.ToString() },
-            { "licenseeid", licenseeid }, //provider
+            { "licenseeid", licenseeid.ToString() }, //provider
             { "operator", "" },
             { "playerid", username },
             { "token", token },

@@ -8,7 +8,7 @@ using Results.ISoftBet;
 using Results.ISoftBet.WithData;
 
 public record SoftBetInitSessionRequest(
-    Guid Token,
+    string Token,
     string UserName) : IRequest<ISoftBetResult<SoftBetInitSessionRequest.Response>>
 {
     public class Handler : IRequestHandler<SoftBetInitSessionRequest, ISoftBetResult<Response>>
@@ -34,22 +34,18 @@ public record SoftBetInitSessionRequest(
                         u.Balance,
                         CurrencyName = u.Currency.Name,
                         u.IsDisabled,
-                        Sessions = u.Sessions
-                            .Where(s => s.ExpirationDate > DateTime.UtcNow)
-                            .Select(
-                                s => new
-                                {
-                                    s.Id,
-                                    s.ExpirationDate
-                                })
-                            .ToList()
+                        Casino = new
+                        {
+                            u.Casino.Id,
+                            u.Casino.SignatureKey
+                        }
                     })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null || user.IsDisabled)
                 return SoftBetResultFactory.Failure<Response>(SoftBetErrorMessage.PlayerAuthenticationFailed);
 
-            if (user.Sessions.All(s => s.Id != request.Token))
+            if (user.Casino.SignatureKey != request.Token)
                 return SoftBetResultFactory.Failure<Response>(SoftBetErrorMessage.PlayerAuthenticationFailed);
 
             var newSession = new Session

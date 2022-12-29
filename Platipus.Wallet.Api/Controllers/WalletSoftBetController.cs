@@ -37,15 +37,16 @@ public class WalletSoftBetController : RestApiController
     [HttpPost("service/{providerId}")]
     [ProducesResponseType(typeof(SoftBetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
-        string providerId,
+        int providerId,
         string hash,
         SoftBetSingleRequest request,
         CancellationToken cancellationToken)
     {
         var casino = await _context.Set<Casino>()
             .Where(
-                c => c.Id == providerId
-                  && c.Users.Select(u => u.UserName).Contains(request.Username))
+                c =>
+                    c.SwProviderId == request.LicenseeId
+                 && c.Users.Select(u => u.UserName).Contains(request.Username))
             .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 
