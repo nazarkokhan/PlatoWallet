@@ -308,7 +308,7 @@ public record LogInRequest(
             { "token", token },
             { "username", username },
             { "currency", currency },
-            { "country", "ukraine" },
+            { "country", "ua" },
             { "ISBskinid", "1" },
             { "ISBgameid", "1" },
             { "mode", "real" },
