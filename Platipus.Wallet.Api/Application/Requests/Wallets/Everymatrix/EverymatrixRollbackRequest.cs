@@ -1,8 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
+using Base;
+using Base.Response;
 using Extensions;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
+using Results.ResultToResultMappers;
 using Services.Wallet;
 using Services.Wallet.DTOs;
 
