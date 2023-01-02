@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Extensions;
 
 using Application.Results.Base;
+using Application.Results.Everymatrix;
 using Application.Results.Hub88;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ActionResults;
@@ -27,4 +28,7 @@ public static class ActionResultExtensions
 
     public static IActionResult ToActionResult(this ISoftswissResult result)
         => new SoftswissExternalActionResult(result);
+
+    public static IActionResult ToActionResult(this IEverymatrixResult result)
+        => new EveryMatrixExternalActionResult(result);
 }

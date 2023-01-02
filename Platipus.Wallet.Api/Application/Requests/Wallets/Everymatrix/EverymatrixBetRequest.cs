@@ -1,65 +1,90 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
-using Base;
 using Base.Response;
-using Extensions;
+using Domain.Entities;
+using Infrastructure.Persistence;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
-using Results.ResultToResultMappers;
-using Services.Wallet;
-using Services.Wallet.DTOs;
-
+using Microsoft.EntityFrameworkCore;
 public record EverymatrixBetRequest(
-    string SupplierUser,
-    string TransactionUuid,
+    string TransactionId,
     Guid Token,
-    bool RoundClosed,
-    string Round,
-    string? RewardUuid,
-    string RequestUuid,
-    bool IsFree,
-    int GameId,
-    string GameCode,
+    string RoundId,
+    string GameId,
     string Currency,
-    string? Bet,
-    int Amount,
-    EverymatrixMetaDto? Meta) : IEverymatrixBaseRequest, IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>
+    decimal Amount) : IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>
 {
     public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
-        private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet)
+        public Handler(WalletDbContext context)
         {
-            _wallet = wallet;
+            _context = context;
         }
 
         public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixBetRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(
-                r => new BetRequest(
-                    r.Token,
-                    r.SupplierUser,
-                    r.Currency,
-                    r.Round,
-                    r.TransactionUuid,
-                    r.RoundClosed,
-                    r.Amount / 100000m));
+            var round = await _context.Set<Round>()
+                        .Where(r => r.Id == request.RoundId)
+                        .Include(r => r.User.Currency)
+                        .Include(r => r.Transactions)
+                        .FirstOrDefaultAsync(cancellationToken);
 
-            var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
-            if (walletResult.IsFailure)
-                return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
+                    if (round is null)
+                    {
+                        var session = await _context.Set<Session>()
+                            .Where(s => s.Id == request.Token)
+                            .FirstAsync(cancellationToken);
 
-            var response = walletResult.Data.Map(
-                d => new EverymatrixBalanceResponse(
-                    (int)(d.Balance * 100000),
-                    request.SupplierUser,
-                    request.RequestUuid,
-                    d.Currency));
+                        var thisUser = await _context.Set<User>()
+                            .Where(u => u.Id == session.UserId)
+                            .Include(u => u.Currency)
+                            .FirstOrDefaultAsync();
 
-            return EverymatrixResultFactory.Success(response);
+                        round = new Round
+                        {
+                            Id = request.RoundId,
+                            Finished = false,
+                            User = thisUser
+                        };
+                        _context.Add(round);
+
+                        await _context.SaveChangesAsync(cancellationToken);
+                    }
+
+                    var user = round.User;
+
+                    if (round.Transactions.Any(t => t.Id == request.TransactionId))
+                        return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(
+                            EverymatrixErrorCode.DoubleTransaction);
+
+
+                    if (round.Finished)
+                        return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.UnknownError);
+
+
+                    if (user?.Currency.Name != request.Currency)
+                        return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.CurrencyDoesntMatch);
+
+                    round.User.Balance -= request.Amount;
+
+                    var transaction = new Transaction
+                    {
+                        Id = request.TransactionId,
+                        Amount = request.Amount,
+                    };
+
+                    round.Transactions.Add(transaction);
+
+                    _context.Update(round);
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    var response = new EverymatrixBalanceResponse(Status:"200", TotalBalance: user.Balance, Currency: user.Currency.Name);
+
+                    return EverymatrixResultFactory.Success(response);
         }
     }
 }

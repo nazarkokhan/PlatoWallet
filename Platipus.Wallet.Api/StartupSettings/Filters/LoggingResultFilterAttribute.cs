@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Controllers;
+using Controllers.Other;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
