@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
+using Base;
 using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -8,13 +9,12 @@ using Results.Everymatrix.WithData;
 using Microsoft.EntityFrameworkCore;
 public record EverymatrixBetRequest(
     string TransactionId,
-    Guid Token,
-    string RoundId,
-    string GameId,
+    string Token,
     string Currency,
-    decimal Amount) : IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>
+    decimal Amount,
+    string Hash) :IEveryMatrixBaseRequest, IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>
 {
-    public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
+    public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -23,21 +23,22 @@ public record EverymatrixBetRequest(
             _context = context;
         }
 
-        public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
+        public async Task<IEverymatrixResult<EveryMatrixBaseResponse>> Handle(
             EverymatrixBetRequest request,
             CancellationToken cancellationToken)
         {
+            var session = await _context.Set<Session>()
+                .Where(s => s.Id == new Guid(request.Token))
+                .FirstAsync(cancellationToken);
+
             var round = await _context.Set<Round>()
-                        .Where(r => r.Id == request.RoundId)
+                        .Where(r => r.UserId == session.UserId)
                         .Include(r => r.User.Currency)
                         .Include(r => r.Transactions)
                         .FirstOrDefaultAsync(cancellationToken);
 
                     if (round is null)
                     {
-                        var session = await _context.Set<Session>()
-                            .Where(s => s.Id == request.Token)
-                            .FirstAsync(cancellationToken);
 
                         var thisUser = await _context.Set<User>()
                             .Where(u => u.Id == session.UserId)
@@ -46,30 +47,40 @@ public record EverymatrixBetRequest(
 
                         round = new Round
                         {
-                            Id = request.RoundId,
+                            Id = Guid.NewGuid().ToString(),
                             Finished = false,
                             User = thisUser
                         };
+
                         _context.Add(round);
 
                         await _context.SaveChangesAsync(cancellationToken);
                     }
+                    var user = await _context.Set<User>()
+                        .Where(u => u.Id == session.UserId)
+                        .Include(u => u.Currency)
+                        .FirstOrDefaultAsync();
 
-                    var user = round.User;
 
                     if (round.Transactions.Any(t => t.Id == request.TransactionId))
-                        return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(
+                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(
                             EverymatrixErrorCode.DoubleTransaction);
 
 
                     if (round.Finished)
-                        return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.UnknownError);
+                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError);
 
 
                     if (user?.Currency.Name != request.Currency)
-                        return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.CurrencyDoesntMatch);
+                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.CurrencyDoesntMatch);
 
-                    round.User.Balance -= request.Amount;
+                    user.Balance -= request.Amount;
+
+                    if (user.Balance < 0)
+                    {
+                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(
+                            EverymatrixErrorCode.InsufficientFunds);
+                    }
 
                     var transaction = new Transaction
                     {
@@ -79,10 +90,12 @@ public record EverymatrixBetRequest(
 
                     round.Transactions.Add(transaction);
 
+
+                    _context.Update(user);
                     _context.Update(round);
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    var response = new EverymatrixBalanceResponse(Status:"200", TotalBalance: user.Balance, Currency: user.Currency.Name);
+                    var response = new EveryMatrixBaseResponse(Status:"200", TotalBalance: user.Balance, Currency: user.Currency.Name);
 
                     return EverymatrixResultFactory.Success(response);
         }

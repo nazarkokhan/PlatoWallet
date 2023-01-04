@@ -2,60 +2,60 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.Wallets.Everymatrix;
-using Application.Requests.Wallets.Psw;
-using Application.Requests.Wallets.Psw.Base.Response;
-using Extensions;
+using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.Filters;
 
-[Route("wallet/psw")]
+[Route("wallet/everymatrix")]
 [MockedErrorActionFilter(Order = 1)]
-[EveryMatrixHashFilter(Order = 2)]
-[ProducesResponseType(typeof(PswErrorResponse), StatusCodes.Status400BadRequest)]
-public class WalletPswController : RestApiController
+[EveryMatrixVerifySignatureFilter(Order = 2)]
+[ProducesResponseType(typeof(EverymatrixErrorResponse), StatusCodes.Status400BadRequest)]
+public class WalletEveryMatrixController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletPswController(IMediator mediator) => _mediator = mediator;
+    public WalletEveryMatrixController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("balance")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [HttpPost("get-balance")]
+    [ProducesResponseType(typeof(EveryMatrixBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
         EverymatrixGetBalanceRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        => (Ok(await _mediator.Send(request, cancellationToken)));
 
     [HttpPost("bet")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(EveryMatrixBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswBetRequest request,
+        EverymatrixBetRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        => (Ok(await _mediator.Send(request, cancellationToken)));
 
     [HttpPost("win")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(EveryMatrixBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswWinRequest request,
+        EverymatrixWinRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        => (Ok(await _mediator.Send(request, cancellationToken)));
 
-    [HttpPost("rollback")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rollback(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswRollbackRequest request,
+    [HttpPost("cancel")]
+    [ProducesResponseType(typeof(EveryMatrixBaseResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Cancel(
+        EverymatrixCancelRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        => (Ok(await _mediator.Send(request, cancellationToken)));
 
-    [HttpPost("award")]
-    [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Award(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
-        PswAwardRequest request,
+    [HttpPost("reconciliation")]
+    [ProducesResponseType(typeof(EveryMatrixBaseResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Reconciliation(
+        EveryMatrixReconciliationRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        => (Ok(await _mediator.Send(request, cancellationToken)));
+
+    [HttpPost("authenticate")]
+    [ProducesResponseType(typeof(EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Authenticate(
+        EverymatrixRequestAuthenticateRequest request,
+        CancellationToken cancellationToken)
+        => (Ok(await _mediator.Send(request, cancellationToken)));
 }
 

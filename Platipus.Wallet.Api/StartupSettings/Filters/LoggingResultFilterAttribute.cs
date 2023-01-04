@@ -36,6 +36,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             WalletHub88Controller => CasinoProvider.Hub88.ToString(),
             WalletSoftswissController => CasinoProvider.Softswiss.ToString(),
             WalletSwController => CasinoProvider.Sw.ToString(),
+            WalletEveryMatrixController => CasinoProvider.Everymatrix.ToString(),
             _ => "Other"
         };
 

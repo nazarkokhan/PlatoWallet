@@ -2,7 +2,9 @@ namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 
 using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Results.Everymatrix;
 
 public class ExceptionHandlerMiddleware : IMiddleware
 {
@@ -23,6 +25,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
             "databet" => GetDatabetErrorResponse(),
             //TODO "openbox" => GetDatabetErrorResponse(),
             "psw" => GetPswErrorResponse(),
+            "everymatrix" => GetEveryMatrixErrorResponse(),
             _ => GetCommonErrorResponse(context)
         };
 
@@ -49,5 +52,15 @@ public class ExceptionHandlerMiddleware : IMiddleware
     {
         const DafabetErrorCode errorCode = DafabetErrorCode.SystemError;
         return new DafabetErrorResponse((int)errorCode, errorCode.ToString());
+    }
+
+    private static object GetEveryMatrixErrorResponse()
+    {
+        const EverymatrixErrorCode errorCode = EverymatrixErrorCode.UnknownError;
+
+        return new EverymatrixErrorResponse(
+            Status: "Failed",
+            ErrorCode: $"{(int)errorCode}",
+            Description: errorCode.ToString());
     }
 }

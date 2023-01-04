@@ -1,8 +1,5 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 using Base;
 using Base.Response;
 using Domain.Entities;
@@ -13,44 +10,58 @@ using Results.Everymatrix.WithData;
 using Services.Wallet;
 
 public record EverymatrixGetBalanceRequest(
-    Guid Token,
-    string Curency,
-    string Hash) : IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>, IEveryMatrixBaseRequest
+    string Token,
+    string Currency,
+    string Hash) :IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>, IEveryMatrixBaseRequest
 {
 
 
-    public class Handler : IRequestHandler<EverymatrixGetBalanceRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
+    public class Handler : IRequestHandler<EverymatrixGetBalanceRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
     {
-        private readonly IWalletService _wallet;
         private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet, WalletDbContext context, HttpContext httpContext)
+        public Handler(WalletDbContext context)
         {
-            _wallet = wallet;
             _context = context;
         }
 
-        public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
+        public async Task<IEverymatrixResult<EveryMatrixBaseResponse>> Handle(
             EverymatrixGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>().FirstOrDefaultAsync(s => s.Id == request.Token);
+            var session = await _context.Set<Session>().FirstOrDefaultAsync(s => s.Id ==new Guid(request.Token));
 
             if (session is null)
             {
-                EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound);
+                EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TokenNotFound);
             }
 
             var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == session.UserId);
 
             if (user is null)
             {
-                EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.UnknownError);
+                EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.VendorAccountNotActive);
             }
 
-            var response = new EverymatrixBalanceResponse(
-                Status: "200",
-                Currency: $"{request.Curency}",
+            var userIsBlocked = user.IsDisabled;
+
+            if (userIsBlocked)
+            {
+                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UserIsBlocked);
+            }
+
+            var currency = await _context.Set<Currency>().FirstOrDefaultAsync(c => c.Id == user.CurrencyId);
+
+           var currencyIsValid = currency.Name == request.Currency;
+
+            if (!currencyIsValid)
+            {
+                EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.CurrencyDoesntMatch);
+            }
+
+            var response = new EveryMatrixBaseResponse(
+                Status: "Ok",
+                Currency: $"{request.Currency}",
                 TotalBalance: user.Balance);
 
             return EverymatrixResultFactory.Success(response);

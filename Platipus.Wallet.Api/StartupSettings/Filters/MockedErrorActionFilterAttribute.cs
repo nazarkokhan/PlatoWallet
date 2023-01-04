@@ -9,7 +9,6 @@ using Application.Requests.Wallets.Psw.Base;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
 using Controllers;
-using Controllers.Other;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
