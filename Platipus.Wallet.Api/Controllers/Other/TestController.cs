@@ -1,5 +1,8 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Abstract;
@@ -284,6 +287,23 @@ public class TestController : RestApiController
         CancellationToken cancellationToken)
     {
         return Ok(request);
+    }
+
+    [HttpPost("EveryMatrix/hash")]
+    public async Task<IActionResult> EveryMatrix(ActionType actionType, Guid userId)
+    {
+        var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == userId);
+
+        var password = user.Password;
+
+        var dateTime = DateTime.UtcNow.ToString("yyyy:MM:dd:HH", CultureInfo.InvariantCulture);
+
+        var md5Hash = MD5.Create()
+            .ComputeHash(Encoding.UTF8.GetBytes($"NameOfMethod({actionType})Time({dateTime})password({password})"));
+
+        var validHash = Convert.ToHexString(md5Hash);
+
+        return Ok(validHash);
     }
 
     public record SomeTest(JsonNode SomeProp);
