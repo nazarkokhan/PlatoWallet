@@ -91,12 +91,12 @@ public record LogInRequest(
 
             string launchUrl;
 
-          launchUrl = switch (casino.Provider)
+            switch (casino.Provider)
             {
                 //TODO refactor
                 case CasinoProvider.Everymatrix:
                 {
-                    var getGameLinkResult = GetEveryMatrixLaunchUrlAsync(
+                    launchUrl = GetEveryMatrixLaunchUrlAsync(
                         request.Game,
                         "en",
                         false,
