@@ -52,7 +52,7 @@ public class TestController : RestApiController
         if (casino is null)
             return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = PswRequestSign.Compute(rawRequestBytes, casino.SignatureKey);
 
@@ -176,7 +176,7 @@ public class TestController : RestApiController
         if (casino is null)
             return Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.PrivateKeyForWalletItself);
 
@@ -271,7 +271,7 @@ public class TestController : RestApiController
         if (user is null)
             return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = user.Map(u => SoftBetRequestHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
 

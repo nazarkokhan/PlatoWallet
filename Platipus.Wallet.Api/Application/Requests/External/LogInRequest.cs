@@ -91,9 +91,21 @@ public record LogInRequest(
 
             string launchUrl;
 
-            switch (casino.Provider)
+          launchUrl = switch (casino.Provider)
             {
                 //TODO refactor
+                case CasinoProvider.Everymatrix:
+                {
+                    var getGameLinkResult = GetEveryMatrixLaunchUrlAsync(
+                        request.Game,
+                        "en",
+                        false,
+                        false,
+                        "dev",
+                        session.Id,
+                        user.Currency.Name);
+                    break;
+                }
                 case CasinoProvider.Psw:
                 {
                     var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
@@ -328,6 +340,34 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"softbet/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
+    private static string GetEveryMatrixLaunchUrlAsync(
+        string gameCode,
+        string? language,
+        bool freePlay,
+        bool mobile,
+        string mode,
+        Guid token,
+        string currency)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            { "brand", "dafabet" },
+            { nameof(gameCode), gameCode },
+            { nameof(language), language },
+            { nameof(freePlay), freePlay.ToString() },
+            {nameof(mobile), mobile.ToString()},
+            {nameof(mode), mode},
+            {nameof(token), token.ToString()},
+            { nameof(currency), currency }
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"everymatrix/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
