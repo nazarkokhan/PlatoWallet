@@ -2,9 +2,13 @@ namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 
 using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.EmaraPlay.Base;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
+using Application.Requests.Wallets.PariMatch.Base;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Results.EmaraPlay;
 using Application.Results.Everymatrix;
+using Application.Results.PariMatch;
 
 public class ExceptionHandlerMiddleware : IMiddleware
 {
@@ -26,6 +30,8 @@ public class ExceptionHandlerMiddleware : IMiddleware
             //TODO "openbox" => GetDatabetErrorResponse(),
             "psw" => GetPswErrorResponse(),
             "everymatrix" => GetEveryMatrixErrorResponse(),
+            "parimatch" => GetPariMatchErrorResponse(),
+            "enaraplay" => GetEnaraPlayErrorResponse(),
             _ => GetCommonErrorResponse(context)
         };
 
@@ -33,6 +39,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
 
         _logger.LogInformation("Returning unexpected error {UnexpectedErrorResponseBody}", unexpectedErrorResponseBody);
     }
+
 
     private static object GetCommonErrorResponse(HttpContext context)
     {
@@ -42,16 +49,25 @@ public class ExceptionHandlerMiddleware : IMiddleware
         return new CommonErrorResponse(errorCode);
     }
 
+    private static object GetEnaraPlayErrorResponse()
+    {
+        const EmaraPlayErrorCode errorCode = EmaraPlayErrorCode.InternalServerError;
+        int code = (int)errorCode;
+        return new EmaraPlayErrorResponse(
+            code.ToString(),
+            errorCode.ToString());
+    }
+
     private static object GetPswErrorResponse()
     {
         const PswErrorCode errorCode = PswErrorCode.Unknown;
-        return new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
+        return new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
     }
 
     private static object GetDatabetErrorResponse()
     {
         const DafabetErrorCode errorCode = DafabetErrorCode.SystemError;
-        return new DafabetErrorResponse((int)errorCode, errorCode.ToString());
+        return new DafabetErrorResponse((int) errorCode, errorCode.ToString());
     }
 
     private static object GetEveryMatrixErrorResponse()
@@ -59,8 +75,16 @@ public class ExceptionHandlerMiddleware : IMiddleware
         const EverymatrixErrorCode errorCode = EverymatrixErrorCode.UnknownError;
 
         return new EverymatrixErrorResponse(
-            Status: "Failed",
-            ErrorCode: $"{(int)errorCode}",
-            Description: errorCode.ToString());
+            "Failed",
+            $"{(int) errorCode}",
+            errorCode.ToString());
+    }
+
+    private static object GetPariMatchErrorResponse()
+    {
+        return new PariMatchErrorResponse(
+            PariMatchErrorCode.ErrorInternal.ToString(),
+            "Internal error",
+            DateTimeOffset.UtcNow.ToString("yyyy:MM:dd:HH:mm:ss:fff t zzz"));
     }
 }

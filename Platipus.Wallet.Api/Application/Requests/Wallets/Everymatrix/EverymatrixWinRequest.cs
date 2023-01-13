@@ -3,14 +3,11 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 using Base;
 using Base.Response;
 using Domain.Entities;
-using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
-using Results.ResultToResultMappers;
-using Services.Wallet;
-using Services.Wallet.DTOs;
+
 public record EverymatrixWinRequest(
     string Hash,
     decimal Amount,
@@ -35,6 +32,16 @@ public record EverymatrixWinRequest(
             EverymatrixWinRequest request,
             CancellationToken cancellationToken)
         {
+
+            var session = await _context.Set<Session>()
+                .Where(s => s.Id == new Guid(request.Token))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (session is null)
+            {
+                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TokenNotFound);
+            }
+
             var round = await _context.Set<Round>()
                 .Where(r => r.Id == request.RoundId)
                 .Include(r => r.User.Currency)

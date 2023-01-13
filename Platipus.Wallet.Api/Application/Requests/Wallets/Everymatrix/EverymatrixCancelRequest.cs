@@ -48,15 +48,29 @@ public record EverymatrixCancelRequest(
             {
                 return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UserIsBlocked);
             }
+            
 
             var transaction = await _dbContext.Set<Transaction>()
                 .Where(t => t.Id == request.ExternalId)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (transaction is null)
-            {
+            
+            var round = await _dbContext.Set<Round>()
+                .Where(
+                    r => r.Id == transaction.RoundId)
+                .Include(r => r.User.Currency)
+                .Include(r => r.Transactions)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (round is null)
+                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError, new Exception("Round isn't found"));
+
+            if (round.Finished)
+                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError, new Exception("Round is finished"));
+
+            var lastTransaction = round.Transactions.MaxBy(t => t.CreatedDate);
+            if (lastTransaction is null || lastTransaction.Id != transaction.Id)
                 return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TransactionNotFound);
-            }
 
             var currency = await _dbContext.Set<Currency>().FirstOrDefaultAsync(c => c.Id == user.CurrencyId);
 

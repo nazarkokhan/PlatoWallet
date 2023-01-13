@@ -3,7 +3,6 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Abstract;
 using Application.Extensions;
@@ -16,6 +15,8 @@ using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 [Route("test")]
 public class TestController : RestApiController
@@ -289,7 +290,7 @@ public class TestController : RestApiController
         return Ok(request);
     }
 
-    [HttpPost("EveryMatrix/hash")]
+    [HttpPost("everymatrix/hash")]
     public async Task<IActionResult> EveryMatrix(ActionType actionType, Guid userId)
     {
         var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == userId);
@@ -304,6 +305,16 @@ public class TestController : RestApiController
         var validHash = Convert.ToHexString(md5Hash);
 
         return Ok(validHash);
+    }
+
+    [HttpPost("emaraplay/hash")]
+    public async Task<IActionResult> EmaraPlay(object request)
+    {
+        var bodyToHash = JsonConvert.SerializeObject(request);
+        var hashedBody = Encoding.UTF8.GetBytes(bodyToHash);
+        var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
+        return Ok(HMACSHA512.HashData(secretBytes, hashedBody));
+
     }
 
     public record SomeTest(JsonNode SomeProp);

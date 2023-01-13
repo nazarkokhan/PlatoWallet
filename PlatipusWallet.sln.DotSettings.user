@@ -4,4 +4,6 @@
   &lt;Assembly Path="/Users/nazarkokhan/.nuget/packages/horizon.xmlrpc.aspnetcore/2.5.0/lib/netstandard2.0/Horizon.XmlRpc.AspNetCore.dll" /&gt;
   &lt;Assembly Path="/Users/nazarkokhan/.nuget/packages/horizon.xmlrpc.server/2.5.0/lib/netstandard2.0/Horizon.XmlRpc.Server.dll" /&gt;
   &lt;Assembly Path="/Users/nazarkokhan/.nuget/packages/horizon.xmlrpc.core/2.5.0/lib/netstandard2.0/Horizon.XmlRpc.Core.dll" /&gt;
-&lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
+&lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=enaraplay/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=parimatch/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

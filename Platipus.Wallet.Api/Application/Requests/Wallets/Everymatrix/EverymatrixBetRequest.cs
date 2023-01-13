@@ -31,6 +31,11 @@ public record EverymatrixBetRequest(
                 .Where(s => s.Id == new Guid(request.Token))
                 .FirstAsync(cancellationToken);
 
+            if (session is null)
+            {
+                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TokenNotFound);
+            }
+
             var round = await _context.Set<Round>()
                         .Where(r => r.UserId == session.UserId)
                         .Include(r => r.User.Currency)
