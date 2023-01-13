@@ -7,7 +7,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.Filters;
 
-[Microsoft.AspNetCore.Components.Route("wallet/emaraplay")]
+[Route("wallet/emaraplay")]
 [MockedErrorActionFilter(Order = 1)]
 [EmaraPlayVerifyHashFilter(Order = 2)]
 [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status400BadRequest)]

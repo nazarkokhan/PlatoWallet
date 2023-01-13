@@ -6,7 +6,8 @@ using Application.Requests.Wallets.PariMatch.Base;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.Filters;
-
+//TODO add x-hub-consumer header
+//TODO Add GetPariMatchLaunchUrl
 [Route("wallet/parimatch")]
 [MockedErrorActionFilter(Order = 1)]
 [ProducesResponseType(typeof(PariMatchErrorResponse), StatusCodes.Status400BadRequest)]

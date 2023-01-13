@@ -94,6 +94,13 @@ public record LogInRequest(
             switch (casino.Provider)
             {
                 //TODO refactor
+                // case CasinoProvider.PariMatch:
+                // {
+                //     launchUrl = GetPariMatchLaunchUrl(
+                //         "PlatipusGaming",
+                //         )
+                // }
+
                 case CasinoProvider.Everymatrix:
                 {
                     launchUrl = GetEveryMatrixLaunchUrlAsync(
@@ -355,7 +362,6 @@ public record LogInRequest(
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            { "brand", "dafabet" },
             { nameof(gameCode), gameCode },
             { nameof(language), language },
             { nameof(freePlay), freePlay.ToString() },
@@ -368,6 +374,35 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"everymatrix/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
+    private static string GetPariMatchLaunchUrl(
+        string cid,
+        string? productId,
+        string sessionToken,
+        string lang,
+        string lobbyUrl,
+        string targetChannel,
+        string providerId,
+        string consumerId)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            { nameof(cid), cid },
+            { nameof(productId), productId },
+            { nameof(sessionToken), sessionToken },
+            {nameof(lang), lang},
+            {nameof(lobbyUrl), lobbyUrl},
+            {nameof(targetChannel), targetChannel},
+            { nameof(providerId), providerId },
+            { nameof(consumerId), consumerId }
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"parimatch/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
