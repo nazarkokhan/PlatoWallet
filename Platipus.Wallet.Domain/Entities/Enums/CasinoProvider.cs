@@ -13,5 +13,6 @@ public enum CasinoProvider
     Uis,
     Everymatrix,
     PariMatch,
-    EmaraPlay
+    EmaraPlay,
+    Betflag
 }

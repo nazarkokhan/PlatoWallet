@@ -3,13 +3,16 @@ namespace Platipus.Wallet.Api.Controllers;
 using Abstract;
 using Application.Requests.Wallets.PariMatch;
 using Application.Requests.Wallets.PariMatch.Base;
+using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
+using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 //TODO add x-hub-consumer header
 //TODO Add GetPariMatchLaunchUrl
 [Route("wallet/parimatch")]
 [MockedErrorActionFilter(Order = 1)]
+[JsonSettingsName(nameof(CasinoProvider.PariMatch))]
 [ProducesResponseType(typeof(PariMatchErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletPariMatchController : RestApiController
 {

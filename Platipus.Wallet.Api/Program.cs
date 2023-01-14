@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
@@ -140,6 +141,28 @@ try
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
+        .AddJsonOptions(
+            nameof(CasinoProvider.PariMatch),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
+        .AddJsonOptions(
+            nameof(CasinoProvider.EmaraPlay),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
+        .AddJsonOptions(
+            nameof(CasinoProvider.Betflag),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
+
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
         .Configure<SupportedCountriesOptions>(

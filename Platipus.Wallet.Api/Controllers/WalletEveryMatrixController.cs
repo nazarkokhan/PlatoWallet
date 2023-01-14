@@ -1,14 +1,17 @@
-namespace Platipus.Wallet.Api.Controllers.Other;
+namespace Platipus.Wallet.Api.Controllers;
 
-using Abstract;
-using Application.Requests.Wallets.Everymatrix;
-using Application.Requests.Wallets.Everymatrix.Base.Response;
+using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
-using StartupSettings.Filters;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix.Base.Response;
+using Platipus.Wallet.Api.Controllers.Abstract;
+using Platipus.Wallet.Api.StartupSettings.Filters;
+using StartupSettings.ControllerSpecificJsonOptions;
 
 [Route("wallet/everymatrix")]
 [MockedErrorActionFilter(Order = 1)]
 [EveryMatrixVerifySignatureFilter(Order = 2)]
+[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
 [ProducesResponseType(typeof(EverymatrixErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletEveryMatrixController : RestApiController
 {

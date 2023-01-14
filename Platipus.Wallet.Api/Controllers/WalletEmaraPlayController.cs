@@ -3,13 +3,16 @@ namespace Platipus.Wallet.Api.Controllers;
 using Abstract;
 using Application.Requests.Wallets.EmaraPlay;
 using Application.Requests.Wallets.EmaraPlay.Base;
+using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
+using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
 [Route("wallet/emaraplay")]
 [MockedErrorActionFilter(Order = 1)]
 [EmaraPlayVerifyHashFilter(Order = 2)]
+[JsonSettingsName(nameof(CasinoProvider.EmaraPlay))]
 [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status400BadRequest)]
 public class WalletEmaraPlayController : RestApiController
 {
