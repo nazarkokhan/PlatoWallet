@@ -32,7 +32,7 @@ public class WalletPariMatchController : RestApiController
     public async Task<IActionResult> Bet(
         PariMatchBetRequest request,
         CancellationToken cancellationToken)
-        => (((Ok(await _mediator.Send(request, cancellationToken)))));
+        => Ok(await _mediator.Send(request, cancellationToken));
 
     [HttpPost("win")]
     [ProducesResponseType(typeof(PariMatchWinRequest.PariMatchWinResponse), StatusCodes.Status200OK)]
