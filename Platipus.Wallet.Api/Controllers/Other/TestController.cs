@@ -16,6 +16,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 [Route("test")]
@@ -314,13 +315,12 @@ public class TestController : RestApiController
         var hashedBody = Encoding.UTF8.GetBytes(bodyToHash);
         var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
         return Ok(HMACSHA512.HashData(secretBytes, hashedBody));
-
     }
 
     [HttpPost("betflag/hash")]
     public async Task<IActionResult> Betflag(long timestamp, string sessionId)
     {
-        var validHash = BetflagRequestHash.Compute( sessionId, timestamp);
+        var validHash = BetflagRequestHash.Compute(sessionId, timestamp);
 
         return Ok(validHash);
     }
@@ -328,8 +328,7 @@ public class TestController : RestApiController
     [HttpPost("betconstruct/hash")]
     public async Task<IActionResult> BetConstruct(string data, DateTime time)
     {
-        var validHash = BetConstructRequestHash.Compute(time.ToString(CultureInfo.InvariantCulture), data);
-        return Ok(validHash);
+        return Ok(BetConstructRequestHash.Compute(time.ToString(), data));
     }
 
     public record SomeTest(JsonNode SomeProp);

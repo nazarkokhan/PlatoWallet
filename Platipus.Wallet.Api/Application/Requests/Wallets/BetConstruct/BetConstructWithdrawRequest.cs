@@ -1,4 +1,5 @@
 // ReSharper disable NotAccessedPositionalProperty.Global
+
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct;
 
 using Api.Extensions.SecuritySign;
@@ -36,16 +37,6 @@ public record BetConstructWithdrawRequest(
             BetConstructWithdrawRequest request,
             CancellationToken cancellationToken)
         {
-            var isValidHash = BetConstructVerifyHashExtension.VerifyBetConstructHash(
-                request,
-                request.Data.ToString(),
-                request.Time);
-
-            if (!isValidHash)
-            {
-                return Failure<BetConstructBaseResponse>(BetConstructErrorCode.AuthenticationFailed);
-            }
-
             var session = await _context.Set<Session>()
                 .FirstOrDefaultAsync(s => s.Id == new Guid(request.Token));
 
@@ -53,7 +44,6 @@ public record BetConstructWithdrawRequest(
             {
                 return Failure<BetConstructBaseResponse>(BetConstructErrorCode.TokenNotFound);
             }
-
 
             var user = await _context.Set<User>()
                 .Where(u => u.Id == session.UserId)
@@ -68,7 +58,9 @@ public record BetConstructWithdrawRequest(
 
             if (user is null)
             {
-                return Failure<BetConstructBaseResponse>(BetConstructErrorCode.IncorrectParametersPassed, new Exception("User isn't found"));
+                return Failure<BetConstructBaseResponse>(
+                    BetConstructErrorCode.IncorrectParametersPassed,
+                    new Exception("User isn't found"));
             }
 
             if (user.Currency.Name == request.CurrencyId)
@@ -78,7 +70,6 @@ public record BetConstructWithdrawRequest(
 
             if (round is null)
             {
-
                 round = new Round
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -91,12 +82,10 @@ public record BetConstructWithdrawRequest(
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
-
             if (round.Transactions.Any(t => t.Id == request.TransactionId))
                 return Failure<BetConstructBaseResponse>(BetConstructErrorCode.TransactionIsAlreadyExist);
 
             user.Balance += request.BetAmount;
-
 
             var transaction = new Transaction
             {

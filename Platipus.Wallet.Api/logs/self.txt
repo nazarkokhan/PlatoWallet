@@ -2965,3 +2965,243 @@
    at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
    at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
    at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T09:04:47.8812790Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.14-000066 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T09:22:46.3561150Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'ViK9tIUBTP9IbbiDC7q1'. Preview of field's value: 'SUCCSESS'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"SUCCSESS\""}}
+2023-01-15T09:32:23.0136520Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T09:32:33.2870660Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T09:37:06.2988450Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'f_LKtIUBXebJET_GKnG3'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:38:14.1900130Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'OxzLtIUBj8V9VSOHNMc5'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:39:42.8145200Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'nRzMtIUBj8V9VSOHjsdt'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:39:49.4931070Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'TfLMtIUBXebJET_GqHKC'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:39:56.9570290Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'WfLMtIUBXebJET_GxXKG'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:40:03.3699720Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'shzMtIUBj8V9VSOH3se7'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:40:28.1743750Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'KiLNtIUBTP9IbbiDP7-Y'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:41:28.5963690Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'x_LOtIUBXebJET_GK3KO'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:42:21.8906890Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'wSLOtIUBTP9IbbiD-7-_'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T09:48:41.2329670Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'yfLUtIUBXebJET_GxXRU'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:04:42.7178220Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'nvLjtIUBXebJET_GcXg3'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:05:17.6957600Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T10:06:35.4048490Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'IxzltIUBj8V9VSOHKc59'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:06:42.6673340Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'lSLltIUBTP9IbbiDRcXZ'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:06:51.1358290Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'K_LltIUBXebJET_GZnns'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:07:10.9753270Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'syLltIUBTP9IbbiDtMVt'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:07:36.5949600Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'ySLmtIUBTP9IbbiDGMWD'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:10:05.0123720Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'MxzotIUBj8V9VSOHXM9C'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:12:18.5571170Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'yRzqtIUBj8V9VSOHZc-3'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:12:34.2261420Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T10:13:15.7388480Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T10:13:25.6398040Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T10:15:12.8460710Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'gCLttIUBTP9IbbiDDse_'. Preview of field's value: 'AuthenticationFailed'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"AuthenticationFailed\""}}
+2023-01-15T10:48:23.4330890Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T10:48:35.5104200Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T10:57:50.4098460Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.ErrorCode] of type [long] in document with id 'lPIUtYUBXebJET_GFYYe'. Preview of field's value: 'TokenExpired'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"TokenExpired\""}}

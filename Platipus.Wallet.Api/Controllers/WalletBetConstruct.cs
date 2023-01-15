@@ -13,6 +13,7 @@ using StartupSettings.Filters;
 
 [Route("wallet/betflag")]
 [MockedErrorActionFilter(Order = 1)]
+[BetConstructVerifyHashFilterAttribute(Order = 2)]
 [ProducesResponseType(typeof(BetConstructErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletBetConstructController : RestApiController
 {
@@ -23,7 +24,7 @@ public class WalletBetConstructController : RestApiController
     [HttpPost("player-info")]
     [ProducesResponseType(typeof(BetConstructPlayerInfoResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
-        BetConstructPlayerInfoResponse request,
+        BetConstructGetPlayerInfoRequest request,
         CancellationToken cancellationToken)
         => (Ok(await _mediator.Send(request, cancellationToken)));
 

@@ -35,7 +35,7 @@ public record BetflagAuthenticateRequest(
             //TODO check how is round find, sometimes it must be find by transaction
 
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid(request.Key), cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key), cancellationToken: cancellationToken);
 
             if (session is null)
             {

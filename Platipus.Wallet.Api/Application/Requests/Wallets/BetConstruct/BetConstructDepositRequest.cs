@@ -38,16 +38,6 @@ public record BetConstructDepositRequest(
             //TODO check if the BetAmount is same to win transaction amount
             //TODO check all parameters in requests
 
-            var isValidHash = BetConstructVerifyHashExtension.VerifyBetConstructHash(
-                request,
-                request.Data.ToString(),
-                request.Time);
-
-            if (!isValidHash)
-            {
-                return Failure<BetConstructBaseResponse>(BetConstructErrorCode.AuthenticationFailed);
-            }
-
             var session = await _context.Set<Session>()
                 .LastOrDefaultAsync(s => s.Id == new Guid(request.Token));
 

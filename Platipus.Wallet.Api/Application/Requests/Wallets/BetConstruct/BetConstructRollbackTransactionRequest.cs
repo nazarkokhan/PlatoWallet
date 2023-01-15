@@ -31,15 +31,6 @@ public record BetConstructRollbackTransactionRequest(
             BetConstructRollbackTransactionRequest request,
             CancellationToken cancellationToken)
         {
-            var isValidHash = BetConstructVerifyHashExtension.VerifyBetConstructHash(
-                request,
-                request.Data.ToString(),
-                request.Time);
-
-            if (!isValidHash)
-            {
-                return Failure<BetConstructBaseResponse>(BetConstructErrorCode.AuthenticationFailed);
-            }
 
             var session = await _context.Set<Session>()
                 .FirstOrDefaultAsync(s => s.Id == new Guid(request.Token));

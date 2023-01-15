@@ -9,7 +9,7 @@ using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
 [Route("wallet/betflag")]
-[MockedErrorActionFilter(Order = 1)]
+// [MockedErrorActionFilter(Order = 1)]
 [BetflagVerifyHashFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Betflag))]
 [ProducesResponseType(typeof(BetflagErrorResponse), StatusCodes.Status400BadRequest)]

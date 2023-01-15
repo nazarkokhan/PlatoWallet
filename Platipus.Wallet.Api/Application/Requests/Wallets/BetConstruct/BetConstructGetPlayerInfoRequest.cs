@@ -5,16 +5,18 @@ using Base;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Results.BetConstruct;
 using Results.BetConstruct.WithData;
 using static Results.BetConstruct.BetConstructResultFactory;
 using Microsoft.EntityFrameworkCore;
 
 public record BetConstructGetPlayerInfoRequest(
-    DateTime Time,
-    object Data,
-    string Hash,
-    string Token) : IRequest<IBetConstructResult<BetConstructPlayerInfoResponse>>, IBetConstructBaseRequest
+        DateTime Time,
+        object Data,
+        string Hash,
+        [property: BindProperty(Name = "token")] string Token)
+    : IRequest<IBetConstructResult<BetConstructPlayerInfoResponse>>, IBetConstructBaseRequest
 {
     public class Handler : IRequestHandler<BetConstructGetPlayerInfoRequest, IBetConstructResult<BetConstructPlayerInfoResponse>>
     {
@@ -30,16 +32,6 @@ public record BetConstructGetPlayerInfoRequest(
             BetConstructGetPlayerInfoRequest request,
             CancellationToken cancellationToken)
         {
-            var isValidHash = BetConstructVerifyHashExtension.VerifyBetConstructHash(
-                request,
-                request.Data.ToString(),
-                request.Time);
-
-            if (!isValidHash)
-            {
-                return Failure<BetConstructPlayerInfoResponse>(BetConstructErrorCode.AuthenticationFailed);
-            }
-
             var session = await _context.Set<Session>()
                 .FirstOrDefaultAsync(s => s.Id == new Guid(request.Token), cancellationToken: cancellationToken);
 
@@ -77,7 +69,9 @@ public record BetConstructGetPlayerInfoRequest(
             }
 
             if (user.IsDisabled)
-                return Failure<BetConstructPlayerInfoResponse>(BetConstructErrorCode.GameIsBlocked, new Exception("User is blocked"));
+                return Failure<BetConstructPlayerInfoResponse>(
+                    BetConstructErrorCode.GameIsBlocked,
+                    new Exception("User is blocked"));
 
             var response = new BetConstructPlayerInfoResponse(
                 true,
@@ -86,12 +80,11 @@ public record BetConstructGetPlayerInfoRequest(
                 user.Currency,
                 user.Balance,
                 user.UserName,
-                (int)BetConstructGender.Male,
+                (int) BetConstructGender.Male,
                 "Country",
                 user.Id.ToString());
 
             return Success(response);
         }
     }
-
 }

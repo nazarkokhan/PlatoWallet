@@ -47,7 +47,7 @@ public record BetflagCancelRequest(
             }
 
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid(request.Key));
+                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
 
             if (session is null)
             {

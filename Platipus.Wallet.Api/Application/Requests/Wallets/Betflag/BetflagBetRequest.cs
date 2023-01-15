@@ -1,4 +1,3 @@
-// ReSharper disable NotAccessedPositionalProperty.Global
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
@@ -66,7 +65,7 @@ public record BetflagBetRequest(
             }
 
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid(request.Key));
+                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
 
             if (session is null)
             {
