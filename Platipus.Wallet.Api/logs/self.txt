@@ -3388,3 +3388,499 @@ ResponseBody: {@ResponseBody}
 RequestHeaders: {@RequestHeaders} 
 ResponseHeaders: {@ResponseHeaders} 
 ' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T13:50:39.6395690Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T13:54:11.8300560Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T13:55:10.0292630Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T13:58:55.3274350Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:03:16.2210720Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:06:14.4311070Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.RequestBody.GameId] of type [long] in document with id '9yPAtYUBTP9IbbiDkQKC'. Preview of field's value: 'string'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"string\""}}
+2023-01-15T14:08:28.5355740Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:11:30.8372600Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:12:19.1299070Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:13:56.9601880Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:16:38.4889910Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:19:54.4703990Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:19:54.4733710Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:20:54.7796630Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id '1vLOtYUBXebJET_GALqM'. Preview of field's value: '0'","caused_by":{"type":"illegal_argument_exception","reason":"[1:4030] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:20:52.8019460+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"timestamp\\\\\\\": 1673785133,\\n  \\\\\\\"hash\\\\\\\": \\\\\\\"352570\"[truncated 5460 bytes]; line: 1, column: 4030]","caused_by":{"type":"i_o_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:20:52.8019460+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"timestamp\\\\\\\": 1673785133,\\n  \\\\\\\"hash\\\\\\\": \\\\\\\"352570\"[truncated 5460 bytes]; line: 1, column: 4030]"}}}
+2023-01-15T14:23:26.5775920Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id 'Kh3QtYUBj8V9VSOHUQ9b'. Preview of field's value: '0'","caused_by":{"type":"illegal_argument_exception","reason":"[1:4381] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:23:24.4897140+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5735 bytes]; line: 1, column: 4381]","caused_by":{"type":"i_o_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:23:24.4897140+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5735 bytes]; line: 1, column: 4381]"}}}
+2023-01-15T14:25:28.6074090Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id '3fLStYUBXebJET_GLrs0'. Preview of field's value: '0'","caused_by":{"type":"illegal_argument_exception","reason":"[1:4514] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:25:26.5403810+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]","caused_by":{"type":"i_o_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:25:26.5403810+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]"}}}
+2023-01-15T14:26:27.2321400Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id 'J_LTtYUBXebJET_GErz_'. Preview of field's value: '0'","caused_by":{"type":"illegal_argument_exception","reason":"[1:4514] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:26:25.1667100+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]","caused_by":{"type":"i_o_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:26:25.1667100+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]"}}}
+2023-01-15T14:26:49.4933060Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id 'EiPTtYUBTP9IbbiDagge'. Preview of field's value: '0'","caused_by":{"type":"x_content_parse_exception","reason":"[1:4514] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:26:47.7171680+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]","caused_by":{"type":"json_parse_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:26:47.7171680+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]"}}}
+2023-01-15T14:26:49.4955940Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id 'FiPTtYUBTP9IbbiDagge'. Preview of field's value: '0'","caused_by":{"type":"x_content_parse_exception","reason":"[1:4514] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:26:48.9505420+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]","caused_by":{"type":"json_parse_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:26:48.9505420+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5867 bytes]; line: 1, column: 4514]"}}}
+2023-01-15T14:37:20.0862120Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id 'WB3dtYUBj8V9VSOHCRJV'. Preview of field's value: '0'","caused_by":{"type":"illegal_argument_exception","reason":"[1:4517] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:37:17.9911170+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5871 bytes]; line: 1, column: 4517]","caused_by":{"type":"i_o_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:37:17.9911170+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5871 bytes]; line: 1, column: 4517]"}}}
+2023-01-15T14:38:43.9611720Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.ResponseBody.Data.Result] of type [boolean] in document with id '-CPetYUBTP9IbbiDUQod'. Preview of field's value: '0'","caused_by":{"type":"x_content_parse_exception","reason":"[1:4081] Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:38:42.9105960+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5441 bytes]; line: 1, column: 4081]","caused_by":{"type":"json_parse_exception","reason":"Current token (VALUE_NUMBER_INT) not of boolean type\n at [Source: (byte[])\"{\"@timestamp\":\"2023-01-15T16:38:42.9105960+02:00\",\"level\":\"Information\",\"messageTemplate\":\"Provider: {Provider} \\nRawRequestBody: {RawRequestBody} \\nRequestBody: {@RequestBody} \\nRawResponseBody: {RawResponseBody} \\nResponseBody: {@ResponseBody} \\nRequestHeaders: {@RequestHeaders} \\nResponseHeaders: {@ResponseHeaders} \\n\",\"message\":\"Provider: \\\"Other\\\" \\nRawRequestBody: \\\"{\\n  \\\\\\\"key\\\\\\\": \\\\\\\"969c2cda-1eff-4f08-a3f6-d5e3e7614b48\\\\\\\",\\n  \\\\\\\"transactionid\\\\\\\": \\\\\\\"9eeda175-775b-409f-be57-02b2487\"[truncated 5441 bytes]; line: 1, column: 4081]"}}}
+2023-01-15T14:54:42.1324910Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:55:32.4750760Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:58:18.8082100Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"failed to parse field [platipus-wallet-api.RequestBody.GameId] of type [long] in document with id 'ZfLwtYUBXebJET_GPsRL'. Preview of field's value: 'string'","caused_by":{"type":"illegal_argument_exception","reason":"For input string: \"string\""}}
+2023-01-15T14:58:44.9335960Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.01.15-000068 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-01-15T14:59:56.9205220Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---> System.IO.IOException: Unable to read data from the transport connection: Operation timed out.
+ ---> System.Net.Sockets.SocketException (60): Operation timed out
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.CreateException(SocketError error, Boolean forAsyncThrow)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ReceiveAsync(Socket socket, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.ReceiveAsync(Memory`1 buffer, SocketFlags socketFlags, Boolean fromNetworkStream, CancellationToken cancellationToken)
+   at System.Net.Sockets.NetworkStream.ReadAsync(Memory`1 buffer, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnection.<CheckUsabilityOnScavenge>g__ReadAheadWithZeroByteReadAsync|45_0()
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(Object s)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at System.Threading.ThreadPool.<>c.<.cctor>b__86_0(Object state)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.InvokeContinuation(Action`1 continuation, Object state, Boolean forceAsync, Boolean requiresExecutionContextFlow)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.OnCompleted(SocketAsyncEventArgs _)
+   at System.Net.Sockets.SocketAsyncEventArgs.OnCompletedInternal()
+   at System.Net.Sockets.SocketAsyncEventArgs.FinishOperationAsyncSuccess(Int32 bytesTransferred, SocketFlags flags)
+   at System.Net.Sockets.SocketAsyncEventArgs.CompletionCallback(Int32 bytesTransferred, SocketFlags flags, SocketError socketError)
+   at System.Net.Sockets.SocketAsyncEventArgs.TransferCompletionCallbackCore(Int32 bytesTransferred, Byte[] socketAddress, Int32 socketAddressSize, SocketFlags receivedFlags, SocketError socketError)
+   at System.Net.Sockets.SocketAsyncContext.OperationQueue`1.ProcessAsyncOperation(TOperation op)
+   at System.Net.Sockets.SocketAsyncContext.ReadOperation.System.Threading.IThreadPoolWorkItem.Execute()
+   at System.Net.Sockets.SocketAsyncContext.HandleEvents(SocketEvents events)
+   at System.Net.Sockets.SocketAsyncEngine.System.Threading.IThreadPoolWorkItem.Execute()
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+   at System.Threading.Thread.StartCallback()
+--- End of stack trace from previous location ---
+
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.<CheckUsabilityOnScavenge>g__ReadAheadWithZeroByteReadAsync|45_0()
+   at System.Net.Http.HttpConnection.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnection.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:01:14.1956400Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: Operation timed out (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (60): Operation timed out
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:02:31.3099810Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: Operation timed out (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (60): Operation timed out
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:03:03.3462700Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:05:15.5508390Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:05:47.5701930Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:06:23.1253920Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:06:55.1972490Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:07:27.2189070Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:07:59.2694800Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:08:49.2671980Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)
+2023-01-15T15:09:27.3229360Z Caught exception while performing bulk operation to Elasticsearch: Elasticsearch.Net.ElasticsearchClientException: Maximum timeout reached while retrying request. Call: Status code unknown from: POST /_bulk
+ ---> System.Net.Http.HttpRequestException: nodename nor servname provided, or not known (elastic.aws.intra:9200)
+ ---> System.Net.Sockets.SocketException (0xFFFDFFFF): nodename nor servname provided, or not known
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|277_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(HttpRequestMessage request)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at Elasticsearch.Net.HttpConnection.RequestAsync[TResponse](RequestData requestData, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Elasticsearch.Net.Transport`1.HandleElasticsearchClientException(RequestData data, Exception clientException, IElasticsearchResponse response)
+   at Elasticsearch.Net.Transport`1.FinalizeResponse[TResponse](RequestData requestData, IRequestPipeline pipeline, List`1 seenExceptions, TResponse response)
+   at Elasticsearch.Net.Transport`1.RequestAsync[TResponse](HttpMethod method, String path, CancellationToken cancellationToken, PostData data, IRequestParameters requestParameters)
+   at Serilog.Sinks.Elasticsearch.ElasticsearchSink.EmitBatchAsync(IEnumerable`1 events)

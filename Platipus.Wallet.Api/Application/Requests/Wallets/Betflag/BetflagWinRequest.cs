@@ -4,6 +4,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
 using Api.Extensions.SecuritySign;
 using Base;
+using BetConstruct.Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -68,29 +69,34 @@ public record BetflagWinRequest(
 
             var user = round.User;
 
-            var transactionIsRetry = round.Transactions.Any(t => t.Id != request.TransactionId);
+            var transactionIsRetry = round.Transactions.Any(t => t.Id == request.TransactionId);
 
-            if (!transactionIsRetry)
+            if (transactionIsRetry)
             {
-                var transaction = new Transaction
-                {
-                    Id = request.TransactionId,
-                    Amount = (decimal) request.Win,
-                };
-
-                user.Balance += (decimal) request.Win;
-
-                if (user.Balance < 0)
-                {
-                    return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InsufficientFunds);
-                }
-
-                round.Transactions.Add(transaction);
-
-                _context.Update(user);
-                _context.Update(round);
-                await _context.SaveChangesAsync(cancellationToken);
+                return Failure<BetflagBetWinCancelResponse>(
+                    BetflagErrorCode.Exception,
+                    new Exception("Transaction already exist"));
             }
+
+            var transaction = new Transaction
+            {
+                Id = request.TransactionId,
+                Amount = (decimal) request.Win,
+                RoundId = round.Id
+            };
+
+            user.Balance += (decimal) request.Win;
+
+            if (user.Balance < 0)
+            {
+                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InsufficientFunds);
+            }
+
+            _context.Add(transaction);
+
+            _context.Update(user);
+            _context.Update(round);
+            await _context.SaveChangesAsync(cancellationToken);
 
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 

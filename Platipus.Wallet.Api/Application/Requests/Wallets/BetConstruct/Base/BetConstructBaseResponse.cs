@@ -4,5 +4,5 @@ public record BetConstructBaseResponse(
     bool Result,
     string? ErrDesc,
     int? ErrCode,
-    long Transactionid,
+    string Transactionid,
     decimal Balance);

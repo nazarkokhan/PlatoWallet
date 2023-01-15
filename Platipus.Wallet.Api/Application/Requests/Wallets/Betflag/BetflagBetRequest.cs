@@ -34,8 +34,17 @@ public record BetflagBetRequest(
             BetflagBetRequest request,
             CancellationToken cancellationToken)
         {
+            var session = await _context.Set<Session>()
+                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
+
+            if (session is null)
+            {
+                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidToken);
+            }
+
+
             var user = await _context.Set<User>()
-                .Where(u => u.Id == new Guid(request.Key))
+                .Where(u => u.Id == session.UserId)
                 .Include(u => u.Currency)
                 .FirstOrDefaultAsync();
 
@@ -62,14 +71,6 @@ public record BetflagBetRequest(
                 _context.Add(round);
 
                 await _context.SaveChangesAsync(cancellationToken);
-            }
-
-            var session = await _context.Set<Session>()
-                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
-
-            if (session is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidToken);
             }
 
             var transactionIsRetry = round.Transactions.Any(t => t.Id != request.TransactionId);

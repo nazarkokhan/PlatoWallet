@@ -39,7 +39,7 @@ public record BetConstructDepositRequest(
             //TODO check all parameters in requests
 
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid(request.Token));
+                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Token));
 
             if (session is null)
             {
@@ -72,7 +72,7 @@ public record BetConstructDepositRequest(
 
             var user = round.User;
 
-            if (user.Currency.Name == request.CurrencyId)
+            if (user.Currency.Name != request.CurrencyId)
             {
                 return Failure<BetConstructBaseResponse>(BetConstructErrorCode.WrongCurrency);
             }
@@ -107,7 +107,7 @@ public record BetConstructDepositRequest(
                 true,
                 null,
                 null,
-                Convert.ToInt64(transaction.Id),
+                transaction.Id,
                 user.Balance);
 
             return Success(response);

@@ -90,7 +90,7 @@ public record BetConstructRollbackTransactionRequest(
                 true,
                 null,
                 null,
-                Convert.ToInt64(transaction.Id),
+                transaction.Id,
                 user.Balance);
 
             return Success(response);
