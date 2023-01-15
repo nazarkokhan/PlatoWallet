@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using System.Net;
 using Application.Requests.Wallets.BetConstruct.Base;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.Betflag;
@@ -15,6 +16,7 @@ public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+
         var httpContext = context.HttpContext;
         var dbContext = httpContext?.RequestServices.GetService<WalletDbContext>();
 

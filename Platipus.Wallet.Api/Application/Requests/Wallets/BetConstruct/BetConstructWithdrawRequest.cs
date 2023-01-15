@@ -63,7 +63,7 @@ public record BetConstructWithdrawRequest(
                     new Exception("User isn't found"));
             }
 
-            if (user.Currency.Name == request.CurrencyId)
+            if (user.Currency.Name != request.CurrencyId)
             {
                 return Failure<BetConstructBaseResponse>(BetConstructErrorCode.WrongCurrency);
             }
@@ -85,7 +85,7 @@ public record BetConstructWithdrawRequest(
             if (round.Transactions.Any(t => t.Id == request.TransactionId))
                 return Failure<BetConstructBaseResponse>(BetConstructErrorCode.TransactionIsAlreadyExist);
 
-            user.Balance += request.BetAmount;
+            user.Balance -= request.BetAmount;
 
             var transaction = new Transaction
             {

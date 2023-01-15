@@ -10,7 +10,7 @@ using StartupSettings.Filters;
 
 [Route("wallet/betflag")]
 // [MockedErrorActionFilter(Order = 1)]
-[BetflagVerifyHashFilter(Order = 2)]
+[BetflagVerifyHashFilter(Order = 0)]
 [JsonSettingsName(nameof(CasinoProvider.Betflag))]
 [ProducesResponseType(typeof(BetflagErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletBetflagController : RestApiController
@@ -24,7 +24,10 @@ public class WalletBetflagController : RestApiController
     public async Task<IActionResult> GetBalance(
         BetflagBalanceRequest request,
         CancellationToken cancellationToken)
-        => (Ok(await _mediator.Send(request, cancellationToken)));
+    {
+        return (Ok(await _mediator.Send(request, cancellationToken)));
+    }
+
 
     [HttpPost("bet")]
     [ProducesResponseType(typeof(BetflagBetWinCancelResponse), StatusCodes.Status200OK)]

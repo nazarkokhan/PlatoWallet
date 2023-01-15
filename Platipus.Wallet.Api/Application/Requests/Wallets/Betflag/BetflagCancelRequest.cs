@@ -31,8 +31,16 @@ public record BetflagCancelRequest(
             BetflagCancelRequest request,
             CancellationToken cancellationToken)
         {
+            var session = await _context.Set<Session>()
+                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
+
+            if (session is null)
+            {
+                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidToken);
+            }
+
             var user = await _context.Set<User>()
-                .FirstOrDefaultAsync(u => u.Id == new Guid(request.Key), cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id == session.UserId, cancellationToken: cancellationToken);
 
             if (user is null)
             {
@@ -44,14 +52,6 @@ public record BetflagCancelRequest(
             if (user.IsDisabled)
             {
                 return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.Exception, new Exception("User is Blocked"));
-            }
-
-            var session = await _context.Set<Session>()
-                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
-
-            if (session is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidToken);
             }
 
             var round = await _context.Set<Round>()
