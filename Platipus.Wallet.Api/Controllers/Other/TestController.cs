@@ -317,5 +317,20 @@ public class TestController : RestApiController
 
     }
 
+    [HttpPost("betflag/hash")]
+    public async Task<IActionResult> Betflag(long timestamp, string sessionId)
+    {
+        var validHash = BetflagRequestHash.Compute( sessionId, timestamp);
+
+        return Ok(validHash);
+    }
+
+    [HttpPost("betconstruct/hash")]
+    public async Task<IActionResult> BetConstruct(string data, DateTime time)
+    {
+        var validHash = BetConstructRequestHash.Compute(time.ToString(CultureInfo.InvariantCulture), data);
+        return Ok(validHash);
+    }
+
     public record SomeTest(JsonNode SomeProp);
 }

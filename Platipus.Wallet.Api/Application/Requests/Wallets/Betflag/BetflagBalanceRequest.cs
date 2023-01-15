@@ -32,7 +32,7 @@ public record BetflagBalanceRequest(
             //TODO refactor this
 
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid( request.Key));
+                .LastOrDefaultAsync(s => s.Id == new Guid(request.Key));
 
             if (session is null)
             {
@@ -59,10 +59,9 @@ public record BetflagBalanceRequest(
                     new Exception("The launch token is not valid"));
             }
 
-
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            var hash = BetflagRequestHash.Compute(session.Id.ToString(), timeStamp);
+            var hash = BetflagRequestHash.Compute("0", timeStamp).ToUpperInvariant();
 
             var response = new BetflagBaseResponse(
                 (int) BetflagErrorCode.SUCCSESS,

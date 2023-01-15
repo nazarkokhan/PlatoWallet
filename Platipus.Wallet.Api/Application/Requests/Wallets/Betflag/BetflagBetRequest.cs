@@ -1,4 +1,5 @@
 // ReSharper disable NotAccessedPositionalProperty.Global
+
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
 using Api.Extensions.SecuritySign;
@@ -65,7 +66,7 @@ public record BetflagBetRequest(
             }
 
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid( request.Key));
+                .LastOrDefaultAsync(s => s.Id == new Guid(request.Key));
 
             if (session is null)
             {
@@ -98,7 +99,7 @@ public record BetflagBetRequest(
 
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            var hash = BetflagRequestHash.Compute(session.Id.ToString(), timeStamp);
+            var hash = BetflagRequestHash.Compute("0", timeStamp).ToUpperInvariant();
 
             var response = new BetflagBetWinCancelResponse(
                 (int) BetflagErrorCode.SUCCSESS,

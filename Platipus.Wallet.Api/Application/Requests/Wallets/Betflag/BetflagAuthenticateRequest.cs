@@ -34,9 +34,8 @@ public record BetflagAuthenticateRequest(
             //TODO check cancel requests, last transaction.max by must be transaction doesn't exist
             //TODO check how is round find, sometimes it must be find by transaction
 
-
             var session = await _context.Set<Session>()
-                .LastOrDefaultAsync(s => s.Id == new Guid( request.Key), cancellationToken: cancellationToken);
+                .LastOrDefaultAsync(s => s.Id == new Guid(request.Key), cancellationToken: cancellationToken);
 
             if (session is null)
             {
@@ -63,10 +62,9 @@ public record BetflagAuthenticateRequest(
                     new Exception("The launch token is not valid"));
             }
 
-
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            var hash = BetflagRequestHash.Compute(session.Id.ToString(), timeStamp, "BetflagSecretKey");
+            var hash = BetflagRequestHash.Compute("0", timeStamp).ToUpperInvariant();
 
             var response = new BetflagBaseResponse(
                 (int) BetflagErrorCode.SUCCSESS,
@@ -83,6 +81,4 @@ public record BetflagAuthenticateRequest(
             return BetflagResultFactory.Success(response);
         }
     }
-
-    public string Key { get; set; }
 }

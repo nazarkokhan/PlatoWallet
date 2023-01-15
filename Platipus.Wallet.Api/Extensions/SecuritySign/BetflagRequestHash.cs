@@ -12,7 +12,7 @@ public static class BetflagRequestHash
         long timeStamp,
         string secretKey = "BetflagSecretKey")
     {
-        var md5 = Compute(sessionId, timeStamp, secretKey);
+        var md5 = Compute(sessionId, timeStamp, secretKey).ToUpperInvariant();
 
         var isValid = externalMd5.Equals(md5);
 

@@ -24,9 +24,7 @@ public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
 
         var session = await dbContext.Set<Session>().FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
 
-        var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-        var isHashValid = BetflagRequestHash.IsValidSign(request.Hash, session.UserId.ToString(), timeStamp);
+        var isHashValid = BetflagRequestHash.IsValidSign(request.Hash, session.Id.ToString(), request.Timestamp);
 
         if (!isHashValid)
         {
