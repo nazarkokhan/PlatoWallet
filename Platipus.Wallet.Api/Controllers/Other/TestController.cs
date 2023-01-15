@@ -311,10 +311,12 @@ public class TestController : RestApiController
     [HttpPost("emaraplay/hash")]
     public async Task<IActionResult> EmaraPlay(object request)
     {
-        var bodyToHash = JsonConvert.SerializeObject(request);
-        var hashedBody = Encoding.UTF8.GetBytes(bodyToHash);
         var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
-        return Ok(HMACSHA512.HashData(secretBytes, hashedBody));
+
+        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+
+        var data = HMACSHA512.HashData(secretBytes, rawRequestBytes);
+        return Ok(Convert.ToHexString(data));
     }
 
     [HttpPost("betflag/hash")]

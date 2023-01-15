@@ -23,7 +23,6 @@ public class WalletEmaraPlayController : RestApiController
     [HttpPost("balance")]
     [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
-        [FromHeader(Name = "Authorization")] string hash,
         EmaraPlayBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -31,7 +30,6 @@ public class WalletEmaraPlayController : RestApiController
     [HttpPost("bet")]
     [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        [FromHeader(Name = "Authorization")] string hash,
         EmaraPlayBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -39,7 +37,6 @@ public class WalletEmaraPlayController : RestApiController
     [HttpPost("win")]
     [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Result(
-        [FromHeader(Name = "Authorization")] string hash,
         EmaraPlayResultRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -47,7 +44,6 @@ public class WalletEmaraPlayController : RestApiController
     [HttpPost("rollback")]
     [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Refund(
-        [FromHeader(Name = "Authorization")] string hash,
         EmaraPlayRefundRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

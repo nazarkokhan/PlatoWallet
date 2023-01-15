@@ -1,4 +1,5 @@
 namespace Platipus.Wallet.Api.Controllers;
+// ReSharper disable UnusedParameter.Global
 
 using Abstract;
 using Application.Requests.Wallets.BetConstruct;
