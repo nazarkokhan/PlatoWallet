@@ -15,8 +15,13 @@ public record EverymatrixWinRequest(
     string GameId,
     string RoundId,
     string ExternalId,
-    string BetTransactionId,
-    string Token
+    string BetExternalId,
+    string Token,
+    bool RoundEnd,
+    string JackpotPayout,
+    string JackpotId,
+    decimal JackpotPayoutAmount,
+    string BonusId
 ) :IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>,IEveryMatrixBaseRequest
 {
     public class Handler : IRequestHandler<EverymatrixWinRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
@@ -43,12 +48,12 @@ public record EverymatrixWinRequest(
             }
 
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.RoundId)
+                .Where(r => r.Id == request.RoundId && r.UserId == session.UserId)
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (round is null || round.Transactions.Any(t => t.Id == request.BetTransactionId))
+            if (round is null || round.Transactions.Any(t => t.Id == request.BetExternalId))
                 return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.DoubleTransaction);
 
             if (round.Finished)
@@ -62,7 +67,7 @@ public record EverymatrixWinRequest(
 
             var transaction = new Transaction
             {
-                Id = request.BetTransactionId,
+                Id = request.BetExternalId,
                 Amount = request.Amount
             };
 

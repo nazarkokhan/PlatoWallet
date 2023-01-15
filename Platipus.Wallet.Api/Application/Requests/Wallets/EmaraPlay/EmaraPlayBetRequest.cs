@@ -50,13 +50,13 @@ public record EmaraPlayBetRequest(
                 return Failure<EmaraPlayBaseResponse>(EmaraPlayErrorCode.PlayerNotFound);
             }
 
-            var isGameValid = await _context.Set<CasinoGames>()
-                .Where(cg => cg.CasinoId == user.CasinoId && cg.GameId == Int32.Parse(request.Game)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
-
-            if (isGameValid is null)
-            {
-                return Failure<EmaraPlayBaseResponse>(EmaraPlayErrorCode.GameIsNotFoundOrDisabled);
-            }
+            // var isGameValid = await _context.Set<CasinoGames>()
+            //     .Where(cg => cg.CasinoId == user.CasinoId && cg.GameId == Int32.Parse(request.Game)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            //
+            // if (isGameValid is null)
+            // {
+            //     return Failure<EmaraPlayBaseResponse>(EmaraPlayErrorCode.GameIsNotFoundOrDisabled);
+            // }
 
             var round = await _context.Set<Round>()
                 .Where(r => r.Id == request.Bet)

@@ -8,11 +8,16 @@ using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 using Microsoft.EntityFrameworkCore;
 public record EverymatrixBetRequest(
-    string TransactionId,
+    string ExternalId,
     string Token,
     string Currency,
     decimal Amount,
-    string Hash) :IEveryMatrixBaseRequest, IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>
+    string Hash,
+    string RoundId,
+    string GameId,
+    object JackpotContribution,
+    string JackpotId,
+    decimal JackpotContributionAmount) :IEveryMatrixBaseRequest, IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>
 {
     public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
     {
@@ -37,7 +42,7 @@ public record EverymatrixBetRequest(
             }
 
             var round = await _context.Set<Round>()
-                        .Where(r => r.UserId == session.UserId)
+                        .Where(r => r.UserId == session.UserId && r.Id == request.RoundId)
                         .Include(r => r.User.Currency)
                         .Include(r => r.Transactions)
                         .FirstOrDefaultAsync(cancellationToken);
@@ -67,7 +72,7 @@ public record EverymatrixBetRequest(
                         .FirstOrDefaultAsync();
 
 
-                    if (round.Transactions.Any(t => t.Id == request.TransactionId))
+                    if (round.Transactions.Any(t => t.Id == request.ExternalId))
                         return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(
                             EverymatrixErrorCode.DoubleTransaction);
 
@@ -89,7 +94,7 @@ public record EverymatrixBetRequest(
 
                     var transaction = new Transaction
                     {
-                        Id = request.TransactionId,
+                        Id = request.ExternalId,
                         Amount = request.Amount,
                     };
 

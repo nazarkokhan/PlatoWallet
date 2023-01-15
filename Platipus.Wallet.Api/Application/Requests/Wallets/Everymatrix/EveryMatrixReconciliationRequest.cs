@@ -29,11 +29,16 @@ public record EveryMatrixReconciliationRequest(
         {
             var user = await _context.Set<User>().Where(u => u.Id == new Guid(request.UserId)).FirstOrDefaultAsync();
 
-            var currency = await _context.Set<Currency>().FirstOrDefaultAsync(c => c.Id == user.CurrencyId);
-
             if (user is null)
             {
                 return EverymatrixResultFactory.Failure<Response>(EverymatrixErrorCode.UnknownError);
+            }
+
+            var currency = await _context.Set<Currency>().FirstOrDefaultAsync(c => c.Id == user.CurrencyId);
+
+            if (currency is null)
+            {
+                return EverymatrixResultFactory.Failure<Response>(EverymatrixErrorCode.CurrencyDoesntMatch);
             }
 
 
