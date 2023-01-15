@@ -29,7 +29,6 @@ public record BetflagBalanceRequest(
             BetflagBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            //TODO refactor this
 
             var session = await _context.Set<Session>()
                 .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key), cancellationToken: cancellationToken);

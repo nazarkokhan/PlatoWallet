@@ -36,7 +36,6 @@ public record BetConstructDepositRequest(
             CancellationToken cancellationToken)
         {
             //TODO check if the BetAmount is same to win transaction amount
-            //TODO check all parameters in requests
 
             var session = await _context.Set<Session>()
                 .FirstOrDefaultAsync(s => s.Id == new Guid(request.Token));

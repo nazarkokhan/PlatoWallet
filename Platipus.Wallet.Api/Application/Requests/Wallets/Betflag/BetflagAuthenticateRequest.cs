@@ -31,7 +31,6 @@ public record BetflagAuthenticateRequest(
         {
             //TODO Key is provided by betflag to user, but key is not user id
             //TODO need to add bets table to db
-            //TODO check cancel requests, last transaction.max by must be transaction doesn't exist
             //TODO check how is round find, sometimes it must be find by transaction
 
             var session = await _context.Set<Session>()
