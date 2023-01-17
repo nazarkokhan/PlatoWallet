@@ -187,8 +187,10 @@ public record LogInRequest(
                         session.Id,
                         game.LaunchName,
                         cancellationToken);
-
                     launchUrl = getLaunchUrlResult.Data ?? "";
+                    break;
+                case CasinoProvider.Uis:
+                    launchUrl = "uis";
                     break;
                 default:
                     launchUrl = "";
