@@ -189,7 +189,8 @@ try
             })
         .Services
         .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
-        .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
+        .AddHttpClient(
+            "Nazar",
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");

@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Behaviors;
 
 using Extensions;
-using Results.Psw;
 
 public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
@@ -16,8 +15,8 @@ public class ExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest
 
     public async Task<TResponse> Handle(
         TRequest request,
-        CancellationToken cancellationToken,
-        RequestHandlerDelegate<TResponse> next)
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         try
         {
