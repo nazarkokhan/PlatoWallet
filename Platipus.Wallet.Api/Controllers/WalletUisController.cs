@@ -9,7 +9,6 @@ using StartupSettings.Filters;
 
 [Route("wallet/uis")]
 [MockedErrorActionFilter(Order = 1)]
-// [Hub88VerifySignatureFilter(Order = 2)]
 [Produces(MediaTypeNames.Application.Xml)]
 [Consumes(MediaTypeNames.Application.Xml)]
 public class WalletUisController : ApiController
@@ -21,6 +20,7 @@ public class WalletUisController : ApiController
         _mediator = mediator;
     }
 
+    //redeploy
     [HttpGet("authenticate")]
     public async Task<IActionResult> Authenticate(
         [FromQuery] UisAuthenticateRequest request,
