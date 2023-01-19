@@ -54,7 +54,8 @@ public record CreateCasinoRequest(
                         return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
                     break;
                 }
-                case CasinoProvider.Sw or CasinoProvider.GamesGlobal or CasinoProvider.SoftBet when request.SwProviderId is null:
+                case CasinoProvider.Sw or CasinoProvider.GamesGlobal or CasinoProvider.SoftBet or CasinoProvider.Uis
+                    when request.SwProviderId is null:
                     return PswResultFactory.Failure(PswErrorCode.BadParametersInTheRequest);
             }
 
@@ -63,10 +64,14 @@ public record CreateCasinoRequest(
                 Id = request.CasinoId,
                 SignatureKey = request.SignatureKey,
                 Provider = request.Provider,
-                SwProviderId = request.Provider is CasinoProvider.Sw or CasinoProvider.GamesGlobal or CasinoProvider.SoftBet
+                SwProviderId = request.Provider is CasinoProvider.Sw or
+                                                   CasinoProvider.GamesGlobal or
+                                                   CasinoProvider.SoftBet or
+                                                   CasinoProvider.Uis
                     ? request.SwProviderId
                     : null,
-                CasinoCurrencies = matchedCurrencies.Select(c => new CasinoCurrencies { CurrencyId = c.Id })
+                CasinoCurrencies = matchedCurrencies
+                    .Select(c => new CasinoCurrencies { CurrencyId = c.Id })
                     .ToList()
             };
 

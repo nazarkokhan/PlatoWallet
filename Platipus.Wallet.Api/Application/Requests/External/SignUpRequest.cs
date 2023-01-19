@@ -61,7 +61,7 @@ public record SignUpRequest(
 
             int? swUserId = null;
 
-            if (casino.Provider is CasinoProvider.Sw or CasinoProvider.GamesGlobal)
+            if (casino.Provider is CasinoProvider.Sw or CasinoProvider.GamesGlobal or CasinoProvider.Uis)
             {
                 if (request.SwUserId is null)
                     return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.BadParametersInTheRequest);

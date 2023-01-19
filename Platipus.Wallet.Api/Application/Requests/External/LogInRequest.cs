@@ -22,7 +22,8 @@ public record LogInRequest(
     string Password,
     string CasinoId,
     string Game,
-    string? Device) : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
+    string? Device,
+    string? UisLaunchType = "Play now") : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
 {
     public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
     {
@@ -190,7 +191,10 @@ public record LogInRequest(
                     launchUrl = getLaunchUrlResult.Data ?? "";
                     break;
                 case CasinoProvider.Uis:
-                    launchUrl = "uis";
+                    launchUrl = GetUisLaunchUrl(
+                        session.Id,
+                        casino.SwProviderId!.Value,
+                        request.UisLaunchType!);
                     break;
                 default:
                     launchUrl = "";
@@ -201,6 +205,42 @@ public record LogInRequest(
 
             return PswResultFactory.Success(result);
         }
+    }
+
+    private static string GetUisLaunchUrl(
+        Guid token,
+        int operatorId,
+        string launchType)
+    {
+        var queryParameters = new List<KeyValuePair<string, string?>>();
+
+        var tokenKvp = KeyValuePair.Create("token", token.ToString());
+        var operatorIdKvp = KeyValuePair.Create("operatorID", operatorId.ToString());
+        var demoKvp = KeyValuePair.Create("demo", bool.TrueString);
+
+        switch (launchType)
+        {
+            case "Play now":
+                queryParameters.Add(tokenKvp!);
+                queryParameters.Add(operatorIdKvp!);
+                break;
+            case "Play now + Demo":
+                queryParameters.Add(tokenKvp!);
+                queryParameters.Add(operatorIdKvp!);
+                queryParameters.Add(demoKvp!);
+                break;
+            case "Demo":
+                queryParameters.Add(demoKvp!);
+                break;
+        }
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(
+            new Uri("https://platipusgaming2.cloud/"),
+            $"vivo/index.html{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
     }
 
     private static string GetSwLaunchUrl(

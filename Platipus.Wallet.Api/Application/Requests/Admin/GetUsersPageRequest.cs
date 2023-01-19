@@ -6,9 +6,12 @@ using DTOs;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
 
-public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<IPswResult<IPage<GetUsersPageRequest.Response>>>
+public record GetUsersPageRequest(
+        string? CasinoId,
+        string? UserName,
+        PageRequest Page)
+    : IRequest<IPswResult<IPage<GetUsersPageRequest.Response>>>
 {
     public class Handler : IRequestHandler<GetUsersPageRequest, IPswResult<IPage<Response>>>
     {
@@ -24,8 +27,13 @@ public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<
             CancellationToken cancellationToken)
         {
             var usersQuery = _context.Set<User>()
-                .Where(u => u.CasinoId == request.CasinoId)
                 .AsNoTracking();
+
+            if (request.CasinoId is not null)
+                usersQuery = usersQuery.Where(u => u.CasinoId == request.CasinoId);
+
+            if (request.UserName is not null)
+                usersQuery = usersQuery.Where(u => u.UserName == request.UserName);
 
             var totalCount = await usersQuery.CountAsync(cancellationToken);
 
@@ -40,6 +48,9 @@ public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<
                         u.UserName,
                         u.Password,
                         u.IsDisabled,
+                        u.SwUserId,
+                        u.CasinoId,
+                        u.Casino.SwProviderId,
                         new GetCurrencyDto(u.CurrencyId, u.Currency.Name)))
                 .ToListAsync(cancellationToken);
 
@@ -54,5 +65,8 @@ public record GetUsersPageRequest(PageRequest Page, string CasinoId) : IRequest<
         string UserName,
         string Password,
         bool IsDisabled,
+        int? SwUserId,
+        string CasinoId,
+        int? CasinoSwProviderId,
         GetCurrencyDto CurrencyDto);
 }

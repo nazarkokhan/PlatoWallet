@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
 using JorgeSerrano.Json;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Serilog;
@@ -70,8 +69,13 @@ try
         .AddControllers(
             options =>
             {
-                options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
-                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+                // new XmlWriterSettings(){at}
+                // options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
+                // var xmlWriterSettings = new XmlWriterSettings
+                // {
+                //     NewLineOnAttributes = true
+                // };
+                // options.OutputFormatters.Add(new XmlSerializerOutputFormatter(xmlWriterSettings));
 
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
@@ -248,6 +252,11 @@ finally
 
 namespace Platipus.Wallet.Api
 {
+    // public class MyXmlSerializerOutputFormatter : XmlSerializerOutputFormatter
+    // {
+    //
+    // }
+
     public static class App
     {
         public const string Version = "20.0";
