@@ -237,8 +237,8 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(
-            new Uri("https://platipusgaming2.cloud/"),
-            $"vivo/index.html{queryString.ToUriComponent()}");
+            new Uri("https://platipusgaming.cloud/qa/integration/"),
+            $"vivo/test/index.html{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

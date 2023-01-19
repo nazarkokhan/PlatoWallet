@@ -69,12 +69,12 @@ try
         .AddControllers(
             options =>
             {
-                // new XmlWriterSettings(){at}
-                // options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
                 // var xmlWriterSettings = new XmlWriterSettings
                 // {
-                //     NewLineOnAttributes = true
+                //     OmitXmlDeclaration = true,
+                //     NewLineHandling =
                 // };
+                // options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
                 // options.OutputFormatters.Add(new XmlSerializerOutputFormatter(xmlWriterSettings));
 
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);

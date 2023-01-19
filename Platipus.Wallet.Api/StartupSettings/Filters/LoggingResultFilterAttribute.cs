@@ -64,7 +64,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             Encoding.UTF8.GetString(rawRequestBytes),
             request,
             JsonSerializer.Serialize(response),
-            (response),
+            response,
             requestHeaders,
             responseHeaders);
     }
