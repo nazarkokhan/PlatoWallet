@@ -5,17 +5,23 @@ using System.Xml.Serialization;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Results.Uis;
 using Results.Uis.WithData;
 
 [XmlRoot("REQUEST")]
-public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisAuthenticateRequest
+    // [property: BindProperty(Name = "token")] string Token,
+    // [property: BindProperty(Name = "hash")] string Hash)
+    : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("TOKEN")]
+    [BindProperty(Name = "token")]
     public string Token { get; set; }
 
     [XmlElement("HASH")]
+    [BindProperty(Name = "hash")]
     public string Hash { get; set; }
 
     public class Handler : IRequestHandler<UisAuthenticateRequest, IUisResult<UisResponseContainer>>

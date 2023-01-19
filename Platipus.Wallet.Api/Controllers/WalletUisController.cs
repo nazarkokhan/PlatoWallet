@@ -21,27 +21,27 @@ public class WalletUisController : ApiController
         _mediator = mediator;
     }
 
-    [HttpPost("authenticate")]
+    [HttpGet("authenticate")]
     public async Task<IActionResult> Authenticate(
-        [FromBody] UisAuthenticateRequest request,
+        [FromQuery] UisAuthenticateRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("change-balance")]
+    [HttpGet("change-balance")]
     public async Task<IActionResult> ChangeBalance(
-        [FromBody] UisChangeBalanceRequest request,
+        [FromQuery] UisChangeBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("status")]
+    [HttpGet("status")]
     public async Task<IActionResult> Status(
-        [FromBody] UisStatusRequest request,
+        [FromQuery] UisStatusRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("get-balance")]
+    [HttpGet("get-balance")]
     public async Task<IActionResult> GetBalance(
-        [FromBody] UisGetBalanceRequest request,
+        [FromQuery] UisGetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

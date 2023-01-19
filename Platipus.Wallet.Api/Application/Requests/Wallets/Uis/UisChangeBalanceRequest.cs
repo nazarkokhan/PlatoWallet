@@ -6,6 +6,7 @@ using Base;
 using Domain.Entities;
 using Extensions;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Results.ResultToResultMappers;
 using Results.Uis;
@@ -18,6 +19,7 @@ public class UisChangeBalanceRequest
     : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("USERID")]
+    [BindProperty(Name = "userId")]
     public string UserId { get; set; }
 
     [XmlElement("AMOUNT")]
@@ -30,21 +32,25 @@ public class UisChangeBalanceRequest
     public string TrnType { get; set; }
 
     [XmlElement("GAMEID")]
+    [BindProperty(Name = "gameId")]
     public int GameId { get; set; }
 
     [XmlElement("HISTORY")]
     public int History { get; set; }
 
     [XmlElement("ROUNDID")]
+    [BindProperty(Name = "roundId")]
     public string RoundId { get; set; }
 
     [XmlElement("TRNDESCRIPTION")]
     public string TrnDescription { get; set; }
 
     [XmlElement("ISROUNDFINISH")]
+    [BindProperty(Name = "isRoundFinished")]
     public bool IsRoundFinish { get; set; }
 
     [XmlElement("HASH")]
+    [BindProperty(Name = "hash")]
     public string Hash { get; set; }
 
     public class Handler : IRequestHandler<UisChangeBalanceRequest, IUisResult<UisResponseContainer>>

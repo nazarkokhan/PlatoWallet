@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Results.Uis;
 using Results.Uis.WithData;
@@ -13,12 +14,15 @@ using Results.Uis.WithData;
 public class UisStatusRequest : IUisBaseRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("USERID")]
+    [BindProperty(Name = "userId")]
     public string UserId { get; set; }
 
     [XmlElement("CPTRANSACTIONID")]
+    [BindProperty(Name = "CPTransactionID")]
     public string CpTransactionId { get; set; }
 
     [XmlElement("HASH")]
+    [BindProperty(Name = "hash")]
     public string Hash { get; set; }
 
     public class Handler : IRequestHandler<UisStatusRequest, IUisResult<UisResponseContainer>>
