@@ -48,7 +48,8 @@ try
         (context, configuration) =>
         {
             configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration);
+                .ReadFrom.Configuration(context.Configuration)
+                .Enrich.WithProperty("AppVersion", App.Version, true);
         });
 
     var builderConfiguration = builder.Configuration;
@@ -247,18 +248,14 @@ catch (Exception ex)
 }
 finally
 {
+    Log.Fatal("Flushing before closing app");
     Log.CloseAndFlush();
 }
 
 namespace Platipus.Wallet.Api
 {
-    // public class MyXmlSerializerOutputFormatter : XmlSerializerOutputFormatter
-    // {
-    //
-    // }
-
     public static class App
     {
-        public const string Version = "21.0";
+        public const string Version = "22.0";
     }
 }
