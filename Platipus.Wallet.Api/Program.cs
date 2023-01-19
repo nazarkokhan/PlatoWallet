@@ -52,6 +52,8 @@ try
                 .Enrich.WithProperty("AppVersion", App.Version, true);
         });
 
+    Log.Warning("Reconfigured boostrap logger");
+
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
 
