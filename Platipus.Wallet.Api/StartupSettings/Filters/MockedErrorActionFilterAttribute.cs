@@ -49,17 +49,17 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         if (context.Controller is WalletOpenboxController)
         {
-            var openboxSingleRequest = context.ActionArguments.Values.OfType<OpenboxSingleRequest>().Single();
+            var singleRequest = context.ActionArguments.Values.OfType<OpenboxSingleRequest>().Single();
 
             if (!httpContext.Items.TryGetValue("OpenboxPayloadRequestObj", out var payloadRequestObj)
              || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
             {
-                LogOpenboxMockingFailed(logger, openboxSingleRequest);
+                LogOpenboxMockingFailed(logger, singleRequest);
                 return;
             }
 
             usernameOrSession = openboxPayloadObj.Token.ToString();
-            currentMethod = openboxSingleRequest.Method switch
+            currentMethod = singleRequest.Method switch
             {
                 OpenboxHelpers.GetPlayerBalance => ErrorMockMethod.Balance,
                 OpenboxHelpers.MoneyTransactions => ((OpenboxMoneyTransactionRequest)openboxPayloadObj).OrderType switch
@@ -69,6 +69,20 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     _ => null
                 },
                 OpenboxHelpers.CancelTransaction => ErrorMockMethod.Rollback,
+                _ => null
+            };
+        }
+        else if (context.Controller is WalletISoftBetController)
+        {
+            var singleRequest = context.ActionArguments.Values.OfType<SoftBetSingleRequest>().Single();
+
+            usernameOrSession = singleRequest.Username;
+            currentMethod = singleRequest.Action.Command switch
+            {
+                "balance" => ErrorMockMethod.Balance,
+                "bet" => ErrorMockMethod.Bet,
+                "win" => ErrorMockMethod.Win,
+                "rollback" => ErrorMockMethod.Rollback,
                 _ => null
             };
         }
@@ -110,10 +124,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     .Select(a => a.Value as ISwBaseRequest)
                     .SingleOrDefault(a => a is not null)
                     ?.Token.ToString(),
-                WalletISoftBetController => context.ActionArguments
-                    .Select(a => a.Value as SoftBetSingleRequest)
-                    .SingleOrDefault(a => a is not null)
-                    ?.SessionId.ToString(),
                 _ => null
             };
         }
