@@ -15,8 +15,7 @@ using Services.Wallet;
 using Services.Wallet.DTOs;
 
 [XmlRoot("REQUEST")]
-public class UisChangeBalanceRequest
-    : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisChangeBalanceRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("USERID")]
     [BindProperty(Name = "userId")]
@@ -51,7 +50,7 @@ public class UisChangeBalanceRequest
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
-    public string Hash { get; set; }
+    public string? Hash { get; set; }
 
     public class Handler : IRequestHandler<UisChangeBalanceRequest, IUisResult<UisResponseContainer>>
     {

@@ -11,7 +11,7 @@ using Results.Uis.WithData;
 
 #pragma warning disable CS8618
 [XmlRoot("REQUEST")]
-public class UisStatusRequest : IUisBaseRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisStatusRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("USERID")]
     [BindProperty(Name = "userId")]
@@ -23,7 +23,7 @@ public class UisStatusRequest : IUisBaseRequest, IRequest<IUisResult<UisResponse
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
-    public string Hash { get; set; }
+    public string? Hash { get; set; }
 
     public class Handler : IRequestHandler<UisStatusRequest, IUisResult<UisResponseContainer>>
     {

@@ -16,7 +16,7 @@ public record UisGetBalanceRequest : IUisHashRequest, IRequest<IUisResult<UisRes
     public string UserId { get; init; }
 
     [XmlElement("HASH")]
-    public string Hash { get; init; }
+    public string? Hash { get; init; }
 
     public class Handler : IRequestHandler<UisGetBalanceRequest, IUisResult<UisResponseContainer>>
     {

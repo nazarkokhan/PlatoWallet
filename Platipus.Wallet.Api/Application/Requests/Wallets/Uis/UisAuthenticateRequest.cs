@@ -11,10 +11,7 @@ using Results.Uis;
 using Results.Uis.WithData;
 
 [XmlRoot("REQUEST")]
-public class UisAuthenticateRequest
-    // [property: BindProperty(Name = "token")] string Token,
-    // [property: BindProperty(Name = "hash")] string Hash)
-    : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("TOKEN")]
     [BindProperty(Name = "token")]
@@ -22,7 +19,7 @@ public class UisAuthenticateRequest
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
-    public string Hash { get; set; }
+    public string? Hash { get; set; }
 
     public class Handler : IRequestHandler<UisAuthenticateRequest, IUisResult<UisResponseContainer>>
     {
