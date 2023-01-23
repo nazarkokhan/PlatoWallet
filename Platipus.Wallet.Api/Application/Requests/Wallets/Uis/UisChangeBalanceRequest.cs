@@ -35,7 +35,7 @@ public class UisChangeBalanceRequest : IUisHashRequest, IRequest<IUisResult<UisR
     public int GameId { get; set; }
 
     [XmlElement("HISTORY")]
-    public int History { get; set; }
+    public string History { get; set; }
 
     [XmlElement("ROUNDID")]
     [BindProperty(Name = "roundId")]
