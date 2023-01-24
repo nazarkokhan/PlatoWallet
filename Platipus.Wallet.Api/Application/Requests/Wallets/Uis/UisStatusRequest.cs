@@ -74,6 +74,6 @@ public class UisStatusRequest : IUisHashRequest, IRequest<IUisResult<UisResponse
         public string Result { get; set; } = "OK";
 
         [XmlElement("UISSYSTEMTRANSACTIONID")]
-        public string UisSystemTransactionId { get; set; }
+        public string UisSystemTransactionId { get; set; } = "123123123";
     }
 }
