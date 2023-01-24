@@ -42,6 +42,7 @@ public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisRe
                     {
                         u.Id,
                         u.UserName,
+                        u.SwUserId,
                         u.Balance,
                         CurrencyName = u.Currency.Name,
                         u.IsDisabled,

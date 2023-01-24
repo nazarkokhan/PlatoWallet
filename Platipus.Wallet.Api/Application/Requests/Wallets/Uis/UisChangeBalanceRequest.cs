@@ -161,10 +161,10 @@ public class UisChangeBalanceRequest : IUisHashRequest, IRequest<IUisResult<UisR
     public record UisChangeBalanceResponse
     {
         [XmlElement("RESULT")]
-        public string Result { get; set; }
+        public string Result { get; set; } = "OK";
 
         [XmlElement("ECSYSTEMTRANSACTIONID")]
-        public string EcSystemTransactionId { get; set; }
+        public string EcSystemTransactionId { get; set; } = "123123123";
 
         [XmlElement("BALANCE")]
         public decimal Balance { get; set; }
