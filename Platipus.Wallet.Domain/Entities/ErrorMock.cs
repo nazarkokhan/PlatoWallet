@@ -15,6 +15,8 @@ public class MockedError : Entity
 
     public int Count { get; set; }
 
+    public TimeSpan? Timeout { get; set; }
+
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 }

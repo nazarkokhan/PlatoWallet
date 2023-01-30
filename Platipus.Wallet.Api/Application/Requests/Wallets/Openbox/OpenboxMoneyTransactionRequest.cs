@@ -64,10 +64,10 @@ public record OpenboxMoneyTransactionRequest(
             }
 
             if (round.Transactions.Any(t => t.Id == request.OrderUid))
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.Success);
+                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
 
             if (round.Finished)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.Success);
+                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
 
             round.User.Balance -= request.OrderAmount / 100m;
 

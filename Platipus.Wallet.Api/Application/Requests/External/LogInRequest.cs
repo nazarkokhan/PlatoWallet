@@ -22,7 +22,8 @@ public record LogInRequest(
     string Password,
     string CasinoId,
     string Game,
-    string? Device) : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
+    string? Device,
+    string? UisLaunchType = "Play now") : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
 {
     public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
     {
@@ -189,25 +190,30 @@ public record LogInRequest(
                 case CasinoProvider.Sw:
                     launchUrl = GetSwLaunchUrl(
                         session.Id,
-                        "",
+                        $"{casino.Id}-{user.Currency.Name}",
                         user.UserName,
                         request.Game);
                     break;
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
-                        request.Game,
                         game.GameServerId,
-                        session.Id,
+                        casino.SignatureKey,
                         user.UserName,
-                        user.Currency.Name);
+                        user.Currency.Name,
+                        casino.SwProviderId!.Value);
                     break;
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
                         session.Id,
                         game.LaunchName,
                         cancellationToken);
-
                     launchUrl = getLaunchUrlResult.Data ?? "";
+                    break;
+                case CasinoProvider.Uis:
+                    launchUrl = GetUisLaunchUrl(
+                        session.Id,
+                        casino.SwProviderId!.Value,
+                        request.UisLaunchType!);
                     break;
                 default:
                     launchUrl = "";
@@ -218,6 +224,42 @@ public record LogInRequest(
 
             return PswResultFactory.Success(result);
         }
+    }
+
+    private static string GetUisLaunchUrl(
+        Guid token,
+        int operatorId,
+        string launchType)
+    {
+        var queryParameters = new List<KeyValuePair<string, string?>>();
+
+        var tokenKvp = KeyValuePair.Create("token", token.ToString());
+        var operatorIdKvp = KeyValuePair.Create("operatorID", operatorId.ToString());
+        var demoKvp = KeyValuePair.Create("demo", bool.TrueString);
+
+        switch (launchType)
+        {
+            case "Play now":
+                queryParameters.Add(tokenKvp!);
+                queryParameters.Add(operatorIdKvp!);
+                break;
+            case "Play now + Demo":
+                queryParameters.Add(tokenKvp!);
+                queryParameters.Add(operatorIdKvp!);
+                queryParameters.Add(demoKvp!);
+                break;
+            case "Demo":
+                queryParameters.Add(demoKvp!);
+                break;
+        }
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(
+            new Uri("https://platipusgaming.cloud/qa/integration/"),
+            $"vivo/test/index.html{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
     }
 
     private static string GetSwLaunchUrl(
@@ -312,41 +354,34 @@ public record LogInRequest(
     }
 
     private static string GetSoftBetLaunchUrlAsync(
-            string providerGameId,
-            int gameId,
-            // string licenseeId,
-            // string @operator,
-            Guid token,
-            string username,
-            string currency)
-        // string country,
-        // string isbSkinId,
-        // string isbGameId,
-        // string mode,
-        // string extra)
+        int gameId,
+        string token,
+        string username,
+        string currency,
+        int licenseeid)
     {
         var queryParameters = new Dictionary<string, string?>()
         {
-            { "providergameid", providerGameId },
-            { "licenseeid", "134" },
+            { "providergameid", gameId.ToString() },
+            { "licenseeid", licenseeid.ToString() }, //provider
             { "operator", "" },
             { "playerid", username },
-            { "token", token.ToString() },
+            { "token", token },
             { "username", username },
             { "currency", currency },
-            { "country", "ukraine" },
+            { "country", "ua" },
             { "ISBskinid", "1" },
             { "ISBgameid", "1" },
             { "mode", "real" },
             { "launchercode", "26" },
             { "language", "en" },
             { "lobbyurl", "" },
-            { "extra", "" },
+            { "extra", "multi" },
         };
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"softbet/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"isoftbet/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

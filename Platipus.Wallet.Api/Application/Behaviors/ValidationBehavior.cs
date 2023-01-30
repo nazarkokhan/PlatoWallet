@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Behaviors;
 
 using Extensions;
 using FluentValidation;
-using Results.Psw;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
@@ -17,8 +16,8 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
     public async Task<TResponse> Handle(
         TRequest request,
-        CancellationToken cancellationToken,
-        RequestHandlerDelegate<TResponse> next)
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var validator = scope.ServiceProvider.GetService<IValidator<TRequest>>();

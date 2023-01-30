@@ -38,7 +38,7 @@ public record SoftBetCancelRequest(
 
             var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
-                walletResult.ToSoftBetResult();
+                return walletResult.ToSoftBetResult<SoftBetBalanceResponse>();
 
             var response = walletResult.Data.Map(
                 d => new SoftBetBalanceResponse(

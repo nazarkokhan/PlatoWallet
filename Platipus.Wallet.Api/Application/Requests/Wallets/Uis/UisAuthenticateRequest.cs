@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Results.Uis;
 using Results.Uis.WithData;
@@ -13,10 +14,12 @@ using Results.Uis.WithData;
 public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("TOKEN")]
+    [BindProperty(Name = "token")]
     public string Token { get; set; }
 
     [XmlElement("HASH")]
-    public string Hash { get; set; }
+    [BindProperty(Name = "hash")]
+    public string? Hash { get; set; }
 
     public class Handler : IRequestHandler<UisAuthenticateRequest, IUisResult<UisResponseContainer>>
     {
@@ -39,6 +42,7 @@ public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisRe
                     {
                         u.Id,
                         u.UserName,
+                        u.SwUserId,
                         u.Balance,
                         CurrencyName = u.Currency.Name,
                         u.IsDisabled,

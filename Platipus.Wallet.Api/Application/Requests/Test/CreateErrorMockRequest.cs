@@ -5,7 +5,6 @@ using System.Net.Mime;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
 
 public record CreateErrorMockRequest(
     string UserName,
@@ -13,7 +12,8 @@ public record CreateErrorMockRequest(
     string Body,
     HttpStatusCode HttpStatusCode,
     string ContentType,
-    int Count) : IRequest<IPswResult>
+    int Count,
+    TimeSpan? Timeout) : IRequest<IPswResult>
 {
     public class Handler : IRequestHandler<CreateErrorMockRequest, IPswResult>
     {
@@ -40,12 +40,12 @@ public record CreateErrorMockRequest(
             if (user.MockedErrors.Any(m => m.Method == request.Method))
                 return PswResultFactory.Failure(PswErrorCode.Duplication);
 
-            var allowedMediaTypes = new List<string>
+            var contentType = request.ContentType switch
             {
-                MediaTypeNames.Application.Json,
-                MediaTypeNames.Text.Plain,
-                MediaTypeNames.Text.Xml,
-                MediaTypeNames.Text.Html
+                "text" => MediaTypeNames.Text.Plain,
+                "xml" => MediaTypeNames.Text.Xml,
+                "html" => MediaTypeNames.Text.Html,
+                "json" or _ => MediaTypeNames.Application.Json
             };
 
             var mockedError = new MockedError
@@ -53,10 +53,9 @@ public record CreateErrorMockRequest(
                 Method = request.Method,
                 Body = request.Body,
                 HttpStatusCode = request.HttpStatusCode,
-                ContentType = allowedMediaTypes.Contains(request.ContentType)
-                    ? request.ContentType
-                    : MediaTypeNames.Application.Json,
-                Count = request.Count <= 0 ? 1 : request.Count
+                ContentType = contentType,
+                Count = request.Count <= 0 ? 1 : request.Count,
+                Timeout = request.Timeout
             };
 
             user.MockedErrors.Add(mockedError);

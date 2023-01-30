@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
 using JorgeSerrano.Json;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -51,8 +50,11 @@ try
         (context, configuration) =>
         {
             configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration);
+                .ReadFrom.Configuration(context.Configuration)
+                .Enrich.WithProperty("AppVersion", App.Version, true);
         });
+
+    Log.Warning("Reconfigured boostrap logger");
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
@@ -72,8 +74,13 @@ try
         .AddControllers(
             options =>
             {
-                options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
-                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+                // var xmlWriterSettings = new XmlWriterSettings
+                // {
+                //     OmitXmlDeclaration = true,
+                //     NewLineHandling =
+                // };
+                // options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
+                // options.OutputFormatters.Add(new XmlSerializerOutputFormatter(xmlWriterSettings));
 
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
@@ -245,7 +252,8 @@ try
             })
         .Services
         .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
-        .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
+        .AddHttpClient(
+            "Nazar",
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
@@ -298,6 +306,7 @@ catch (Exception ex)
 }
 finally
 {
+    Log.Fatal("Flushing before closing app");
     Log.CloseAndFlush();
 }
 
@@ -305,6 +314,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "20.0";
+        public const string Version = "22.0";
     }
 }
