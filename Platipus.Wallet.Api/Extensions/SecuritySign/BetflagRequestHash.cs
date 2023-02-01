@@ -26,6 +26,6 @@ public static class BetflagRequestHash
         var md5 = MD5.HashData(dataBytes);
         var md5String = Convert.ToHexString(md5);
 
-        return md5String.ToUpper();
+        return md5String;
     }
 }
