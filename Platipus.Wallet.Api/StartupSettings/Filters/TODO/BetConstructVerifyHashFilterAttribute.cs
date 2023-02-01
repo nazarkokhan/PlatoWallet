@@ -1,16 +1,11 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using Application.Requests.Wallets.BetConstruct.Base;
-using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.BetConstruct;
-using Application.Results.Betflag;
-using Domain.Entities;
 using Extensions;
 using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
 {

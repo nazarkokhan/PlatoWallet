@@ -1,11 +1,10 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Abstract;
 using Application.Extensions;
+using Application.Results.Betflag;
 using Application.Results.Hub88;
 using Application.Results.Sw;
 using Domain.Entities;
@@ -15,9 +14,6 @@ using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 [Route("test")]
 public class TestController : RestApiController
@@ -33,7 +29,7 @@ public class TestController : RestApiController
     public async Task<IActionResult> Stringify([FromBody] object request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        var result = new {JsonString = JsonSerializer.Serialize(request)};
+        var result = new { JsonString = JsonSerializer.Serialize(request) };
 
         return Ok(result);
     }
@@ -48,17 +44,17 @@ public class TestController : RestApiController
     {
         var casino = await dbContext.Set<Casino>()
             .Where(c => c.Id == casinoId)
-            .Select(c => new {c.SignatureKey})
+            .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
             return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId).ToActionResult();
 
-        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = PswRequestSign.Compute(rawRequestBytes, casino.SignatureKey);
 
-        var result = new {Signature = validSignature};
+        var result = new { Signature = validSignature };
 
         return Ok(result);
     }
@@ -72,7 +68,7 @@ public class TestController : RestApiController
     {
         var casino = await dbContext.Set<Casino>()
             .Where(c => c.Provider == CasinoProvider.Dafabet)
-            .Select(c => new {c.SignatureKey})
+            .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
@@ -87,7 +83,7 @@ public class TestController : RestApiController
             });
 
         var source = string.Concat(sourceValues);
-        var result = new {Hash = DatabetHash.Compute($"{method}{source}", casino.SignatureKey)};
+        var result = new { Hash = DatabetHash.Compute($"{method}{source}", casino.SignatureKey) };
 
         return Ok(result);
     }
@@ -118,7 +114,7 @@ public class TestController : RestApiController
         var serialize = JsonSerializer.Serialize(request);
         var encryptedPayload = OpenboxPayload.Encrypt(serialize, signatureKey);
 
-        var result = new {EncryptedPayload = encryptedPayload};
+        var result = new { EncryptedPayload = encryptedPayload };
 
         return Ok(result);
     }
@@ -148,7 +144,7 @@ public class TestController : RestApiController
 
         var decryptedPayload = OpenboxPayload.Decrypt(request, signatureKey);
 
-        var result = new {DecryptedPayload = decryptedPayload};
+        var result = new { DecryptedPayload = decryptedPayload };
 
         return Ok(result);
     }
@@ -158,7 +154,7 @@ public class TestController : RestApiController
     {
         var unixNow = (time ?? DateTimeOffset.UtcNow).ToUnixTimeMilliseconds();
 
-        var result = new {UnixNow = unixNow};
+        var result = new { UnixNow = unixNow };
 
         return Ok(result);
     }
@@ -172,19 +168,19 @@ public class TestController : RestApiController
     {
         var casino = await dbContext.Set<Casino>()
             .Where(c => c.Id == casinoId)
-            .Select(c => new {c.SignatureKey})
+            .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
             return Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX).ToActionResult();
 
-        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.PrivateKeyForWalletItself);
 
         var isValid = Hub88RequestSign.IsValidSign(validSignature, rawRequestBytes, casino.SignatureKey);
 
-        var result = new {Signature = validSignature};
+        var result = new { Signature = validSignature };
 
         return Ok(result);
     }
@@ -214,7 +210,7 @@ public class TestController : RestApiController
 
         var validSignature = user.Map(u => SwRequestHash.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
 
-        var result = new {Signature = validSignature};
+        var result = new { Signature = validSignature };
 
         return Ok(result);
     }
@@ -244,7 +240,7 @@ public class TestController : RestApiController
 
         var validSignature = user.Map(u => SwRequestMd5.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
 
-        var result = new {Signature = validSignature};
+        var result = new { Signature = validSignature };
 
         return Ok(result);
     }
@@ -273,11 +269,11 @@ public class TestController : RestApiController
         if (user is null)
             return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
 
-        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
         var validSignature = user.Map(u => SoftBetRequestHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
 
-        var result = new {Signature = validSignature};
+        var result = new { Signature = validSignature };
 
         return Ok(result);
     }
@@ -291,47 +287,69 @@ public class TestController : RestApiController
         return Ok(request);
     }
 
-    [HttpPost("everymatrix/hash")]
-    public async Task<IActionResult> EveryMatrix(ActionType actionType, Guid userId)
-    {
-        var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == userId);
-
-        var password = user.Password;
-
-        var dateTime = DateTime.UtcNow.ToString("yyyy:MM:dd:HH", CultureInfo.InvariantCulture);
-
-        var md5Hash = MD5.Create()
-            .ComputeHash(Encoding.UTF8.GetBytes($"NameOfMethod({actionType})Time({dateTime})password({password})"));
-
-        var validHash = Convert.ToHexString(md5Hash);
-
-        return Ok(validHash);
-    }
-
-    [HttpPost("emaraplay/hash")]
-    public async Task<IActionResult> EmaraPlay(object request)
-    {
-        var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
-
-        var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
-
-        var data = HMACSHA512.HashData(secretBytes, rawRequestBytes);
-        return Ok(Convert.ToHexString(data));
-    }
-
     [HttpPost("betflag/hash")]
-    public async Task<IActionResult> Betflag(long timestamp, string sessionId)
+    public async Task<IActionResult> Betflag(
+        string userName,
+        long timestamp,
+        string key,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
     {
-        var validHash = BetflagRequestHash.Compute(sessionId, timestamp);
+        var user = await dbContext.Set<User>()
+            .Where(c => c.UserName == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.SwUserId,
+                    Casino = new
+                    {
+                        ProviderId = c.Casino.SwProviderId,
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return BetflagResultFactory.Failure(BetflagErrorCode.InvalidParameter).ToActionResult();
+
+        var validHash = BetflagRequestHash.Compute(key, timestamp, user.Casino.SignatureKey);
 
         return Ok(validHash);
     }
 
-    [HttpPost("betconstruct/hash")]
-    public async Task<IActionResult> BetConstruct(string data, DateTime time)
-    {
-        return Ok(BetConstructRequestHash.Compute(time.ToString(), data));
-    }
+    // [HttpPost("everymatrix/hash")]
+    // public async Task<IActionResult> EveryMatrix(ActionType actionType, Guid userId)
+    // {
+    //     var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == userId);
+    //
+    //     var password = user.Password;
+    //
+    //     var dateTime = DateTime.UtcNow.ToString("yyyy:MM:dd:HH", CultureInfo.InvariantCulture);
+    //
+    //     var md5Hash = MD5.Create()
+    //         .ComputeHash(Encoding.UTF8.GetBytes($"NameOfMethod({actionType})Time({dateTime})password({password})"));
+    //
+    //     var validHash = Convert.ToHexString(md5Hash);
+    //
+    //     return Ok(validHash);
+    // }
+    //
+    // [HttpPost("emaraplay/hash")]
+    // public async Task<IActionResult> EmaraPlay(object request)
+    // {
+    //     var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
+    //
+    //     var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+    //
+    //     var data = HMACSHA512.HashData(secretBytes, rawRequestBytes);
+    //     return Ok(Convert.ToHexString(data));
+    // }
+    //
+    // [HttpPost("betconstruct/hash")]
+    // public async Task<IActionResult> BetConstruct(string data, DateTime time)
+    // {
+    //     return Ok(BetConstructRequestHash.Compute(time.ToString(), data));
+    // }
 
     public record SomeTest(JsonNode SomeProp);
 }

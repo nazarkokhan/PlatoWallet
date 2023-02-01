@@ -1,7 +1,5 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
-using System.Net;
-using Application.Requests.Wallets.BetConstruct.Base;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.Betflag;
 using Domain.Entities;
@@ -10,29 +8,47 @@ using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-
         var httpContext = context.HttpContext;
-        var dbContext = httpContext?.RequestServices.GetService<WalletDbContext>();
 
-        var request = context.ActionArguments
-            .Select(a => a.Value as IBetflagBaseRequest)
-            .SingleOrDefault(r => r is not null);
+        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
 
-        var session = await dbContext.Set<Session>().FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
+        var request = context.ActionArguments.Values
+            .OfType<IBetflagRequest>()
+            .Single();
 
-        var isHashValid = BetflagRequestHash.IsValidSign(request.Hash, session.Id.ToString(), request.Timestamp);
+        var session = await dbContext.Set<Session>()
+            .Where(s => s.Id == new Guid(request.Key))
+            .Select(
+                s => new
+                {
+                    s.Id,
+                    s.User.Casino.SignatureKey
+                })
+            .FirstOrDefaultAsync();
+
+        context.HttpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
+
+        if (session is null)
+        {
+            context.Result = BetflagResultFactory.Failure<BetflagErrorResponse>(BetflagErrorCode.InvalidToken).ToActionResult();
+            return;
+        }
+
+        var isHashValid = BetflagRequestHash.IsValidSign(
+            request.Hash,
+            request.Key,
+            request.Timestamp,
+            session.SignatureKey);
 
         if (!isHashValid)
         {
-            context.Result = BetflagResultFactory
-                .Failure<BetflagErrorResponse>(BetflagErrorCode.InvalidToken, new Exception("Invalid Hash"))
-                .ToActionResult();
+            context.Result = BetflagResultFactory.Failure<BetflagErrorResponse>(BetflagErrorCode.InvalidToken).ToActionResult();
+            return;
         }
 
         await next();

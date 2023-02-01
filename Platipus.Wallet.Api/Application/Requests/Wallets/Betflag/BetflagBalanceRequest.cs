@@ -1,8 +1,5 @@
-
-
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
-using Api.Extensions.SecuritySign;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -14,9 +11,9 @@ public record BetflagBalanceRequest(
     string Key,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagBaseResponse>>, IBetflagBaseRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagBalanceResponse>>, IBetflagRequest
 {
-    public class Handler : IRequestHandler<BetflagBalanceRequest, IBetflagResult<BetflagBaseResponse>>
+    public class Handler : IRequestHandler<BetflagBalanceRequest, IBetflagResult<BetflagBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -25,55 +22,31 @@ public record BetflagBalanceRequest(
             _context = context;
         }
 
-        public async Task<IBetflagResult<BetflagBaseResponse>> Handle(
+        public async Task<IBetflagResult<BetflagBalanceResponse>> Handle(
             BetflagBalanceRequest request,
             CancellationToken cancellationToken)
         {
-
-            var session = await _context.Set<Session>()
-                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key), cancellationToken: cancellationToken);
-
-            if (session is null)
-            {
-                return BetflagResultFactory.Failure<BetflagBaseResponse>(BetflagErrorCode.InvalidToken);
-            }
-
             var user = await _context.Set<User>()
-                .Where(u => u.Id == session.UserId)
+                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
                 .Include(u => u.Currency)
                 .Select(
                     u => new
                     {
-                        u.Id,
                         u.Balance,
                         Currency = u.Currency.Name,
-                        u.UserName,
+                        u.UserName
                     })
                 .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
             if (user is null)
-            {
-                return BetflagResultFactory.Failure<BetflagBaseResponse>(
-                    BetflagErrorCode.InvalidParameter,
-                    new Exception("The launch token is not valid"));
-            }
+                return BetflagResultFactory.Failure<BetflagBalanceResponse>(BetflagErrorCode.InvalidParameter);
 
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            var hash = BetflagRequestHash.Compute("0", timeStamp).ToUpperInvariant();
-
-            var response = new BetflagBaseResponse(
-                (int) BetflagErrorCode.SUCCSESS,
-                BetflagErrorCode.SUCCSESS.ToString(),
-                (double) user.Balance,
-                false,
+            var response = new BetflagBalanceResponse(
+                (double)user.Balance,
                 user.Currency,
-                "IdTicket",
-                session.Id.ToString(),
-                user.Id.ToString(),
                 user.UserName,
-                timeStamp,
-                hash);
+                user.UserName);
+
             return BetflagResultFactory.Success(response);
         }
     }

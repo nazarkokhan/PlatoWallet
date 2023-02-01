@@ -1,14 +1,15 @@
-// ReSharper disable NotAccessedPositionalProperty.Global
-
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
-using Api.Extensions.SecuritySign;
 using Base;
 using Domain.Entities;
+using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Results.Betflag;
 using Results.Betflag.WithData;
+using Results.ResultToResultMappers;
+using Services.Wallet;
+using Services.Wallet.DTOs;
 using static Results.Betflag.BetflagResultFactory;
 
 public record BetflagCancelRequest(
@@ -16,14 +17,16 @@ public record BetflagCancelRequest(
     string TransactionId,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagBaseRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagRequest
 {
     public class Handler : IRequestHandler<BetflagCancelRequest, IBetflagResult<BetflagBetWinCancelResponse>>
     {
+        private readonly IWalletService _wallet;
         private readonly WalletDbContext _context;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
+            _wallet = wallet;
             _context = context;
         }
 
@@ -31,75 +34,48 @@ public record BetflagCancelRequest(
             BetflagCancelRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
-                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
-
-            if (session is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidToken);
-            }
-
             var user = await _context.Set<User>()
-                .FirstOrDefaultAsync(u => u.Id == session.UserId, cancellationToken: cancellationToken);
-
-            if (user is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(
-                    BetflagErrorCode.InvalidParameter,
-                    new Exception("User isn't found"));
-            }
-
-            if (user.IsDisabled)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.Exception, new Exception("User is Blocked"));
-            }
-
-            var round = await _context.Set<Round>()
-                .Where(r => r.Transactions.Any(t => t.Id == request.TransactionId) && r.UserId == user.Id)
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
+                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
+                .Select(
+                    u => new
+                    {
+                        u.UserName,
+                        Currency = u.Currency.Name
+                    })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (round is null)
-                return Failure<BetflagBetWinCancelResponse>(
-                    BetflagErrorCode.RoundEndBetNotExists,
-                    new Exception("Round isn't found"));
-
-            if (round.Finished)
-                return Failure<BetflagBetWinCancelResponse>(
-                    BetflagErrorCode.RoundEndBetNotExists,
-                    new Exception("Round is finished"));
+            if (user is null)
+                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.SessionExpired);
 
             var transaction = await _context.Set<Transaction>()
                 .Where(t => t.Id == request.TransactionId)
+                .Select(
+                    u => new
+                    {
+                        u.RoundId,
+                        u.Amount
+                    })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (transaction is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidParameter);
-            }
+                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.CancelReferBetNotExists);
 
-            user.Balance -= transaction.Amount;
+            var walletRequest = request.Map(
+                r => new RollbackRequest(
+                    new Guid(r.Key),
+                    user.UserName,
+                    string.Empty,
+                    transaction.RoundId,
+                    r.TransactionId));
 
-            _context.Remove(transaction);
-            _context.Update(user);
-            await _context.SaveChangesAsync();
+            var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToBetflagResult<BetflagBetWinCancelResponse>();
 
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            var hash = BetflagRequestHash.Compute("0", timeStamp).ToUpperInvariant();
-
-            var response = new BetflagBetWinCancelResponse(
-                (int) BetflagErrorCode.SUCCSESS,
-                BetflagErrorCode.SUCCSESS.ToString(),
-                (double) user.Balance,
-                false,
-                user.Currency.Name,
-                "IdTicket",
-                session.Id.ToString(),
-                false,
-                timeStamp,
-                hash);
+            var response = walletResult.Data.Map(
+                d => new BetflagBetWinCancelResponse(
+                    (double)d.Balance,
+                    d.Currency));
 
             return Success(response);
         }

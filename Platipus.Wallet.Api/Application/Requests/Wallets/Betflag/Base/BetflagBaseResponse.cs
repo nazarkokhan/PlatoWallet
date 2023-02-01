@@ -1,14 +1,19 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag.Base;
 
-public record BetflagBaseResponse(
+using Results.Betflag;
+
+public abstract record BetflagBaseResponse(
     int Result,
-    string Message,
-    double Balance,
-    bool Bonus,
-    string Currency,
-    string IdTicket,
-    string IdSession,
-    string PlayerId,
-    string Nickname,
-    long Timestamp,
-    string Hash);
+    string Message)
+{
+    public BetflagBaseResponse()
+        : this(
+            (int)BetflagErrorCode.SUCCSESS,
+            nameof(BetflagErrorCode.SUCCSESS))
+    {
+    }
+
+    public long Timestamp { get; set; }
+
+    public string Hash { get; set; }
+}

@@ -5,7 +5,6 @@ using Application.Results.EmaraPlay;
 using Application.Results.Everymatrix;
 using Application.Results.Hub88;
 using Application.Results.PariMatch;
-using Application.Results.PariMatch.WithData;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ActionResults;
 

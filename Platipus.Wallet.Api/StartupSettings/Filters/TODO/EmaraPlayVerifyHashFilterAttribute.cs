@@ -1,15 +1,10 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Application.Requests.Wallets.EmaraPlay.Base;
 using Application.Results.EmaraPlay;
-using Domain.Entities;
 using Extensions;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 
 public class EmaraPlayVerifyHashFilterAttribute : ActionFilterAttribute
 {
@@ -19,7 +14,7 @@ public class EmaraPlayVerifyHashFilterAttribute : ActionFilterAttribute
 
         authHeader = authHeader.Replace("Bearer ", "");
 
-        var rawRequestBytes = (byte[]) context.HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = (byte[])context.HttpContext.Items["rawRequestBytes"]!;
 
         var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
 

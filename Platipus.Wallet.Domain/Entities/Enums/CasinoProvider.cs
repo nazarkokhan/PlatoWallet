@@ -11,8 +11,8 @@ public enum CasinoProvider
     SoftBet,
     GamesGlobal,
     Uis,
+    Betflag,
     Everymatrix,
     PariMatch,
-    EmaraPlay,
-    Betflag
+    EmaraPlay
 }

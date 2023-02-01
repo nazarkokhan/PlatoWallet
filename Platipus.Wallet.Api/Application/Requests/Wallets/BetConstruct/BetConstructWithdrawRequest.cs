@@ -2,14 +2,13 @@
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct;
 
-using Api.Extensions.SecuritySign;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Results.BetConstruct;
 using Results.BetConstruct.WithData;
 using static Results.BetConstruct.BetConstructResultFactory;
-using Results.BetConstruct;
 
 public record BetConstructWithdrawRequest(
     DateTime Time,

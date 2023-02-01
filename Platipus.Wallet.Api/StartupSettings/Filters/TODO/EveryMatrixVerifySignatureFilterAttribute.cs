@@ -1,8 +1,6 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 using Application.Requests.Wallets.Everymatrix.Base;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Results.Everymatrix;

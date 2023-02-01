@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Net.Mime;
 using System.Text.Json;
+using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Hub88.Base;
 using Application.Requests.Wallets.Openbox;
@@ -47,9 +48,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         ErrorMockMethod? currentMethod;
         string? usernameOrSession;
 
+        var actionArgumentsValues = context.ActionArguments.Values;
         if (context.Controller is WalletOpenboxController)
         {
-            var singleRequest = context.ActionArguments.Values.OfType<OpenboxSingleRequest>().Single();
+            var singleRequest = actionArgumentsValues.OfType<OpenboxSingleRequest>().Single();
 
             if (!httpContext.Items.TryGetValue("OpenboxPayloadRequestObj", out var payloadRequestObj)
              || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
@@ -74,7 +76,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
         else if (context.Controller is WalletISoftBetController)
         {
-            var singleRequest = context.ActionArguments.Values.OfType<SoftBetSingleRequest>().Single();
+            var singleRequest = actionArgumentsValues.OfType<SoftBetSingleRequest>().Single();
 
             usernameOrSession = singleRequest.Username;
             currentMethod = singleRequest.Action.Command switch
@@ -86,6 +88,20 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 _ => null
             };
         }
+        // else if (context.Controller is WalletUisController)
+        // {
+        //     var singleRequest = context.ActionArguments.Values.OfType<IUisHashRequest>().Single();
+        //
+        //     usernameOrSession = singleRequest.Username;
+        //     currentMethod = singleRequest.Action.Command switch
+        //     {
+        //         "balance" => ErrorMockMethod.Balance,
+        //         "bet" => ErrorMockMethod.Bet,
+        //         "win" => ErrorMockMethod.Win,
+        //         "rollback" => ErrorMockMethod.Rollback,
+        //         _ => null
+        //     };
+        // }
         else
         {
             currentMethod = requestRoute switch
@@ -100,30 +116,34 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             usernameOrSession = context.Controller switch
             {
-                WalletPswController => context.ActionArguments
-                    .Select(a => a.Value as IPswBaseRequest)
-                    .SingleOrDefault(a => a is not null)
+                WalletPswController => actionArgumentsValues
+                    .OfType<IPswBaseRequest>()
+                    .SingleOrDefault()
                     ?.SessionId.ToString(),
-                WalletDafabetController => context.ActionArguments
-                    .Select(a => a.Value as IDafabetBaseRequest)
-                    .SingleOrDefault(a => a is not null)
+                WalletDafabetController => actionArgumentsValues
+                    .OfType<IDafabetBaseRequest>()
+                    .SingleOrDefault()
                     ?.PlayerId,
-                WalletOpenboxController => context.ActionArguments.Values
+                WalletOpenboxController => actionArgumentsValues
                     .OfType<IOpenboxBaseRequest>()
                     .SingleOrDefault()
                     ?.Token.ToString(),
-                WalletHub88Controller => context.ActionArguments
-                    .Select(a => a.Value as IHub88BaseRequest)
-                    .SingleOrDefault(a => a is not null)
+                WalletHub88Controller => actionArgumentsValues
+                    .OfType<IHub88BaseRequest>()
+                    .SingleOrDefault()
                     ?.SupplierUser,
-                WalletSoftswissController => context.ActionArguments.Values
+                WalletSoftswissController => actionArgumentsValues
                     .OfType<ISoftswissBaseRequest>()
                     .SingleOrDefault()
                     ?.SessionId.ToString(),
-                WalletSwController => context.ActionArguments
-                    .Select(a => a.Value as ISwBaseRequest)
-                    .SingleOrDefault(a => a is not null)
+                WalletSwController => actionArgumentsValues
+                    .OfType<ISwBaseRequest>()
+                    .SingleOrDefault()
                     ?.Token.ToString(),
+                WalletBetflagController => actionArgumentsValues
+                    .OfType<IBetflagRequest>()
+                    .SingleOrDefault()
+                    ?.Key,
                 _ => null
             };
         }
@@ -147,6 +167,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             WalletOpenboxController => mockedErrorQuery
                 .Where(e => e.User.Sessions.Any(s => s.Id == new Guid(usernameOrSession))),
+            // WalletUisController => context.ActionArguments.Values.OfType<IUisHashRequest>().Single() switch
+            // {
+            //     _ => throw new ArgumentOutOfRangeException()
+            // },
             _ => mockedErrorQuery
                 .Where(e => e.User.UserName == usernameOrSession)
         };

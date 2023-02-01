@@ -1,15 +1,14 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct;
 
-using Api.Extensions.SecuritySign;
 using Base;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Results.BetConstruct;
 using Results.BetConstruct.WithData;
 using static Results.BetConstruct.BetConstructResultFactory;
-using Microsoft.EntityFrameworkCore;
 
 public record BetConstructGetPlayerInfoRequest(
         DateTime Time,
@@ -80,7 +79,7 @@ public record BetConstructGetPlayerInfoRequest(
                 user.Currency,
                 user.Balance,
                 user.UserName,
-                (int) BetConstructGender.Male,
+                (int)BetConstructGender.Male,
                 "Country",
                 user.Id.ToString());
 

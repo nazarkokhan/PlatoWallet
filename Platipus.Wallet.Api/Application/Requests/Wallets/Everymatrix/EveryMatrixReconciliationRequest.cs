@@ -1,10 +1,8 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
-using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 
@@ -41,7 +39,6 @@ public record EveryMatrixReconciliationRequest(
                 return EverymatrixResultFactory.Failure<Response>(EverymatrixErrorCode.CurrencyDoesntMatch);
             }
 
-
             var transaction = await _context.Set<Transaction>()
                 .Where(
                     t => t.Round.UserId
@@ -71,7 +68,6 @@ public record EveryMatrixReconciliationRequest(
                 Currency: currency.Name,
                 ErrorData: default,
                 ErrorCode: default);
-
 
             return EverymatrixResultFactory.Success(response);
         }

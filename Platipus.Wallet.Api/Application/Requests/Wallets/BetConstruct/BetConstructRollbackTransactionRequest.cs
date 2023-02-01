@@ -1,13 +1,12 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct;
 
-using Api.Extensions.SecuritySign;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Results.BetConstruct.WithData;
-using static Results.BetConstruct.BetConstructResultFactory;
 using Microsoft.EntityFrameworkCore;
 using Results.BetConstruct;
+using Results.BetConstruct.WithData;
+using static Results.BetConstruct.BetConstructResultFactory;
 
 public record BetConstructRollbackTransactionRequest(
     DateTime Time,
@@ -31,7 +30,6 @@ public record BetConstructRollbackTransactionRequest(
             BetConstructRollbackTransactionRequest request,
             CancellationToken cancellationToken)
         {
-
             var session = await _context.Set<Session>()
                 .FirstOrDefaultAsync(s => s.Id == new Guid(request.Token));
 

@@ -1,13 +1,15 @@
-
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
-using Api.Extensions.SecuritySign;
 using Base;
 using Domain.Entities;
+using Extensions;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Betflag;
 using Results.Betflag.WithData;
-using Microsoft.EntityFrameworkCore;
+using Results.ResultToResultMappers;
+using Services.Wallet;
+using Services.Wallet.DTOs;
 using static Results.Betflag.BetflagResultFactory;
 
 public record BetflagBetRequest(
@@ -16,17 +18,20 @@ public record BetflagBetRequest(
     string RoundId,
     double Bet,
     bool FreeSpin,
+    // ReSharper disable once InconsistentNaming
     double QuotaJP,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagBaseRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagRequest
 {
     public class Handler : IRequestHandler<BetflagBetRequest, IBetflagResult<BetflagBetWinCancelResponse>>
     {
+        private readonly IWalletService _wallet;
         private readonly WalletDbContext _context;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
+            _wallet = wallet;
             _context = context;
         }
 
@@ -34,84 +39,37 @@ public record BetflagBetRequest(
             BetflagBetRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
-                .FirstOrDefaultAsync(s => s.Id == new Guid(request.Key));
-
-            if (session is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidToken);
-            }
-
-
             var user = await _context.Set<User>()
-                .Where(u => u.Id == session.UserId)
-                .Include(u => u.Currency)
-                .FirstOrDefaultAsync();
-
-            if (user is null)
-            {
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InvalidParameter, new Exception("User isn't found"));
-            }
-
-            var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.RoundId)
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
+                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
+                .Select(
+                    u => new
+                    {
+                        u.UserName,
+                        Currency = u.Currency.Name
+                    })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (round is null)
-            {
-                round = new Round
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Finished = false,
-                    User = user
-                };
+            if (user is null)
+                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.SessionExpired);
 
-                _context.Add(round);
+            var walletRequest = request.Map(
+                r => new BetRequest(
+                    new Guid(r.Key),
+                    user.UserName,
+                    user.Currency,
+                    r.RoundId,
+                    r.TransactionId,
+                    false,
+                    (decimal)r.Bet));
 
-                await _context.SaveChangesAsync(cancellationToken);
-            }
+            var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToBetflagResult<BetflagBetWinCancelResponse>();
 
-            var transactionIsRetry = round.Transactions.Any(t => t.Id != request.TransactionId);
-
-            if (!transactionIsRetry)
-            {
-                var transaction = new Transaction
-                {
-                    Id = request.TransactionId,
-                    Amount = (decimal) request.Bet,
-                };
-
-                user.Balance -= (decimal) request.Bet;
-
-                if (user.Balance < 0)
-                {
-                    return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.InsufficientFunds);
-                }
-
-                round.Transactions.Add(transaction);
-
-                _context.Update(user);
-                _context.Update(round);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-
-            var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            var hash = BetflagRequestHash.Compute("0", timeStamp).ToUpperInvariant();
-
-            var response = new BetflagBetWinCancelResponse(
-                (int) BetflagErrorCode.SUCCSESS,
-                BetflagErrorCode.SUCCSESS.ToString(),
-                (double) user.Balance,
-                false,
-                user.Currency.Name,
-                "IdTicket",
-                session.Id.ToString(),
-                transactionIsRetry,
-                timeStamp,
-                hash);
+            var response = walletResult.Data.Map(
+                d => new BetflagBetWinCancelResponse(
+                    (double)d.Balance,
+                    d.Currency));
 
             return Success(response);
         }

@@ -5,7 +5,6 @@ using System.Text;
 
 public static class BetConstructRequestHash
 {
-
     public static bool IsValidSign(
         string externalMd5,
         string time,

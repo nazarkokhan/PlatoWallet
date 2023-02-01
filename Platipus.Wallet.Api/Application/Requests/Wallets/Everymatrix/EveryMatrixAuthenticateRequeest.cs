@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
-using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,9 @@ public record EverymatrixRequestAuthenticateRequest(
     string LaunchToken,
     string RequestScope) : IRequest<IEverymatrixResult<EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse>>
 {
-    public class Handler : IRequestHandler<EverymatrixRequestAuthenticateRequest, IEverymatrixResult<EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse>>
+    public class Handler
+        : IRequestHandler<EverymatrixRequestAuthenticateRequest,
+            IEverymatrixResult<EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -52,7 +53,6 @@ public record EverymatrixRequestAuthenticateRequest(
                 UserId = user.Id,
                 ExpirationDate = DateTime.UtcNow.AddDays(1)
             };
-
 
             _context.Add(session);
             await _context.SaveChangesAsync(cancellationToken);

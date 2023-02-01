@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
@@ -141,29 +140,6 @@ try
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
         .AddJsonOptions(
-            nameof(CasinoProvider.Everymatrix),
-            options =>
-            {
-                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
-                                                             | JsonNumberHandling.AllowReadingFromString;
-                options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            })
-        .AddJsonOptions(
-            nameof(CasinoProvider.PariMatch),
-            options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            })
-        .AddJsonOptions(
-            nameof(CasinoProvider.EmaraPlay),
-            options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            })
-        .AddJsonOptions(
             nameof(CasinoProvider.Betflag),
             options =>
             {
@@ -171,6 +147,29 @@ try
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
 
+        // .AddJsonOptions(
+        //     nameof(CasinoProvider.Everymatrix),
+        //     options =>
+        //     {
+        //         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
+        //                                                      | JsonNumberHandling.AllowReadingFromString;
+        //         options.JsonSerializerOptions.PropertyNamingPolicy = null;
+        //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        //     })
+        // .AddJsonOptions(
+        //     nameof(CasinoProvider.PariMatch),
+        //     options =>
+        //     {
+        //         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        //     })
+        // .AddJsonOptions(
+        //     nameof(CasinoProvider.EmaraPlay),
+        //     options =>
+        //     {
+        //         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        //     })
         .Services
         .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
         .Configure<SupportedCountriesOptions>(
@@ -189,30 +188,44 @@ try
                 return new SoftswissCurrenciesOptions { CountryIndexes = optionsValue };
             })
         .AddEndpointsApiExplorer()
-        .AddSwaggerGen(c => {
-            c.SwaggerDoc("v1", new OpenApiInfo {
-                Title = "JWTToken_Auth_API", Version = "v1"
-            });
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme() {
-                Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
-            });
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement {
-                {
-                    new OpenApiSecurityScheme {
-                        Reference = new OpenApiReference {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+        .AddSwaggerGen(
+            c =>
+            {
+                c.SwaggerDoc(
+                    "v1",
+                    new OpenApiInfo
+                    {
+                        Title = "JWTToken_Auth_API",
+                        Version = "v1"
+                    });
+                c.AddSecurityDefinition(
+                    "Bearer",
+                    new OpenApiSecurityScheme()
+                    {
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Description
+                            = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+                    });
+                c.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] { }
                         }
-                    },
-                    new string[] {}
-                }
-            });
-        })
+                    });
+            })
         .AddMediatR(Assembly.GetExecutingAssembly())
         .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
         .AddAllBehaviors()

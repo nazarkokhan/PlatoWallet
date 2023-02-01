@@ -21,6 +21,10 @@ public class AdminController : RestApiController
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
+    [HttpDelete("error-mock")]
+    public async Task<IActionResult> MockError(DeleteErrorMockRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
     [HttpPost("casino")]
     public async Task<IActionResult> CreateCasino(CreateCasinoRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

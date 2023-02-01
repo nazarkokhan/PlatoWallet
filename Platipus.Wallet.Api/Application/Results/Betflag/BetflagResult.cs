@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Results.Betflag;
 
-using PariMatch;
-using Platipus.Wallet.Api.Application.Results.Base;
+using Base;
 
 public record BetflagResult : BaseResult<BetflagErrorCode>, IBetflagResult
 {

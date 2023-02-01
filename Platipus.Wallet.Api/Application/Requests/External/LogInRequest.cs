@@ -102,18 +102,18 @@ public record LogInRequest(
                 //         )
                 // }
 
-                case CasinoProvider.Everymatrix:
-                {
-                    launchUrl = GetEveryMatrixLaunchUrlAsync(
-                        request.Game,
-                        "en",
-                        false,
-                        false,
-                        "dev",
-                        session.Id,
-                        user.Currency.Name);
-                    break;
-                }
+                // case CasinoProvider.Everymatrix:
+                // {
+                //     launchUrl = GetEveryMatrixLaunchUrlAsync(
+                //         request.Game,
+                //         "en",
+                //         false,
+                //         false,
+                //         "dev",
+                //         session.Id,
+                //         user.Currency.Name);
+                //     break;
+                // }
                 case CasinoProvider.Psw:
                 {
                     var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
@@ -210,6 +210,12 @@ public record LogInRequest(
                     launchUrl = getLaunchUrlResult.Data ?? "";
                     break;
                 case CasinoProvider.Uis:
+                    launchUrl = GetUisLaunchUrl(
+                        session.Id,
+                        casino.SwProviderId!.Value,
+                        request.UisLaunchType!);
+                    break;
+                case CasinoProvider.Betflag:
                     launchUrl = GetUisLaunchUrl(
                         session.Id,
                         casino.SwProviderId!.Value,
@@ -400,9 +406,9 @@ public record LogInRequest(
             { nameof(gameCode), gameCode },
             { nameof(language), language },
             { nameof(freePlay), freePlay.ToString() },
-            {nameof(mobile), mobile.ToString()},
-            {nameof(mode), mode},
-            {nameof(token), token.ToString()},
+            { nameof(mobile), mobile.ToString() },
+            { nameof(mode), mode },
+            { nameof(token), token.ToString() },
             { nameof(currency), currency }
         };
 
@@ -428,9 +434,9 @@ public record LogInRequest(
             { nameof(cid), cid },
             { nameof(productId), productId },
             { nameof(sessionToken), sessionToken },
-            {nameof(lang), lang},
-            {nameof(lobbyUrl), lobbyUrl},
-            {nameof(targetChannel), targetChannel},
+            { nameof(lang), lang },
+            { nameof(lobbyUrl), lobbyUrl },
+            { nameof(targetChannel), targetChannel },
             { nameof(providerId), providerId },
             { nameof(consumerId), consumerId }
         };
