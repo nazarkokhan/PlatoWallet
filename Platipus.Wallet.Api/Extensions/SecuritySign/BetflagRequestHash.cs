@@ -13,7 +13,7 @@ public static class BetflagRequestHash
     {
         var md5 = Compute(firstValue, timestamp, secretKey);
 
-        var isValid = externalMd5.Equals(md5);
+        var isValid = externalMd5.Equals(md5, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }
