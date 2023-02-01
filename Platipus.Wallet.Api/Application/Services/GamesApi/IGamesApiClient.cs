@@ -1,10 +1,12 @@
 namespace Platipus.Wallet.Api.Application.Services.GamesApi;
 
+using Domain.Entities.Enums;
 using DTOs.Responses;
 
 public interface IGamesApiClient
 {
     Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
+        CasinoProvider casinoProvider,
         string casinoId,
         Guid sessionId,
         string user,

@@ -7,6 +7,7 @@ using System.Text.Json.Nodes;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using DTOs.Responses;
 using Hub88GamesApi.DTOs.Requests;
 using Infrastructure.Persistence;
@@ -34,6 +35,7 @@ public class GamesApiClient : IGamesApiClient
     }
 
     public async Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
+        CasinoProvider casinoProvider,
         string casinoId,
         Guid sessionId,
         string user,
@@ -45,7 +47,9 @@ public class GamesApiClient : IGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
-            "game/session",
+            casinoProvider is CasinoProvider.Psw
+                ? "game/session"
+                : "https://test.platipusgaming.com/betflag/game/session",
             new PswGetGameLinkGamesApiRequest(
                 casinoId,
                 sessionId,
@@ -157,7 +161,7 @@ public class GamesApiClient : IGamesApiClient
 
         var xRequestSign = PswRequestSign.Compute(requestBytes, casino.SignatureKey);
 
-        jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign);
+        jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToUpper());
 
         _logger.LogInformation(
             "GamesApi Request: {GamesApiRequest}, X-REQUEST-SIGN: {GamesApiRequestSign}",

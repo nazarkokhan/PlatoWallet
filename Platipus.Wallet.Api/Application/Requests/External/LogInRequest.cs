@@ -94,9 +94,10 @@ public record LogInRequest(
 
             switch (casino.Provider)
             {
-                case CasinoProvider.Psw:
+                case CasinoProvider.Psw or CasinoProvider.Betflag:
                 {
                     var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
+                        user.Casino.Provider!.Value,
                         user.Casino.Id,
                         session.Id,
                         user.UserName,
@@ -195,11 +196,11 @@ public record LogInRequest(
                         casino.SwProviderId!.Value,
                         request.UisLaunchType!);
                     break;
-                case CasinoProvider.Betflag:
-                    launchUrl = GetBetflagLaunchUrl(
-                        session.Id,
-                        session.User.UserName,
-                        request.UisLaunchType!);
+                    // case CasinoProvider.Betflag:
+                    //     launchUrl = GetBetflagLaunchUrl(
+                    //         session.Id,
+                    //         session.User.UserName,
+                    //         request.UisLaunchType!);
                     break;
                 //TODO refactor
                 // case CasinoProvider.PariMatch:
