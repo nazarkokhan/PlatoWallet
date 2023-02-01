@@ -94,26 +94,6 @@ public record LogInRequest(
 
             switch (casino.Provider)
             {
-                //TODO refactor
-                // case CasinoProvider.PariMatch:
-                // {
-                //     launchUrl = GetPariMatchLaunchUrl(
-                //         "PlatipusGaming",
-                //         )
-                // }
-
-                // case CasinoProvider.Everymatrix:
-                // {
-                //     launchUrl = GetEveryMatrixLaunchUrlAsync(
-                //         request.Game,
-                //         "en",
-                //         false,
-                //         false,
-                //         "dev",
-                //         session.Id,
-                //         user.Currency.Name);
-                //     break;
-                // }
                 case CasinoProvider.Psw:
                 {
                     var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
@@ -216,11 +196,31 @@ public record LogInRequest(
                         request.UisLaunchType!);
                     break;
                 case CasinoProvider.Betflag:
-                    launchUrl = GetUisLaunchUrl(
+                    launchUrl = GetBetflagLaunchUrl(
                         session.Id,
-                        casino.SwProviderId!.Value,
+                        session.User.UserName,
                         request.UisLaunchType!);
                     break;
+                //TODO refactor
+                // case CasinoProvider.PariMatch:
+                // {
+                //     launchUrl = GetPariMatchLaunchUrl(
+                //         "PlatipusGaming",
+                //         )
+                // }
+
+                // case CasinoProvider.Everymatrix:
+                // {
+                //     launchUrl = GetEveryMatrixLaunchUrlAsync(
+                //         request.Game,
+                //         "en",
+                //         false,
+                //         false,
+                //         "dev",
+                //         session.Id,
+                //         user.Currency.Name);
+                //     break;
+                // }
                 default:
                     launchUrl = "";
                     break;
@@ -230,6 +230,27 @@ public record LogInRequest(
 
             return PswResultFactory.Success(result);
         }
+    }
+
+    private static string GetBetflagLaunchUrl(
+        Guid key,
+        string playerId,
+        string game)
+    {
+        var queryParameters = new Dictionary<string, string?>()
+        {
+            { "Key", key.ToString() },
+            { "PlayerId", playerId },
+            { "Game", game },
+        };
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(
+            new Uri("https://test.platipusgaming.com/"),
+            $"betflag{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
     }
 
     private static string GetUisLaunchUrl(
