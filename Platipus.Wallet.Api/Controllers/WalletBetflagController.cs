@@ -56,7 +56,7 @@ public class WalletBetflagController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("session-close")]
-    [ProducesResponseType(typeof(BetflagSessionCloseRequest.Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BetflagSessionCloseRequest.CloseSessionResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Authenticate(
         BetflagSessionCloseRequest request,
         CancellationToken cancellationToken)

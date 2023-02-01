@@ -14,9 +14,9 @@ public record BetflagSessionCloseRequest(
     int TotalRound,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagSessionCloseRequest.Response>>, IBetflagBaseRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagSessionCloseRequest.CloseSessionResponse>>, IBetflagBaseRequest
 {
-    public class Handler : IRequestHandler<BetflagSessionCloseRequest, IBetflagResult<Response>>
+    public class Handler : IRequestHandler<BetflagSessionCloseRequest, IBetflagResult<CloseSessionResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -25,15 +25,15 @@ public record BetflagSessionCloseRequest(
             _context = context;
         }
 
-        public async Task<IBetflagResult<Response>> Handle(
+        public async Task<IBetflagResult<CloseSessionResponse>> Handle(
             BetflagSessionCloseRequest request,
             CancellationToken cancellationToken)
         {
-            var response = new Response();
+            var response = new CloseSessionResponse();
 
             return BetflagResultFactory.Success(response);
         }
     }
 
-    public record Response : BetflagBaseResponse;
+    public record CloseSessionResponse : BetflagBaseResponse;
 }
