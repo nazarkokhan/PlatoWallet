@@ -270,12 +270,6 @@ try
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
-            })
-        .Services
-        .AddStackExchangeRedisCache(
-            r =>
-            {
-                r.Configuration = builderConfiguration.GetConnectionString("RedisCache");
             });
 
     services.AddXmlRpc();
@@ -327,6 +321,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "32.0";
+        public const string Version = "33.0";
     }
 }

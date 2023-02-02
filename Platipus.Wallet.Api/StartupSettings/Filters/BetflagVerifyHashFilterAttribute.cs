@@ -35,7 +35,7 @@ public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
 
         if (session is null)
         {
-            context.Result = BetflagResultFactory.Failure<BetflagErrorResponse>(BetflagErrorCode.InvalidToken).ToActionResult();
+            context.Result = BetflagResultFactory.Failure<BetflagErrorResponse>(BetflagErrorCode.SessionExpired).ToActionResult();
             return;
         }
 
