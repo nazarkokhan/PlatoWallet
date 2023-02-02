@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Abstract;
 using Application.Extensions;
+using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.Betflag;
 using Application.Results.Hub88;
 using Application.Results.Sw;
@@ -316,6 +317,11 @@ public class TestController : RestApiController
 
         return Ok(validHash);
     }
+
+    public record BetflagHashRequest(
+        string Key,
+        long Timestamp,
+        string Hash) : IBetflagRequest;
 
     // [HttpPost("everymatrix/hash")]
     // public async Task<IActionResult> EveryMatrix(ActionType actionType, Guid userId)

@@ -41,7 +41,9 @@ public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
 
         var isHashValid = BetflagRequestHash.IsValidSign(
             request.Hash,
-            request.Key,
+            request is IBetflagBetWinCancelRequest betWinCancelRequest
+                ? betWinCancelRequest.TransactionId
+                : request.Key,
             request.Timestamp,
             session.SignatureKey);
 

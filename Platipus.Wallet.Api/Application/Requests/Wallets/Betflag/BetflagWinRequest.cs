@@ -21,7 +21,7 @@ public record BetflagWinRequest(
     double WinJp,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagBetWinCancelRequest
 {
     public class Handler : IRequestHandler<BetflagWinRequest, IBetflagResult<BetflagBetWinCancelResponse>>
     {

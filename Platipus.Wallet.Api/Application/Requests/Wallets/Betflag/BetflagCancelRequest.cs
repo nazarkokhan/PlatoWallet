@@ -17,7 +17,7 @@ public record BetflagCancelRequest(
     string TransactionId,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagBetWinCancelRequest
 {
     public class Handler : IRequestHandler<BetflagCancelRequest, IBetflagResult<BetflagBetWinCancelResponse>>
     {

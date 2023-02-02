@@ -22,7 +22,7 @@ public record BetflagBetRequest(
     double QuotaJP,
     long Timestamp,
     string Hash,
-    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagRequest
+    string ApiName) : IRequest<IBetflagResult<BetflagBetWinCancelResponse>>, IBetflagBetWinCancelRequest
 {
     public class Handler : IRequestHandler<BetflagBetRequest, IBetflagResult<BetflagBetWinCancelResponse>>
     {
