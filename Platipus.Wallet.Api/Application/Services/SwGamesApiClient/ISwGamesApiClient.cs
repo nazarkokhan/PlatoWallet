@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
+namespace Platipus.Wallet.Api.Application.Services.SwGamesApiClient;
 
 // public interface ISwGamesApiClient
 // {

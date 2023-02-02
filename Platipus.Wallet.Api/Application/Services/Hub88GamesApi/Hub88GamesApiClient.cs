@@ -142,7 +142,7 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
         var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
 
-        var xRequestSign = Hub88RequestSign.Compute(requestBytes, Hub88RequestSign.PrivateKeyGameServer);
+        var xRequestSign = Hub88SecuritySign.Compute(requestBytes, Hub88SecuritySign.PrivateKeyGameServer);
 
         jsonContent.Headers.Add(Hub88Headers.XHub88Signature, xRequestSign);
 

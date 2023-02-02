@@ -8,18 +8,18 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 
 [Route("wallet/dafabet")]
 [ProducesResponseType(typeof(DafabetBaseResponse), StatusCodes.Status200OK)]
 [MockedErrorActionFilter(Order = 1)]
-[DatabetVerifySignatureFilter(Order = 2)]
+[DatabetSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Dafabet))]
 public class WalletDafabetController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletDafabetController(IMediator mediator)
-        => _mediator = mediator;
+    public WalletDafabetController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("authorize")]
     [ProducesResponseType(typeof(DafabetBalanceResponse), StatusCodes.Status200OK)]

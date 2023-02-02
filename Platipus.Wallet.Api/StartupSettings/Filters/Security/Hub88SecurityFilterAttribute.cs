@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Application.DTOs;
 using Application.Requests.Wallets.Hub88.Base;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
+public class Hub88SecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -65,7 +65,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
 
                 return session;
             },
-            new MemoryCacheEntryOptions {AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)});
+            new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10) });
 
         if (session is null)
         {
@@ -87,7 +87,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
 
         var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
 
-        var isValidSign = Hub88RequestSign.IsValidSign(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
+        var isValidSign = Hub88SecuritySign.IsValid(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 
         if (!isValidSign)
         {
@@ -95,7 +95,7 @@ public class Hub88VerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var requestEntity = new Request(request.RequestUuid) {UserId = session.UserId};
+        var requestEntity = new Request(request.RequestUuid) { UserId = session.UserId };
         dbContext.Add(requestEntity);
 
         await dbContext.SaveChangesAsync(cancellationToken);

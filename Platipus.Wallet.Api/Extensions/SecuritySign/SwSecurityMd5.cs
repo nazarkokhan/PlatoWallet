@@ -3,17 +3,17 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class SwRequestHash
+public static class SwSecurityMd5
 {
     public static bool IsValidSign(
-        string externalHash,
+        string externalMd5,
         int providerId,
         int userId,
         string secretKey)
     {
-        var hash = Compute(providerId, userId, secretKey);
+        var md5 = Compute(providerId, userId, secretKey);
 
-        var isValid = externalHash.Equals(hash);
+        var isValid = externalMd5.Equals(md5);
 
         return isValid;
     }
@@ -23,9 +23,9 @@ public static class SwRequestHash
         var dataString = $"{providerId.ToString()}{secretKey}{userId.ToString()}";
         var dataBytes = Encoding.UTF8.GetBytes(dataString);
 
-        var hash = SHA256.HashData(dataBytes);
-        var hashString = Convert.ToHexString(hash);
+        var md5 = MD5.HashData(dataBytes);
+        var md5String = Convert.ToHexString(md5);
 
-        return hashString;
+        return md5String;
     }
 }

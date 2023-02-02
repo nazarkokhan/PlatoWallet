@@ -3,25 +3,22 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class SwRequestMd5
+public static class EverymatrixSecuritySign
 {
     public static bool IsValidSign(
         string externalMd5,
-        int providerId,
-        int userId,
-        string secretKey)
+        string stringToVerify)
     {
-        var md5 = Compute(providerId, userId, secretKey);
+        var md5 = Compute(stringToVerify);
 
         var isValid = externalMd5.Equals(md5);
 
         return isValid;
     }
 
-    public static string Compute(int providerId, int userId, string secretKey)
+    public static string Compute(string stringToVerify)
     {
-        var dataString = $"{providerId.ToString()}{secretKey}{userId.ToString()}";
-        var dataBytes = Encoding.UTF8.GetBytes(dataString);
+        var dataBytes = Encoding.UTF8.GetBytes(stringToVerify);
 
         var md5 = MD5.HashData(dataBytes);
         var md5String = Convert.ToHexString(md5);

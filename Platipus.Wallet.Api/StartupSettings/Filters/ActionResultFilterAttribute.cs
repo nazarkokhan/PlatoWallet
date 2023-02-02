@@ -123,14 +123,14 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 if (betflagResult.IsSuccess)
                 {
                     var data = (BetflagBaseResponse)betflagResult.Data;
-                    data.Hash = BetflagRequestHash.Compute(data.Result.ToString(), timestamp, secretKey!);
+                    data.Hash = BetflagSecurityHash.Compute(data.Result.ToString(), timestamp, secretKey!);
                     data.Timestamp = timestamp;
                     context.Result = new OkObjectResult(data);
                     return;
                 }
 
                 var hash = secretKey is not null
-                    ? BetflagRequestHash.Compute(((int)errorCode).ToString(), timestamp, secretKey)
+                    ? BetflagSecurityHash.Compute(((int)errorCode).ToString(), timestamp, secretKey)
                     : string.Empty;
 
                 var errorResponse = new BetflagErrorResponse(

@@ -2,9 +2,9 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 
 using System.Security.Cryptography;
 
-public static class Hub88RequestSign
+public static class Hub88SecuritySign
 {
-    public static bool IsValidSign(string requestSign, byte[] rawRequestBody, string signatureKey)
+    public static bool IsValid(string requestSign, byte[] rawRequestBody, string signatureKey)
     {
         var rsa = RSA.Create();
         rsa.ImportFromPem(signatureKey);

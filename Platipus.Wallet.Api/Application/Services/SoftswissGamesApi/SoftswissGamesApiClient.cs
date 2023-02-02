@@ -212,7 +212,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         var jsonContent = JsonContent.Create(request, options: _softswissJsonSerializerOptions);
         var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
 
-        var xRequestSign = SoftswissRequestSign.Compute(requestBytes, casino.SignatureKey);
+        var xRequestSign = SoftswissSecurityHash.Compute(requestBytes, casino.SignatureKey);
 
         jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign);
 

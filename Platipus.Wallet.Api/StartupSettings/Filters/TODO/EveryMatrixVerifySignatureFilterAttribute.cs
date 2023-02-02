@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.TODO;
 
 using System.Globalization;
 using Application.Requests.Wallets.Everymatrix.Base;
@@ -46,7 +46,7 @@ public class EveryMatrixVerifySignatureFilterAttribute : ActionFilterAttribute
 
         var stringToVerify = $"NameOfMethod({methodName})Time({dateTime})password({password})";
 
-        var isHashValid = EveryMatrixRequestHash.IsValidSign(request.Hash, stringToVerify);
+        var isHashValid = EverymatrixSecuritySign.IsValidSign(request.Hash, stringToVerify);
 
         if (!isHashValid)
         {

@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Application.DTOs;
 using Application.Requests.Wallets.Psw.Base;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
+public class PswSecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -56,7 +56,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
 
                 return session;
             },
-            new MemoryCacheEntryOptions {AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)});
+            new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10) });
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
@@ -72,7 +72,7 @@ public class PswVerifySignatureFilterAttribute : ActionFilterAttribute
 
         var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
 
-        var isValidSign = PswRequestSign.IsValidSign(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
+        var isValidSign = PswSecuritySign.IsValid(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 
         if (!isValidSign)
         {

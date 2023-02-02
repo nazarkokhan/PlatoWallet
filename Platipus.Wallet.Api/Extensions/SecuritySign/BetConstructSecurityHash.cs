@@ -3,9 +3,9 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class BetConstructRequestHash
+public static class BetConstructSecurityHash
 {
-    public static bool IsValidSign(
+    public static bool IsValid(
         string externalMd5,
         string time,
         string data,

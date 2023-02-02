@@ -12,7 +12,7 @@ public record EverymatrixRequestAuthenticateRequest(
 {
     public class Handler
         : IRequestHandler<EverymatrixRequestAuthenticateRequest,
-            IEverymatrixResult<EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse>>
+            IEverymatrixResult<EveryMatrixAuthenticationResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -21,7 +21,7 @@ public record EverymatrixRequestAuthenticateRequest(
             _context = context;
         }
 
-        public async Task<IEverymatrixResult<EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse>> Handle(
+        public async Task<IEverymatrixResult<EveryMatrixAuthenticationResponse>> Handle(
             EverymatrixRequestAuthenticateRequest request,
             CancellationToken cancellationToken)
         {
@@ -42,7 +42,7 @@ public record EverymatrixRequestAuthenticateRequest(
 
             if (user is null)
             {
-                return EverymatrixResultFactory.Failure<EverymatrixRequestAuthenticateRequest.EveryMatrixAuthenticationResponse>(
+                return EverymatrixResultFactory.Failure<EveryMatrixAuthenticationResponse>(
                     EverymatrixErrorCode.TokenNotFound,
                     new Exception("The launch token is not valid"));
             }

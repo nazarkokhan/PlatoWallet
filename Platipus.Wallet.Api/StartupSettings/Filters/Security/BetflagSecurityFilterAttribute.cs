@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.Betflag;
@@ -9,12 +9,11 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
-public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
+public class BetflagSecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var httpContext = context.HttpContext;
-
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
 
         var request = context.ActionArguments.Values
@@ -31,7 +30,7 @@ public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
                 })
             .FirstOrDefaultAsync();
 
-        context.HttpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
+        httpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
 
         if (session is null)
         {
@@ -39,7 +38,7 @@ public class BetflagVerifyHashFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var isHashValid = BetflagRequestHash.IsValidSign(
+        var isHashValid = BetflagSecurityHash.IsValid(
             request.Hash,
             request is IBetflagBetWinCancelRequest betWinCancelRequest
                 ? betWinCancelRequest.TransactionId

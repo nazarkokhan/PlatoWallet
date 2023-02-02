@@ -9,10 +9,11 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 
 [Route("wallet/sw")]
 [MockedErrorActionFilter(Order = 1)]
-[SwVerifySignatureFilter(Order = 2)]
+[SwSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Sw))]
 [ProducesResponseType(typeof(SwErrorResponse), StatusCodes.Status200OK)]
 [Consumes("application/x-www-form-urlencoded")]

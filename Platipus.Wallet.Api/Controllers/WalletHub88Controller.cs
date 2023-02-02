@@ -10,17 +10,17 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 
 [Route("wallet/hub88")]
 [MockedErrorActionFilter(Order = 1)]
-[Hub88VerifySignatureFilter(Order = 2)]
+[Hub88SecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Hub88))]
 public class WalletHub88Controller : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletHub88Controller(IMediator mediator)
-        => _mediator = mediator;
+    public WalletHub88Controller(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("user/balance")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]

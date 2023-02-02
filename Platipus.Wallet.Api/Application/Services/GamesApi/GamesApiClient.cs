@@ -159,7 +159,7 @@ public class GamesApiClient : IGamesApiClient
         var jsonContent = JsonContent.Create(request, options: _pswJsonSerializerOptions);
         var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
 
-        var xRequestSign = PswRequestSign.Compute(requestBytes, casino.SignatureKey);
+        var xRequestSign = PswSecuritySign.Compute(requestBytes, casino.SignatureKey);
 
         jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToUpper());
 

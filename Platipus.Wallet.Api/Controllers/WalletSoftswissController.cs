@@ -9,18 +9,18 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 
 [Route("wallet/softswiss")]
 [MockedErrorActionFilter(Order = 1)]
-[SoftswissVerifySignatureFilter(Order = 2)]
+[SoftswissSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Softswiss))]
 [ProducesResponseType(typeof(SoftswissErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletSoftswissController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletSoftswissController(IMediator mediator)
-        => _mediator = mediator;
+    public WalletSoftswissController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("play")]
     [ProducesResponseType(typeof(Hub88BalanceResponse), StatusCodes.Status200OK)]

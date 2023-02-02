@@ -125,8 +125,9 @@ public record LogInRequest(
                         user.Currency.Name,
                         request.Device,
                         "en",
-                        DatabetHash.Compute(
-                            $"launch{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
+                        DatabetSecurityHash.Compute(
+                            "launch",
+                            $"{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
                             casino.SignatureKey));
                     break;
                 case CasinoProvider.Hub88:

@@ -3,7 +3,7 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class OpenboxPayload
+public static class OpenboxSecurityPayload
 {
     public static string Encrypt(string data, string key)
     {

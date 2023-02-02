@@ -1,7 +1,9 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Application.DTOs;
-using Application.Requests.Wallets.Softswiss.Base;
+using Application.Extensions;
+using Application.Requests.Wallets.Sw.Base;
+using Application.Results.Sw;
 using Domain.Entities;
 using Extensions;
 using Extensions.SecuritySign;
@@ -11,29 +13,23 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-public class SoftswissVerifySignatureFilterAttribute : ActionFilterAttribute
+public class SwSecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var httpContext = context.HttpContext;
 
-        var xRequestSign = httpContext.Request.Headers.GetXRequestSign();
-        if (xRequestSign is null)
+        var request = context.ActionArguments
+            .Select(a => a.Value as ISwBaseRequest)
+            .Single(a => a is not null);
+
+        if (request is null)
         {
-            context.Result = SoftswissResultFactory.Failure(SoftswissErrorCode.Forbidden).ToActionResult();
+            context.Result = SwResultFactory.Failure(SwErrorCode.ExpiredToken).ToActionResult();
             return;
         }
 
-        var sessionId = context.ActionArguments
-            .Select(a => a.Value as ISoftswissBaseRequest)
-            .SingleOrDefault(a => a is not null)
-            ?.SessionId; //TODO condition access code style settings
-
-        if (sessionId is null)
-        {
-            context.Result = SoftswissResultFactory.Failure(SoftswissErrorCode.Forbidden).ToActionResult();
-            return;
-        }
+        var sessionId = request.Token;
 
         var services = httpContext.RequestServices;
         var cache = services.GetRequiredService<IAppCache>();
@@ -56,27 +52,40 @@ public class SoftswissVerifySignatureFilterAttribute : ActionFilterAttribute
 
                 return session;
             },
-            new MemoryCacheEntryOptions {AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)});
+            new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10) });
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
-            context.Result = SoftswissResultFactory.Failure(SoftswissErrorCode.Forbidden).ToActionResult();
+            context.Result = SwResultFactory.Failure(SwErrorCode.ExpiredToken).ToActionResult();
             return;
         }
 
         if (session.UserIsDisabled)
         {
-            context.Result = SoftswissResultFactory.Failure(SoftswissErrorCode.PlayerIsDisabled).ToActionResult();
+            context.Result = SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
             return;
         }
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
-
-        var isValidSign = SoftswissRequestSign.IsValidSign(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
+        var isValidSign = request switch
+        {
+            ISwMd5Request md5Request => md5Request.Map(
+                r => SwSecurityMd5.IsValidSign(
+                    r.Md5,
+                    r.ProviderId,
+                    r.UserId,
+                    session.CasinoSignatureKey)),
+            ISwHashRequest hashRequest => hashRequest.Map(
+                r => SwSecurityHash.IsValid(
+                    r.Hash,
+                    r.ProviderId,
+                    r.UserId,
+                    session.CasinoSignatureKey)),
+            _ => false
+        };
 
         if (!isValidSign)
         {
-            context.Result = SoftswissResultFactory.Failure(SoftswissErrorCode.Forbidden).ToActionResult();
+            context.Result = SwResultFactory.Failure(SwErrorCode.InvalidMd5OrHash).ToActionResult();
             return;
         }
 

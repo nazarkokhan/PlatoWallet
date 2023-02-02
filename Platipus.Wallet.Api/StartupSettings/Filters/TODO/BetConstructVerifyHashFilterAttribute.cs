@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.TODO;
 
 using Application.Requests.Wallets.BetConstruct.Base;
 using Application.Results.BetConstruct;
@@ -20,7 +20,7 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
 
         string stringData = request.Data.ToString();
 
-        var isHashValid = BetConstructRequestHash.IsValidSign(request.Hash, request.Time.ToString(), stringData);
+        var isHashValid = BetConstructSecurityHash.IsValid(request.Hash, request.Time.ToString(), stringData);
 
         if (!isHashValid)
         {

@@ -44,7 +44,7 @@ public class RequestSignatureRelegatingHandler : DelegatingHandler
             if (casino is null)
                 throw new NullReferenceException("Casino not found");
 
-            var xRequestSign = PswRequestSign.Compute(requestBytes, casino.SignatureKey);
+            var xRequestSign = PswSecuritySign.Compute(requestBytes, casino.SignatureKey);
 
             request.Headers.Add(PswHeaders.XRequestSign, xRequestSign);
 

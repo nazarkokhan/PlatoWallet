@@ -49,7 +49,7 @@ public class WalletOpenboxController : RestApiController
         if (casino is null)
             return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-        var decryptedPayload = OpenboxPayload.Decrypt(request.Payload, casino.SignatureKey);
+        var decryptedPayload = OpenboxSecurityPayload.Decrypt(request.Payload, casino.SignatureKey);
 
         var payloadType = OpenboxHelpers.GetRequestType(request.Method);
 

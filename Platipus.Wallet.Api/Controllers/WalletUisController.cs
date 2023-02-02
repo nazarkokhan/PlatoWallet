@@ -9,6 +9,7 @@ using StartupSettings.Filters;
 
 [Route("wallet/uis")]
 [MockedErrorActionFilter(Order = 1)]
+//TODO [UisVerifySignatureFilter(Order = 0)]
 [Produces(MediaTypeNames.Application.Xml)]
 [Consumes(MediaTypeNames.Application.Xml)]
 public class WalletUisController : ApiController

@@ -53,7 +53,7 @@ public class TestController : RestApiController
 
         var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
-        var validSignature = PswRequestSign.Compute(rawRequestBytes, casino.SignatureKey);
+        var validSignature = PswSecuritySign.Compute(rawRequestBytes, casino.SignatureKey);
 
         var result = new { Signature = validSignature };
 
@@ -84,7 +84,7 @@ public class TestController : RestApiController
             });
 
         var source = string.Concat(sourceValues);
-        var result = new { Hash = DatabetHash.Compute($"{method}{source}", casino.SignatureKey) };
+        var result = new { Hash = DatabetSecurityHash.Compute(method, source, casino.SignatureKey) };
 
         return Ok(result);
     }
@@ -113,7 +113,7 @@ public class TestController : RestApiController
         var signatureKey = casino.SignatureKey;
 
         var serialize = JsonSerializer.Serialize(request);
-        var encryptedPayload = OpenboxPayload.Encrypt(serialize, signatureKey);
+        var encryptedPayload = OpenboxSecurityPayload.Encrypt(serialize, signatureKey);
 
         var result = new { EncryptedPayload = encryptedPayload };
 
@@ -143,7 +143,7 @@ public class TestController : RestApiController
 
         var signatureKey = casino.SignatureKey;
 
-        var decryptedPayload = OpenboxPayload.Decrypt(request, signatureKey);
+        var decryptedPayload = OpenboxSecurityPayload.Decrypt(request, signatureKey);
 
         var result = new { DecryptedPayload = decryptedPayload };
 
@@ -177,9 +177,9 @@ public class TestController : RestApiController
 
         var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
-        var validSignature = Hub88RequestSign.Compute(rawRequestBytes, Hub88RequestSign.PrivateKeyForWalletItself);
+        var validSignature = Hub88SecuritySign.Compute(rawRequestBytes, Hub88SecuritySign.PrivateKeyForWalletItself);
 
-        var isValid = Hub88RequestSign.IsValidSign(validSignature, rawRequestBytes, casino.SignatureKey);
+        var isValid = Hub88SecuritySign.IsValid(validSignature, rawRequestBytes, casino.SignatureKey);
 
         var result = new { Signature = validSignature };
 
@@ -209,7 +209,8 @@ public class TestController : RestApiController
         if (user is null)
             return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
 
-        var validSignature = user.Map(u => SwRequestHash.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
+        var validSignature
+            = user.Map(u => SwSecurityHash.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
 
         var result = new { Signature = validSignature };
 
@@ -239,7 +240,7 @@ public class TestController : RestApiController
         if (user is null)
             return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
 
-        var validSignature = user.Map(u => SwRequestMd5.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
+        var validSignature = user.Map(u => SwSecurityMd5.Compute(u.Casino.ProviderId ?? 0, u.UserId ?? 0, u.Casino.SignatureKey));
 
         var result = new { Signature = validSignature };
 
@@ -272,7 +273,7 @@ public class TestController : RestApiController
 
         var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
 
-        var validSignature = user.Map(u => SoftBetRequestHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
+        var validSignature = user.Map(u => SoftbetSecurityHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
 
         var result = new { Signature = validSignature };
 
@@ -313,7 +314,7 @@ public class TestController : RestApiController
         if (user is null)
             return BetflagResultFactory.Failure(BetflagErrorCode.InvalidParameter).ToActionResult();
 
-        var validHash = BetflagRequestHash.Compute(key, timestamp, user.Casino.SignatureKey);
+        var validHash = BetflagSecurityHash.Compute(key, timestamp, user.Casino.SignatureKey);
 
         return Ok(validHash);
     }

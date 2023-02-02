@@ -3,9 +3,9 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 using System.Security.Cryptography;
 using System.Text;
 
-public static class SoftBetRequestHash
+public static class SoftbetSecurityHash
 {
-    public static bool IsValidSign(
+    public static bool IsValid(
         string externalHash,
         byte[] data,
         string secretKey)

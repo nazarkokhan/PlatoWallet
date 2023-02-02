@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Application.Requests.Wallets.Dafabet.Base;
 using Domain.Entities;
@@ -10,41 +10,32 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 
-public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
+public class DatabetSecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var baseRequest = context.ActionArguments.Select(a => a.Value as IDafabetBaseRequest).SingleOrDefault(a => a is not null);
-
-        if (baseRequest is null)
-        {
-            context.Result = DafabetResultFactory.Failure(DafabetErrorCode.SystemError).ToActionResult();
-            return;
-        }
+        var baseRequest = context.ActionArguments.Values.OfType<IDafabetBaseRequest>().Single();
 
         var requestRoute = context.ActionDescriptor.EndpointMetadata
             .OfType<HttpMethodAttribute>()
             .SingleOrDefault()
-            ?
-            .Template;
+            ?.Template;
 
         if (requestRoute is null)
         {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<DatabetVerifySignatureFilterAttribute>>();
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<DatabetSecurityFilterAttribute>>();
             logger.LogCritical("Dafabet wallet request route not found for endpoint");
         }
-
-        var source = $"{requestRoute}{baseRequest.GetSource()}";
 
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<WalletDbContext>();
         var databetCasino = await dbContext.Set<Casino>()
             .Where(c => c.Provider == CasinoProvider.Dafabet)
-            .Select(c => new {c.SignatureKey})
+            .Select(c => new { c.SignatureKey })
             .FirstAsync(context.HttpContext.RequestAborted);
 
         var secretKey = databetCasino.SignatureKey;
 
-        var isValidJSysHash = baseRequest.IsValidHash(source, secretKey);
+        var isValidJSysHash = baseRequest.IsValid(requestRoute ?? string.Empty, secretKey);
 
         if (!isValidJSysHash)
         {
@@ -52,6 +43,6 @@ public class DatabetVerifySignatureFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var executedContext = await next();
+        await next();
     }
 }

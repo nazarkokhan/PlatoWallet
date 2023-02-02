@@ -8,10 +8,11 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 
 [Route("wallet/betflag")]
 [MockedErrorActionFilter(Order = 1)]
-[BetflagVerifyHashFilter(Order = 0)]
+[BetflagSecurityFilter(Order = 0)]
 [JsonSettingsName(nameof(CasinoProvider.Betflag))]
 [ProducesResponseType(typeof(BetflagErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletBetflagController : RestApiController

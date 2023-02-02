@@ -54,7 +54,7 @@ public class WalletISoftBetController : RestApiController
             return SoftBetResultFactory.Failure(SoftBetErrorMessage.IncorrectFormatOfParameters).ToActionResult();
 
         var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
-        var isValidHash = SoftBetRequestHash.IsValidSign(hash, rawRequestBytes, casino.SignatureKey);
+        var isValidHash = SoftbetSecurityHash.IsValid(hash, rawRequestBytes, casino.SignatureKey);
         if (!isValidHash)
             return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
