@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Web;
 using Abstract;
 using Application.Extensions;
 using Application.Requests.Wallets.Betflag.Base;
@@ -15,6 +16,7 @@ using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 
 [Route("test")]
 public class TestController : RestApiController
@@ -315,6 +317,40 @@ public class TestController : RestApiController
             return BetflagResultFactory.Failure(BetflagErrorCode.InvalidParameter).ToActionResult();
 
         var validHash = BetflagSecurityHash.Compute(key, timestamp, user.Casino.SignatureKey);
+
+        return Ok(validHash);
+    }
+
+    [HttpGet("reevo/hash")]
+    public async Task<IActionResult> Reevo(
+        string userName,
+        string url,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.UserName == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.SwUserId,
+                    Casino = new
+                    {
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return BetflagResultFactory.Failure(BetflagErrorCode.InvalidParameter).ToActionResult();
+
+        var requestQueryString2 = new Uri(url).Query;
+        var nameValueCollection = HttpUtility.ParseQueryString(requestQueryString2);
+        var requestQueryString = nameValueCollection.Keys.Cast<string?>()
+            .ToDictionary(o => o!, o => new StringValues(nameValueCollection.GetValues(o)));
+        requestQueryString.Remove("key");
+        var withoutKey = QueryString.Create(requestQueryString).ToString();
+        var validHash = ReevoSecurityHash.Compute(withoutKey, user.Casino.SignatureKey);
 
         return Ok(validHash);
     }

@@ -8,6 +8,7 @@ using Application.Requests.Wallets.Hub88.Base;
 using Application.Requests.Wallets.Openbox;
 using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Psw.Base;
+using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
@@ -88,6 +89,21 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 _ => null
             };
         }
+        else if (context.Controller is WalletReevoController)
+        {
+            var singleRequest = actionArgumentsValues.OfType<ReevoSingleRequest>().Single();
+
+            usernameOrSession = singleRequest.Username;
+            currentMethod = singleRequest.Action switch
+            {
+                "balance" => ErrorMockMethod.Balance,
+                "debit" => ErrorMockMethod.Bet,
+                "credit" => ErrorMockMethod.Win,
+                "rollback" => ErrorMockMethod.Rollback,
+                _ => null
+            };
+        }
+        //TODO
         // else if (context.Controller is WalletUisController)
         // {
         //     var singleRequest = context.ActionArguments.Values.OfType<IUisHashRequest>().Single();
@@ -107,8 +123,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             currentMethod = requestRoute switch
             {
                 "balance" or "balance-md5" or "balance-hash" or "user/balance" => ErrorMockMethod.Balance,
-                "bet" or "bet-win" or "play" or "transaction/bet" => ErrorMockMethod.Bet,
-                "win" or "result" or "transaction/win" => ErrorMockMethod.Win,
+                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" => ErrorMockMethod.Bet,
+                "win" or "result" or "transaction/win" or "credit" => ErrorMockMethod.Win,
                 "award" or "bonusWin" or "freespin" or "freespins" => ErrorMockMethod.Award,
                 "rollback" or "cancel" or "refund" or "transaction/rollback" => ErrorMockMethod.Rollback,
                 _ => null
@@ -144,6 +160,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     .OfType<IBetflagRequest>()
                     .SingleOrDefault()
                     ?.Key,
+                WalletReevoController => actionArgumentsValues
+                    .OfType<IReevoRequest>()
+                    .SingleOrDefault()
+                    ?.GameSessionId.ToString(),
                 _ => null
             };
         }
@@ -165,14 +185,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         mockedErrorQuery = context.Controller switch
         {
-            WalletOpenboxController => mockedErrorQuery
-                .Where(e => e.User.Sessions.Any(s => s.Id == new Guid(usernameOrSession))),
-            // WalletUisController => context.ActionArguments.Values.OfType<IUisHashRequest>().Single() switch
-            // {
-            //     _ => throw new ArgumentOutOfRangeException()
-            // },
-            _ => mockedErrorQuery
-                .Where(e => e.User.UserName == usernameOrSession)
+            WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == new Guid(usernameOrSession))),
+            _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
         };
 
         var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);

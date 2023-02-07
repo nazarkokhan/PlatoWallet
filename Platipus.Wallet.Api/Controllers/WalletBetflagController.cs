@@ -23,7 +23,7 @@ public class WalletBetflagController : RestApiController
 
     [HttpPost("balance")]
     [ProducesResponseType(typeof(BetflagBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetBalance(
+    public async Task<IActionResult> Balance(
         BetflagBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -59,7 +59,7 @@ public class WalletBetflagController : RestApiController
     [Obsolete]
     [HttpPost("session-close")]
     [ProducesResponseType(typeof(BetflagSessionCloseRequest.CloseSessionResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Authenticate(
+    public async Task<IActionResult> SessionClose(
         BetflagSessionCloseRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

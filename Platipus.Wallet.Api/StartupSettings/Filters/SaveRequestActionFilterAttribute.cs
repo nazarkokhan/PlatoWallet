@@ -8,6 +8,7 @@ public class SaveRequestActionFilterAttribute : ActionFilterAttribute
     {
         const string requestParamName = "request";
         var hasRequestBody = context.ActionArguments.TryGetValue(requestParamName, out var request);
+        // && context.HttpContext.Request.Method is not "GET"
 
         if (hasRequestBody)
             context.HttpContext.Items.Add(requestParamName, request);

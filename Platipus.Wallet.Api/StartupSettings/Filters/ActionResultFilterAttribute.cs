@@ -9,6 +9,7 @@ using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
+using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
@@ -19,6 +20,7 @@ using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
+using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
 using Application.Results.Uis.WithData;
@@ -137,6 +139,23 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     errorCode,
                     timestamp,
                     hash);
+
+                context.Result = new OkObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+
+            if (baseExternalActionResult.Result is IReevoResult<object> reevoResult)
+            {
+                if (reevoResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(reevoResult.Data);
+                    return;
+                }
+
+                var errorCode = reevoResult.ErrorCode;
+
+                var errorResponse = new ReevoErrorResponse(errorCode);
 
                 context.Result = new OkObjectResult(errorResponse);
 

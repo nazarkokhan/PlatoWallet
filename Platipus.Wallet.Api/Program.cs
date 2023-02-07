@@ -146,7 +146,12 @@ try
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             })
-
+        .AddJsonOptions(
+            nameof(CasinoProvider.Reevo),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+            })
         // .AddJsonOptions(
         //     nameof(CasinoProvider.Everymatrix),
         //     options =>

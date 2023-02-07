@@ -12,6 +12,7 @@ public enum CasinoProvider
     GamesGlobal,
     Uis,
     Betflag,
+    Reevo,
     Everymatrix,
     PariMatch,
     EmaraPlay
