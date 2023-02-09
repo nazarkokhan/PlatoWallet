@@ -4,6 +4,7 @@ using System.Net.Mime;
 using System.Text.Json;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
+using Application.Requests.Wallets.Everymatrix.Base;
 using Application.Requests.Wallets.Hub88.Base;
 using Application.Requests.Wallets.Openbox;
 using Application.Requests.Wallets.Openbox.Base;
@@ -122,11 +123,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             currentMethod = requestRoute switch
             {
-                "balance" or "balance-md5" or "balance-hash" or "user/balance" => ErrorMockMethod.Balance,
-                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" => ErrorMockMethod.Bet,
-                "win" or "result" or "transaction/win" or "credit" => ErrorMockMethod.Win,
+                "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" => ErrorMockMethod.Balance,
+                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" or "Bet" => ErrorMockMethod.Bet,
+                "win" or "result" or "transaction/win" or "credit" or "Win" => ErrorMockMethod.Win,
                 "award" or "bonusWin" or "freespin" or "freespins" => ErrorMockMethod.Award,
-                "rollback" or "cancel" or "refund" or "transaction/rollback" => ErrorMockMethod.Rollback,
+                "rollback" or "cancel" or "refund" or "transaction/rollback" or "Cancel" => ErrorMockMethod.Rollback,
                 _ => null
             };
 
@@ -164,19 +165,23 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     .OfType<IReevoRequest>()
                     .SingleOrDefault()
                     ?.GameSessionId.ToString(),
+                WalletEverymatrixController => actionArgumentsValues
+                    .OfType<IEveryMatrixRequest>()
+                    .SingleOrDefault()
+                    ?.Token.ToString(),
                 _ => null
             };
         }
 
         if (currentMethod is null)
         {
-            logger.LogCritical("ErrorMockMethod not found for route {RequestRoute}", requestRoute);
+            logger.LogDebug("ErrorMockMethod not found for route {RequestRoute}", requestRoute);
             return;
         }
 
         if (usernameOrSession is null)
         {
-            logger.LogCritical("Can not mock error for request because UserName is empty");
+            logger.LogDebug("Can not mock error for request because UserName is empty");
             return;
         }
 

@@ -152,15 +152,12 @@ try
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
             })
-        // .AddJsonOptions(
-        //     nameof(CasinoProvider.Everymatrix),
-        //     options =>
-        //     {
-        //         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
-        //                                                      | JsonNumberHandling.AllowReadingFromString;
-        //         options.JsonSerializerOptions.PropertyNamingPolicy = null;
-        //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        //     })
+        .AddJsonOptions(
+            nameof(CasinoProvider.Everymatrix),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            })
         // .AddJsonOptions(
         //     nameof(CasinoProvider.PariMatch),
         //     options =>
@@ -205,7 +202,7 @@ try
                     });
                 c.AddSecurityDefinition(
                     "Bearer",
-                    new OpenApiSecurityScheme()
+                    new OpenApiSecurityScheme
                     {
                         Name = "Authorization",
                         Type = SecuritySchemeType.ApiKey,
@@ -241,8 +238,7 @@ try
             {
                 optionsBuilder
                     .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
-                    // .UseSnakeCaseNamingConvention()
-                    ;
+                    .UseSnakeCaseNamingConvention();
 
                 if (builder.Environment.IsDevelopment())
                 {

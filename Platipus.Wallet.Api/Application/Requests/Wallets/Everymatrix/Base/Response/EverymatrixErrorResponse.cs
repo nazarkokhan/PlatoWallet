@@ -1,7 +1,18 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix.Base.Response;
 
+using Results.Everymatrix;
+
 public record EverymatrixErrorResponse(
     string Status,
-    string ErrorCode,
+    int ErrorCode,
     string Description,
-    string LogId = "0");
+    string LogId = "") : EverymatrixBaseResponse(Status)
+{
+    public EverymatrixErrorResponse(EverymatrixErrorCode errorCode)
+        : this(
+            "Failed",
+            (int)errorCode,
+            errorCode.ToString())
+    {
+    }
+}

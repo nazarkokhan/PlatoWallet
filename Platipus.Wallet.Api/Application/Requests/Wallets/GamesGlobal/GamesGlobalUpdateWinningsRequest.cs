@@ -96,7 +96,7 @@ public record GamesGlobalUpdateWinningsRequest(GamesGlobalUpdateWinningDto[] Win
             var bal = (long)(responseFund.Balance * 100);
 
             var resp = new RespDto(
-                new GamesGlobalUserInfoDto()
+                new GamesGlobalUserInfoDto
                 {
                     UserId = user.UserId!.Value,
                     UserName = user.UserName,

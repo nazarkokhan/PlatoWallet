@@ -80,7 +80,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
 
         return new EverymatrixErrorResponse(
             "Failed",
-            $"{(int)errorCode}",
+            (int)errorCode,
             errorCode.ToString());
     }
 

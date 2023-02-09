@@ -3,6 +3,7 @@
   <component name="EfCoreDialogsState">
     <option name="keyValueStorage">
       <map>
+        <entry key="Common:7098c587-4d62-48ba-b3db-50bb5d2569f9:dbContext" value="Platipus.Wallet.Infrastructure.Persistence.WalletDbContext" />
         <entry key="Common:buildConfiguration" value="Release" />
         <entry key="Common:dbContext" value="Platipus.Wallet.Infrastructure.Persistence.WalletDbContext" />
         <entry key="Common:noBuild" value="false" />

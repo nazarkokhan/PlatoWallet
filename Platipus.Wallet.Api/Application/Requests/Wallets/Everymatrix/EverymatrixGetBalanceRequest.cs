@@ -9,11 +9,11 @@ using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 
 public record EverymatrixGetBalanceRequest(
-    string Token,
+    Guid Token,
     string Currency,
-    string Hash) : IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>, IEveryMatrixBaseRequest
+    string Hash) : IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>, IEveryMatrixRequest
 {
-    public class Handler : IRequestHandler<EverymatrixGetBalanceRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
+    public class Handler : IRequestHandler<EverymatrixGetBalanceRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -22,44 +22,26 @@ public record EverymatrixGetBalanceRequest(
             _context = context;
         }
 
-        public async Task<IEverymatrixResult<EveryMatrixBaseResponse>> Handle(
+        public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>().FirstOrDefaultAsync(s => s.Id == new Guid(request.Token));
-
-            if (session is null)
-            {
-                EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TokenNotFound);
-            }
-
-            var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == session.UserId);
+            var user = await _context.Set<User>()
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
+                .Include(u => u.Currency)
+                .Select(
+                    u => new
+                    {
+                        u.Balance,
+                        Currency = u.Currency.Name,
+                        u.UserName
+                    })
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
             if (user is null)
-            {
-                EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.VendorAccountNotActive);
-            }
+                return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound);
 
-            var userIsBlocked = user.IsDisabled;
-
-            if (userIsBlocked)
-            {
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UserIsBlocked);
-            }
-
-            var currency = await _context.Set<Currency>().FirstOrDefaultAsync(c => c.Id == user.CurrencyId);
-
-            var currencyIsValid = currency.Name == request.Currency;
-
-            if (!currencyIsValid)
-            {
-                EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.CurrencyDoesntMatch);
-            }
-
-            var response = new EveryMatrixBaseResponse(
-                Status: "Ok",
-                Currency: $"{request.Currency}",
-                TotalBalance: user.Balance);
+            var response = new EverymatrixBalanceResponse(user.Balance, user.Currency);
 
             return EverymatrixResultFactory.Success(response);
         }

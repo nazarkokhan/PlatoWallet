@@ -18,8 +18,8 @@ public class DatabetSecurityFilterAttribute : ActionFilterAttribute
 
         var requestRoute = context.ActionDescriptor.EndpointMetadata
             .OfType<HttpMethodAttribute>()
-            .SingleOrDefault()
-            ?.Template;
+            .Single()
+            .Template;
 
         if (requestRoute is null)
         {

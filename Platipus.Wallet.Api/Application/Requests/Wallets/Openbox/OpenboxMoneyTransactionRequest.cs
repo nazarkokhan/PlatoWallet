@@ -40,7 +40,7 @@ public record OpenboxMoneyTransactionRequest(
             CancellationToken cancellationToken)
         {
             var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == (request.Token)))
+                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
                 .Include(r => r.User.Currency)
                 .Include(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);

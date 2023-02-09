@@ -73,8 +73,8 @@ public record LogInRequest(
 
             var session = new Session
             {
-                ExpirationDate = DateTime.UtcNow.AddDays(1),
                 User = user,
+                IsTemporaryToken = casino.Provider is CasinoProvider.Everymatrix //TODO add support for older ones
             };
 
             _context.Add(session);
@@ -88,7 +88,10 @@ public record LogInRequest(
                         g.GameServerId,
                         g.LaunchName
                     })
-                .FirstAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (game is null)
+                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidGame);
 
             string launchUrl;
 
@@ -203,25 +206,25 @@ public record LogInRequest(
                     //         session.User.UserName,
                     //         request.UisLaunchType!);
                     break;
+                case CasinoProvider.Everymatrix:
+                {
+                    launchUrl = GetEveryMatrixLaunchUrlAsync(
+                        request.Game,
+                        "en",
+                        false,
+                        false,
+                        "dev",
+                        session.Id,
+                        user.Currency.Name);
+                    break;
+                }
+
                 //TODO refactor
                 // case CasinoProvider.PariMatch:
                 // {
                 //     launchUrl = GetPariMatchLaunchUrl(
                 //         "PlatipusGaming",
                 //         )
-                // }
-
-                // case CasinoProvider.Everymatrix:
-                // {
-                //     launchUrl = GetEveryMatrixLaunchUrlAsync(
-                //         request.Game,
-                //         "en",
-                //         false,
-                //         false,
-                //         "dev",
-                //         session.Id,
-                //         user.Currency.Name);
-                //     break;
                 // }
                 default:
                     launchUrl = "";
@@ -239,7 +242,7 @@ public record LogInRequest(
         string playerId,
         string game)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             { "Key", key.ToString() },
             { "PlayerId", playerId },
@@ -297,7 +300,7 @@ public record LogInRequest(
         string userId,
         string game)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             { "key", key },
             { "userid", userId },
@@ -324,7 +327,7 @@ public record LogInRequest(
         string gameId,
         string currency)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             // { "brand", "openbox" },//TODO need?
             { nameof(token), token.ToString() },
@@ -358,7 +361,7 @@ public record LogInRequest(
         string? language,
         string hash)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             { "brand", "dafabet" },
             { nameof(gameCode), gameCode },
@@ -389,7 +392,7 @@ public record LogInRequest(
         string currency,
         int licenseeid)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             { "providergameid", gameId.ToString() },
             { "licenseeid", licenseeid.ToString() }, //provider
@@ -424,12 +427,12 @@ public record LogInRequest(
         Guid token,
         string currency)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             { nameof(gameCode), gameCode },
             { nameof(language), language },
-            { nameof(freePlay), freePlay.ToString() },
-            { nameof(mobile), mobile.ToString() },
+            { nameof(freePlay), freePlay.ToString().ToLower() },
+            { nameof(mobile), mobile.ToString().ToLower() },
             { nameof(mode), mode },
             { nameof(token), token.ToString() },
             { nameof(currency), currency }
@@ -452,7 +455,7 @@ public record LogInRequest(
         string providerId,
         string consumerId)
     {
-        var queryParameters = new Dictionary<string, string?>()
+        var queryParameters = new Dictionary<string, string?>
         {
             { nameof(cid), cid },
             { nameof(productId), productId },

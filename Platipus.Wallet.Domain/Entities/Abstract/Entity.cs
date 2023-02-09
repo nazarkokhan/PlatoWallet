@@ -4,8 +4,8 @@ using Generic;
 
 public abstract class Entity : Entity<Guid>
 {
+    protected Entity()
+    {
+        Id = Guid.NewGuid();
+    }
 }
-
-// public abstract class AuditableEntity : Entity
-// {
-// }

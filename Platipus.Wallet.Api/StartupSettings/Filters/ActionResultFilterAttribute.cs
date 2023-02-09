@@ -6,6 +6,7 @@ using ActionResults;
 using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
@@ -16,6 +17,7 @@ using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis.Base;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.Betflag.WithData;
+using Application.Results.Everymatrix.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
@@ -156,6 +158,23 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 var errorCode = reevoResult.ErrorCode;
 
                 var errorResponse = new ReevoErrorResponse(errorCode);
+
+                context.Result = new OkObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+
+            if (baseExternalActionResult.Result is IEverymatrixResult<object> everymatrixResult)
+            {
+                if (everymatrixResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(everymatrixResult.Data);
+                    return;
+                }
+
+                var errorCode = everymatrixResult.ErrorCode;
+
+                var errorResponse = new EverymatrixErrorResponse(errorCode);
 
                 context.Result = new OkObjectResult(errorResponse);
 

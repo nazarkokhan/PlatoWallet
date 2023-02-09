@@ -25,12 +25,6 @@ public static class CommonResultToEverymatrixMappers
             ErrorCode.MissingSignature or ErrorCode.SessionExpired => EverymatrixErrorCode.TokenNotFound,
             ErrorCode.BetLimitReached => EverymatrixErrorCode.DoubleTransaction,
             ErrorCode.InvalidUser => EverymatrixErrorCode.UserIsBlocked,
-            // ErrorCode.InvalidCasinoId => expr,
-            // ErrorCode.InvalidGame => expr,
-            // ErrorCode.InvalidExpirationDate => expr,
-            // ErrorCode.WrongCurrency => EverymatrixErrorCode.CurrencyDoesntMatch,
-            // ErrorCode.DuplicateTransaction => expr,
-            // ErrorCode.TransactionDoesNotExist => expr,
             ErrorCode.Unknown or _ => EverymatrixErrorCode.UnknownError,
         };
     }

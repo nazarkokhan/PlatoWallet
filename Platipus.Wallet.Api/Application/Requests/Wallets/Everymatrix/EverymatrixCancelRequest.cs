@@ -3,85 +3,70 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 using Base;
 using Base.Response;
 using Domain.Entities;
+using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
+using Results.ResultToResultMappers;
+using Services.Wallet;
+using Services.Wallet.DTOs;
 
 public record EverymatrixCancelRequest(
-    string Hash,
+    Guid Token,
     string ExternalId,
     string CanceledExternalId,
-    string Token) : IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>, IEveryMatrixBaseRequest
+    string Hash) : IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>, IEveryMatrixRequest
 {
-    public class Handler : IRequestHandler<EverymatrixCancelRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
+    public class Handler : IRequestHandler<EverymatrixCancelRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
-        private readonly WalletDbContext _dbContext;
+        private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-
-        public Handler(WalletDbContext dbContext)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
-            _dbContext = dbContext;
+            _wallet = wallet;
+            _context = context;
         }
 
-        public async Task<IEverymatrixResult<EveryMatrixBaseResponse>> Handle(
+        public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixCancelRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _dbContext.Set<Session>()
-                .Where(s => s.Id == new Guid(request.Token))
+            var user = await _context.Set<User>()
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
+                .Select(u => new { u.UserName })
                 .FirstOrDefaultAsync(cancellationToken);
-
-            if (session is null)
-            {
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TokenNotFound);
-            }
-
-            var user = await _dbContext.Set<User>().Where(u => u.Id == session.UserId).FirstOrDefaultAsync();
 
             if (user is null)
-            {
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError);
-            }
+                return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound);
 
-            if (user.IsDisabled)
-            {
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UserIsBlocked);
-            }
-            
-
-            var transaction = await _dbContext.Set<Transaction>()
+            var transaction = await _context.Set<Transaction>()
                 .Where(t => t.Id == request.ExternalId)
+                .Select(
+                    u => new
+                    {
+                        u.RoundId,
+                        u.Amount
+                    })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            
-            var round = await _dbContext.Set<Round>()
-                .Where(
-                    r => r.Id == transaction.RoundId)
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
-                .FirstOrDefaultAsync(cancellationToken);
+            if (transaction is null)
+                return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TransactionNotFound);
 
-            if (round is null)
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError, new Exception("Round isn't found"));
+            var walletRequest = request.Map(
+                r => new RollbackRequest(
+                    r.Token,
+                    user.UserName,
+                    string.Empty,
+                    transaction.RoundId,
+                    r.ExternalId));
 
-            if (round.Finished)
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError, new Exception("Round is finished"));
+            var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
 
-            var lastTransaction = round.Transactions.MaxBy(t => t.CreatedDate);
-            if (lastTransaction is null || lastTransaction.Id != transaction.Id)
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TransactionNotFound);
-
-            var currency = await _dbContext.Set<Currency>().FirstOrDefaultAsync(c => c.Id == user.CurrencyId);
-
-            user.Balance -= transaction.Amount;
-
-            _dbContext.Remove(transaction);
-            _dbContext.Update(user);
-            await _dbContext.SaveChangesAsync();
-
-
-            var response = new EveryMatrixBaseResponse("Ok", user.Balance, currency.Name);
+            var response = walletResult.Data.Map(d => new EverymatrixBalanceResponse(d.Balance, d.Currency));
 
             return EverymatrixResultFactory.Success(response);
         }

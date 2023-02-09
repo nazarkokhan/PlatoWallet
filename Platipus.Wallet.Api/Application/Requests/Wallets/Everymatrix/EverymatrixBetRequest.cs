@@ -3,111 +3,67 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 using Base;
 using Base.Response;
 using Domain.Entities;
+using Extensions;
 using Infrastructure.Persistence;
-using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 using Microsoft.EntityFrameworkCore;
+using Results.Everymatrix;
+using Results.ResultToResultMappers;
+using Services.Wallet;
+using Services.Wallet.DTOs;
+using static Results.Everymatrix.EverymatrixResultFactory;
+
 public record EverymatrixBetRequest(
-    string ExternalId,
-    string Token,
-    string Currency,
-    decimal Amount,
-    string Hash,
-    string RoundId,
-    string GameId,
-    object JackpotContribution,
-    string JackpotId,
-    decimal JackpotContributionAmount) :IEveryMatrixBaseRequest, IRequest<IEverymatrixResult<EveryMatrixBaseResponse>>
+        Guid Token,
+        decimal Amount,
+        string Currency,
+        string GameId,
+        string RoundId,
+        string ExternalId,
+        string Hash,
+        EverymatrixJackpotContribution? JackpotContribution)
+    : IEveryMatrixRequest, IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>
 {
-    public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EveryMatrixBaseResponse>>
+    public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
+        private readonly IWalletService _wallet;
         private readonly WalletDbContext _context;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
+            _wallet = wallet;
             _context = context;
         }
 
-        public async Task<IEverymatrixResult<EveryMatrixBaseResponse>> Handle(
+        public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixBetRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
-                .Where(s => s.Id == new Guid(request.Token))
-                .FirstAsync(cancellationToken);
+            var user = await _context.Set<User>()
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
+                .Select(u => new { u.UserName })
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (session is null)
-            {
-                return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.TokenNotFound);
-            }
+            if (user is null)
+                return Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound);
 
-            var round = await _context.Set<Round>()
-                        .Where(r => r.UserId == session.UserId && r.Id == request.RoundId)
-                        .Include(r => r.User.Currency)
-                        .Include(r => r.Transactions)
-                        .FirstOrDefaultAsync(cancellationToken);
+            var walletRequest = request.Map(
+                r => new BetRequest(
+                    r.Token,
+                    user.UserName,
+                    r.Currency,
+                    r.RoundId,
+                    r.ExternalId,
+                    false,
+                    r.Amount));
 
-                    if (round is null)
-                    {
+            var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
 
-                        var thisUser = await _context.Set<User>()
-                            .Where(u => u.Id == session.UserId)
-                            .Include(u => u.Currency)
-                            .FirstOrDefaultAsync();
+            var response = walletResult.Data.Map(d => new EverymatrixBalanceResponse(d.Balance, d.Currency));
 
-                        round = new Round
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Finished = false,
-                            User = thisUser
-                        };
-
-                        _context.Add(round);
-
-                        await _context.SaveChangesAsync(cancellationToken);
-                    }
-                    var user = await _context.Set<User>()
-                        .Where(u => u.Id == session.UserId)
-                        .Include(u => u.Currency)
-                        .FirstOrDefaultAsync();
-
-
-                    if (round.Transactions.Any(t => t.Id == request.ExternalId))
-                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(
-                            EverymatrixErrorCode.DoubleTransaction);
-
-
-                    if (round.Finished)
-                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.UnknownError);
-
-
-                    if (user?.Currency.Name != request.Currency)
-                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(EverymatrixErrorCode.CurrencyDoesntMatch);
-
-                    user.Balance -= request.Amount;
-
-                    if (user.Balance < 0)
-                    {
-                        return EverymatrixResultFactory.Failure<EveryMatrixBaseResponse>(
-                            EverymatrixErrorCode.InsufficientFunds);
-                    }
-
-                    var transaction = new Transaction
-                    {
-                        Id = request.ExternalId,
-                        Amount = request.Amount,
-                    };
-
-                    round.Transactions.Add(transaction);
-
-
-                    _context.Update(user);
-                    _context.Update(round);
-                    await _context.SaveChangesAsync(cancellationToken);
-
-                    var response = new EveryMatrixBaseResponse(Status:"200", TotalBalance: user.Balance, Currency: user.Currency.Name);
-
-                    return EverymatrixResultFactory.Success(response);
+            return Success(response);
         }
     }
 }

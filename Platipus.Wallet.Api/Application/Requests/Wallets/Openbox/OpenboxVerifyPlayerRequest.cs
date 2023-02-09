@@ -23,7 +23,7 @@ public record OpenboxVerifyPlayerRequest(Guid Token) : IOpenboxBaseRequest, IReq
         {
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
-                .Where(u => u.Id == (request.Token))
+                .Where(u => u.Id == request.Token)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null)

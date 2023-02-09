@@ -23,10 +23,4 @@ public static class ActionResultExtensions
     public static IActionResult ToActionResult(this IHub88Result result) => new Hub88ExternalActionResult(result);
 
     public static IActionResult ToActionResult(this ISoftswissResult result) => new SoftswissExternalActionResult(result);
-
-    public static IActionResult ToActionResult(this IEverymatrixResult result) => new EveryMatrixExternalActionResult(result);
-
-    public static IActionResult ToActionResult(this IPariMatchResult result) => new PariMatchExternalActionResult(result);
-
-    public static IActionResult ToActionResult(this IEmaraPlayResult result) => new EmaraPlayExternalActionResult(result);
 }

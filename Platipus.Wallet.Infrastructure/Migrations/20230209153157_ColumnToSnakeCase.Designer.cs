@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Platipus.Wallet.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Platipus.Wallet.Infrastructure.Persistence;
 namespace Platipus.Wallet.Infrastructure.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230209153157_ColumnToSnakeCase")]
+    partial class ColumnToSnakeCase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,10 +321,6 @@ namespace Platipus.Wallet.Infrastructure.Migrations
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expiration_date");
-
-                    b.Property<bool>("IsTemporaryToken")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_temporary_token");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
