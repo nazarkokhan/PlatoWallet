@@ -11,6 +11,7 @@
     <ItemGroup>
         <PackageReference Include="Bogus" Version="34.0.2"/>
         <PackageReference Include="Bogus.Text" Version="34.0.2"/>
+        <PackageReference Include="EFCore.NamingConventions" Version="7.0.2"/>
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2"/>
         <PackageReference Include="Horizon.XmlRpc.AspNetCore" Version="2.5.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1"/>

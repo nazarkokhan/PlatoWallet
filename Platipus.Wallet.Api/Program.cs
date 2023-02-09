@@ -240,7 +240,9 @@ try
             (provider, optionsBuilder) =>
             {
                 optionsBuilder
-                    .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)));
+                    .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
+                    // .UseSnakeCaseNamingConvention()
+                    ;
 
                 if (builder.Environment.IsDevelopment())
                 {

@@ -4,7 +4,6 @@ using Domain.Entities;
 using DTOs;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Common;
 
 public record GetCasinoGamesRequest(string? CasinoId) : IRequest<IResult<List<GetCommonGameDto>>>
 {
@@ -22,8 +21,9 @@ public record GetCasinoGamesRequest(string? CasinoId) : IRequest<IResult<List<Ge
             CancellationToken cancellationToken)
         {
             var casinos = await _context.Set<Game>()
-                // .Where(c => c.CasinoId == request.CasinoId) //TODO need?
-                // .Select(c => c.Game)
+                .Where(
+                    c => request.CasinoId == null
+                      || c.CasinoGames.Any(g => g.CasinoId == request.CasinoId))
                 .Select(
                     c => new GetCommonGameDto(
                         c.Id,
