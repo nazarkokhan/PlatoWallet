@@ -19,7 +19,7 @@ public static class EverymatrixSecurityHash
 
     public static string Compute(string nameOfMethod, string password)
     {
-        var stringToVerify = $"NameOfMethod({nameOfMethod})Time({DateTime.UtcNow:yyyy:MM:dd:HH})password({password})";
+        var stringToVerify = $"{nameOfMethod}{DateTime.UtcNow:yyyy:MM:dd:HH}{password}";
 
         var dataBytes = Encoding.UTF8.GetBytes(stringToVerify);
 

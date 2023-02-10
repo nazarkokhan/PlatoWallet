@@ -209,6 +209,7 @@ public record LogInRequest(
                 case CasinoProvider.Everymatrix:
                 {
                     launchUrl = GetEveryMatrixLaunchUrlAsync(
+                        casino.Id,
                         request.Game,
                         "en",
                         false,
@@ -419,6 +420,7 @@ public record LogInRequest(
     }
 
     private static string GetEveryMatrixLaunchUrlAsync(
+        string brand,
         string gameCode,
         string? language,
         bool freePlay,
@@ -429,6 +431,7 @@ public record LogInRequest(
     {
         var queryParameters = new Dictionary<string, string?>
         {
+            { nameof(brand), brand },
             { nameof(gameCode), gameCode },
             { nameof(language), language },
             { nameof(freePlay), freePlay.ToString().ToLower() },
