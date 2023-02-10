@@ -35,36 +35,43 @@ public class WalletOpenboxController : RestApiController
     [ProducesResponseType(typeof(OpenboxSingleResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(OpenboxSingleRequest request, CancellationToken cancellationToken)
     {
-        var casinoId = request.VendorUid switch
+        try
         {
-            "00000000000000000000000000000001" => "openbox", //TODO move to db
-            _ => null
-        };
-        if (casinoId is null)
-            return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
+            var casinoId = request.VendorUid switch
+            {
+                "00000000000000000000000000000001" => "openbox", //TODO move to db
+                _ => null
+            };
+            if (casinoId is null)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-        var casino = await _context.Set<Casino>()
-            .Where(c => c.Id == casinoId)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (casino is null)
-            return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
+            var casino = await _context.Set<Casino>()
+                .Where(c => c.Id == casinoId)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (casino is null)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-        var decryptedPayload = OpenboxSecurityPayload.Decrypt(request.Payload, casino.SignatureKey);
+            var decryptedPayload = OpenboxSecurityPayload.Decrypt(request.Payload, casino.SignatureKey);
 
-        var payloadType = OpenboxHelpers.GetRequestType(request.Method);
+            var payloadType = OpenboxHelpers.GetRequestType(request.Method);
 
-        if (payloadType is null)
-            return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
+            if (payloadType is null)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-        var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayload, payloadType, _jsonSerializerOptions);
-        if (payloadRequestObj is null)
-            return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
-        HttpContext.Items.Add("OpenboxPayloadRequestObj", payloadRequestObj);
+            var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayload, payloadType, _jsonSerializerOptions);
+            if (payloadRequestObj is null)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
+            HttpContext.Items.Add("OpenboxPayloadRequestObj", payloadRequestObj);
 
-        var responseObj = await _mediator.Send(payloadRequestObj, cancellationToken);
-        if (responseObj is not IOpenboxResult response)
-            return OpenboxResultFactory.Failure(OpenboxErrorCode.InternalServiceError).ToActionResult();
+            var responseObj = await _mediator.Send(payloadRequestObj, cancellationToken);
+            if (responseObj is not IOpenboxResult response)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.InternalServiceError).ToActionResult();
 
-        return response.ToActionResult();
+            return response.ToActionResult();
+        }
+        catch (Exception e)
+        {
+            return OpenboxResultFactory.Failure(OpenboxErrorCode.Success, e).ToActionResult();
+        }
     }
 }

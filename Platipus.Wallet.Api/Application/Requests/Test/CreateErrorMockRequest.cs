@@ -55,12 +55,11 @@ public record CreateErrorMockRequest(
                 HttpStatusCode = request.HttpStatusCode,
                 ContentType = contentType,
                 Count = request.Count <= 0 ? 1 : request.Count,
-                Timeout = request.Timeout
+                Timeout = request.Timeout,
+                User = user
             };
 
-            user.MockedErrors.Add(mockedError);
-            _context.Update(user);
-
+            _context.Add(mockedError);
             await _context.SaveChangesAsync(cancellationToken);
 
             return PswResultFactory.Success();

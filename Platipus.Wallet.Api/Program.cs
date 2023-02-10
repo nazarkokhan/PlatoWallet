@@ -240,7 +240,7 @@ try
                     .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
                     .UseSnakeCaseNamingConvention();
 
-                if (builder.Environment.IsDevelopment())
+                if (builder.Environment.IsDevelopment() || builder.Environment.IsDebug())
                 {
                     optionsBuilder.UseLoggerFactory(provider.GetRequiredService<ILoggerFactory>());
                     optionsBuilder.EnableSensitiveDataLogging();
