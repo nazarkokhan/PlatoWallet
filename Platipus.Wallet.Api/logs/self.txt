@@ -1,0 +1,72 @@
+2023-02-12T17:21:39.8831060Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:26:45.8529800Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:26:52.7608090Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:30:10.9775490Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:30:35.6115090Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:32:19.5451950Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:36:39.9384090Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:36:46.0105400Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}
+2023-02-12T17:37:39.5389380Z Failed to store event with template 'Provider: {Provider} 
+RawRequestBody: {RawRequestBody} 
+RequestBody: {@RequestBody} 
+RawResponseBody: {RawResponseBody} 
+ResponseBody: {@ResponseBody} 
+RequestHeaders: {@RequestHeaders} 
+ResponseHeaders: {@ResponseHeaders} 
+' into Elasticsearch. Elasticsearch reports for index .ds-platipus-wallet-api-2023.02.12-000114 the following: {"type":"mapper_parsing_exception","reason":"object mapping for [platipus-wallet-api.ResponseBody] tried to parse field [ResponseBody] as object, but found a concrete value"}

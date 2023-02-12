@@ -1,18 +1,17 @@
 namespace Platipus.Wallet.Api.Controllers;
 
+using Abstract;
+using Application.Requests.Wallets.Everymatrix;
+using Application.Requests.Wallets.Everymatrix.Base.Response;
+using Domain.Entities.Enums;
+using Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix.Base.Response;
-using Platipus.Wallet.Api.Controllers.Abstract;
-using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
-using Platipus.Wallet.Api.StartupSettings.Filters;
-using Platipus.Wallet.Api.StartupSettings.Filters.Security;
-using Platipus.Wallet.Domain.Entities.Enums;
+using StartupSettings.ControllerSpecificJsonOptions;
+using StartupSettings.Filters;
 
 [Route("wallet/everymatrix")]
 [MockedErrorActionFilter(Order = 1)]
-[EverymatrixSecurityFilter(Order = 2)]
+// [EverymatrixSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
 [ProducesResponseType(typeof(EverymatrixErrorResponse), StatusCodes.Status200OK)]
 public class WalletEverymatrixController : RestApiController
@@ -63,5 +62,3 @@ public class WalletEverymatrixController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
-
-

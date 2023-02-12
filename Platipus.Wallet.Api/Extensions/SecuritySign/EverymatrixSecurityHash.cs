@@ -19,13 +19,13 @@ public static class EverymatrixSecurityHash
 
     public static string Compute(string nameOfMethod, string password)
     {
-        var stringToVerify = $"{nameOfMethod}{DateTime.UtcNow:yyyy:MM:dd:HH}{password}";
+        var stringToVerify = $"{nameOfMethod}{DateTime.Now:yyyy:MM:dd:hh}{password}";
 
-        var dataBytes = Encoding.UTF8.GetBytes(stringToVerify);
+        var dataBytes = Encoding.ASCII.GetBytes(stringToVerify);
 
         var md5 = MD5.HashData(dataBytes);
         var md5String = Convert.ToHexString(md5);
 
-        return md5String;
+        return md5String.ToLower();
     }
 }
