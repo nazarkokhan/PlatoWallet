@@ -70,7 +70,7 @@ public class SoftswissSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
 
         var isValidSign = SoftswissSecurityHash.IsValid(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 

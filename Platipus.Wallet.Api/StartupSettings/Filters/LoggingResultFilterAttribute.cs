@@ -18,8 +18,8 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
 
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
-        var request = httpContext.Items["request"];
+        var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
+        var request = httpContext.Items[HttpContextItems.RequestObject];
         var response = (context.Result as OkObjectResult)?.Value;
 
         var requestHeaders = httpContext.Request.Headers.ToDictionary(x => x.Key, x => x.Value);
@@ -40,7 +40,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             WalletUisController => CasinoProvider.Uis.ToString(),
             WalletBetflagController => CasinoProvider.Betflag.ToString(),
             WalletReevoController => CasinoProvider.Reevo.ToString(),
-            // WalletEveryMatrixController => CasinoProvider.Everymatrix.ToString(),
+            WalletEverymatrixController => CasinoProvider.Everymatrix.ToString(),
             _ => "Other"
         };
 
@@ -56,7 +56,6 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             }
         }
 
-        // logger.LogInformation();
         logger.Log(
             isError ? LogLevel.Error : LogLevel.Information,
             "Provider: {Provider} \n"

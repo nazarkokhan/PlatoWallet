@@ -70,7 +70,7 @@ public class PswSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
 
         var isValidSign = PswSecuritySign.IsValid(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 

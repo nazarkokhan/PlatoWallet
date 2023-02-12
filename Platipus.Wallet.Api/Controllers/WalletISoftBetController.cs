@@ -14,6 +14,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using StartupSettings;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
@@ -53,7 +54,7 @@ public class WalletISoftBetController : RestApiController
         if (casino is null)
             return SoftBetResultFactory.Failure(SoftBetErrorMessage.IncorrectFormatOfParameters).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
         var isValidHash = SoftbetSecurityHash.IsValid(hash, rawRequestBytes, casino.SignatureKey);
         if (!isValidHash)
             return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();

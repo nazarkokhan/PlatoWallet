@@ -85,7 +85,7 @@ public class Hub88SecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var rawRequestBytes = (byte[])httpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
 
         var isValidSign = Hub88SecuritySign.IsValid(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
 

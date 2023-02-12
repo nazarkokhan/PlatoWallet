@@ -14,7 +14,7 @@ public class EmaraPlayVerifyHashFilterAttribute : ActionFilterAttribute
 
         authHeader = authHeader.Replace("Bearer ", "");
 
-        var rawRequestBytes = (byte[])context.HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = context.HttpContext.GetRequestBodyBytesItem();
 
         var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
 

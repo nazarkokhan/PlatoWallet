@@ -38,7 +38,7 @@ public class GamesGlobalMiddleware : IMiddleware
             return;
         }
 
-        var rawRequest = (byte[])context.Items[HttpContextItemKeys.RawRequestBytes]!;
+        var rawRequest = context.GetRequestBodyBytesItem();
         var originalRequestString = Encoding.UTF8.GetString(rawRequest);
 
         var modifiedRequestString = originalRequestString

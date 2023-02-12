@@ -5,7 +5,6 @@ using System.Text.Json.Nodes;
 using System.Web;
 using Abstract;
 using Application.Extensions;
-using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.Betflag;
 using Application.Results.Hub88;
 using Application.Results.Sw;
@@ -17,6 +16,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
+using StartupSettings;
 
 [Route("test")]
 public class TestController : RestApiController
@@ -53,7 +53,7 @@ public class TestController : RestApiController
         if (casino is null)
             return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
 
         var validSignature = PswSecuritySign.Compute(rawRequestBytes, casino.SignatureKey);
 
@@ -177,7 +177,7 @@ public class TestController : RestApiController
         if (casino is null)
             return Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
 
         var validSignature = Hub88SecuritySign.Compute(rawRequestBytes, Hub88SecuritySign.PrivateKeyForWalletItself);
 
@@ -273,7 +273,7 @@ public class TestController : RestApiController
         if (user is null)
             return SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
 
-        var rawRequestBytes = (byte[])HttpContext.Items["rawRequestBytes"]!;
+        var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
 
         var validSignature = user.Map(u => SoftbetSecurityHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
 
@@ -355,34 +355,28 @@ public class TestController : RestApiController
         return Ok(validHash);
     }
 
-    public record BetflagHashRequest(
-        string Key,
-        long Timestamp,
-        string Hash) : IBetflagRequest;
+    [HttpPost("everymatrix/hash")]
+    public async Task<IActionResult> Everymatrix(string username, string route, CancellationToken cancellationToken)
+    {
+        var user = await _context.Set<User>()
+            .Where(u => u.UserName == username)
+            .Select(u => new { CasinoSignatureKey = u.Casino.SignatureKey })
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
-    // [HttpPost("everymatrix/hash")]
-    // public async Task<IActionResult> EveryMatrix(ActionType actionType, Guid userId)
-    // {
-    //     var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == userId);
-    //
-    //     var password = user.Password;
-    //
-    //     var dateTime = DateTime.UtcNow.ToString("yyyy:MM:dd:HH", CultureInfo.InvariantCulture);
-    //
-    //     var md5Hash = MD5.Create()
-    //         .ComputeHash(Encoding.UTF8.GetBytes($"NameOfMethod({actionType})Time({dateTime})password({password})"));
-    //
-    //     var validHash = Convert.ToHexString(md5Hash);
-    //
-    //     return Ok(validHash);
-    // }
+        if (user is null)
+            return BadRequest("User not found");
+
+        var hash = EverymatrixSecurityHash.Compute(route, user.CasinoSignatureKey);
+
+        return Ok(hash);
+    }
     //
     // [HttpPost("emaraplay/hash")]
     // public async Task<IActionResult> EmaraPlay(object request)
     // {
     //     var secretBytes = Encoding.UTF8.GetBytes("EmaraPlaySecret");
     //
-    //     var rawRequestBytes = (byte[]) HttpContext.Items["rawRequestBytes"]!;
+    //     var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
     //
     //     var data = HMACSHA512.HashData(secretBytes, rawRequestBytes);
     //     return Ok(Convert.ToHexString(data));
