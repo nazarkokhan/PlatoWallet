@@ -3,7 +3,6 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Common;
 
 public record SetCasinoGamesRequest(string CasinoId, List<string> GameLaunchNames) : IRequest<IResult>
 {
@@ -33,22 +32,15 @@ public record SetCasinoGamesRequest(string CasinoId, List<string> GameLaunchName
                 .Select(g => g.Id)
                 .ToListAsync(cancellationToken);
 
-            var casinoGamesToAdd = games.Select(g => new CasinoGames {GameId = g}).ToList();
-            casino.CasinoGames = casinoGamesToAdd;
-            // casinoGamesToAdd.AddRange(casinoGamesToAdd);
+            _context.RemoveRange(casino.CasinoGames);
 
-            _context.Update(casino);
+            var casinoGamesToAdd = games.Select(g => new CasinoGames { GameId = g }).ToList();
+            _context.AddRange(casinoGamesToAdd);
+            casino.CasinoGames.AddRange(casinoGamesToAdd);
+
             await _context.SaveChangesAsync(cancellationToken);
 
             return ResultFactory.Success();
         }
     }
-
-    // public class Validator : AbstractValidator<SetCasinoGamesRequest>
-    // {
-    //     public Validator()
-    //     {
-    //         RuleFor(p => p.Balance).ScalePrecision(2, 38);
-    //     }
-    // }
 }
