@@ -268,12 +268,19 @@ try
             })
         .Services
         .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
-        .AddHttpClient(
-            "Nazar",
+        .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
-            });
+            })
+        // .Services
+        // .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
+        // .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
+        //     options =>
+        //     {
+        //         options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
+        //     })
+        ;
 
     services.AddXmlRpc();
 

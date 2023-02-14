@@ -36,7 +36,6 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var rawQueryString = httpContext.Request.QueryString.ToString();
         var requestQueryString = httpContext.Request.Query.ToDictionary(x => x.Key, x => x.Value);
         requestQueryString.Remove("key");
         var withoutKey = QueryString.Create(requestQueryString).ToString();

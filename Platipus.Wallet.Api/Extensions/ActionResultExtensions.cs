@@ -1,10 +1,7 @@
 namespace Platipus.Wallet.Api.Extensions;
 
 using Application.Results.Base;
-using Application.Results.EmaraPlay;
-using Application.Results.Everymatrix;
 using Application.Results.Hub88;
-using Application.Results.PariMatch;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ActionResults;
 

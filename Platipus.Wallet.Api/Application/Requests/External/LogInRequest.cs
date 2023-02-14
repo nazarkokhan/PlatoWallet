@@ -6,6 +6,7 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Services.GamesApi;
@@ -23,6 +24,7 @@ public record LogInRequest(
     string CasinoId,
     string Game,
     string? Device,
+    string? Lobby = "XXX",
     string? UisLaunchType = "Play now") : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
 {
     public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
@@ -200,14 +202,14 @@ public record LogInRequest(
                         casino.SwProviderId!.Value,
                         request.UisLaunchType!);
                     break;
-                    // case CasinoProvider.Betflag:
-                    //     launchUrl = GetBetflagLaunchUrl(
-                    //         session.Id,
-                    //         session.User.UserName,
-                    //         request.UisLaunchType!);
+                case CasinoProvider.Reevo:
+                    var reevoLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
+                        session.Id,
+                        game.LaunchName,
+                        cancellationToken);
+                    launchUrl = reevoLaunchUrlResult.Data ?? "";
                     break;
                 case CasinoProvider.Everymatrix:
-                {
                     launchUrl = GetEveryMatrixLaunchUrlAsync(
                         casino.Id,
                         request.Game,
@@ -218,7 +220,6 @@ public record LogInRequest(
                         session.Id,
                         user.Currency.Name);
                     break;
-                }
 
                 //TODO refactor
                 // case CasinoProvider.PariMatch:
@@ -232,31 +233,18 @@ public record LogInRequest(
                     break;
             }
 
+            var url = new Uri(launchUrl);
+            var queryParams = QueryHelpers.ParseQuery(url.Query);
+            if (!queryParams.TryGetValue("lobby", out var lobby) || string.IsNullOrWhiteSpace(lobby))
+            {
+                queryParams["lobby"] = request.Lobby;
+            }
+
+            launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             var result = new Response(session.Id, user.Balance, launchUrl);
 
             return PswResultFactory.Success(result);
         }
-    }
-
-    private static string GetBetflagLaunchUrl(
-        Guid key,
-        string playerId,
-        string game)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { "Key", key.ToString() },
-            { "PlayerId", playerId },
-            { "Game", game },
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(
-            new Uri("https://test.platipusgaming.com/"),
-            $"betflag{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
     }
 
     private static string GetUisLaunchUrl(
@@ -307,7 +295,7 @@ public record LogInRequest(
             { "userid", userId },
             { "gameconfig", game },
             { "lang", "en" },
-            { "lobby", "" },
+            // { "lobby", "" },
             { "token", token.ToString() },
         };
 
@@ -408,7 +396,7 @@ public record LogInRequest(
             { "mode", "real" },
             { "launchercode", "26" },
             { "language", "en" },
-            { "lobbyurl", "" },
+            // { "lobbyurl", "" },
             { "extra", "multi" },
         };
 
@@ -464,7 +452,7 @@ public record LogInRequest(
             { nameof(productId), productId },
             { nameof(sessionToken), sessionToken },
             { nameof(lang), lang },
-            { nameof(lobbyUrl), lobbyUrl },
+            // { nameof(lobbyUrl), lobbyUrl },
             { nameof(targetChannel), targetChannel },
             { nameof(providerId), providerId },
             { nameof(consumerId), consumerId }

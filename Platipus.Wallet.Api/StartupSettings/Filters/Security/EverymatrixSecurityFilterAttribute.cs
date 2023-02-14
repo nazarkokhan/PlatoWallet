@@ -1,16 +1,15 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
-using Application.Requests.Wallets.Everymatrix;
+using Application.Requests.Wallets.Everymatrix.Base;
+using Application.Requests.Wallets.Everymatrix.Base.Response;
+using Application.Results.Everymatrix;
+using Domain.Entities;
+using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
-using Application.Requests.Wallets.Everymatrix.Base;
-using Application.Requests.Wallets.Everymatrix.Base.Response;
-using Platipus.Wallet.Api.Application.Results.Everymatrix;
-using Extensions;
-using Extensions.SecuritySign;
-using Domain.Entities;
-using Infrastructure.Persistence;
 
 public class EverymatrixSecurityFilterAttribute : ActionFilterAttribute
 {
