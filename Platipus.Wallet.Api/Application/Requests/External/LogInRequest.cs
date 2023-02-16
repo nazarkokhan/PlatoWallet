@@ -14,6 +14,8 @@ using Services.GamesGlobalGamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
+using Services.ReevoGamesApi;
+using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
@@ -34,19 +36,22 @@ public record LogInRequest(
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
+        private readonly IReevoGameApiClient _reevoGameApiClient;
 
         public Handler(
             WalletDbContext context,
             IGamesApiClient gamesApiClient,
             IHub88GamesApiClient hub88GamesApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
-            IGamesGlobalGamesApiClient globalGamesApiClient)
+            IGamesGlobalGamesApiClient globalGamesApiClient,
+            IReevoGameApiClient reevoGameApiClient)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
             _hub88GamesApiClient = hub88GamesApiClient;
             _softswissGamesApiClient = softswissGamesApiClient;
             _globalGamesApiClient = globalGamesApiClient;
+            _reevoGameApiClient = reevoGameApiClient;
         }
 
         public async Task<IPswResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
@@ -79,8 +84,11 @@ public record LogInRequest(
                 IsTemporaryToken = casino.Provider is CasinoProvider.Everymatrix //TODO add support for older ones
             };
 
-            _context.Add(session);
-            await _context.SaveChangesAsync(cancellationToken);
+            if (casino.Provider is not CasinoProvider.Reevo)
+            {
+                _context.Add(session);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
             var game = await _context.Set<Game>()
                 .Where(g => g.LaunchName == request.Game)
@@ -203,11 +211,30 @@ public record LogInRequest(
                         request.UisLaunchType!);
                     break;
                 case CasinoProvider.Reevo:
-                    var reevoLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
-                        session.Id,
-                        game.LaunchName,
+                    var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
+                        new ReevoGetGameGameApiRequest(
+                            "",
+                            "",
+                            request.UserName,
+                            request.UserName,
+                            request.Password,
+                            "en",
+                            game.LaunchName,
+                            request.Lobby ?? "",
+                            "0",
+                            user.Currency.Name,
+                            casino.Id),
                         cancellationToken);
-                    launchUrl = reevoLaunchUrlResult.Data ?? "";
+
+                    if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.ErrorMessage is not null)
+                        return PswResultFactory.Failure<Response>(PswErrorCode.Unknown);
+                    var dataSuccess = reevoLaunchUrlResult.Data.Success;
+
+                    session.Id = new Guid(dataSuccess.GameSessionId);
+                    _context.Add(session);
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    launchUrl = dataSuccess.Response;
                     break;
                 case CasinoProvider.Everymatrix:
                     launchUrl = GetEveryMatrixLaunchUrlAsync(

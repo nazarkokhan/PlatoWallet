@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Services.Wallet.New;
 
-using Platipus.Wallet.Api.Application.Services.Wallet.DTOs;
+using DTOs;
 
 public interface IWalletServiceNew
 {

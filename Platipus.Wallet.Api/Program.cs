@@ -12,6 +12,7 @@ using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.GamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
+using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Controllers.GamesGlobal;
@@ -151,6 +152,7 @@ try
             options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
         .AddJsonOptions(
             nameof(CasinoProvider.Everymatrix),
@@ -273,14 +275,13 @@ try
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
             })
-        // .Services
-        // .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
-        // .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
-        //     options =>
-        //     {
-        //         options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
-        //     })
-        ;
+        .Services
+        .AddSingleton<IReevoGameApiClient, ReevoGameApiClient>()
+        .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
+            options =>
+            {
+                options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
+            });
 
     services.AddXmlRpc();
 
@@ -331,6 +332,6 @@ namespace Platipus.Wallet.Api
 {
     public static class App
     {
-        public const string Version = "33.0";
+        public const string Version = "35.0";
     }
 }
