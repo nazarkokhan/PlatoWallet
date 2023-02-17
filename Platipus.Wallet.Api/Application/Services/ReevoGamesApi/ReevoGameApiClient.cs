@@ -76,7 +76,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
             var error = responseJsonNode?["error"]?.GetValue<int?>();
             if (error is not 0)
             {
-                var errorResponse = responseJsonNode.Deserialize<ReevoErrorGameApiResponse>();
+                var errorResponse = responseJsonNode.Deserialize<ReevoErrorGameApiResponse>(_hub88JsonSerializerOptions);
                 if (errorResponse is null)
                     return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.GeneralError);
                 var errorBox = new ReevoCommonBoxGameApiResponse<TResponse>(errorResponse, default!);
@@ -84,7 +84,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
                 return ReevoResultFactory.Success(errorBox);
             }
 
-            var successResponse = responseJsonNode.Deserialize<TResponse>();
+            var successResponse = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
             if (successResponse is null)
                 return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.GeneralError);
             var successBox = new ReevoCommonBoxGameApiResponse<TResponse>(null, successResponse);

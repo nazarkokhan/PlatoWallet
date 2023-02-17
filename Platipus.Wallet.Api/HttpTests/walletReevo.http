@@ -1,0 +1,15 @@
+###login
+POST http://localhost:5275/external/login
+Content-Type: application/json
+
+{
+  "user_name": "reevo_nazar",
+  "password": "qwe123",
+  "casino_id": "reevo_platipus",
+  "game": "extragems",
+  "lobby": "string"
+}
+
+###balance
+GET http://localhost:5275/wallet/reevo?action=balance
+Accept: application/json

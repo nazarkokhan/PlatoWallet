@@ -1,0 +1,11 @@
+###login
+POST http://localhost:5275/external/login
+Content-Type: application/json
+
+{
+  "user_name": "nazar_openbox",
+  "password": "qwe123",
+  "casino_id": "openbox",
+  "game": "extragems",
+  "lobby": "string"
+}

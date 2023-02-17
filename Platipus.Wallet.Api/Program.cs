@@ -175,7 +175,10 @@ try
         //         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         //     })
         .Services
-        .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
+        // .Configure<SupportedCurrenciesOptions>(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)).Bind)
+        .AddOptions<SupportedCurrenciesOptions>()
+        .Bind(builderConfiguration.GetSection(nameof(SupportedCurrenciesOptions)))
+        .Services
         .Configure<SupportedCountriesOptions>(
             options => builderConfiguration.GetSection(nameof(SupportedCountriesOptions)).Bind(options))
         .Configure(
@@ -280,7 +283,8 @@ try
         .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
             {
-                options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
+                // options.BaseAddress = new Uri($"{gamesApiUrl} reevo/");
+                options.BaseAddress = new Uri("http://localhost:5143/reevo");
             });
 
     services.AddXmlRpc();
