@@ -273,14 +273,18 @@ public record LogInRequest(
                     break;
             }
 
-            var url = new Uri(launchUrl);
-            var queryParams = QueryHelpers.ParseQuery(url.Query);
-            if (!queryParams.TryGetValue("lobby", out var lobby) || string.IsNullOrWhiteSpace(lobby))
+            if (!string.IsNullOrWhiteSpace(launchUrl))
             {
-                queryParams["lobby"] = request.Lobby;
+                var url = new Uri(launchUrl);
+                var queryParams = QueryHelpers.ParseQuery(url.Query);
+                if (!queryParams.TryGetValue("lobby", out var lobby) || string.IsNullOrWhiteSpace(lobby))
+                {
+                    queryParams["lobby"] = request.Lobby;
+                }
+
+                launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             }
 
-            launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             var result = new Response(session.Id, user.Balance, launchUrl);
 
             return PswResultFactory.Success(result);

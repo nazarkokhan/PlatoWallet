@@ -48,7 +48,7 @@ public class GamesApiClient : IGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
-            new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/session").AbsolutePath,
+            new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/session").AbsoluteUri,
             new PswGetGameLinkGamesApiRequest(
                 casinoId,
                 sessionId,
