@@ -40,6 +40,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
     }
 
     public async Task<ISoftswissResult<SoftswissGetGameLinkGameApiResponse>> GetLaunchUrlAsync(
+        Uri baseUrl,
         string casinoId,
         string user,
         Guid sessionId,
@@ -65,7 +66,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
                 SoftswissErrorCode.GameIsNotAvailableToYourCasino);
 
         var response = await PostSignedRequestAsync<SoftswissGetLaunchUrlGameApiRequest, SoftswissGetGameLinkGameApiResponse>(
-            "sessions",
+            baseUrl.AbsoluteUri,
             new SoftswissGetLaunchUrlGameApiRequest(
                 casinoId,
                 gameEntity.GameServerId,

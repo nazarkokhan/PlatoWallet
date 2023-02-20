@@ -11,7 +11,11 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<IResult<string?>> GetLaunchUrlAsync(Guid token, string game, CancellationToken cancellationToken = default)
+    public async Task<IResult<string?>> GetLaunchUrlAsync(
+        Uri baseUrl,
+        Guid token,
+        string game,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -24,7 +28,7 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
             };
             var jsonContent = JsonContent.Create(requestBody);
 
-            var httpResponse = await _httpClient.PostAsync("", jsonContent, cancellationToken);
+            var httpResponse = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             var responseJsonNode = JsonNode.Parse(responseString);

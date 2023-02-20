@@ -35,6 +35,7 @@ public class GamesApiClient : IGamesApiClient
     }
 
     public async Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
+        Uri baseUrl,
         CasinoProvider casinoProvider,
         string casinoId,
         Guid sessionId,
@@ -42,14 +43,12 @@ public class GamesApiClient : IGamesApiClient
         string currency,
         string game,
         string locale,
-        string lobby,
-        string launchMode,
+        string lobby = "",
+        string launchMode = "url",
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
-            casinoProvider is CasinoProvider.Psw
-                ? "game/session"
-                : "https://test.platipusgaming.com/betflag/game/session",
+            new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/session").AbsolutePath,
             new PswGetGameLinkGamesApiRequest(
                 casinoId,
                 sessionId,

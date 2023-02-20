@@ -26,7 +26,8 @@ public record LogInRequest(
     string CasinoId,
     string Game,
     string? Device,
-    string? Lobby = "XXX",
+    string? Lobby,
+    string? LaunchUrlEnvironment = "test",
     string? UisLaunchType = "Play now") : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
 {
     public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
@@ -103,6 +104,7 @@ public record LogInRequest(
             if (game is null)
                 return PswResultFactory.Failure<Response>(PswErrorCode.InvalidGame);
 
+            var baseUrl = new Uri($"https://{request.LaunchUrlEnvironment}.platipusgaming.com/");
             string launchUrl;
 
             switch (casino.Provider)
@@ -110,6 +112,7 @@ public record LogInRequest(
                 case CasinoProvider.Psw or CasinoProvider.Betflag:
                 {
                     var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
+                        baseUrl,
                         user.Casino.Provider!.Value,
                         user.Casino.Id,
                         session.Id,
@@ -123,6 +126,7 @@ public record LogInRequest(
                 }
                 case CasinoProvider.Openbox:
                     launchUrl = GetOpenboxLaunchUrl(
+                        baseUrl,
                         session.Id,
                         user.CasinoId,
                         user.Id,
@@ -132,6 +136,7 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.Dafabet:
                     launchUrl = GetDafabetLaunchUrlAsync(
+                        baseUrl,
                         request.Game,
                         user.UserName,
                         session.Id,
@@ -162,6 +167,7 @@ public record LogInRequest(
                         "EE");
 
                     var getGameLinkResult = await _hub88GamesApiClient.GetLaunchUrlAsync(
+                        baseUrl,
                         getHub88GameLinkRequestDto,
                         cancellationToken);
 
@@ -171,6 +177,7 @@ public record LogInRequest(
                 case CasinoProvider.Softswiss:
                 {
                     var getGameLinkResult = await _softswissGamesApiClient.GetLaunchUrlAsync(
+                        baseUrl,
                         user.CasinoId,
                         user.UserName,
                         session.Id,
@@ -184,6 +191,7 @@ public record LogInRequest(
                 }
                 case CasinoProvider.Sw:
                     launchUrl = GetSwLaunchUrl(
+                        baseUrl,
                         session.Id,
                         $"{casino.Id}-{user.Currency.Name}",
                         user.UserName,
@@ -191,6 +199,7 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
+                        baseUrl,
                         game.GameServerId,
                         casino.SignatureKey,
                         user.UserName,
@@ -199,6 +208,7 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
+                        baseUrl,
                         session.Id,
                         game.LaunchName,
                         cancellationToken);
@@ -206,12 +216,14 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.Uis:
                     launchUrl = GetUisLaunchUrl(
+                        request.LaunchUrlEnvironment,
                         session.Id,
                         casino.SwProviderId!.Value,
                         request.UisLaunchType!);
                     break;
                 case CasinoProvider.Reevo:
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
+                        baseUrl,
                         new ReevoGetGameGameApiRequest(
                             "",
                             "",
@@ -238,6 +250,7 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.Everymatrix:
                     launchUrl = GetEveryMatrixLaunchUrlAsync(
+                        baseUrl,
                         casino.Id,
                         request.Game,
                         "en",
@@ -275,6 +288,7 @@ public record LogInRequest(
     }
 
     private static string GetUisLaunchUrl(
+        string? requestLaunchUrlEnvironment,
         Guid token,
         int operatorId,
         string launchType)
@@ -311,6 +325,7 @@ public record LogInRequest(
     }
 
     private static string GetSwLaunchUrl(
+        Uri baseUrl,
         Guid token,
         string key,
         string userId,
@@ -329,13 +344,14 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(
-            new Uri("https://test.platipusgaming.com/"),
+            baseUrl,
             $"BIGBOSS/connect.do{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
 
     private static string GetOpenboxLaunchUrl(
+        Uri baseUrl,
         Guid token,
         string agencyUid,
         Guid playerUid,
@@ -362,13 +378,14 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(
-            new Uri("https://test.platipusgaming.com/onlinecasino/"),
-            $"openbox/launcher{queryString.ToUriComponent()}");
+            baseUrl,
+            $"onlinecasino/openbox/launcher{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
 
     private static string GetDafabetLaunchUrlAsync(
+        Uri baseUrl,
         string gameCode,
         string playerId,
         Guid playerToken,
@@ -396,12 +413,13 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"dafabet/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(baseUrl, $"dafabet/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
 
     private static string GetSoftBetLaunchUrlAsync(
+        Uri baseUrl,
         int gameId,
         string token,
         string username,
@@ -429,12 +447,13 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"isoftbet/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(baseUrl, $"isoftbet/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
 
     private static string GetEveryMatrixLaunchUrlAsync(
+        Uri baseUrl,
         string brand,
         string gameCode,
         string? language,
@@ -458,12 +477,13 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"everymatrix/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(baseUrl, $"everymatrix/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
 
     private static string GetPariMatchLaunchUrl(
+        Uri baseUrl,
         string cid,
         string? productId,
         string sessionToken,
@@ -487,7 +507,7 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(new Uri("https://test.platipusgaming.com/"), $"parimatch/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(baseUrl, $"parimatch/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

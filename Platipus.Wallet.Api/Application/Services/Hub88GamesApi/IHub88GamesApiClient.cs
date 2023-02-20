@@ -8,6 +8,7 @@ public interface IHub88GamesApiClient
 {
     //Game
     Task<IHub88Result<Hub88GetLaunchUrlGamesApiResponseDto>> GetLaunchUrlAsync(
+        Uri baseUrl,
         Hub88GetGameLinkGamesApiRequestDto request,
         CancellationToken cancellationToken = default);
 

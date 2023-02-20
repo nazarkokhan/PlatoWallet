@@ -6,6 +6,7 @@ using DTOs.Responses;
 public interface ISoftswissGamesApiClient
 {
     Task<ISoftswissResult<SoftswissGetGameLinkGameApiResponse>> GetLaunchUrlAsync(
+        Uri baseUrl,
         string casinoId,
         string user,
         Guid sessionId,

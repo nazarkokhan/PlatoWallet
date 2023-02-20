@@ -6,6 +6,7 @@ using DTOs.Responses;
 public interface IGamesApiClient
 {
     Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
+        Uri baseUrl,
         CasinoProvider casinoProvider,
         string casinoId,
         Guid sessionId,

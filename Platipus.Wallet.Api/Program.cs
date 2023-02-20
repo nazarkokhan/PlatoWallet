@@ -283,8 +283,8 @@ try
         .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
             {
-                // options.BaseAddress = new Uri($"{gamesApiUrl} reevo/");
-                options.BaseAddress = new Uri("http://localhost:5143/reevo");
+                options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
+                // options.BaseAddress = new Uri("http://localhost:5143/reevo");
             });
 
     services.AddXmlRpc();

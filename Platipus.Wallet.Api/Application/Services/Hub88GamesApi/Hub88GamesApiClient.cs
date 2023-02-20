@@ -26,11 +26,12 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
 
     //Game
     public async Task<IHub88Result<Hub88GetLaunchUrlGamesApiResponseDto>> GetLaunchUrlAsync(
+        Uri baseUrl,
         Hub88GetGameLinkGamesApiRequestDto request,
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<Hub88GetGameLinkGamesApiRequestDto, Hub88GetLaunchUrlGamesApiResponseDto>(
-            "game/url",
+            new Uri(baseUrl, "game/url").AbsoluteUri,
             request,
             cancellationToken);
 

@@ -21,42 +21,51 @@ public class ReevoGameApiClient : IReevoGameApiClient
     }
 
     public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoGetGameGameApiResponse>>> GetGameAsync(
+        Uri baseUrl,
         ReevoGetGameGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         return await PostSignedRequestAsync<ReevoGetGameGameApiRequest, ReevoGetGameGameApiResponse>(
+            baseUrl,
             request,
             cancellationToken);
     }
 
     public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundAsync(
+        Uri? baseUrl,
         ReevoAddFreeRoundsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         return await PostSignedRequestAsync<ReevoAddFreeRoundsGameApiRequest, ReevoAddFreeRoundsGameApiResponse>(
+            baseUrl,
             request,
             cancellationToken);
     }
 
     public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoGetGameHistoryGameApiResponse>>> GetGameHistory(
+        Uri? baseUrl,
         ReevoGetGameHistoryGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         return await PostSignedRequestAsync<ReevoGetGameHistoryGameApiRequest, ReevoGetGameHistoryGameApiResponse>(
+            baseUrl,
             request,
             cancellationToken);
     }
 
     public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoGetGameListGameApiResponse>>> CreateRewardAsync(
+        Uri? baseUrl,
         ReevoGetGameListGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         return await PostSignedRequestAsync<ReevoGetGameListGameApiRequest, ReevoGetGameListGameApiResponse>(
+            baseUrl,
             request,
             cancellationToken);
     }
 
     private async Task<IReevoResult<ReevoCommonBoxGameApiResponse<TResponse>>> PostSignedRequestAsync<TRequest, TResponse>(
+        Uri? baseUrl,
         TRequest request,
         CancellationToken cancellationToken)
     {
@@ -64,7 +73,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
         {
             var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
 
-            var httpResponse = await _httpClient.PostAsync((string?)null, jsonContent, cancellationToken);
+            var httpResponse = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
