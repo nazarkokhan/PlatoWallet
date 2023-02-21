@@ -36,17 +36,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         var executedContext = await next();
 
-        var requestRoute = context.ActionDescriptor.EndpointMetadata
-            .OfType<HttpMethodAttribute>()
-            .SingleOrDefault()
-            ?.Template;
-
-        if (requestRoute is null)
-        {
-            logger.LogCritical("Request route not found");
-            return;
-        }
-
         ErrorMockMethod? currentMethod;
         string? usernameOrSession;
 
@@ -121,6 +110,17 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         // }
         else
         {
+            var requestRoute = context.ActionDescriptor.EndpointMetadata
+                .OfType<HttpMethodAttribute>()
+                .SingleOrDefault()
+                ?.Template;
+
+            if (requestRoute is null)
+            {
+                logger.LogCritical("Request route not found");
+                return;
+            }
+
             currentMethod = requestRoute switch
             {
                 "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" => ErrorMockMethod.Balance,
@@ -175,7 +175,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         if (currentMethod is null)
         {
-            logger.LogDebug("ErrorMockMethod not found for route {RequestRoute}", requestRoute);
+            logger.LogDebug("ErrorMockMethod not found");
             return;
         }
 
