@@ -227,11 +227,11 @@ public record LogInRequest(
                         new ReevoGetGameGameApiRequest(
                             "",
                             "",
-                            request.UserName,
+                            user.UserName,
                             request.UserName,
                             request.Password,
                             "en",
-                            game.LaunchName,
+                            game.GameServerId.ToString(),
                             request.Lobby ?? "",
                             "0",
                             user.Currency.Name,

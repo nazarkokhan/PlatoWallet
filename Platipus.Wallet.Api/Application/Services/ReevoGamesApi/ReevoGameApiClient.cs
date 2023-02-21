@@ -71,6 +71,12 @@ public class ReevoGameApiClient : IReevoGameApiClient
     {
         try
         {
+            if (baseUrl is not null)
+            {
+                baseUrl = new Uri("http://localhost:5143/reevo");
+                // baseUrl = new Uri(baseUrl, "reevo");
+            }
+
             var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
 
             var httpResponse = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);

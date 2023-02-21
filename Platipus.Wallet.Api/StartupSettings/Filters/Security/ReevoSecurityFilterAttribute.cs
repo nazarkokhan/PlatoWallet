@@ -26,11 +26,18 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
                 s => new
                 {
                     s.Id,
+                    s.ExpirationDate,
                     s.User.Casino.SignatureKey
                 })
             .FirstOrDefaultAsync();
 
         if (session is null)
+        {
+            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.GeneralError).ToActionResult();
+            return;
+        }
+
+        if (session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.GeneralError).ToActionResult();
             return;
