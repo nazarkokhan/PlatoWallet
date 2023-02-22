@@ -8,10 +8,11 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 
 [Route("wallet/everymatrix")]
 [MockedErrorActionFilter(Order = 1)]
-// [EverymatrixSecurityFilter(Order = 2)]
+[EverymatrixSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
 [ProducesResponseType(typeof(EverymatrixErrorResponse), StatusCodes.Status200OK)]
 public class WalletEverymatrixController : RestApiController

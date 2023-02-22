@@ -20,6 +20,14 @@ using Services.SoftswissGamesApi;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
 
+//oponbox, uis, psw
+enum LaunchMode
+{
+    Real = 1,
+    Fun,
+    Demo
+}
+
 public record LogInRequest(
     string UserName,
     string Password,
@@ -322,7 +330,7 @@ public record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(
-            new Uri("https://platipusgaming.cloud/qa/integration/"),
+            new Uri("https://platipusgaming.cloud/qa/integration/vivo/test/index.html"),
             $"vivo/test/index.html{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;

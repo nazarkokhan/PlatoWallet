@@ -19,7 +19,7 @@ public static class EverymatrixSecurityHash
 
     public static string Compute(string nameOfMethod, string password)
     {
-        var stringToVerify = $"{nameOfMethod}{DateTime.Now:yyyy:MM:dd:hh}{password}";
+        var stringToVerify = $"{nameOfMethod}{DateTime.UtcNow:yyyy:MM:dd:hh}{password}";
 
         var dataBytes = Encoding.ASCII.GetBytes(stringToVerify);
 
@@ -28,4 +28,12 @@ public static class EverymatrixSecurityHash
 
         return md5String.ToLower();
     }
+
+    // static public string GetMD5(string str, int size)
+    // {
+    //     if (size > 0 && str.Length != size) str.PadLeft(16, '#');
+    //
+    //     MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+    //     return ToHex(md5.ComputeHash(Encoding.ASCII.GetBytes(str)));
+    // }
 }

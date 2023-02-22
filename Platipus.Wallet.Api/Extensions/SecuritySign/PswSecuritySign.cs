@@ -20,6 +20,6 @@ public static class PswSecuritySign
         var hmac = HMACSHA256.HashData(signatureKeyBytes, rawRequestBody);
         var validSignature = Convert.ToHexString(hmac);
 
-        return validSignature.ToLower();
+        return validSignature;
     }
 }

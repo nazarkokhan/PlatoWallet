@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using System.Data;
 using System.Net.Mime;
 using System.Text.Json;
 using Application.Requests.Wallets.Betflag.Base;
@@ -194,7 +195,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
         };
 
-        // var dbTransaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var dbTransaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
         var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (mockedError is null)
@@ -260,6 +261,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await dbTransaction.CommitAsync(cancellationToken);
     }
 
     private static void LogOpenboxMockingFailed(ILogger logger, OpenboxSingleRequest openboxRequest)

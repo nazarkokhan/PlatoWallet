@@ -5,9 +5,9 @@ using Base.Response;
 using Domain.Entities;
 using Extensions;
 using Infrastructure.Persistence;
-using Results.Everymatrix.WithData;
 using Microsoft.EntityFrameworkCore;
 using Results.Everymatrix;
+using Results.Everymatrix.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 using Services.Wallet.DTOs;
@@ -17,7 +17,7 @@ public record EverymatrixBetRequest(
         Guid Token,
         decimal Amount,
         string Currency,
-        string GameId,
+        int GameId,
         string RoundId,
         string ExternalId,
         string Hash,
