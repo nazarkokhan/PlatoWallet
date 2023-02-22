@@ -4,13 +4,13 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using EntityFrameworkQueryableExtensions = Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions;
 
-public record AddGameRequest(
+public record CreateGameRequest(
     int GameServerId,
     string Name,
     string LaunchName,
     int CategoryId) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<AddGameRequest, IResult>
+    public class Handler : IRequestHandler<CreateGameRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -20,7 +20,7 @@ public record AddGameRequest(
         }
 
         public async Task<IResult> Handle(
-            AddGameRequest request,
+            CreateGameRequest request,
             CancellationToken cancellationToken)
         {
             var game = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
