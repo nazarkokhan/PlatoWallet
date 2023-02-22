@@ -25,5 +25,8 @@ public enum PswErrorCode
     Unknown = 100,
     InvalidHash = 101,
     CouldNotTryToMockSessionError = 1000,
-    Duplication = 1001
+    Duplication = 1001,
+
+    //remve
+    ReevoGameServerError = 1001
 }
