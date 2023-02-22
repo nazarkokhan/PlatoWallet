@@ -194,6 +194,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
         };
 
+        // var dbTransaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
         var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (mockedError is null)

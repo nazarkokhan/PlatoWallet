@@ -12,13 +12,18 @@ public class ExternalGamelistController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public ExternalGamelistController(IMediator mediator)
-        => _mediator = mediator;
+    public ExternalGamelistController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet("gamelist")]
     [ProducesResponseType(typeof(List<GetCommonGameDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CommonErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CommonGames([FromQuery] GetCasinoGamesRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("game")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CommonErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddGame(AddGameRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("casino-gamelist")]

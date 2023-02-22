@@ -23,12 +23,18 @@ public class WalletOpenboxController : RestApiController
     private readonly IMediator _mediator;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly WalletDbContext _context;
+    private readonly ILogger<WalletOpenboxController> _logger;
 
-    public WalletOpenboxController(IMediator mediator, IOptionsMonitor<JsonOptions> options, WalletDbContext context)
+    public WalletOpenboxController(
+        IMediator mediator,
+        IOptionsMonitor<JsonOptions> options,
+        WalletDbContext context,
+        ILogger<WalletOpenboxController> logger)
     {
         _mediator = mediator;
         _jsonSerializerOptions = options.Get(nameof(CasinoProvider.Openbox)).JsonSerializerOptions;
         _context = context;
+        _logger = logger;
     }
 
     [HttpPost("main")]
@@ -61,7 +67,9 @@ public class WalletOpenboxController : RestApiController
             var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayload, payloadType, _jsonSerializerOptions);
             if (payloadRequestObj is null)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
+
             HttpContext.Items.Add("OpenboxPayloadRequestObj", payloadRequestObj);
+            _logger.LogInformation("Openbox decrypted payload: {OpenboxDecryptedPayload}", payloadRequestObj);
 
             var responseObj = await _mediator.Send(payloadRequestObj, cancellationToken);
             if (responseObj is not IOpenboxResult response)
