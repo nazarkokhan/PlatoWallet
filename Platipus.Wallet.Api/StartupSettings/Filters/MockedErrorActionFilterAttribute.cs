@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
-using System.Data;
 using System.Net.Mime;
 using System.Text.Json;
 using Application.Requests.Wallets.Betflag.Base;
@@ -186,7 +185,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
+        var dbTransaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         var mockedErrorQuery = dbContext.Set<MockedError>()
+            .FromSqlRaw("select * from mocked_errors for update")
             .Where(e => e.Method == currentMethod);
 
         mockedErrorQuery = context.Controller switch
@@ -195,7 +197,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
         };
 
-        var dbTransaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
         var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (mockedError is null)
@@ -259,9 +260,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             dbContext.Remove(mockedError);
             logger.LogInformation("Mocked error deleted");
         }
+        else
+            dbContext.Update(mockedError);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-
         await dbTransaction.CommitAsync(cancellationToken);
     }
 
