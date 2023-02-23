@@ -197,6 +197,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
         };
 
+        dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
         var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
 
         if (mockedError is null)

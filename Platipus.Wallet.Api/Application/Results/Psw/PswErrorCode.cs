@@ -28,5 +28,6 @@ public enum PswErrorCode
     Duplication = 1001,
 
     //remve
-    ReevoGameServerError = 1001
+    ReevoGameServerError = 10052,
+    MaxTimeout3Min = 100122
 }

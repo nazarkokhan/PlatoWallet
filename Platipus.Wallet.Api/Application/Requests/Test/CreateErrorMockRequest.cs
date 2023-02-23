@@ -48,6 +48,9 @@ public record CreateErrorMockRequest(
                 "json" or _ => MediaTypeNames.Application.Json
             };
 
+            if (request.Timeout > TimeSpan.FromMinutes(3))
+                return PswResultFactory.Failure(PswErrorCode.MaxTimeout3Min);
+
             var mockedError = new MockedError
             {
                 Method = request.Method,
