@@ -1,7 +1,8 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Everymatrix.Base;
@@ -24,10 +25,10 @@ using Microsoft.EntityFrameworkCore;
 
 public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 {
+    [SuppressMessage("ReSharper", "MethodSupportsCancellation")]
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var httpContext = context.HttpContext;
-        var cancellationToken = httpContext.RequestAborted;
         var services = httpContext.RequestServices;
         var logger = services.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
         var dbContext = services.GetRequiredService<WalletDbContext>();
@@ -185,7 +186,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var dbTransaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var dbTransaction = await dbContext.Database.BeginTransactionAsync();
 
         var mockedErrorQuery = dbContext.Set<MockedError>()
             .FromSqlRaw("select * from mocked_errors for update")
@@ -197,8 +198,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
         };
 
-        dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
-        var mockedError = await mockedErrorQuery.FirstOrDefaultAsync(executedContext.HttpContext.RequestAborted);
+        dbContext.Database.SetCommandTimeout(TimeSpan.FromDays(1));
+        var mockedError = await mockedErrorQuery.FirstOrDefaultAsync();
 
         if (mockedError is null)
         {
@@ -220,7 +221,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             });
 
         if (mockedError.Timeout is not null)
-            await Task.Delay(mockedError.Timeout.Value, cancellationToken);
+            await Task.Delay(mockedError.Timeout.Value);
 
         switch (mockedError.ContentType)
         {
@@ -237,7 +238,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 object? response = null;
                 try
                 {
-                    response = JsonSerializer.Deserialize<object>(mockedError.Body);
+                    response = JsonNode.Parse(mockedError.Body);
                     context.HttpContext.Items.Add("response", response);
                 }
                 catch (Exception e)
@@ -264,8 +265,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         else
             dbContext.Update(mockedError);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
-        await dbTransaction.CommitAsync(cancellationToken);
+        await dbContext.SaveChangesAsync();
+        await dbTransaction.CommitAsync();
     }
 
     private static void LogOpenboxMockingFailed(ILogger logger, OpenboxSingleRequest openboxRequest)
