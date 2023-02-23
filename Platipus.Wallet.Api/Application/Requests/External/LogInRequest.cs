@@ -168,7 +168,7 @@ public record LogInRequest(
                         "https://amazing-casino.com/lobby",
                         "en",
                         "142.245.172.168",
-                        556,
+                        game.GameServerId,
                         request.Game,
                         "https://amazing-casion.com/deposit",
                         user.Currency.Name,

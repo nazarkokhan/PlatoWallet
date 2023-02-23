@@ -15,6 +15,7 @@ using Results.Hub88.WithData;
 
 public class Hub88GamesApiClient : IHub88GamesApiClient
 {
+    private const string Hub88 = "hub88/";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _hub88JsonSerializerOptions;
 
@@ -31,7 +32,7 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<Hub88GetGameLinkGamesApiRequestDto, Hub88GetLaunchUrlGamesApiResponseDto>(
-            new Uri(baseUrl, "game/url").AbsoluteUri,
+            new Uri(baseUrl, Hub88 + "game/url").AbsoluteUri,
             request,
             cancellationToken);
 
@@ -43,7 +44,7 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<Hub88GetGamesListRequestDto, List<Hub88GetGameDto>>(
-            "game/list",
+            Hub88 + "game/list",
             request,
             cancellationToken);
 
@@ -55,7 +56,7 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<Hub88GetRoundGamesApiRequestDto, Hub88GetRoundGamesApiResponseDto>(
-            "game/round",
+            Hub88 + "game/round",
             request,
             cancellationToken);
 
@@ -68,7 +69,7 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<Hub88PrepaidsListGamesApiRequestDto, List<Hub88PrepaidGamesApiResponseDto>>(
-            "freebet/prepaids/list",
+            Hub88 + "freebet/prepaids/list",
             request,
             cancellationToken);
 
