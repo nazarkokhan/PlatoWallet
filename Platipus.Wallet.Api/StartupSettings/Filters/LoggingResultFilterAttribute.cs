@@ -16,7 +16,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
     {
         var httpContext = context.HttpContext;
 
-        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
+        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<LoggingResultFilterAttribute>>();
 
         var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
         var request = httpContext.Items[HttpContextItems.RequestObject];

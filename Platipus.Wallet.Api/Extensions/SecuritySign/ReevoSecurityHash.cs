@@ -24,8 +24,21 @@ public static class ReevoSecurityHash
         var secretBytes = Encoding.UTF8.GetBytes(queryString + secretKey);
         var hash = SHA1.HashData(secretBytes);
 
-        var hashString = Convert.ToHexString(hash);
+        var hashString = Tools.ToHex(hash);
+        var hashString2 = Convert.ToHexString(hash);
 
         return hashString;
+    }
+}
+
+public class Tools
+{
+    static public string ToHex(byte[] data)
+    {
+        StringBuilder hash = new StringBuilder();
+        for (int i = 0; i < 16; ++i)
+            hash.AppendFormat("{0:x2}", data[i]);
+
+        return hash.ToString();
     }
 }

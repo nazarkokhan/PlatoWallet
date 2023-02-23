@@ -10,6 +10,26 @@ Content-Type: application/json
   "lobby": "string"
 }
 
+###getGame
+#POST https://test.platipusgaming.com/reevo
+POST http://localhost:5143/reevo
+Content-Type: application/json
+
+{
+  "api_login": "",
+  "api_password": "",
+  "user_id": "reevo_nazar",
+  "user_nickname": "reevo_nazar",
+  "user_password": "qwe123",
+  "lang": "en",
+  "gameid": "568",
+  "homeurl": "string",
+  "play_for_fun": "0",
+  "currency": "USD",
+  "operator": "reevo_platipus",
+  "method": "getGame"
+}
+
 ###balance
 GET http://localhost:5275/wallet/reevo?action=balance
 Accept: application/json

@@ -247,9 +247,7 @@ public record LogInRequest(
                         cancellationToken);
 
                     if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.ErrorMessage is not null)
-                    {
                         return PswResultFactory.Failure<Response>(PswErrorCode.ReevoGameServerError);
-                    }
 
                     var dataSuccess = reevoLaunchUrlResult.Data.Success;
 
