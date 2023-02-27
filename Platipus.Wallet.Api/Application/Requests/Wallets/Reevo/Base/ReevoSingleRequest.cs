@@ -23,7 +23,7 @@ public record ReevoSingleRequest : IReevoRequest
     public string Username { get; init; } = null!;
 
     [FromQuery(Name = "game_id_hash")]
-    public string GameIdHash { get; init; } = null!;
+    public string? GameIdHash { get; init; }
 
     [FromQuery(Name = "session_id")]
     public string SessionId { get; init; } = null!;

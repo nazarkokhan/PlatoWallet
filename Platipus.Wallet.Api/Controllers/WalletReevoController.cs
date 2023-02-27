@@ -40,7 +40,7 @@ public class WalletReevoController : RestApiController
                         r.Action,
                         r.RemoteId ?? throw new ReevoMissingParameterException(nameof(r.RemoteId)),
                         r.Username,
-                        r.GameIdHash,
+                        r.GameIdHash  ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.SessionId,
                         r.GameSessionId,
                         r.Key)),
@@ -53,7 +53,7 @@ public class WalletReevoController : RestApiController
                         r.Username,
                         r.SessionId,
                         r.Amount ?? throw new ReevoMissingParameterException(nameof(r.Amount)),
-                        r.GameIdHash,
+                        r.GameIdHash ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.TransactionId ?? throw new ReevoMissingParameterException(nameof(r.TransactionId)),
                         r.RoundId ?? throw new ReevoMissingParameterException(nameof(r.RoundId)),
                         r.GameplayFinal,
@@ -72,7 +72,7 @@ public class WalletReevoController : RestApiController
                         r.Username,
                         r.SessionId,
                         r.Amount ?? throw new ReevoMissingParameterException(nameof(r.Amount)),
-                        r.GameIdHash,
+                        r.GameIdHash ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.TransactionId ?? throw new ReevoMissingParameterException(nameof(r.TransactionId)),
                         r.RoundId ?? throw new ReevoMissingParameterException(nameof(r.RoundId)),
                         r.GameplayFinal,
@@ -93,7 +93,7 @@ public class WalletReevoController : RestApiController
                         r.Username,
                         r.SessionId,
                         r.Amount ?? throw new ReevoMissingParameterException(nameof(r.Amount)),
-                        r.GameIdHash,
+                        r.GameIdHash  ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.TransactionId ?? throw new ReevoMissingParameterException(nameof(r.TransactionId)),
                         r.RoundId ?? throw new ReevoMissingParameterException(nameof(r.RoundId)),
                         r.GameplayFinal,
@@ -159,26 +159,3 @@ public class WalletReevoController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
-
-// [FromQuery(Name = "callerId")] string callerId,
-// [FromQuery(Name = "callerPassword")] string callerPassword,
-// [FromQuery(Name = "action")] string action,
-// [FromQuery(Name = "remote_id")] int? remoteId, // required for balance
-// [FromQuery(Name = "username")] string username,
-// [FromQuery(Name = "game_id_hash")] string gameIdHash,
-// [FromQuery(Name = "session_id")] string sessionId,
-// [FromQuery(Name = "gamesession_id")] Guid gameSessionId,
-// [FromQuery(Name = "key")] string key,
-// [FromQuery(Name = "amount")] double? amount, //bet, win, cancel
-// [FromQuery(Name = "transaction_id")] string? transactionId, //bet, win, cancel
-// [FromQuery(Name = "round_id")] string? roundId, //bet, win, cancel
-// [FromQuery(Name = "gameplay_final")] int gameplayFinal, //bet, win, cancel
-// [FromQuery(Name = "is_freeround_bet")] int? isFreeRoundBet, //bet
-// [FromQuery(Name = "freeround_id")] string? freeRoundId, //bet, win
-// [FromQuery(Name = "fee")] double? fee, //bet, win
-// [FromQuery(Name = "jackpot_contribution_in_amount")] double? jackpotContributionInAmount, //bet, win
-// [FromQuery(Name = "is_freeround_win")] int? isFreeRoundWin, //win
-// [FromQuery(Name = "freeround_spins_remaining")] int? freeroundSpinsRemaining, //win
-// [FromQuery(Name = "freeround_completed")] int? freeroundCompleted, //win
-// [FromQuery(Name = "is_jackpot_win")] int? isJackpotWin, //win
-// [FromQuery(Name = "jackpot_win_in_amount")] double? jackpotWinInAmount) //win
