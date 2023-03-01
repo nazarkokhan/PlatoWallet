@@ -20,7 +20,7 @@ public record ReevoRollbackRequest(
     string Username,
     string SessionId,
     double Amount,
-    string GameIdHash,
+    string? GameIdHash,
     string TransactionId,
     string RoundId,
     int GameplayFinal,

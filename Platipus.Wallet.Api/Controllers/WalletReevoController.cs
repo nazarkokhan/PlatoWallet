@@ -14,7 +14,7 @@ using StartupSettings.Filters.Security;
 
 [Route("wallet/reevo")]
 [MockedErrorActionFilter(Order = 1)]
-[ReevoSecurityFilter(Order = 0)]
+[ReevoSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Reevo))]
 [ProducesResponseType(typeof(ReevoErrorResponse), StatusCodes.Status200OK)]
 [ProducesResponseType(typeof(ReevoSuccessResponse), StatusCodes.Status200OK)]
@@ -93,7 +93,7 @@ public class WalletReevoController : RestApiController
                         r.Username,
                         r.SessionId,
                         r.Amount ?? throw new ReevoMissingParameterException(nameof(r.Amount)),
-                        r.GameIdHash  ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
+                        r.GameIdHash,
                         r.TransactionId ?? throw new ReevoMissingParameterException(nameof(r.TransactionId)),
                         r.RoundId ?? throw new ReevoMissingParameterException(nameof(r.RoundId)),
                         r.GameplayFinal,

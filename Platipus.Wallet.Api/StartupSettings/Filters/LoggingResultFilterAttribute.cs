@@ -20,7 +20,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
 
         var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
         var request = httpContext.Items[HttpContextItems.RequestObject];
-        var response = (context.Result as OkObjectResult)?.Value;
+        var response = (context.Result as ObjectResult)?.Value;
 
         var requestHeaders = httpContext.Request.Headers.ToDictionary(x => x.Key, x => x.Value);
         var responseHeaders = httpContext.Response.Headers.ToDictionary(x => x.Key, x => x.Value);
