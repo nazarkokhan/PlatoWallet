@@ -2,11 +2,9 @@ namespace Platipus.Wallet.Api.Controllers;
 
 using System.Net.Mime;
 using Abstract;
-using Application.Extensions;
 using Application.Requests.Wallets.Uis;
 using Domain.Entities;
 using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

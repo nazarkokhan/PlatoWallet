@@ -21,6 +21,18 @@ public class AdminController : RestApiController
     public async Task<IActionResult> MockError(DeleteErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
+    [HttpGet("environments")]
+    public async Task<IActionResult> GetEnvironments(
+        [FromQuery] GetGameEnvironmentsPageRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("environments")]
+    public async Task<IActionResult> GetEnvironments(
+        CreateGameEnvironmentRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
     [HttpPost("casino")]
     public async Task<IActionResult> CreateCasino(CreateCasinoRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -40,10 +52,4 @@ public class AdminController : RestApiController
     [HttpPost("award")]
     public async Task<IActionResult> CreateAward(CreateAwardRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    // [HttpPut("casinos/set-databet-provider")]
-    // public async Task<IActionResult> SetDatabetCasinoProvider(
-    //     SetDatabetCasinoProviderRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
