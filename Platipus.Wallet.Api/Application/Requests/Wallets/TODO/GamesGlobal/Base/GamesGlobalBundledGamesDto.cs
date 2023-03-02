@@ -9,5 +9,5 @@ public record GamesGlobalBundledGamesDto
     public int numberOfPaylines { get; init; }
     public int chipSize { get; init; }
     public long costPerBet { get; init; }
-    public string FriendlyGameName { get; init; }
+    public string FriendlyGameName { get; init; } = null!;
 }
