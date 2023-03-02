@@ -2,17 +2,15 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.SoftBet;
 
 using Base.Response;
 using Domain.Entities;
-using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Results.ISoftBet;
 using Results.ISoftBet.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 public record SoftBetEndRequest(
-    Guid SessionId,
+    string SessionId,
     string UserName,
     string SessionStatus) : IRequest<ISoftBetResult<SoftBetBalanceResponse>>
 {
@@ -31,14 +29,13 @@ public record SoftBetEndRequest(
             SoftBetEndRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(
-                r => new GetBalanceRequest(
-                    r.SessionId,
-                    r.UserName));
+            var walletResult = await _wallet.GetBalanceAsync(
+                request.SessionId,
+                cancellationToken: cancellationToken);
 
-            var walletResult = await _wallet.GetBalanceAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToSoftBetResult<SoftBetBalanceResponse>();
+            var data = walletResult.Data;
 
             var session = await _context.Set<Session>()
                 .TagWith("GetSession")
@@ -51,10 +48,9 @@ public record SoftBetEndRequest(
             _context.Remove(session);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = walletResult.Data.Map(
-                d => new SoftBetBalanceResponse(
-                    (int)(d.Balance * 100),
-                    d.Currency));
+            var response = new SoftBetBalanceResponse(
+                (int)(data.Balance * 100),
+                data.Currency);
 
             return SoftBetResultFactory.Success(response);
         }

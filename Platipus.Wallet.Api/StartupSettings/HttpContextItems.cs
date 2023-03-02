@@ -9,6 +9,9 @@ public static class HttpContextItems
     public const string ResponseBodyBytes = nameof(ResponseBodyBytes);
 
     public const string BetflagCasinoSecretKey = nameof(BetflagCasinoSecretKey);
+    public const string OpenboxPayloadRequestObj = nameof(OpenboxPayloadRequestObj);
+
+    public const string SoftBetPayloadRequestObj = nameof(SoftBetPayloadRequestObj);
 
     public static byte[] GetRequestBodyBytesItem(this HttpContext httpContext)
     {

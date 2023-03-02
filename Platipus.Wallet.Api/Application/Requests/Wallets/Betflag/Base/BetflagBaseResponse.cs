@@ -15,5 +15,5 @@ public abstract record BetflagBaseResponse(
 
     public long Timestamp { get; set; }
 
-    public string Hash { get; set; }
+    public string Hash { get; set; } = null!;
 }

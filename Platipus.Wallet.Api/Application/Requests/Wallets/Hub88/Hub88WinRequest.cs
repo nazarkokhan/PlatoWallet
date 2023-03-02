@@ -2,17 +2,15 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Hub88;
 
 using Base;
 using Base.Response;
-using Extensions;
 using Results.Hub88;
 using Results.Hub88.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 public record Hub88WinRequest(
     string SupplierUser,
     string TransactionUuid,
-    Guid Token,
+    string Token,
     bool RoundClosed,
     string Round,
     string? RewardUuid,
@@ -39,27 +37,24 @@ public record Hub88WinRequest(
             Hub88WinRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(
-                r => new WinRequest(
-                    r.Token,
-                    r.SupplierUser,
-                    r.Currency,
-                    r.GameCode,
-                    r.Round,
-                    r.TransactionUuid,
-                    r.RoundClosed,
-                    r.Amount / 100000m));
+            var walletResult = await _wallet.WinAsync(
+                request.Token,
+                request.Round,
+                request.TransactionUuid,
+                request.Amount / 100000m,
+                request.RoundClosed,
+                request.Currency,
+                cancellationToken: cancellationToken);
 
-            var walletResult = await _wallet.WinAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToHub88Result<Hub88BalanceResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(
-                d => new Hub88BalanceResponse(
-                    (int)(d.Balance * 100000),
-                    request.SupplierUser,
-                    request.RequestUuid,
-                    d.Currency));
+            var response = new Hub88BalanceResponse(
+                (int)(data.Balance * 100000),
+                request.SupplierUser,
+                request.RequestUuid,
+                data.Currency);
 
             return Hub88ResultFactory.Success(response);
         }

@@ -1,15 +1,13 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.SoftBet;
 
 using Base.Response;
-using Extensions;
 using Results.ISoftBet;
 using Results.ISoftBet.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 public record SoftBetCancelRequest(
-    Guid SessionId,
+    string SessionId,
     string UserName,
     string ProviderGameId,
     string RoundId,
@@ -28,22 +26,19 @@ public record SoftBetCancelRequest(
             SoftBetCancelRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(
-                r => new RollbackRequest(
-                    r.SessionId,
-                    r.UserName,
-                    r.ProviderGameId,
-                    r.RoundId,
-                    r.TransactionId));
+            var walletResult = await _wallet.RollbackAsync(
+                request.SessionId,
+                request.RoundId,
+                request.TransactionId,
+                cancellationToken: cancellationToken);
 
-            var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToSoftBetResult<SoftBetBalanceResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(
-                d => new SoftBetBalanceResponse(
-                    (int)(d.Balance * 100),
-                    d.Currency));
+            var response = new SoftBetBalanceResponse(
+                (int)(data.Balance * 100),
+                data.Currency);
 
             return SoftBetResultFactory.Success(response);
         }

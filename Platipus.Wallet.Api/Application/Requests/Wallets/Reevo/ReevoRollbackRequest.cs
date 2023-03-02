@@ -1,16 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Reevo;
 
 using Base;
-using Domain.Entities;
-using Extensions;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Reevo;
 using Results.Reevo.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
-using static Results.Reevo.ReevoResultFactory;
 
 public record ReevoRollbackRequest(
     string CallerId,
@@ -24,47 +18,35 @@ public record ReevoRollbackRequest(
     string TransactionId,
     string RoundId,
     int GameplayFinal,
-    Guid GameSessionId,
+    string GameSessionId,
     string Key) : IRequest<IReevoResult<ReevoSuccessResponse>>, IReevoRequest
 {
     public class Handler : IRequestHandler<ReevoRollbackRequest, IReevoResult<ReevoSuccessResponse>>
     {
         private readonly IWalletService _wallet;
-        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet, WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
             _wallet = wallet;
-            _context = context;
         }
 
         public async Task<IReevoResult<ReevoSuccessResponse>> Handle(
             ReevoRollbackRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == request.GameSessionId))
-                .Select(u => new { Currency = u.Currency.Name })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.RollbackAsync(
+                request.SessionId,
+                request.TransactionId,
+                request.RoundId,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return Failure<ReevoSuccessResponse>(ReevoErrorCode.GeneralError);
-
-            var walletRequest = request.Map(
-                r => new RollbackRequest(
-                    r.GameSessionId,
-                    r.Username,
-                    string.Empty,
-                    r.RoundId,
-                    r.TransactionId));
-
-            var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToReevoResult<ReevoSuccessResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(d => new ReevoSuccessResponse(d.Balance));
+            var response = new ReevoSuccessResponse(data.Balance);
 
-            return Success(response);
+            return ReevoResultFactory.Success(response);
         }
     }
 }

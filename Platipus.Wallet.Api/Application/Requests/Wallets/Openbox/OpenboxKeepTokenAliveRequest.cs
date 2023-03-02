@@ -5,7 +5,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record OpenboxKeepTokenAliveRequest(Guid Token)
+public record OpenboxKeepTokenAliveRequest(string Token)
     : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxKeepTokenAliveRequest.Response>>
 {
     public class Handler : IRequestHandler<OpenboxKeepTokenAliveRequest, IOpenboxResult<Response>>

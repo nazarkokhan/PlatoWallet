@@ -11,7 +11,7 @@ using Results.Uis;
 using Results.Uis.WithData;
 
 [XmlRoot("REQUEST")]
-public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisAuthenticateRequest : IUisRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("TOKEN")]
     [BindProperty(Name = "token")]
@@ -34,39 +34,34 @@ public class UisAuthenticateRequest : IUisHashRequest, IRequest<IUisResult<UisRe
             UisAuthenticateRequest request,
             CancellationToken cancellationToken)
         {
-            var token = new Guid(request.Token);
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == token))
+            var session = await _context.Set<Session>()
+                .Where(s => s.Id == request.Token)
                 .Select(
-                    u => new
+                    s => new
                     {
-                        u.Id,
-                        u.UserName,
-                        u.SwUserId,
-                        u.Balance,
-                        CurrencyName = u.Currency.Name,
-                        u.IsDisabled,
-                        Sessions = u.Sessions
-                            .Where(s => s.ExpirationDate > DateTime.UtcNow)
-                            .Select(
-                                s => new
-                                {
-                                    s.Id,
-                                    s.ExpirationDate
-                                })
-                            .ToList()
+                        s.Id,
+                        s.ExpirationDate,
+                        User = new
+                        {
+                            s.User.Id,
+                            s.User.Username,
+                            s.User.Balance,
+                            CurrencyName = s.User.Currency.Id,
+                            s.User.IsDisabled,
+                        }
                     })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (user is null || user.IsDisabled)
-                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.ExpiredToken);
+            if (session is null || session.ExpirationDate < DateTime.UtcNow)
+                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.InvalidToken);
 
-            if (user.Sessions.All(s => s.Id != token))
-                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.ExpiredToken);
+            var user = session.User;
+            if (user.IsDisabled)
+                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.InvalidToken);
 
             var response = new UisAuthenticateResponse
             {
-                UserId = user.UserName,
+                UserId = user.Username,
                 Currency = user.CurrencyName,
                 Balance = user.Balance
             };

@@ -36,9 +36,9 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User)
                 .Select(
                     u => new Response(
                         u.Id,
-                        u.UserName,
+                        u.Username,
                         u.Balance,
-                        u.Currency.Name,
+                        u.Currency.Id,
                         u.Sessions
                             .Select(
                                 s => new SessionDto(
@@ -54,13 +54,13 @@ public record GetUserSessionsPageRequest(PageRequest Page, string User)
     }
 
     public record Response(
-        Guid Id,
-        string User,
+        int Id,
+        string Username,
         decimal Balance,
         string Currency,
         List<SessionDto> Sessions);
 
     public record SessionDto(
-        Guid Id,
+        string Id,
         DateTime ExpirationDate);
 }

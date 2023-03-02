@@ -4,23 +4,45 @@ using DTOs;
 
 public interface IWalletService
 {
-    Task<IResult<BalanceResponse>> GetBalanceAsync(
-        GetBalanceRequest request,
+    Task<IResult<WalletGetBalanceResponse>> GetBalanceAsync(
+        string sessionId,
+        bool searchByUsername = false,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BetOrWinResponse>> BetAsync(
-        BetRequest request,
+    Task<IResult<WalletBetWinRollbackResponse>> BetAsync(
+        string sessionId,
+        string roundId,
+        string transactionId,
+        decimal amount,
+        string? currency = null,
+        bool roundFinished = false,
+        bool searchByUsername = false,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BetOrWinResponse>> WinAsync(
-        WinRequest request,
+    Task<IResult<WalletBetWinRollbackResponse>> WinAsync(
+        string sessionId,
+        string roundId,
+        string transactionId,
+        decimal amount,
+        bool roundFinished = true,
+        string? currency = null,
+        bool searchByUsername = false,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BetOrWinResponse>> RollbackAsync(
-        RollbackRequest request,
+    Task<IResult<WalletBetWinRollbackResponse>> RollbackAsync(
+        string sessionId,
+        string transactionId,
+        string? roundId = null,
+        bool searchByUsername = false,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<BalanceResponse>> AwardAsync(
-        AwardRequest request,
+    Task<IResult<WalletGetBalanceResponse>> AwardAsync(
+        string sessionId,
+        string roundId,
+        string transactionId,
+        decimal amount,
+        string awardId,
+        string? currency = null,
+        bool searchByUsername = false,
         CancellationToken cancellationToken = default);
 }

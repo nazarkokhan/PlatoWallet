@@ -5,5 +5,5 @@ public enum ReevoErrorCode
     Success = 200,
     BetRefused = 403,
     RollbackRefused = 404,
-    GeneralError = 500
+    InternalError = 500
 }

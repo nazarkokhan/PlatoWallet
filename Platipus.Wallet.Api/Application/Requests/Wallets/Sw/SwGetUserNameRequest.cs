@@ -1,10 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sw;
 
 using Base;
-using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Results.ResultToResultMappers;
 using Results.Sw;
 using Results.Sw.WithData;
 using Services.Wallet;
@@ -13,7 +12,7 @@ public record SwGetUserNameRequest(
         [property: BindProperty(Name = "providerid")] int ProviderId,
         [property: BindProperty(Name = "userid")] int UserId,
         [property: BindProperty(Name = "hash")] string Hash,
-        [property: BindProperty(Name = "token")] Guid Token)
+        [property: BindProperty(Name = "token")] string Token)
     : ISwHashRequest, IRequest<ISwResult<SwGetUserNameRequest.SwUserNameResponse>>
 {
     public class Handler : IRequestHandler<SwGetUserNameRequest, ISwResult<SwUserNameResponse>>
@@ -31,20 +30,17 @@ public record SwGetUserNameRequest(
             SwGetUserNameRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.SwUserId == request.UserId && u.Casino.SwProviderId == request.ProviderId)
-                .Select(
-                    u => new
-                    {
-                        u.UserName,
-                        u.SwUserId
-                    })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.GetBalanceAsync(
+                request.Token,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return SwResultFactory.Failure<SwUserNameResponse>(SwErrorCode.UserNotFound);
+            if (walletResult.IsFailure)
+                return walletResult.ToSwResult<SwUserNameResponse>();
+            var data = walletResult.Data;
 
-            var response = new SwUserNameResponse(request.UserId, user.UserName);
+            var response = new SwUserNameResponse(
+                data.UserId,
+                data.Username);
 
             return SwResultFactory.Success(response);
         }

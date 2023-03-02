@@ -15,17 +15,36 @@ public static class CommonResultToBetflagMappers
             ? BetflagResultFactory.Success()
             : BetflagResultFactory.Failure(result.ErrorCode.ToBetflagErrorCode(), result.Exception);
 
-    public static BetflagErrorCode ToBetflagErrorCode(this ErrorCode source)
+    private static BetflagErrorCode ToBetflagErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => BetflagErrorCode.InsufficientFunds,
-            ErrorCode.SessionExpired => BetflagErrorCode.SessionExpired,
-            ErrorCode.MissingSignature or ErrorCode.InvalidSignature => BetflagErrorCode.InvalidToken,
+            // ErrorCode. => BetflagErrorCode.SUCCSESS,
+            ErrorCode.SessionNotFound => BetflagErrorCode.InvalidToken,
+            ErrorCode.UnknownBetException => BetflagErrorCode.BetFail2,
+            ErrorCode.InsufficientFunds => BetflagErrorCode.InsufficientFunds,
+            ErrorCode.CasinoNotFound => BetflagErrorCode.WalletNotFound,
             ErrorCode.BadParametersInTheRequest => BetflagErrorCode.InvalidParameter,
-            ErrorCode.DuplicateTransaction => BetflagErrorCode.BetFail2,
-            ErrorCode.TransactionDoesNotExist => BetflagErrorCode.RoundEndBetNotExists,
-            ErrorCode.InvalidSign => BetflagErrorCode.InvalidToken,
+            ErrorCode.TransactionNotFound => BetflagErrorCode.BetNotFound,
+            // ErrorCode. => BetflagErrorCode.ProviderOnMaintenance,
+            ErrorCode.SessionExpired => BetflagErrorCode.SessionExpired,
+            ErrorCode.UserIsDisabled => BetflagErrorCode.ClientBlocked,
+            // ErrorCode. => BetflagErrorCode.BetWithCancel,
+            // ErrorCode. => BetflagErrorCode.WinWithoutBet,
+            ErrorCode.UnknownWinException => BetflagErrorCode.WinWithBetError,
+            // ErrorCode. => BetflagErrorCode.WinWithBetCancelled,
+            // ErrorCode. => BetflagErrorCode.CancelReferBetNotExists,
+            // ErrorCode. => BetflagErrorCode.CancelIncorrectAmount,
+            // ErrorCode. => BetflagErrorCode.CancelReferBetInTimeout,
+            ErrorCode.UnknownRollbackException => BetflagErrorCode.CancelReferBetInError,
+            // ErrorCode. => BetflagErrorCode.CancelWithWin,
+            ErrorCode.RoundNotFound => BetflagErrorCode.RoundEndBetNotExists,
+            // ErrorCode. => BetflagErrorCode.RoundEndBetInError,
+            ErrorCode.UnknownLogoutException => BetflagErrorCode.SessionCloseInconsistentValues,
+            // ErrorCode. => BetflagErrorCode.SessionOpenErrorOpenTicket,
+            // ErrorCode. => BetflagErrorCode.WalletException,
+            // ErrorCode. => BetflagErrorCode.TemporanyError,
+            // ErrorCode. => BetflagErrorCode.Exception,
             ErrorCode.Unknown or _ => BetflagErrorCode.GeneralError
         };
     }

@@ -38,15 +38,17 @@ public class GamesApiClient : IGamesApiClient
         Uri baseUrl,
         CasinoProvider casinoProvider,
         string casinoId,
-        Guid sessionId,
+        string sessionId,
         string user,
         string currency,
         string game,
-        string locale,
+        LaunchMode launchModeType,
+        string locale = "en",
         string lobby = "",
         string launchMode = "url",
         CancellationToken cancellationToken = default)
     {
+        //launchmodetype
         var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
             new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/session").AbsoluteUri,
             new PswGetGameLinkGamesApiRequest(

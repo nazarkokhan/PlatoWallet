@@ -1,0 +1,262 @@
+[
+  {
+    "Id": "sw",
+    "Provider": 5,
+    "SignatureKey": "12345678",
+    "InternalId": 1,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "betflag_platipus",
+    "Provider": 9,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "dafabet",
+    "Provider": 1,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "USD",
+      "XVG",
+      "EUR"
+    ],
+    "CasinoGames": [
+      "extragems"
+    ]
+  },
+  {
+    "Id": "everymatrix_platipus",
+    "Provider": 11,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": [
+      "frozenmirror",
+      "hallowin",
+      "ninegems",
+      "waysofthegauls",
+      "diamondhunt",
+      "coinfest",
+      "extragems",
+      "bookoflight",
+      "poshcats",
+      "wildcrowns",
+      "pearlsoftheocean",
+      "jokerchase",
+      "piedradelsol",
+      "undiademuertos"
+    ]
+  },
+  {
+    "Id": "gg",
+    "Provider": 7,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "hub88",
+    "Provider": 3,
+    "SignatureKey": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnXQ7rU5lbYEGRSl4/PZVdAb9R\nTagu7k4M5m2sRg\u002Bx2c\u002BvC6DYVWTs3JWIcR8WxBYCcXIs8v7r10o55OOGxYTFLsZq\n28B8m3mVONm9jmXmrCRZQdjwLLRt2wdTf3riMrdTbBs5BTWq3uq7eIx1wyTb2mVL\nhOnSeMqN2ug9ZzMsdwIDAQAB\n-----END PUBLIC KEY-----",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {
+      "Hub88PrivateWalletSecuritySign": "-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQCnXQ7rU5lbYEGRSl4/PZVdAb9RTagu7k4M5m2sRg\u002Bx2c\u002BvC6DY\nVWTs3JWIcR8WxBYCcXIs8v7r10o55OOGxYTFLsZq28B8m3mVONm9jmXmrCRZQdjw\nLLRt2wdTf3riMrdTbBs5BTWq3uq7eIx1wyTb2mVLhOnSeMqN2ug9ZzMsdwIDAQAB\nAoGAGmco6mEm6W53CZfE5I8vmBuldgsdREIeGBTmKm5nHXSyOfhIqLhYErH9\u002BSd3\ncxz\u002BJ\u002BaDz6mKI\u002BSz9gwxBNr2Re/sc\u002BL0pjZbtvC\u002BBfF4E5kyfEMiZB/C6yPF6r78\nnK83nNpQhtFe36Ka/MO4A2V2C4SMTaXAcFGnE0J5dVp1QEkCQQDXwHruO8tNRqoJ\nTnUN0eHxbL\u002BHa5HVTlqUlbUvn\u002BGQdkr5sR0lc12u6EsdU8o\u002BQ3/N7Yblyyb5lcaT\nQa5fdMLtAkEAxpW6EDgtmoNPG7Yzfjm2/79p2cILHgCog9lHOzI\u002BBQRLIQqtnhn6\njKxP87Pmlg2hzzbqR/XWgPqq3ahL1P6McwJBAML8TN1Totfy/ictBfL4dSd4rdwY\nZpMNniVc64PgDb4\u002BemIRJJM9ITS68W/O0x/UZwPYICs7n7y/FNju6kWQw70CQDdR\nXhNGku2HxnGhv5ZZ3XBAkevm8dHZvRd9XypORJiBKax6nQJ9mh21ok/wvTrvcTOX\nyItjH\u002B2t5gr45qbegaECQGHXR\u002BM3KHTV1cxHIrmevs5CHylemSN2pS7WbovsdxHn\n6zmKAQ7i6rk4P7ezL9/rtd6adFEWG6SYnlCUgv9d7dk=\n-----END RSA PRIVATE KEY-----",
+      "Hub88PublicGameServiceSecuritySign": "-----BEGIN RSA PRIVATE KEY-----\nMIICWwIBAAKBgHi57tRMYFBfHa8ZN5NTTSsK/iOKUBmOjhzZKrrZiLjraL/U9edz\nftNi5KaSoXOXLpiEOvaTD\u002BfuuXGvDbME4\u002BXBlfavFX8zza9FDLmERh9uhe\u002BOLgwP\nu4AebHvwt8uMY2Eg5\u002BEOc4m0uvlEDI09U54WaxgNw9k4n3mnHboXXVHxAgMBAAEC\ngYBtJg2bu4HIqHY5/N6WQFYgeEvU7hQFRzGNO3q6fDp0lcGaznuUyoL7swlu4FtA\nGotyMPruO3/B/b\u002BD3PTRybYQlmkLESdrffIwChTckIS29UkEtBAn5QE2ifOaa4Ic\nKRACGi0gjOToulTS4HB2/0EWd5ilRjkqhWYvbFm2bHV6kQJBAOWtWZcHtG5BHveu\nHWYBh26izHeMSztyTUKRTiC97Fl3/dYmSyEON4fDV9gNervSEvfOJgIpISmxwXeh\nwL8sXlsCQQCGkAB5UvykV8aIR8k39f83jZT9e49YdGxXvg6WY8cylyQiO6Mw9mom\nNAsqaeDSLbe9MpZroWvVRbvWnV5MGBqjAkEAmN48Vw3FxeyKFAhLgO1bmwO4W4mB\nOVvmmHvmKFzAxvvac4KhVqsDwtT9zsuJ\u002BSDlhxIqsh11\u002BS5auqlqhNOfKQJAJiz6\nhXEezf09DPLYynCXDIq1Z0jDvUOibS41c0Mxg0/P54pl3QE70kTXmhvZtadUxm9w\nr25namVTSirxUsNP4wJAMCOSoOD1vOIVlRQ\u002BqyZm9lEZOGUlSdcx4QLzepNYbEK7\n8Dj8gIpH/b8QjPE2emdoYw1VDtUkWxj6dWu1wNLkBA==\n-----END RSA PRIVATE KEY-----",
+      "Hub88PrivateGameServiceSecuritySign": "-----BEGIN PUBLIC KEY-----\nMIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHi57tRMYFBfHa8ZN5NTTSsK/iOK\nUBmOjhzZKrrZiLjraL/U9edzftNi5KaSoXOXLpiEOvaTD\u002BfuuXGvDbME4\u002BXBlfav\nFX8zza9FDLmERh9uhe\u002BOLgwPu4AebHvwt8uMY2Eg5\u002BEOc4m0uvlEDI09U54WaxgN\nw9k4n3mnHboXXVHxAgMBAAE=\n-----END PUBLIC KEY-----"
+    },
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "openbox",
+    "Provider": 2,
+    "SignatureKey": "1234567890123456",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {
+      "OpenboxVendorUid": "00000000000000000000000000000001"
+    },
+    "CasinoCurrencies": [
+      "CNY"
+    ],
+    "CasinoGames": [
+      "coinfest",
+      "hallowin",
+      "extragems"
+    ]
+  },
+  {
+    "Id": "platipus_isoftbet",
+    "Provider": 6,
+    "SignatureKey": "12345678",
+    "InternalId": 3011,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "EUR",
+      "USD"
+    ],
+    "CasinoGames": [
+      "rouletteeuropean",
+      "blackjackvip",
+      "ninegems",
+      "baccarat",
+      "jacksorbetter",
+      "thebigscore",
+      "catchtheleprechaun",
+      "bookoflight",
+      "coinfest",
+      "wildcrowns"
+    ]
+  },
+  {
+    "Id": "psw",
+    "Provider": 0,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "EUR",
+      "XVG",
+      "USD"
+    ],
+    "CasinoGames": [
+      "extragems"
+    ]
+  },
+  {
+    "Id": "reevo_local",
+    "Provider": 10,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "local",
+    "Params": {
+      "ReevoCallerId": "reevo01",
+      "ReevoCallerPassword": "reevopass01"
+    },
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "reevo_platipus",
+    "Provider": 10,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {
+      "ReevoCallerId": "reevo01",
+      "ReevoCallerPassword": "reevopass01"
+    },
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": [
+      "bookoflight",
+      "waysofthegauls",
+      "ninegems",
+      "extragems",
+      "piedradelsol",
+      "jokerchase",
+      "hallowin",
+      "undiademuertos",
+      "poshcats",
+      "pearlsoftheocean",
+      "diamondhunt",
+      "coinfest",
+      "wildcrowns",
+      "frozenmirror"
+    ]
+  },
+  {
+    "Id": "softswiss",
+    "Provider": 4,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": [
+      "coinfest",
+      "poshcats",
+      "extragems",
+      "jokerchase",
+      "waysofthegauls",
+      "undiademuertos",
+      "diamondhunt",
+      "bookoflight",
+      "frozenmirror",
+      "ninegems",
+      "wildcrowns",
+      "pearlsoftheocean",
+      "hallowin",
+      "piedradelsol"
+    ]
+  },
+  {
+    "Id": "uis_platipus",
+    "Provider": 8,
+    "SignatureKey": "12345678",
+    "InternalId": 150794,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "ARS",
+      "USD",
+      "THB",
+      "TRY",
+      "UYU",
+      "MYR",
+      "AUD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "wall",
+    "Provider": 0,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "QAR",
+      "ZAR",
+      "KRW",
+      "RON",
+      "UAH",
+      "USD"
+    ],
+    "CasinoGames": []
+  }
+]

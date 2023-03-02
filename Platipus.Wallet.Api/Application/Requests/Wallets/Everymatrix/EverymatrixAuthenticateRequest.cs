@@ -10,7 +10,7 @@ using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 
 public record EverymatrixAuthenticateRequest(
-        Guid LaunchToken,
+        string LaunchToken,
         string RequestScope)
     : IRequest<IEverymatrixResult<EverymatrixAuthenticateRequest.EverymatrixAuthenticationResponse>>, IEveryMatrixBaseRequest
 {
@@ -38,8 +38,8 @@ public record EverymatrixAuthenticateRequest(
                         User = new
                         {
                             s.User.Balance,
-                            Currency = s.User.Currency.Name,
-                            s.User.UserName,
+                            Currency = s.User.Currency.Id,
+                            s.User.Username,
                             s.User.Id
                         }
                     })
@@ -49,11 +49,7 @@ public record EverymatrixAuthenticateRequest(
                 return EverymatrixResultFactory.Failure<EverymatrixAuthenticationResponse>(EverymatrixErrorCode.TokenNotFound);
 
             var user = launchSession.User;
-            var gameSession = new Session
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id
-            };
+            var gameSession = new Session { UserId = user.Id };
 
             _context.Add(gameSession);
             await _context.SaveChangesAsync(cancellationToken);
@@ -62,19 +58,19 @@ public record EverymatrixAuthenticateRequest(
                 gameSession.Id,
                 user.Balance.ToString(CultureInfo.InvariantCulture),
                 user.Currency,
-                user.UserName,
-                user.Id);
+                user.Username,
+                user.Id.ToString());
 
             return EverymatrixResultFactory.Success(response);
         }
     }
 
     public record EverymatrixAuthenticationResponse(
-        Guid Token,
+        string Token,
         string TotalBalance,
         string Currency,
         string UserName,
-        Guid UserId,
+        string UserId,
         string Country = "Ukraine",
         string Age = "26",
         string Sex = "male") : EverymatrixBaseSuccessResponse;

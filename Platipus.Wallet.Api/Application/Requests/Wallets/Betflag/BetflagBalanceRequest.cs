@@ -1,11 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
 using Base;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Betflag;
 using Results.Betflag.WithData;
+using Results.ResultToResultMappers;
+using Services.Wallet;
 
 public record BetflagBalanceRequest(
     string Key,
@@ -15,37 +14,28 @@ public record BetflagBalanceRequest(
 {
     public class Handler : IRequestHandler<BetflagBalanceRequest, IBetflagResult<BetflagBalanceResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IBetflagResult<BetflagBalanceResponse>> Handle(
             BetflagBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
-                .Include(u => u.Currency)
-                .Select(
-                    u => new
-                    {
-                        u.Balance,
-                        Currency = u.Currency.Name,
-                        u.UserName
-                    })
-                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            var walletResult = await _wallet.GetBalanceAsync(request.Key, cancellationToken: cancellationToken);
 
-            if (user is null)
-                return BetflagResultFactory.Failure<BetflagBalanceResponse>(BetflagErrorCode.InvalidParameter);
+            if (walletResult.IsFailure)
+                return walletResult.ToBetflagResult<BetflagBalanceResponse>();
+            var data = walletResult.Data;
 
             var response = new BetflagBalanceResponse(
-                (double)user.Balance,
-                user.Currency,
-                user.UserName,
-                user.UserName);
+                (double)data.Balance,
+                data.Currency,
+                data.UserId.ToString(),
+                data.Username);
 
             return BetflagResultFactory.Success(response);
         }

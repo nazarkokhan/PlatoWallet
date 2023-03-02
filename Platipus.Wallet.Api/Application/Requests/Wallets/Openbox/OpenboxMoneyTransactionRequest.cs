@@ -2,12 +2,11 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Openbox;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Results.ResultToResultMappers;
+using Services.Wallet;
 
 public record OpenboxMoneyTransactionRequest(
-    Guid Token,
+    string Token,
     string GameUid,
     string GameCycleUid,
     string OrderUid,
@@ -16,11 +15,11 @@ public record OpenboxMoneyTransactionRequest(
 {
     public class Handler : IRequestHandler<OpenboxMoneyTransactionRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IOpenboxResult<OpenboxBalanceResponse>> Handle(
@@ -39,50 +38,18 @@ public record OpenboxMoneyTransactionRequest(
             OpenboxMoneyTransactionRequest request,
             CancellationToken cancellationToken)
         {
-            var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.BetAsync(
+                request.Token,
+                request.GameCycleUid,
+                request.OrderUid,
+                request.OrderAmount / 100m,
+                cancellationToken: cancellationToken);
 
-            if (round is null)
-            {
-                var user = await _context.Set<User>()
-                    .Where(u => u.Sessions.Any(s => s.Id == request.Token))
-                    .Include(u => u.Currency)
-                    .FirstAsync(cancellationToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToOpenboxResult<OpenboxBalanceResponse>();
+            var data = walletResult.Data;
 
-                round = new Round
-                {
-                    Id = request.GameCycleUid,
-                    Finished = false,
-                    User = user
-                };
-                _context.Add(round);
-
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-
-            if (round.Transactions.Any(t => t.Id == request.OrderUid))
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
-
-            if (round.Finished)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
-
-            round.User.Balance -= request.OrderAmount / 100m;
-
-            var transaction = new Transaction
-            {
-                Id = request.OrderUid,
-                Amount = request.OrderAmount,
-            };
-
-            round.Transactions.Add(transaction);
-
-            _context.Update(round);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var response = new OpenboxBalanceResponse((long)(round.User.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(data.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }
@@ -91,39 +58,18 @@ public record OpenboxMoneyTransactionRequest(
             OpenboxMoneyTransactionRequest request,
             CancellationToken cancellationToken)
         {
-            var round = await _context.Set<Round>()
-                .Where(
-                    r => r.Id == request.GameCycleUid
-                      && r.User.Sessions.Any(s => s.Id == request.Token))
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.WinAsync(
+                request.Token,
+                request.GameCycleUid,
+                request.OrderUid,
+                request.OrderAmount / 100m,
+                cancellationToken: cancellationToken);
 
-            if (round is null)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
+            if (walletResult.IsFailure)
+                return walletResult.ToOpenboxResult<OpenboxBalanceResponse>();
+            var data = walletResult.Data;
 
-            if (round.Transactions.Any(t => t.Id == request.OrderUid))
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
-
-            if (round.Finished)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
-
-            round.User.Balance += request.OrderAmount / 100m;
-
-            round.Finished = true;
-
-            var transaction = new Transaction
-            {
-                Id = request.OrderUid,
-                Amount = request.OrderAmount,
-            };
-
-            round.Transactions.Add(transaction);
-
-            _context.Update(round);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var response = new OpenboxBalanceResponse((long)(round.User.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(data.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }

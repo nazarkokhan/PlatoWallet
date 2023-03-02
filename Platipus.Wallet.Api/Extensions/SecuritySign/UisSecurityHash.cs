@@ -2,22 +2,21 @@ namespace Platipus.Wallet.Api.Extensions.SecuritySign;
 
 using System.Security.Cryptography;
 using System.Text;
-using Application.Requests.Wallets.Uis.Base;
 
 public static class UisSecurityHash
 {
-    public static bool IsValid(this IUisHashRequest request, string secretKey)
+    public static bool IsValid(string hash, string source, string secretKey)
     {
-        var computedHash = request.Compute(secretKey);
+        var computedHash = Compute(source, secretKey);
 
-        var isValid = request.Hash?.Equals(computedHash, StringComparison.InvariantCultureIgnoreCase);
+        var isValid = hash.Equals(computedHash, StringComparison.InvariantCultureIgnoreCase);
 
-        return isValid ?? true;
+        return isValid;
     }
 
-    public static string Compute(this IUisHashRequest request, string secretKey)
+    public static string Compute(string source, string secretKey)
     {
-        var requestStringToHash = Encoding.UTF8.GetBytes(request.GetSource() + secretKey);
+        var requestStringToHash = Encoding.UTF8.GetBytes(source + secretKey);
 
         var md5 = MD5.HashData(requestStringToHash);
 

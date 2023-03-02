@@ -1,18 +1,21 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
+using System.ComponentModel;
+using System.Text.Json.Nodes;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public record CreateCasinoRequest(
-    string CasinoId,
-    string SignatureKey,
+    [property: DefaultValue("custom_psw")] string CasinoId,
+    [property: DefaultValue("12345678")] string SignatureKey,
     CasinoProvider Provider,
     List<string> Currencies,
-    int? SwProviderId) : IRequest<IPswResult>
+    Dictionary<string, JsonNode>? Params,
+    [property: DefaultValue("test")] string? Environment) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<CreateCasinoRequest, IPswResult>
+    public class Handler : IRequestHandler<CreateCasinoRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -21,7 +24,7 @@ public record CreateCasinoRequest(
             _context = context;
         }
 
-        public async Task<IPswResult> Handle(
+        public async Task<IResult> Handle(
             CreateCasinoRequest request,
             CancellationToken cancellationToken)
         {
@@ -30,55 +33,69 @@ public record CreateCasinoRequest(
                 .AnyAsync(cancellationToken);
 
             if (casinoExist)
-                return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
+                return ResultFactory.Failure(ErrorCode.CasinoAlreadyExists);
+
+            var environmentExist = await _context.Set<GameEnvironment>()
+                .Where(e => e.Id == request.Environment)
+                .AnyAsync(cancellationToken);
+
+            if (!environmentExist)
+                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
 
             var supportedCurrencies = await _context.Set<Currency>()
                 .ToListAsync(cancellationToken);
 
             var matchedCurrencies = supportedCurrencies
-                .Where(c => request.Currencies.Any(rc => rc == c.Name))
+                .Where(c => request.Currencies.Any(rc => rc == c.Id))
                 .ToList();
 
             if (matchedCurrencies.Count != request.Currencies.Count)
-                return PswResultFactory.Failure(PswErrorCode.WrongCurrency);
+                return ResultFactory.Failure(ErrorCode.InvalidCurrency);
 
-            switch (request.Provider)
+            if (request.Provider is CasinoProvider.Dafabet)
             {
-                case CasinoProvider.Dafabet:
-                {
-                    var dafabetCasinoExist = await _context.Set<Casino>()
-                        .Where(e => e.Provider == request.Provider)
-                        .AnyAsync(cancellationToken);
+                var dafabetCasinoExist = await _context.Set<Casino>()
+                    .Where(e => e.Provider == request.Provider)
+                    .AnyAsync(cancellationToken);
 
-                    if (dafabetCasinoExist)
-                        return PswResultFactory.Failure(PswErrorCode.InvalidCasinoId);
-                    break;
-                }
-                case CasinoProvider.Sw or CasinoProvider.GamesGlobal or CasinoProvider.SoftBet or CasinoProvider.Uis
-                    when request.SwProviderId is null:
-                    return PswResultFactory.Failure(PswErrorCode.BadParametersInTheRequest);
+                if (dafabetCasinoExist)
+                    return ResultFactory.Failure(ErrorCode.ThisProviderSupportOnlyOneCasino);
             }
 
-            var casino = new Casino
+            var casino = new Casino(
+                request.CasinoId,
+                request.Provider,
+                request.SignatureKey)
             {
-                Id = request.CasinoId,
-                SignatureKey = request.SignatureKey,
-                Provider = request.Provider,
-                SwProviderId = request.Provider is CasinoProvider.Sw or
-                                                   CasinoProvider.GamesGlobal or
-                                                   CasinoProvider.SoftBet or
-                                                   CasinoProvider.Uis
-                    ? request.SwProviderId
-                    : null,
                 CasinoCurrencies = matchedCurrencies
                     .Select(c => new CasinoCurrencies { CurrencyId = c.Id })
-                    .ToList()
+                    .ToList(),
             };
+
+            if (request.Params is not null)
+                casino.Params = request.Params;
+
+            if (casino.Provider is CasinoProvider.Reevo)
+            {
+                var callerId = (string?)casino.Params[CasinoParams.ReevoCallerId];
+                var callerPassword = (string?)casino.Params[CasinoParams.ReevoCallerPassword];
+
+                if (callerId is null || callerPassword is null)
+                    return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
+            }
+
+            if (casino.Provider is CasinoProvider.Openbox)
+            {
+                var vendorId = (string?)casino.Params[CasinoParams.OpenboxVendorUid];
+
+                if (vendorId is null)
+                    return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
+            }
 
             _context.Add(casino);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return PswResultFactory.Success();
+            return ResultFactory.Success();
         }
     }
 }

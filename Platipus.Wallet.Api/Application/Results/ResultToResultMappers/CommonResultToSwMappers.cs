@@ -15,17 +15,30 @@ public static class CommonResultToSwMappers
             ? SwResultFactory.Success()
             : SwResultFactory.Failure(result.ErrorCode.ToSwErrorCode(), result.Exception);
 
-    public static SwErrorCode ToSwErrorCode(this ErrorCode source)
+    private static SwErrorCode ToSwErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => SwErrorCode.InvalidAmount,
-            ErrorCode.UserDisabled => SwErrorCode.UserNotFound,
+            // ErrorCode.InsufficientFunds => SwErrorCode.InvalidAmount,
+            // ErrorCode.UserIsDisabled => SwErrorCode.UserNotFound,
+            // ErrorCode.SessionExpired => SwErrorCode.ExpiredToken,
+            // ErrorCode.SecurityParameterIsEmpty or ErrorCode.SecurityParameterIsInvalid or ErrorCode.SecurityParameterIsInvalid => SwErrorCode.InvalidMd5OrHash,
+            // ErrorCode.CasinoNotFound => SwErrorCode.InvalidPartnered,
+            // ErrorCode.TransactionAlreadyExists => SwErrorCode.TransactionAlreadyProcessed,
+            // ErrorCode.TransactionNotFound => SwErrorCode.InvalidTransactionId,
+            // ErrorCode.Unknown or _ => SwErrorCode.InternalSystemError
+            ErrorCode.UserNotFound => SwErrorCode.UserNotFound,
+            ErrorCode.CasinoNotFound => SwErrorCode.InvalidPartnered,
+            ErrorCode.SecurityParameterIsInvalid => SwErrorCode.InvalidMd5OrHash,
+            // ErrorCode. => SwErrorCode.InvalidIp,
+            // ErrorCode. => SwErrorCode.InvalidAmount,
+            ErrorCode.InsufficientFunds => SwErrorCode.InsufficientBalance,
+            // ErrorCode. => SwErrorCode.TransferLimit,
+            // ErrorCode. => SwErrorCode.DuplicateRemoteTransactionId,
+            // ErrorCode. => SwErrorCode.InsufficientBalance2,
+            ErrorCode.TransactionNotFound => SwErrorCode.InvalidTransactionId,
+            ErrorCode.TransactionAlreadyExists => SwErrorCode.TransactionAlreadyProcessed,
             ErrorCode.SessionExpired => SwErrorCode.ExpiredToken,
-            ErrorCode.MissingSignature or ErrorCode.InvalidSignature or ErrorCode.InvalidSign => SwErrorCode.InvalidMd5OrHash,
-            ErrorCode.InvalidCasinoId => SwErrorCode.InvalidPartnered,
-            ErrorCode.DuplicateTransaction => SwErrorCode.TransactionAlreadyProcessed,
-            ErrorCode.TransactionDoesNotExist => SwErrorCode.InvalidTransactionId,
             ErrorCode.Unknown or _ => SwErrorCode.InternalSystemError
         };
     }

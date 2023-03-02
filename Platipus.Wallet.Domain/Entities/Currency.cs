@@ -1,14 +1,15 @@
 namespace Platipus.Wallet.Domain.Entities;
 
-using Abstract;
+using Abstract.Generic;
 
-public class Currency : Entity
+public class Currency : Entity<string>
 {
-    public string Name { get; set; } = null!;
+    public Currency(string id)
+    {
+        Id = id;
+    }
 
-    // public CurrencyMetadata CurrencyMetadata { get; set; }
-    
     public List<User> Users { get; set; } = new();
-    
+
     public List<CasinoCurrencies> CasinoCurrencies { get; set; } = new();
 }

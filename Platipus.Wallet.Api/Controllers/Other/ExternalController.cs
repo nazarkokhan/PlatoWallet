@@ -33,7 +33,7 @@ public class ExternalController : RestApiController
     [HttpGet("casino-currencies")]
     [ProducesResponseType(typeof(List<GetCurrencyDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CasinoCurrencies(
-        [FromQuery] GetCasinoCurrenciesRequest request,
+        [FromQuery] GetCurrenciesRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 

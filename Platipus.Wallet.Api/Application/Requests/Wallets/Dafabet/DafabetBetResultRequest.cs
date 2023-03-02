@@ -2,9 +2,8 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Dafabet;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Results.ResultToResultMappers;
+using Services.Wallet;
 
 public record DafabetBetResultRequest(
     string PlayerId,
@@ -14,52 +13,35 @@ public record DafabetBetResultRequest(
     string TransactionId,
     bool EndRound,
     string? Device,
-    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
+    string Hash) : IDafabetRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DafabetBetResultRequest, IDafabetResult<DafabetBalanceResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IDafabetResult<DafabetBalanceResponse>> Handle(
             DafabetBetResultRequest request,
             CancellationToken cancellationToken)
         {
-            var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.RoundId && r.User.UserName == request.PlayerId)
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.WinAsync(
+                request.PlayerId,
+                request.RoundId,
+                request.TransactionId,
+                request.Amount,
+                request.EndRound,
+                searchByUsername: true,
+                cancellationToken: cancellationToken);
 
-            if (round is null)
-                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
+            if (walletResult.IsFailure)
+                return walletResult.ToDafabetResult<DafabetBalanceResponse>();
+            var data = walletResult.Data;
 
-            if (round.Transactions.Any(t => t.Id == request.TransactionId))
-                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.TransactionNotFound);
-
-            if (round.Finished)
-                return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.RoundNotFound);
-
-            round.User.Balance += request.Amount;
-            if (request.EndRound)
-                round.Finished = request.EndRound;
-
-            var transaction = new Transaction
-            {
-                Id = request.TransactionId,
-                Amount = request.Amount,
-            };
-
-            round.Transactions.Add(transaction);
-
-            _context.Update(round);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var response = new DafabetBalanceResponse(round.User.UserName, round.User.Currency.Name, round.User.Balance);
+            var response = new DafabetBalanceResponse(data.Username, data.Currency, data.Balance);
 
             return DafabetResultFactory.Success(response);
         }

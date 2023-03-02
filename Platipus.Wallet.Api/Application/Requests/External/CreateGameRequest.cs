@@ -25,15 +25,15 @@ public record CreateGameRequest(
         {
             var game = await EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
                 _context.Set<Game>()
-                    .Where(c => c.GameServerId == request.GameServerId),
+                    .Where(c => c.GameServiceId == request.GameServerId),
                 cancellationToken);
 
             if (game is not null)
-                return ResultFactory.Failure(ErrorCode.InvalidGame);
+                return ResultFactory.Failure(ErrorCode.GameNotFound);
 
             game = new Game
             {
-                GameServerId = request.GameServerId,
+                GameServiceId = request.GameServerId,
                 Name = request.Name,
                 LaunchName = request.LaunchName,
                 CategoryId = request.CategoryId

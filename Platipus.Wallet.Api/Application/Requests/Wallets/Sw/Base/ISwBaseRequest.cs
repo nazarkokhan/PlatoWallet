@@ -8,5 +8,5 @@ public interface ISwBaseRequest : IBaseWalletRequest
 
     public int UserId { get; }
 
-    public Guid Token { get; }
+    public string Token { get; }
 }

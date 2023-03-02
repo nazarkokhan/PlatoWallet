@@ -15,11 +15,14 @@ public static class CommonResultToReevoMappers
             ? ReevoResultFactory.Success()
             : ReevoResultFactory.Failure(result.ErrorCode.ToReevoErrorCode(), result.Exception);
 
-    public static ReevoErrorCode ToReevoErrorCode(this ErrorCode source)
+    private static ReevoErrorCode ToReevoErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.Unknown or _ => ReevoErrorCode.GeneralError
+            // ErrorCode. => ReevoErrorCode.Success,
+            ErrorCode.UnknownBetException => ReevoErrorCode.BetRefused,
+            ErrorCode.UnknownRollbackException => ReevoErrorCode.RollbackRefused,
+            ErrorCode.Unknown or _ => ReevoErrorCode.InternalError
         };
     }
 }

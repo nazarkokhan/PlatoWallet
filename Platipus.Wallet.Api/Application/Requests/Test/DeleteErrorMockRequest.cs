@@ -1,12 +1,14 @@
 namespace Platipus.Wallet.Api.Application.Requests.Test;
 
+using System.ComponentModel;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public record DeleteErrorMockRequest(
-    string UserName,
-    ErrorMockMethod Method) : IRequest<IPswResult>
+    [property: DefaultValue("reevo_nazar_123")] string Username,
+    MockedErrorMethod Method) : IRequest<IPswResult>
 {
     public class Handler : IRequestHandler<DeleteErrorMockRequest, IPswResult>
     {
@@ -22,7 +24,7 @@ public record DeleteErrorMockRequest(
             CancellationToken cancellationToken)
         {
             var deletedErrorMocks = await _context.Set<MockedError>()
-                .Where(e => e.User.UserName == request.UserName && e.Method == request.Method)
+                .Where(e => e.User.Username == request.Username && e.Method == request.Method)
                 .ExecuteDeleteAsync(cancellationToken: cancellationToken);
 
             if (deletedErrorMocks is 0)

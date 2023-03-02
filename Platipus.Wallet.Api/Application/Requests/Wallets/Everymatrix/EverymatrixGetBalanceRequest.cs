@@ -2,46 +2,38 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
+using Results.ResultToResultMappers;
+using Services.Wallet;
 
 public record EverymatrixGetBalanceRequest(
-    Guid Token,
+    string Token,
     string Currency,
     string Hash) : IRequest<IEverymatrixResult<EverymatrixBalanceResponse>>, IEveryMatrixRequest
 {
     public class Handler : IRequestHandler<EverymatrixGetBalanceRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
-                .Include(u => u.Currency)
-                .Select(
-                    u => new
-                    {
-                        u.Balance,
-                        Currency = u.Currency.Name,
-                        u.UserName
-                    })
-                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            var walletResult = await _wallet.GetBalanceAsync(
+                request.Token,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound);
+            if (walletResult.IsFailure)
+                return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
+            var data = walletResult.Data;
 
-            var response = new EverymatrixBalanceResponse(user.Balance, user.Currency);
+            var response = new EverymatrixBalanceResponse(data.Balance, data.Currency);
 
             return EverymatrixResultFactory.Success(response);
         }

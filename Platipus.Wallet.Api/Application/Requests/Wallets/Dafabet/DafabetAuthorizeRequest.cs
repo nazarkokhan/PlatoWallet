@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 public record DafabetAuthorizeRequest(
     string PlayerId,
-    Guid PlayerToken,
-    string Hash) : IDafabetBaseRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
+    string PlayerToken,
+    string Hash) : IDafabetRequest, IRequest<IDafabetResult<DafabetBalanceResponse>>
 {
     public class Handler : IRequestHandler<DafabetAuthorizeRequest, IDafabetResult<DafabetBalanceResponse>>
     {
@@ -25,34 +25,34 @@ public record DafabetAuthorizeRequest(
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
-                .Where(u => u.UserName == request.PlayerId)
+                .Where(u => u.Username == request.PlayerId)
                 .Select(
                     u => new
                     {
                         u.Id,
-                        u.UserName,
+                        u.Username,
                         u.Balance,
-                        CurrencyName = u.Currency.Name,
+                        Currency = u.Currency.Id,
                         u.IsDisabled,
-                        Sessions = u.Sessions
-                            .Where(s => s.ExpirationDate > DateTime.UtcNow)
+                        Session = u.Sessions
+                            .Where(s => s.Id == request.PlayerToken)
                             .Select(
                                 s => new
                                 {
                                     s.Id,
                                     s.ExpirationDate
                                 })
-                            .ToList()
+                            .FirstOrDefault()
                     })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null || user.IsDisabled)
                 return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.PlayerNotFound);
 
-            if (user.Sessions.All(s => s.Id != request.PlayerToken))
+            if (user.Session is null || user.Session.ExpirationDate < DateTime.UtcNow)
                 return DafabetResultFactory.Failure<DafabetBalanceResponse>(DafabetErrorCode.InvalidToken);
 
-            var response = new DafabetBalanceResponse(user.UserName, user.CurrencyName, user.Balance);
+            var response = new DafabetBalanceResponse(user.Username, user.Currency, user.Balance);
 
             return DafabetResultFactory.Success(response);
         }

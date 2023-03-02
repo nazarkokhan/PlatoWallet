@@ -1,250 +1,382 @@
 namespace Platipus.Wallet.Api.Application.Services.Wallet;
 
 using Domain.Entities;
+using Domain.Entities.Enums;
 using DTOs;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public class WalletService : IWalletService
 {
+    private readonly ILogger<WalletService> _logger;
     private readonly WalletDbContext _context;
 
-    public WalletService(WalletDbContext context)
+    public WalletService(ILogger<WalletService> logger, WalletDbContext context)
     {
+        _logger = logger;
         _context = context;
     }
 
-    public async Task<IResult<BalanceResponse>> GetBalanceAsync(
-        GetBalanceRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IResult<WalletGetBalanceResponse>> GetBalanceAsync(
+        string sessionId,
+        bool searchByUsername = false,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _context.Set<User>()
-            .TagWith("GetUserBalance")
-            .Where(
-                u => u.UserName == request.User
-                  && u.Sessions
-                         .Select(s => s.Id)
-                         .Contains(request.SessionId))
-            .Select(
-                u => new
-                {
-                    u.Id,
-                    u.Balance,
-                    u.IsDisabled,
-                    Currency = u.Currency.Name
-                })
-            .FirstOrDefaultAsync(cancellationToken);
+        try
+        {
+            var user = await _context.Set<User>()
+                .TagWith("GetBalance")
+                .Where(
+                    u => searchByUsername
+                        ? u.Username == sessionId
+                        : u.Sessions.Any(s => s.Id == sessionId))
+                .Select(
+                    u => new WalletGetBalanceResponse(
+                        u.Id,
+                        u.Username,
+                        u.Balance,
+                        u.CurrencyId,
+                        u.CasinoId,
+                        u.IsDisabled))
+                .FirstOrDefaultAsync(cancellationToken);
 
-        if (user is null)
-            return ResultFactory.Failure<BalanceResponse>(ErrorCode.InvalidUser);
+            if (user is null)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserNotFound);
 
-        if (user.IsDisabled)
-            return ResultFactory.Failure<BalanceResponse>(ErrorCode.UserDisabled);
+            if (user.IsDisabled)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserIsDisabled);
 
-        var response = new BalanceResponse(user.Balance, user.Currency);
-
-        return ResultFactory.Success(response);
+            return ResultFactory.Success(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Common wallet service GetBalance unknown exception");
+            return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UnknownGetBalanceException, e);
+        }
     }
 
-    public async Task<IResult<BetOrWinResponse>> BetAsync(
-        BetRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IResult<WalletBetWinRollbackResponse>> BetAsync(
+        string sessionId,
+        string roundId,
+        string transactionId,
+        decimal amount,
+        string? currency = null,
+        bool roundFinished = false,
+        bool searchByUsername = false,
+        CancellationToken cancellationToken = default)
     {
-        var round = await _context.Set<Round>()
-            .Where(r => r.Id == request.RoundId && r.User.UserName == request.User)
-            .Include(r => r.User.Currency)
-            .Include(r => r.Transactions)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (round is null)
+        try
         {
-            var thisUser = await _context.Set<User>()
-                .Where(u => u.UserName == request.User)
-                .Include(u => u.Currency)
-                .FirstAsync(cancellationToken);
+            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
-            round = new Round
+            var transactionAlreadyExists = await _context.Set<Transaction>()
+                .TagWith("Bet")
+                .Where(t => t.Id == transactionId)
+                .AnyAsync(cancellationToken);
+
+            if (transactionAlreadyExists)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.TransactionAlreadyExists);
+
+            var user = await _context.Set<User>()
+                .TagWith("Bet")
+                .Where(
+                    u => searchByUsername
+                        ? u.Username == sessionId
+                        : u.Sessions.Any(s => s.Id == sessionId))
+                .Include(u => u.Rounds.Where(r => r.Id == roundId))
+                .ThenInclude(r => r.Transactions)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
+
+            if (user.IsDisabled)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserIsDisabled);
+
+            var round = user.Rounds.FirstOrDefault();
+
+            if (round is null)
             {
-                Id = request.RoundId,
-                Finished = false,
-                User = thisUser
+                var roundAlreadyExists = await _context.Set<Round>()
+                    .TagWith("Bet")
+                    .Where(t => t.Id == roundId)
+                    .AnyAsync(cancellationToken);
+
+                if (roundAlreadyExists)
+                    return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundAlreadyExists);
+
+                round = new Round(roundId) { UserId = user.Id };
+                _context.Add(round);
+
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+
+            if (round.Finished)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundAlreadyFinished);
+
+            if (currency is not null && currency != user.CurrencyId)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.InvalidCurrency);
+
+            user.Balance -= amount;
+            if (roundFinished)
+                round.Finish();
+
+            var transaction = new Transaction(transactionId, amount, TransactionType.Bet);
+
+            _context.Add(transaction);
+            round.Transactions.Add(transaction);
+
+            _context.Update(round);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await dbTransaction.CommitAsync(cancellationToken);
+
+            var response = new WalletBetWinRollbackResponse(
+                user.Id,
+                user.Username,
+                user.Balance,
+                user.CurrencyId,
+                new WalletBetWinRollbackResponse.TransactionDto(transaction.Id, transaction.InternalId, transaction.CreatedDate),
+                new WalletBetWinRollbackResponse.RoundDto(round.Id, round.InternalId, round.CreatedDate));
+
+            return ResultFactory.Success(response);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Common wallet service Bet unknown exception");
+            return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UnknownBetException, e);
+        }
+    }
+
+    public async Task<IResult<WalletBetWinRollbackResponse>> WinAsync(
+        string sessionId,
+        string roundId,
+        string transactionId,
+        decimal amount,
+        bool roundFinished = true,
+        string? currency = null,
+        bool searchByUsername = false,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+            var transactionAlreadyExists = await _context.Set<Transaction>()
+                .TagWith("Win")
+                .Where(t => t.Id == transactionId)
+                .AnyAsync(cancellationToken);
+
+            if (transactionAlreadyExists)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.TransactionAlreadyExists);
+
+            var user = await _context.Set<User>()
+                .TagWith("Win")
+                .Where(
+                    u => searchByUsername
+                        ? u.Username == sessionId
+                        : u.Sessions.Any(s => s.Id == sessionId))
+                .Include(u => u.Rounds.Where(r => r.Id == roundId))
+                .ThenInclude(r => r.Transactions)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
+
+            if (user.IsDisabled)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserIsDisabled);
+
+            var round = user.Rounds.FirstOrDefault();
+            if (round is null)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundNotFound);
+
+            if (round.Finished)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundAlreadyFinished);
+
+            if (currency is not null && currency != user.CurrencyId)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.InvalidCurrency);
+
+            user.Balance += amount;
+
+            var transaction = new Transaction(transactionId, amount, TransactionType.Win) { RoundId = round.Id };
+
+            _context.Add(transaction);
+            round.Transactions.Add(transaction);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await dbTransaction.CommitAsync(cancellationToken);
+
+            var response = new WalletBetWinRollbackResponse(
+                user.Id,
+                user.Username,
+                user.Balance,
+                user.CurrencyId,
+                new WalletBetWinRollbackResponse.TransactionDto(transaction.Id, transaction.InternalId, transaction.CreatedDate),
+                new WalletBetWinRollbackResponse.RoundDto(round.Id, round.InternalId, round.CreatedDate));
+
+            return ResultFactory.Success(response);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Common wallet service Win unknown exception");
+            return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UnknownWinException, e);
+        }
+    }
+
+    public async Task<IResult<WalletBetWinRollbackResponse>> RollbackAsync(
+        string sessionId,
+        string transactionId,
+        string? roundId = null,
+        bool searchByUsername = false,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+            var user = await _context.Set<User>()
+                .TagWith("Rollback")
+                .Where(
+                    u => searchByUsername
+                        ? u.Username == sessionId
+                        : u.Sessions.Any(s => s.Id == sessionId))
+                .Include(u => u.Rounds.Where(r => r.Id == roundId))
+                .ThenInclude(r => r.Transactions.Where(t => t.Id == transactionId))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
+
+            if (user.IsDisabled)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserIsDisabled);
+
+            var round = user.Rounds.FirstOrDefault();
+            if (round is null)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundNotFound);
+
+            if (round.Finished)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundAlreadyFinished);
+
+            var transaction = round.Transactions.FirstOrDefault();
+            if (transaction is null || transaction.IsCanceled)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.TransactionNotFound);
+
+            transaction.Cancel();
+            _context.Update(transaction);
+
+            user.Balance += transaction.Amount;
+            _context.Update(user);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await dbTransaction.CommitAsync(cancellationToken);
+
+            var response = new WalletBetWinRollbackResponse(
+                user.Id,
+                user.Username,
+                user.Balance,
+                user.CurrencyId,
+                new WalletBetWinRollbackResponse.TransactionDto(transaction.Id, transaction.InternalId, transaction.CreatedDate),
+                new WalletBetWinRollbackResponse.RoundDto(round.Id, round.InternalId, round.CreatedDate));
+
+            return ResultFactory.Success(response);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Common wallet service Rollback unknown exception");
+            return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UnknownRollbackException, e);
+        }
+    }
+
+    public async Task<IResult<WalletGetBalanceResponse>> AwardAsync(
+        string sessionId,
+        string roundId,
+        string transactionId,
+        decimal amount,
+        string awardId,
+        string? currency = null,
+        bool searchByUsername = false,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+            var transactionAlreadyExists = await _context.Set<Transaction>()
+                .TagWith("Award")
+                .Where(t => t.Id == transactionId)
+                .AnyAsync(cancellationToken);
+
+            if (transactionAlreadyExists)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.TransactionAlreadyExists);
+
+            var roundAlreadyExists = await _context.Set<Round>()
+                .TagWith("Award")
+                .Where(t => t.Id == roundId)
+                .AnyAsync(cancellationToken);
+
+            if (roundAlreadyExists)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.RoundAlreadyExists);
+
+            var user = await _context.Set<User>()
+                .TagWith("Award")
+                .Where(
+                    u => searchByUsername
+                        ? u.Username == sessionId
+                        : u.Sessions.Any(s => s.Id == sessionId))
+                .Include(u => u.Awards.FirstOrDefault(r => r.Id == awardId))
+                .ThenInclude(r => r!.AwardRound)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserNotFound);
+
+            if (user.IsDisabled)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserIsDisabled);
+
+            var award = user.Awards.FirstOrDefault();
+            if (award is null)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardNotFound);
+
+            if (award.AwardRound is not null)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardIsAlreadyUsed);
+
+            var transaction = new Transaction(transactionId, amount, TransactionType.Award);
+            _context.Add(transaction);
+
+            var awardRound = new AwardRound { AwardId = awardId };
+            _context.Add(awardRound);
+
+            var round = new Round(roundId)
+            {
+                Finished = true,
+                Transactions = new List<Transaction> { transaction },
+                AwardRound = awardRound,
+                UserId = user.Id
             };
             _context.Add(round);
 
+            user.Balance += amount;
+            _context.Update(user);
+
             await _context.SaveChangesAsync(cancellationToken);
+            await dbTransaction.CommitAsync(cancellationToken);
+
+            var response = new WalletGetBalanceResponse(
+                user.Id,
+                user.Username,
+                user.Balance,
+                user.CurrencyId,
+                user.CasinoId,
+                user.IsDisabled);
+
+            return ResultFactory.Success(response);
         }
-
-        var user = round.User;
-
-        if (round.Transactions.Any(t => t.Id == request.TransactionId))
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.DuplicateTransaction);
-
-        if (round.Finished)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.Unknown);
-
-        if (user.Currency.Name != request.Currency)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.WrongCurrency);
-
-        user.Balance -= request.Amount;
-        if (request.Finished)
-            round.Finished = request.Finished;
-
-        var transaction = new Transaction
+        catch (Exception e)
         {
-            Id = request.TransactionId,
-            Amount = request.Amount,
-        };
-
-        round.Transactions.Add(transaction);
-
-        _context.Update(round);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var response = new BetOrWinResponse(
-            user.Balance,
-            user.Currency.Name,
-            transaction.InternalId,
-            transaction.CreatedDate);
-
-        return ResultFactory.Success(response);
-    }
-
-    public async Task<IResult<BetOrWinResponse>> WinAsync(
-        WinRequest request,
-        CancellationToken cancellationToken)
-    {
-        var round = await _context.Set<Round>()
-            .Where(
-                r => r.Id == request.RoundId
-                  && r.User.UserName == request.User)
-            .Include(r => r.User.Currency)
-            .Include(r => r.Transactions)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (round is null || round.Transactions.Any(t => t.Id == request.TransactionId))
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.DuplicateTransaction);
-
-        if (round.Finished)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.Unknown);
-        var user = round.User;
-        if (user.Currency.Name != request.Currency)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.WrongCurrency);
-
-        user.Balance += request.Amount;
-        if (request.Finished)
-            round.Finished = request.Finished;
-
-        var transaction = new Transaction
-        {
-            Id = request.TransactionId,
-            Amount = request.Amount
-        };
-
-        round.Transactions.Add(transaction);
-
-        _context.Update(round);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var response = new BetOrWinResponse(
-            user.Balance,
-            user.Currency.Name,
-            transaction.InternalId,
-            transaction.CreatedDate);
-
-        return ResultFactory.Success(response);
-    }
-
-    public async Task<IResult<BetOrWinResponse>> RollbackAsync(
-        RollbackRequest request,
-        CancellationToken cancellationToken)
-    {
-        var round = await _context.Set<Round>()
-            .Where(
-                r => r.Id == request.RoundId
-                  && r.User.UserName == request.User)
-            .Include(r => r.User.Currency)
-            .Include(r => r.Transactions)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (round is null)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.BadParametersInTheRequest);
-
-        if (round.Finished)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.Unknown);
-
-        var lastTransaction = round.Transactions.MaxBy(t => t.CreatedDate);
-        if (lastTransaction is null || lastTransaction.Id != request.TransactionId)
-            return ResultFactory.Failure<BetOrWinResponse>(ErrorCode.TransactionDoesNotExist);
-
-        var user = round.User;
-
-        user.Balance += lastTransaction.Amount;
-        _context.Update(user);
-
-        round.Transactions.Remove(lastTransaction);
-        _context.Update(round);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var response = new BetOrWinResponse(
-            user.Balance,
-            user.Currency.Name,
-            lastTransaction.InternalId,
-            lastTransaction.CreatedDate);
-
-        return ResultFactory.Success(response);
-    }
-
-    public async Task<IResult<BalanceResponse>> AwardAsync(
-        AwardRequest request,
-        CancellationToken cancellationToken)
-    {
-        var award = await _context.Set<Award>()
-            .Where(a => a.Id == request.AwardId)
-            .Include(a => a.User)
-            .Include(a => a.AwardRound!.Round)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (award is null || award.User.UserName != request.User)
-            return ResultFactory.Failure<BalanceResponse>(ErrorCode.AwardDoesNotExist);
-
-        if (award.AwardRound is not null)
-            return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
-
-        var round = await _context.Set<Round>()
-            .Where(r => r.Id == request.RoundId)
-            .Include(a => a.Transactions)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (round is not null)
-            return ResultFactory.Failure<BalanceResponse>(ErrorCode.DuplicateTransaction);
-
-        round = new Round
-        {
-            Id = request.RoundId,
-            Finished = true,
-            Transactions = new List<Transaction>
-            {
-                new()
-                {
-                    Id = request.TransactionId,
-                    Amount = request.Amount
-                }
-            },
-            AwardRound = new AwardRound { Award = award }
-        };
-        _context.Add(round);
-
-        var user = award.User;
-
-        user.Rounds.Add(round);
-        user.Balance += request.Amount;
-        _context.Update(user);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var result = new BalanceResponse(user.Balance, user.Currency.Name);
-
-        return ResultFactory.Success(result);
+            _logger.LogError(e, "Common wallet service Award unknown exception");
+            return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UnknownAwardException, e);
+        }
     }
 }

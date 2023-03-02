@@ -1,24 +1,21 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
-using Application.DTOs;
+using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Requests.Wallets.Hub88.Base;
 using Application.Results.Hub88;
 using Domain.Entities;
-using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
-using LazyCache;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 public class Hub88SecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var request = context.ActionArguments
-            .Select(a => a.Value as IHub88BaseRequest)
-            .Single(a => a is not null)!;
+        var request = context.ActionArguments.Values
+            .OfType<IHub88BaseRequest>()
+            .Single();
 
         var httpContext = context.HttpContext;
         var cancellationToken = httpContext.RequestAborted;
@@ -42,30 +39,18 @@ public class Hub88SecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var sessionId = request.Token;
-
-        var cache = services.GetRequiredService<IAppCache>();
-
-        var session = await cache.GetOrAddAsync(
-            sessionId.ToString(),
-            async entry =>
-            {
-                var sessionToFind = new Guid((string)entry.Key);
-
-                var session = await dbContext.Set<Session>()
-                    .Where(c => c.Id == sessionToFind)
-                    .Select(
-                        s => new CachedSessionDto(
-                            s.Id,
-                            s.ExpirationDate,
-                            s.User.Id,
-                            s.User.IsDisabled,
-                            s.User.Casino.SignatureKey))
-                    .FirstOrDefaultAsync(httpContext.RequestAborted);
-
-                return session;
-            },
-            new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10) });
+        var session = await dbContext.Set<Session>()
+            .Where(c => c.Id == request.Token)
+            .Select(
+                s => new
+                {
+                    s.Id,
+                    s.ExpirationDate,
+                    UserId = s.User.Id,
+                    UserIsDisabled = s.User.IsDisabled,
+                    UserCasinoSignatureKey = s.User.Casino.SignatureKey
+                })
+            .FirstOrDefaultAsync(httpContext.RequestAborted);
 
         if (session is null)
         {
@@ -87,7 +72,7 @@ public class Hub88SecurityFilterAttribute : ActionFilterAttribute
 
         var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
 
-        var isValidSign = Hub88SecuritySign.IsValid(xRequestSign, rawRequestBytes, session.CasinoSignatureKey);
+        var isValidSign = Hub88SecuritySign.IsValid(xRequestSign, rawRequestBytes, session.UserCasinoSignatureKey);
 
         if (!isValidSign)
         {
@@ -100,6 +85,6 @@ public class Hub88SecurityFilterAttribute : ActionFilterAttribute
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var executedContext = await next();
+        await next();
     }
 }

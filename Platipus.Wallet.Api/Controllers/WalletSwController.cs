@@ -2,11 +2,16 @@ namespace Platipus.Wallet.Api.Controllers;
 
 using System.Net.Mime;
 using Abstract;
+using Application.Extensions;
 using Application.Requests.Wallets.Sw;
 using Application.Requests.Wallets.Sw.Base.Response;
+using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.Security;
@@ -68,4 +73,60 @@ public class WalletSwController : ApiController
         [FromForm] SwFreespinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("private/test/get-security-value/hash")]
+    public async Task<IActionResult> GetSecurityValueHash(
+        string userName,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.Username == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.Id,
+                    Casino = new
+                    {
+                        ProviderId = c.Casino.InternalId,
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return ResultFactory.Failure(ErrorCode.UserNotFound).ToActionResult();
+
+        var securityValue = user.Map(u => SwSecurityHash.Compute(u.Casino.ProviderId, u.UserId, u.Casino.SignatureKey));
+
+        return Ok(securityValue);
+    }
+
+    [HttpPost("private/test/get-security-value/md5")]
+    public async Task<IActionResult> GetSecurityValueMd5(
+        string userName,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.Username == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.Id,
+                    Casino = new
+                    {
+                        ProviderId = c.Casino.InternalId,
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            return ResultFactory.Failure(ErrorCode.UserNotFound).ToActionResult();
+
+        var securityValue = user.Map(u => SwSecurityMd5.Compute(u.Casino.ProviderId, u.UserId, u.Casino.SignatureKey));
+
+        return Ok(securityValue);
+    }
 }

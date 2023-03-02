@@ -1,15 +1,13 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.SoftBet;
 
 using Base.Response;
-using Extensions;
 using Results.ISoftBet;
 using Results.ISoftBet.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 public record SoftBetGetBalanceRequest(
-    Guid SessionId,
+    string SessionId,
     string UserName) : IRequest<ISoftBetResult<SoftBetBalanceResponse>>
 {
     public class Handler : IRequestHandler<SoftBetGetBalanceRequest, ISoftBetResult<SoftBetBalanceResponse>>
@@ -25,19 +23,17 @@ public record SoftBetGetBalanceRequest(
             SoftBetGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(
-                r => new GetBalanceRequest(
-                    r.SessionId,
-                    r.UserName));
+            var walletResult = await _wallet.GetBalanceAsync(
+                request.SessionId,
+                cancellationToken: cancellationToken);
 
-            var walletResult = await _wallet.GetBalanceAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToSoftBetResult<SoftBetBalanceResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(
-                d => new SoftBetBalanceResponse(
-                    (int)(d.Balance * 100),
-                    d.Currency));
+            var response = new SoftBetBalanceResponse(
+                (int)(data.Balance * 100),
+                data.Currency);
 
             return SoftBetResultFactory.Success(response);
         }

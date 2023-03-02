@@ -25,14 +25,14 @@ public record SoftBetInitSessionRequest(
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
-                .Where(u => u.UserName == request.UserName)
+                .Where(u => u.Username == request.UserName)
                 .Select(
                     u => new
                     {
                         u.Id,
-                        u.UserName,
+                        UserName = u.Username,
                         u.Balance,
-                        CurrencyName = u.Currency.Name,
+                        CurrencyName = u.Currency.Id,
                         u.IsDisabled,
                         Casino = new
                         {
@@ -68,7 +68,7 @@ public record SoftBetInitSessionRequest(
     }
 
     public record Response(
-        Guid SessionId,
+        string SessionId,
         string PlayerId,
         string Username,
         string Currency,

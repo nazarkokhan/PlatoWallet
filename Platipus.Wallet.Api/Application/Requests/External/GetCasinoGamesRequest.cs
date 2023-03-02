@@ -26,8 +26,8 @@ public record GetCasinoGamesRequest(string? CasinoId) : IRequest<IResult<List<Ge
                       || c.CasinoGames.Any(g => g.CasinoId == request.CasinoId))
                 .Select(
                     c => new GetCommonGameDto(
-                        c.Id,
-                        c.GameServerId,
+                        c.GameServiceId,
+                        c.GameServiceId,
                         c.Name,
                         c.LaunchName,
                         c.CategoryId))

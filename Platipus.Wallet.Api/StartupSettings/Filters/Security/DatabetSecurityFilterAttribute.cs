@@ -1,10 +1,9 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
+using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Requests.Wallets.Dafabet.Base;
 using Domain.Entities;
-using Domain.Entities.Enums;
-using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -14,28 +13,29 @@ public class DatabetSecurityFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var baseRequest = context.ActionArguments.Values.OfType<IDafabetBaseRequest>().Single();
+        var request = context.ActionArguments.Values
+            .OfType<IDafabetRequest>()
+            .Single();
 
         var requestRoute = context.ActionDescriptor.EndpointMetadata
             .OfType<HttpMethodAttribute>()
             .Single()
-            .Template;
-
-        if (requestRoute is null)
-        {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<DatabetSecurityFilterAttribute>>();
-            logger.LogCritical("Dafabet wallet request route not found for endpoint");
-        }
+            .Template!;
 
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<WalletDbContext>();
-        var databetCasino = await dbContext.Set<Casino>()
-            .Where(c => c.Provider == CasinoProvider.Dafabet)
-            .Select(c => new { c.SignatureKey })
-            .FirstAsync(context.HttpContext.RequestAborted);
 
-        var secretKey = databetCasino.SignatureKey;
+        var user = await dbContext.Set<User>()
+            .Where(u => u.Username == request.PlayerId)
+            .Select(u => new { CasinoSignatureKey = u.Casino.SignatureKey })
+            .FirstOrDefaultAsync(context.HttpContext.RequestAborted);
 
-        var isValidJSysHash = baseRequest.IsValid(requestRoute ?? string.Empty, secretKey);
+        if (user is null)
+        {
+            context.Result = DafabetResultFactory.Failure(DafabetErrorCode.PlayerNotFound).ToActionResult();
+            return;
+        }
+
+        var isValidJSysHash = request.IsValid(requestRoute, user.CasinoSignatureKey);
 
         if (!isValidJSysHash)
         {

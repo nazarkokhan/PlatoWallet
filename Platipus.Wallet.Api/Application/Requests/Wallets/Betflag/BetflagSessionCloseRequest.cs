@@ -25,13 +25,13 @@ public record BetflagSessionCloseRequest(
             _context = context;
         }
 
-        public async Task<IBetflagResult<CloseSessionResponse>> Handle(
+        public Task<IBetflagResult<CloseSessionResponse>> Handle(
             BetflagSessionCloseRequest request,
             CancellationToken cancellationToken)
         {
             var response = new CloseSessionResponse();
 
-            return BetflagResultFactory.Success(response);
+            return Task.FromResult<IBetflagResult<CloseSessionResponse>>(BetflagResultFactory.Success(response));
         }
     }
 

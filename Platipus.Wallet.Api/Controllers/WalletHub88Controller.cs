@@ -2,12 +2,18 @@
 
 namespace Platipus.Wallet.Api.Controllers;
 
+using System.Text.Json.Nodes;
 using Abstract;
 using Application.Requests.Wallets.Hub88;
 using Application.Requests.Wallets.Hub88.Base.Response;
+using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using StartupSettings;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.Security;
@@ -53,4 +59,31 @@ public class WalletHub88Controller : RestApiController
         Hub88RollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("private/test/get-security-value")]
+    public async Task<IActionResult> GetSecurityValue(
+        string casinoId,
+        [FromBody] JsonNode request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var casino = await dbContext.Set<Casino>()
+            .Where(c => c.Id == casinoId)
+            .Select(
+                c => new
+                {
+                    c.SignatureKey,
+                    PrivateWalletSecuritySign = (string)c.Params[CasinoParams.Hub88PrivateWalletSecuritySign]!
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (casino is null)
+            return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
+
+        var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
+
+        var securityValue = Hub88SecuritySign.Compute(rawRequestBytes, casino.PrivateWalletSecuritySign);
+
+        return Ok(securityValue);
+    }
 }

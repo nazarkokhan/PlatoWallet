@@ -4,5 +4,5 @@ public interface IEveryMatrixRequest : IEveryMatrixBaseRequest
 {
     public string Hash { get; init; }
 
-    public Guid Token { get; init; }
+    public string Token { get; init; }
 }

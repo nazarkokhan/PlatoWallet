@@ -6,7 +6,7 @@ using Application.Requests.Wallets.Dafabet.Base;
 
 public static class DatabetSecurityHash
 {
-    public static bool IsValid(this IDafabetBaseRequest request, string requestRoute, string secretKey)
+    public static bool IsValid(this IDafabetRequest request, string requestRoute, string secretKey)
     {
         var computedHash = request.Compute(requestRoute, secretKey);
 
@@ -28,7 +28,7 @@ public static class DatabetSecurityHash
         return computedHash.ToLower();
     }
 
-    public static string Compute(this IDafabetBaseRequest request, string requestRoute, string secretKey)
+    public static string Compute(this IDafabetRequest request, string requestRoute, string secretKey)
     {
         return Compute(requestRoute, request.GetSource(), secretKey);
     }

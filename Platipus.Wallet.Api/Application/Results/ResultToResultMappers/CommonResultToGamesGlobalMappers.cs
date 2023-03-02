@@ -15,20 +15,20 @@ public static class CommonResultToGamesGlobalMappers
             ? GamesGlobalResultFactory.Success()
             : GamesGlobalResultFactory.Failure(result.ErrorCode.ToGamesGlobalErrorCode(), result.Exception);
 
-    public static GamesGlobalErrorCode ToGamesGlobalErrorCode(this ErrorCode source)
+    private static GamesGlobalErrorCode ToGamesGlobalErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => GamesGlobalErrorCode.InvalidTransactionAmount,
-            ErrorCode.UserDisabled => GamesGlobalErrorCode.PlayerAccountClosed,
+            ErrorCode.InsufficientFunds => GamesGlobalErrorCode.InvalidTransactionAmount,
+            ErrorCode.UserIsDisabled => GamesGlobalErrorCode.PlayerAccountClosed,
             ErrorCode.SessionExpired => GamesGlobalErrorCode.PlayerIsNotLoggedInOrSessionHasExpired,
-            ErrorCode.MissingSignature or ErrorCode.InvalidSignature => GamesGlobalErrorCode.InvalidAPICredentials,
+            ErrorCode.SecurityParameterIsEmpty or ErrorCode.SecurityParameterIsInvalid => GamesGlobalErrorCode.InvalidAPICredentials,
             ErrorCode.BadParametersInTheRequest => GamesGlobalErrorCode.FreeGameInvalidParameters,
-            ErrorCode.InvalidCasinoId => GamesGlobalErrorCode.MissingServerConfiguration,
-            ErrorCode.InvalidGame => GamesGlobalErrorCode.InvalidGameName,
-            ErrorCode.WrongCurrency => GamesGlobalErrorCode.IncorrectCurrency,
-            ErrorCode.DuplicateTransaction => GamesGlobalErrorCode.UnresolvedTicketsOnCompleteGame,
-            ErrorCode.TransactionDoesNotExist => GamesGlobalErrorCode.InvalidTicketId,
+            ErrorCode.CasinoNotFound => GamesGlobalErrorCode.MissingServerConfiguration,
+            ErrorCode.GameNotFound => GamesGlobalErrorCode.InvalidGameName,
+            ErrorCode.InvalidCurrency => GamesGlobalErrorCode.IncorrectCurrency,
+            ErrorCode.TransactionAlreadyExists => GamesGlobalErrorCode.UnresolvedTicketsOnCompleteGame,
+            ErrorCode.TransactionNotFound => GamesGlobalErrorCode.InvalidTicketId,
             ErrorCode.Unknown or _ => GamesGlobalErrorCode.UnknownServerError
         };
     }

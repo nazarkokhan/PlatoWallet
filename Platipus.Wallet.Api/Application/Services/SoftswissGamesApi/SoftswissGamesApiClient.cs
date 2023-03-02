@@ -43,7 +43,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         Uri baseUrl,
         string casinoId,
         string user,
-        Guid sessionId,
+        string sessionId,
         string game,
         string currency,
         long balance,
@@ -57,7 +57,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
             .Select(
                 c => new
                 {
-                    c.GameServerId,
+                    GameServerId = c.GameServiceId,
                 })
             .FirstOrDefaultAsync(cancellationToken);
 

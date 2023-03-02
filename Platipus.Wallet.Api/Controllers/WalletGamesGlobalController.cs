@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 public class WalletGamesGlobalController : Controller
 {
     [HttpPost]
-    public async Task<IActionResult> Regular(
+    public IActionResult Regular(
         [FromHeader(Name = "UserName")] string username,
         [FromHeader(Name = "Password")] string password,
         [FromHeader(Name = "RequestId")] Guid requestId,
@@ -21,7 +21,7 @@ public class WalletGamesGlobalController : Controller
     }
 
     [HttpPost("admin")]
-    public async Task<IActionResult> Admin(
+    public IActionResult Admin(
         [FromHeader(Name = "UserName")] string username,
         [FromHeader(Name = "Password")] string password,
         [FromHeader(Name = "RequestId")] Guid requestId,

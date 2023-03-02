@@ -84,7 +84,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
             if (string.IsNullOrWhiteSpace(responseString))
-                return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.GeneralError);
+                return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError);
 
             var responseJsonNode = JsonNode.Parse(responseString);
 
@@ -93,7 +93,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
             {
                 var errorResponse = responseJsonNode.Deserialize<ReevoErrorGameApiResponse>(_hub88JsonSerializerOptions);
                 if (errorResponse is null)
-                    return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.GeneralError);
+                    return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError);
                 var errorBox = new ReevoCommonBoxGameApiResponse<TResponse>(errorResponse, default!);
 
                 return ReevoResultFactory.Success(errorBox);
@@ -101,14 +101,14 @@ public class ReevoGameApiClient : IReevoGameApiClient
 
             var successResponse = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
             if (successResponse is null)
-                return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.GeneralError);
+                return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError);
             var successBox = new ReevoCommonBoxGameApiResponse<TResponse>(null, successResponse);
 
             return ReevoResultFactory.Success(successBox);
         }
         catch (Exception e)
         {
-            return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.GeneralError, e);
+            return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError, e);
         }
     }
 }

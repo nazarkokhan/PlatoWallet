@@ -32,7 +32,7 @@ public record CreateAwardRequest(
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
-                .Where(u => u.UserName == request.User)
+                .Where(u => u.Username == request.User)
                 .Include(
                     u => u.Awards
                         .Where(a => a.Id == request.AwardId))
@@ -45,11 +45,7 @@ public record CreateAwardRequest(
             if (user.Awards.Any(a => a.Id == request.AwardId))
                 return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.DuplicateAward);
 
-            var award = new Award
-            {
-                Id = request.AwardId,
-                ValidUntil = request.ValidUntil
-            };
+            var award = new Award(request.AwardId, request.ValidUntil);
 
             user.Awards.Add(award);
             _context.Update(user);
@@ -58,10 +54,10 @@ public record CreateAwardRequest(
 
             var createFreebetAwardResult = await _gamesApiClient.CreateFreebetAwardAsync(
                 user.CasinoId,
-                user.UserName,
+                user.Username,
                 award.Id,
-                user.Currency.Name,
-                new[] {request.Game},
+                user.Currency.Id,
+                new[] { request.Game },
                 request.ValidUntil,
                 10, //TODO where to get from?
                 cancellationToken);

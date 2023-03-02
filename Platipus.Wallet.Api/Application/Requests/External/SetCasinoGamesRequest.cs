@@ -25,11 +25,11 @@ public record SetCasinoGamesRequest(string CasinoId, List<string> GameLaunchName
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
-                return ResultFactory.Failure(ErrorCode.InvalidCasinoId);
+                return ResultFactory.Failure(ErrorCode.CasinoNotFound);
 
             var games = await _context.Set<Game>()
                 .Where(g => request.GameLaunchNames.Contains(g.LaunchName))
-                .Select(g => g.Id)
+                .Select(g => g.GameServiceId)
                 .ToListAsync(cancellationToken);
 
             _context.RemoveRange(casino.CasinoGames);

@@ -2,14 +2,13 @@ namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using Base.Common.Page;
 using Domain.Entities;
-using DTOs;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public record GetUsersPageRequest(
         string? CasinoId,
-        string? UserName,
+        string? Username,
         PageRequest Page)
     : IRequest<IPswResult<IPage<GetUsersPageRequest.Response>>>
 {
@@ -32,26 +31,24 @@ public record GetUsersPageRequest(
             if (request.CasinoId is not null)
                 usersQuery = usersQuery.Where(u => u.CasinoId == request.CasinoId);
 
-            if (request.UserName is not null)
-                usersQuery = usersQuery.Where(u => u.UserName == request.UserName);
+            if (request.Username is not null)
+                usersQuery = usersQuery.Where(u => u.Username == request.Username);
 
             var totalCount = await usersQuery.CountAsync(cancellationToken);
 
-            usersQuery = usersQuery
-                .OrderByDescending(p => p.Id);
+            usersQuery = usersQuery.OrderByDescending(p => p.CreatedDate);
 
             var users = await usersQuery
                 .SkipTake(request.Page)
                 .Select(
                     u => new Response(
                         u.Id,
-                        u.UserName,
+                        u.Username,
                         u.Password,
                         u.IsDisabled,
-                        u.SwUserId,
                         u.CasinoId,
-                        u.Casino.SwProviderId,
-                        new GetCurrencyDto(u.CurrencyId, u.Currency.Name)))
+                        u.Casino.InternalId,
+                        u.CurrencyId))
                 .ToListAsync(cancellationToken);
 
             var page = new Page<Response>(users, totalCount);
@@ -61,12 +58,11 @@ public record GetUsersPageRequest(
     }
 
     public record Response(
-        Guid Id,
-        string UserName,
+        int Id,
+        string Username,
         string Password,
         bool IsDisabled,
-        int? SwUserId,
         string CasinoId,
-        int? CasinoSwProviderId,
-        GetCurrencyDto CurrencyDto);
+        int CasinoInternalId,
+        string Currency);
 }

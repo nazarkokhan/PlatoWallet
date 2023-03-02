@@ -6,7 +6,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record OpenboxVerifyPlayerRequest(Guid Token) : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxTokenResponse>>
+public record OpenboxVerifyPlayerRequest(string Token) : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxTokenResponse>>
 {
     public class Handler : IRequestHandler<OpenboxVerifyPlayerRequest, IOpenboxResult<OpenboxTokenResponse>>
     {
@@ -21,24 +21,20 @@ public record OpenboxVerifyPlayerRequest(Guid Token) : IOpenboxBaseRequest, IReq
             OpenboxVerifyPlayerRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
+            var temporarySession = await _context.Set<Session>()
                 .TagWith("GetSession")
                 .Where(u => u.Id == request.Token)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (session is null)
+            if (temporarySession is null || temporarySession.ExpirationDate < DateTime.UtcNow)
                 return OpenboxResultFactory.Failure<OpenboxTokenResponse>(OpenboxErrorCode.TokenRelatedErrors);
 
-            if (session.ExpirationDate <= DateTime.UtcNow)
-                return OpenboxResultFactory.Failure<OpenboxTokenResponse>(OpenboxErrorCode.TokenRelatedErrors);
-
-            //TODO session.IsMainToken = false;
-            var newSession = new Session {UserId = session.UserId};
-            _context.Add(newSession);
+            var playSession = new Session { UserId = temporarySession.UserId };
+            _context.Add(playSession);
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = new OpenboxTokenResponse(newSession.Id);
+            var response = new OpenboxTokenResponse(playSession.Id);
 
             return OpenboxResultFactory.Success(response);
         }

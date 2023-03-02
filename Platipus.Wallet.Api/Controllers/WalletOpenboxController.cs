@@ -1,7 +1,9 @@
 namespace Platipus.Wallet.Api.Controllers;
 
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Abstract;
+using Application.Requests.Wallets.Openbox;
 using Application.Requests.Wallets.Openbox.Base;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Domain.Entities;
@@ -12,6 +14,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using StartupSettings;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
@@ -39,39 +42,58 @@ public class WalletOpenboxController : RestApiController
 
     [HttpPost("main")]
     [ProducesResponseType(typeof(OpenboxSingleResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Balance(OpenboxSingleRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Main(OpenboxSingleRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var casinoId = request.VendorUid switch
-            {
-                "00000000000000000000000000000001" => "openbox", //TODO move to db
-                _ => null
-            };
-            if (casinoId is null)
-                return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
-
             var casino = await _context.Set<Casino>()
-                .Where(c => c.Id == casinoId)
+                .Where(
+                    c => c.Provider == CasinoProvider.Openbox
+                      && (string)c.Params[CasinoParams.OpenboxVendorUid]! == request.VendorUid)
+                .Select(
+                    c => new
+                    {
+                        c.Id,
+                        c.SignatureKey
+                    })
                 .FirstOrDefaultAsync(cancellationToken);
             if (casino is null)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-            var decryptedPayload = OpenboxSecurityPayload.Decrypt(request.Payload, casino.SignatureKey);
-
+            var decryptedPayloadJson = OpenboxSecurityPayload.Decrypt(request.Payload, casino.SignatureKey);
             var payloadType = OpenboxHelpers.GetRequestType(request.Method);
 
             if (payloadType is null)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-            var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayload, payloadType, _jsonSerializerOptions);
-            if (payloadRequestObj is null)
+            var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayloadJson, payloadType, _jsonSerializerOptions);
+            if (payloadRequestObj is not IOpenboxBaseRequest decryptedPayload)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
-            HttpContext.Items.Add("OpenboxPayloadRequestObj", payloadRequestObj);
-            _logger.LogInformation("Openbox decrypted payload: {OpenboxDecryptedPayload}", payloadRequestObj);
+            var session = await _context.Set<Session>()
+                .Where(s => s.Id == decryptedPayload.Token)
+                .Select(
+                    s => new
+                    {
+                        s.ExpirationDate,
+                        s.IsTemporaryToken,
+                        UserCasinoId = s.User.CasinoId
+                    })
+                .FirstOrDefaultAsync(cancellationToken);
+            if (session is null || session.ExpirationDate < DateTime.UtcNow)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.TokenRelatedErrors).ToActionResult();
 
-            var responseObj = await _mediator.Send(payloadRequestObj, cancellationToken);
+            var isAuthRequest = payloadRequestObj is OpenboxVerifyPlayerRequest;
+            if (isAuthRequest ? !session.IsTemporaryToken : session.IsTemporaryToken)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.TokenRelatedErrors).ToActionResult();
+
+            if (casino.Id != session.UserCasinoId)
+                return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
+
+            HttpContext.Items.Add(HttpContextItems.OpenboxPayloadRequestObj, decryptedPayload);
+            _logger.LogInformation("Openbox decrypted payload: {OpenboxDecryptedPayload}", decryptedPayload);
+
+            var responseObj = await _mediator.Send(decryptedPayload, cancellationToken);
             if (responseObj is not IOpenboxResult response)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.InternalServiceError).ToActionResult();
 
@@ -79,7 +101,38 @@ public class WalletOpenboxController : RestApiController
         }
         catch (Exception e)
         {
-            return OpenboxResultFactory.Failure(OpenboxErrorCode.Success, e).ToActionResult();
+            _logger.LogError(e, "Openbox unexpected exception");
+            return OpenboxResultFactory.Failure(OpenboxErrorCode.InternalServiceError, e).ToActionResult();
         }
+    }
+
+    [HttpPost("private/test/get-security-value")]
+    public async Task<IActionResult> GetSecurityValue(
+        string vendorUid,
+        [FromBody] JsonNode request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var casino = await _context.Set<Casino>()
+            .Where(
+                c => c.Provider == CasinoProvider.Openbox
+                  && (string)c.Params[CasinoParams.OpenboxVendorUid]! == vendorUid)
+            .Select(
+                c => new
+                {
+                    c.Id,
+                    c.SignatureKey
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (casino is null)
+            return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
+
+        var signatureKey = casino.SignatureKey;
+
+        var serialize = JsonSerializer.Serialize(request);
+        var securityValue = OpenboxSecurityPayload.Encrypt(serialize, signatureKey);
+
+        return Ok(securityValue);
     }
 }

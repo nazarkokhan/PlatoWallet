@@ -32,7 +32,7 @@ public record ExternalHub88PrepaidsListRequest(string CasinoId, string Game)
                 .Select(
                     c => new
                     {
-                        c.GameServerId,
+                        GameServerId = c.GameServiceId,
                         c.LaunchName
                     })
                 .FirstOrDefaultAsync(cancellationToken);

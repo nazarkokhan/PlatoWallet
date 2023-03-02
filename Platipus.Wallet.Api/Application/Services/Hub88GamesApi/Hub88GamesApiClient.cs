@@ -144,7 +144,26 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
         var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
         var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
 
-        var xRequestSign = Hub88SecuritySign.Compute(requestBytes, Hub88SecuritySign.PrivateKeyGameServer);
+        // var jsonText = Encoding.UTF8.GetString(requestBytes);
+        // var operatorId = JsonNode.Parse(jsonText)?["operator_id"]?.GetValue<string?>();
+
+        var privateGameServiceSecuritySign = @"-----BEGIN RSA PRIVATE KEY-----
+MIICWwIBAAKBgHi57tRMYFBfHa8ZN5NTTSsK/iOKUBmOjhzZKrrZiLjraL/U9edz
+ftNi5KaSoXOXLpiEOvaTD+fuuXGvDbME4+XBlfavFX8zza9FDLmERh9uhe+OLgwP
+u4AebHvwt8uMY2Eg5+EOc4m0uvlEDI09U54WaxgNw9k4n3mnHboXXVHxAgMBAAEC
+gYBtJg2bu4HIqHY5/N6WQFYgeEvU7hQFRzGNO3q6fDp0lcGaznuUyoL7swlu4FtA
+GotyMPruO3/B/b+D3PTRybYQlmkLESdrffIwChTckIS29UkEtBAn5QE2ifOaa4Ic
+KRACGi0gjOToulTS4HB2/0EWd5ilRjkqhWYvbFm2bHV6kQJBAOWtWZcHtG5BHveu
+HWYBh26izHeMSztyTUKRTiC97Fl3/dYmSyEON4fDV9gNervSEvfOJgIpISmxwXeh
+wL8sXlsCQQCGkAB5UvykV8aIR8k39f83jZT9e49YdGxXvg6WY8cylyQiO6Mw9mom
+NAsqaeDSLbe9MpZroWvVRbvWnV5MGBqjAkEAmN48Vw3FxeyKFAhLgO1bmwO4W4mB
+OVvmmHvmKFzAxvvac4KhVqsDwtT9zsuJ+SDlhxIqsh11+S5auqlqhNOfKQJAJiz6
+hXEezf09DPLYynCXDIq1Z0jDvUOibS41c0Mxg0/P54pl3QE70kTXmhvZtadUxm9w
+r25namVTSirxUsNP4wJAMCOSoOD1vOIVlRQ+qyZm9lEZOGUlSdcx4QLzepNYbEK7
+8Dj8gIpH/b8QjPE2emdoYw1VDtUkWxj6dWu1wNLkBA==
+-----END RSA PRIVATE KEY-----"; //TODO get from db in Params[]
+
+        var xRequestSign = Hub88SecuritySign.Compute(requestBytes, privateGameServiceSecuritySign);
 
         jsonContent.Headers.Add(Hub88Headers.XHub88Signature, xRequestSign);
 

@@ -1,3 +1,4 @@
+#pragma warning disable CS8907
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag.Base;
 
 using Results.Betflag;

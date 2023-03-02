@@ -24,13 +24,13 @@ public record UpdateGameRequest(
             CancellationToken cancellationToken)
         {
             var game = await _context.Set<Game>()
-                .Where(c => c.GameServerId == request.GameServerId)
+                .Where(c => c.GameServiceId == request.GameServerId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (game is null)
-                return ResultFactory.Failure(ErrorCode.InvalidGame);
+                return ResultFactory.Failure(ErrorCode.GameNotFound);
 
-            game.GameServerId = request.GameServerId;
+            game.GameServiceId = request.GameServerId;
             game.Name = request.Name;
             game.LaunchName = request.LaunchName;
             game.CategoryId = request.CategoryId;

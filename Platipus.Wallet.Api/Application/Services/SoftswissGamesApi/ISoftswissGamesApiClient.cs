@@ -9,7 +9,7 @@ public interface ISoftswissGamesApiClient
         Uri baseUrl,
         string casinoId,
         string user,
-        Guid sessionId,
+        string sessionId,
         string game,
         string currency,
         long balance,

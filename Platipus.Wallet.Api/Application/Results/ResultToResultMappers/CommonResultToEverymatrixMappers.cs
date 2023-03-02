@@ -15,17 +15,21 @@ public static class CommonResultToEverymatrixMappers
             ? EverymatrixResultFactory.Success()
             : EverymatrixResultFactory.Failure(result.ErrorCode.ToEverymatrixErrorCode(), result.Exception);
 
-    public static EverymatrixErrorCode ToEverymatrixErrorCode(this ErrorCode source)
+    private static EverymatrixErrorCode ToEverymatrixErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => EverymatrixErrorCode.InsufficientFunds,
-            ErrorCode.UserDisabled => EverymatrixErrorCode.UserIsBlocked,
-            ErrorCode.InvalidSignature or ErrorCode.InvalidSign => EverymatrixErrorCode.InvalidHash,
-            ErrorCode.MissingSignature or ErrorCode.SessionExpired => EverymatrixErrorCode.TokenNotFound,
-            ErrorCode.BetLimitReached => EverymatrixErrorCode.DoubleTransaction,
-            ErrorCode.InvalidUser => EverymatrixErrorCode.UserIsBlocked,
-            ErrorCode.Unknown or _ => EverymatrixErrorCode.UnknownError,
+            ErrorCode.SessionNotFound => EverymatrixErrorCode.TokenNotFound,
+            ErrorCode.UserIsDisabled => EverymatrixErrorCode.UserIsBlocked,
+            ErrorCode.InsufficientFunds => EverymatrixErrorCode.InsufficientFunds,
+            ErrorCode.UserNotFound => EverymatrixErrorCode.VendorAccountNotActive,
+            // ErrorCode. => EverymatrixErrorCode.IpIsNotAllowed,
+            ErrorCode.InvalidCurrency => EverymatrixErrorCode.CurrencyDoesntMatch,
+            ErrorCode.TransactionNotFound => EverymatrixErrorCode.TransactionNotFound,
+            ErrorCode.TransactionAlreadyExists => EverymatrixErrorCode.DoubleTransaction,
+            ErrorCode.SecurityParameterIsInvalid => EverymatrixErrorCode.InvalidHash,
+            ErrorCode.CasinoNotFound => EverymatrixErrorCode.CasinoLossLimit,
+            ErrorCode.Unknown or _ => EverymatrixErrorCode.UnknownError
         };
     }
 }

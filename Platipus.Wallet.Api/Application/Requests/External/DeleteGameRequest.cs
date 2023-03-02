@@ -20,11 +20,11 @@ public record DeleteGameRequest(int Id) : IRequest<IResult>
             CancellationToken cancellationToken)
         {
             var deletedGames = await _context.Set<Game>()
-                .Where(c => c.Id == request.Id)
+                .Where(c => c.GameServiceId == request.Id)
                 .ExecuteDeleteAsync(cancellationToken);
 
-            if (deletedGames is not 1)
-                return ResultFactory.Failure(ErrorCode.InvalidGame);
+            if (deletedGames is 0)
+                return ResultFactory.Failure(ErrorCode.GameNotFound);
 
             return ResultFactory.Success();
         }

@@ -2,49 +2,44 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uis;
 
 using System.Xml.Serialization;
 using Base;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Results.ResultToResultMappers;
 using Results.Uis;
 using Results.Uis.WithData;
+using Services.Wallet;
 
 #pragma warning disable CS8618
 [XmlRoot("REQUEST")]
-public record UisGetBalanceRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
+public record UisGetBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("USERID")]
-    public string UserId { get; init; }
+    public string UserId { get; set; }
 
     [XmlElement("HASH")]
     public string? Hash { get; init; }
 
     public class Handler : IRequestHandler<UisGetBalanceRequest, IUisResult<UisResponseContainer>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IUisResult<UisResponseContainer>> Handle(
             UisGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var transaction = await _context.Set<User>()
-                .Where(u => u.UserName == request.UserId)
-                .Select(
-                    u => new
-                    {
-                        u.Id,
-                        u.Balance
-                    })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.GetBalanceAsync(
+                request.UserId,
+                true,
+                cancellationToken);
 
-            if (transaction is null)
-                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.ExpiredToken);
+            if (walletResult.IsFailure)
+                return walletResult.ToUisResult<UisResponseContainer>();
+            var data = walletResult.Data;
 
-            var response = new UisGetBalanceResponse { Balance = transaction.Balance };
+            var response = new UisGetBalanceResponse { Balance = data.Balance };
 
             var container = new UisResponseContainer
             {

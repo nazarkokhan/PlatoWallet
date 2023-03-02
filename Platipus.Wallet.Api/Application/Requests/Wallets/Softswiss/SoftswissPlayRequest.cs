@@ -1,15 +1,14 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Softswiss;
 
+using System.Text.Json.Serialization;
 using Base;
-using Extensions;
 using Microsoft.Extensions.Options;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 using StartupSettings.Options;
 
 public record SoftswissPlayRequest(
-        Guid SessionId,
+        string SessionId,
         string UserId,
         string Currency,
         string Game,
@@ -33,69 +32,75 @@ public record SoftswissPlayRequest(
             SoftswissPlayRequest request,
             CancellationToken cancellationToken)
         {
-            var action = request.Actions?.FirstOrDefault();
+            var action = request.Actions?.SingleOrDefault();
 
             Response response;
             switch (action?.Action)
             {
                 case null:
-                    var balanceRequest = request.Map(r => new GetBalanceRequest(r.SessionId, r.UserId));
+                {
+                    var walletResult = await _wallet.GetBalanceAsync(request.SessionId, cancellationToken: cancellationToken);
+                    if (walletResult.IsFailure)
+                        return walletResult.ToSoftswissResult<Response>();
+                    var data = walletResult.Data;
 
-                    var balanceResult = await _wallet.GetBalanceAsync(balanceRequest, cancellationToken);
-                    if (balanceResult.IsFailure)
-                        return balanceResult.ToSoftswissResult<Response>();
+                    response = new Response(
+                        _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
+                        request.GameId,
+                        null);
 
-                    response = balanceResult.Data.Map(
-                        d => new Response(
-                            _currencyMultipliers.GetSumOut(request.Currency, d.Balance),
-                            request.GameId,
-                            null));
                     break;
+                }
 
                 case "bet":
-                    var betRequest = request.Map(
-                        r => new BetRequest(
-                            r.SessionId,
-                            r.UserId,
-                            r.Currency,
-                            r.GameId,
-                            action.ActionId,
-                            r.Finished ?? false,
-                            _currencyMultipliers.GetSumIn(request.Currency, action.Amount)));
+                {
+                    var walletResult = await _wallet.BetAsync(
+                        request.SessionId,
+                        request.GameId,
+                        action.ActionId,
+                        _currencyMultipliers.GetSumIn(request.Currency, action.Amount),
+                        request.Currency,
+                        request.Finished ?? false,
+                        cancellationToken: cancellationToken);
+                    if (walletResult.IsFailure)
+                        return walletResult.ToSoftswissResult<Response>();
+                    var data = walletResult.Data;
 
-                    var betResult = await _wallet.BetAsync(betRequest, cancellationToken);
-                    if (betResult.IsFailure)
-                        return betResult.ToSoftswissResult<Response>();
+                    response = new Response(
+                        _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
+                        request.GameId,
+                        new List<PlayTransaction>
+                        {
+                            new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)
+                        });
 
-                    response = betResult.Data.Map(
-                        d => new Response(
-                            _currencyMultipliers.GetSumOut(request.Currency, d.Balance),
-                            request.GameId,
-                            new List<PlayTransaction> { new(action.ActionId, d.InternalTransactionId, d.CreatedDate) }));
                     break;
+                }
 
                 case "win":
-                    var winRequest = request.Map(
-                        r => new WinRequest(
-                            r.SessionId,
-                            r.UserId,
-                            r.Currency,
-                            r.Game,
-                            r.GameId,
-                            action.ActionId,
-                            r.Finished ?? true,
-                            _currencyMultipliers.GetSumIn(request.Currency, action.Amount)));
+                {
+                    var walletResult = await _wallet.WinAsync(
+                        request.SessionId,
+                        request.GameId,
+                        action.ActionId,
+                        _currencyMultipliers.GetSumIn(request.Currency, action.Amount),
+                        request.Finished ?? false,
+                        request.Currency,
+                        cancellationToken: cancellationToken);
+                    if (walletResult.IsFailure)
+                        return walletResult.ToSoftswissResult<Response>();
+                    var data = walletResult.Data;
 
-                    var winResult = await _wallet.WinAsync(winRequest, cancellationToken);
-                    if (winResult.IsFailure)
-                        return winResult.ToSoftswissResult<Response>();
+                    response = new Response(
+                        _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
+                        request.GameId,
+                        new List<PlayTransaction>
+                        {
+                            new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)
+                        });
 
-                    response = winResult.Data.Map(
-                        d => new Response(
-                            _currencyMultipliers.GetSumOut(request.Currency, d.Balance),
-                            request.GameId,
-                            new List<PlayTransaction> { new(action.ActionId, d.InternalTransactionId, d.CreatedDate) }));
                     break;
+                }
 
                 default:
                     return SoftswissResultFactory.Failure<Response>(SoftswissErrorCode.BadRequest);
@@ -108,7 +113,7 @@ public record SoftswissPlayRequest(
     public record Response(
         long Balance,
         string GameId,
-        List<PlayTransaction>? Transactions);
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] List<PlayTransaction>? Transactions);
 
     public record PlayTransaction(
         string ActionId,

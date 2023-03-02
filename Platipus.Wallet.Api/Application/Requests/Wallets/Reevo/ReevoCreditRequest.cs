@@ -1,16 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Reevo;
 
 using Base;
-using Domain.Entities;
-using Extensions;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Reevo;
 using Results.Reevo.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
-using static Results.Reevo.ReevoResultFactory;
 
 public record ReevoCreditRequest(
     string CallerId,
@@ -30,7 +25,7 @@ public record ReevoCreditRequest(
     string? FreeRoundId,
     int IsJackpotWin,
     double? JackpotWinInAmount,
-    Guid GameSessionId,
+    string GameSessionId,
     string Key) : IRequest<IReevoResult<ReevoSuccessResponse>>, IReevoRequest
 {
     public class Handler : IRequestHandler<ReevoCreditRequest, IReevoResult<ReevoSuccessResponse>>
@@ -48,32 +43,21 @@ public record ReevoCreditRequest(
             ReevoCreditRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == request.GameSessionId))
-                .Select(u => new { Currency = u.Currency.Name })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.WinAsync(
+                request.SessionId,
+                request.RoundId,
+                request.TransactionId,
+                (decimal)request.Amount,
+                roundFinished: request.GameplayFinal is 1,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return Failure<ReevoSuccessResponse>(ReevoErrorCode.GeneralError);
-
-            var walletRequest = request.Map(
-                r => new WinRequest(
-                    r.GameSessionId,
-                    r.Username,
-                    user.Currency,
-                    r.GameIdHash,
-                    r.RoundId,
-                    r.TransactionId,
-                    r.GameplayFinal is 1,
-                    (decimal)r.Amount));
-
-            var walletResult = await _wallet.WinAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToReevoResult<ReevoSuccessResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(d => new ReevoSuccessResponse(d.Balance));
+            var response = new ReevoSuccessResponse(data.Balance);
 
-            return Success(response);
+            return ReevoResultFactory.Success(response);
         }
     }
 }

@@ -1,13 +1,23 @@
 namespace Platipus.Wallet.Domain.Entities;
 
-using Abstract;
+using Abstract.Generic;
 
-public class Session : Entity
+public class Session : Entity<string>
 {
-    public Guid UserId { get; set; }
+    public Session()
+        : this(TimeSpan.FromDays(10))
+    {
+    }
+
+    public Session(TimeSpan duration)
+    {
+        ExpirationDate = DateTime.UtcNow.Add(duration);
+    }
+
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public DateTime ExpirationDate { get; set; } = DateTime.UtcNow.AddDays(1);
+    public DateTime ExpirationDate { get; set; }
 
     public bool IsTemporaryToken { get; set; }
 }

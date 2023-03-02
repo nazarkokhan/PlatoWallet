@@ -1,20 +1,26 @@
 namespace Platipus.Wallet.Api.Controllers;
 
+using System.Web;
 using Abstract;
 using Application.Extensions;
 using Application.Requests.Wallets.Reevo;
 using Application.Requests.Wallets.Reevo.Base;
 using Application.Results.Reevo;
+using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.Security;
 
 [Route("wallet/reevo")]
 [MockedErrorActionFilter(Order = 1)]
-[ReevoSecurityFilter(Order = 2)]
+[ReevoSecurityFilter(Order = 0)]
 [JsonSettingsName(nameof(CasinoProvider.Reevo))]
 [ProducesResponseType(typeof(ReevoErrorResponse), StatusCodes.Status200OK)]
 [ProducesResponseType(typeof(ReevoSuccessResponse), StatusCodes.Status200OK)]
@@ -40,7 +46,7 @@ public class WalletReevoController : RestApiController
                         r.Action,
                         r.RemoteId ?? throw new ReevoMissingParameterException(nameof(r.RemoteId)),
                         r.Username,
-                        r.GameIdHash  ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
+                        r.GameIdHash ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.SessionId,
                         r.GameSessionId,
                         r.Key)),
@@ -103,14 +109,14 @@ public class WalletReevoController : RestApiController
             };
             if (concreteRequest is null)
                 return ReevoResultFactory
-                    .Failure(request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.GeneralError)
+                    .Failure(request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.InternalError)
                     .ToActionResult();
 
             var result = await _mediator.Send(concreteRequest, cancellationToken);
 
             if (result is not IReevoResult reevoResult)
                 return ReevoResultFactory
-                    .Failure(request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.GeneralError)
+                    .Failure(request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.InternalError)
                     .ToActionResult();
 
             return reevoResult.ToActionResult();
@@ -118,44 +124,50 @@ public class WalletReevoController : RestApiController
         catch (ReevoMissingParameterException e)
         {
             return ReevoResultFactory.Failure(
-                    request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.GeneralError,
+                    request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.InternalError,
                     e)
                 .ToActionResult();
         }
         catch (Exception e)
         {
             return ReevoResultFactory.Failure(
-                    request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.GeneralError,
+                    request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.InternalError,
                     e)
                 .ToActionResult();
         }
     }
 
-    [Obsolete]
-    [HttpGet("balance")]
-    public async Task<IActionResult> Balance(
-        [FromQuery] ReevoBalanceRequest request,
+    [HttpPost("private/test/get-security-value")]
+    public async Task<IActionResult> GetSecurityValue(
+        string userName,
+        string url,
+        [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    {
+        var user = await dbContext.Set<User>()
+            .Where(c => c.Username == userName)
+            .Select(
+                c => new
+                {
+                    UserId = c.Id,
+                    Casino = new
+                    {
+                        c.Casino.SignatureKey,
+                    }
+                })
+            .FirstOrDefaultAsync(cancellationToken);
 
-    [Obsolete]
-    [HttpGet("debit")]
-    public async Task<IActionResult> Bet(
-        [FromQuery] ReevoDebitRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        if (user is null)
+            return ResultFactory.Failure(ErrorCode.UserNotFound).ToActionResult();
 
-    [Obsolete]
-    [HttpGet("credit")]
-    public async Task<IActionResult> Win(
-        [FromQuery] ReevoCreditRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        var requestQueryString2 = new Uri(url).Query;
+        var nameValueCollection = HttpUtility.ParseQueryString(requestQueryString2);
+        var requestQueryString = nameValueCollection.Keys.Cast<string?>()
+            .ToDictionary(o => o!, o => new StringValues(nameValueCollection.GetValues(o)));
+        requestQueryString.Remove("key");
+        var withoutKey = QueryString.Create(requestQueryString).ToString();
+        var securityValue = ReevoSecurityHash.Compute(withoutKey, user.Casino.SignatureKey);
 
-    [Obsolete]
-    [HttpGet("rollback")]
-    public async Task<IActionResult> Rollback(
-        [FromQuery] ReevoRollbackRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        return Ok(securityValue);
+    }
 }

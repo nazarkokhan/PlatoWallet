@@ -1,11 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Reevo;
 
 using Base;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Reevo;
 using Results.Reevo.WithData;
+using Results.ResultToResultMappers;
+using Services.Wallet;
 
 public record ReevoBalanceRequest(
     string CallerId,
@@ -15,38 +14,31 @@ public record ReevoBalanceRequest(
     string Username,
     string GameIdHash,
     string SessionId,
-    Guid GameSessionId,
+    string GameSessionId,
     string Key) : IRequest<IReevoResult<ReevoSuccessResponse>>, IReevoRequest
 {
     public class Handler : IRequestHandler<ReevoBalanceRequest, IReevoResult<ReevoSuccessResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IReevoResult<ReevoSuccessResponse>> Handle(
             ReevoBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == request.GameSessionId))
-                .Include(u => u.Currency)
-                .Select(
-                    u => new
-                    {
-                        u.Balance,
-                        Currency = u.Currency.Name,
-                        u.UserName
-                    })
-                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            var walletResult = await _wallet.GetBalanceAsync(
+                request.SessionId,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return ReevoResultFactory.Failure<ReevoSuccessResponse>(ReevoErrorCode.GeneralError);
+            if (walletResult.IsFailure)
+                return walletResult.ToReevoResult<ReevoSuccessResponse>();
+            var data = walletResult.Data;
 
-            var response = new ReevoSuccessResponse(user.Balance);
+            var response = new ReevoSuccessResponse(data.Balance);
 
             return ReevoResultFactory.Success(response);
         }

@@ -6,7 +6,7 @@ using Services.Wallet;
 using StartupSettings.Options;
 
 public record SoftswissFreespinsRequest(
-        Guid SessionId,
+        string SessionId,
         string IssueId,
         string Status,
         long TotalAmount)
@@ -23,7 +23,7 @@ public record SoftswissFreespinsRequest(
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
-        public async Task<ISoftswissResult<SoftswissBalanceResponse>> Handle(
+        public Task<ISoftswissResult<SoftswissBalanceResponse>> Handle(
             SoftswissFreespinsRequest request,
             CancellationToken cancellationToken)
         {
@@ -36,7 +36,7 @@ public record SoftswissFreespinsRequest(
             // var response = walletResult.Data.Map(
             //     d => new SoftswissBalanceResponse(_currencyMultipliers.GetSumOut(request.Currency, d.Balance)));
 
-            return SoftswissResultFactory.Success(new SoftswissBalanceResponse(-9999));
+            return Task.FromResult<ISoftswissResult<SoftswissBalanceResponse>>(SoftswissResultFactory.Success(new SoftswissBalanceResponse(-9999)));
         }
     }
 }

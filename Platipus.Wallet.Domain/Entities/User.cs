@@ -1,11 +1,10 @@
 namespace Platipus.Wallet.Domain.Entities;
 
-using Abstract;
+using Abstract.Generic;
 
-public class User : Entity
+public class User : Entity<int>
 {
-    public string UserName { get; set; } = null!;
-
+    public string Username { get; set; } = null!;
 
     public string Password { get; set; } = null!;
 
@@ -13,9 +12,7 @@ public class User : Entity
 
     public bool IsDisabled { get; set; }
 
-    public int? SwUserId { get; set; } = null!;
-
-    public Guid CurrencyId { get; set; }
+    public string CurrencyId { get; set; } = null!;
     public Currency Currency { get; set; } = null!;
 
     public string CasinoId { get; set; } = null!;

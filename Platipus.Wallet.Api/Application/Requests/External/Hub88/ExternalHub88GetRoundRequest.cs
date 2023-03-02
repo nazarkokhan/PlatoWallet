@@ -34,7 +34,7 @@ public record ExternalHub88GetRoundRequest(string TransactionUuid) : IRequest<IH
                     {
                         c.Id,
                         c.RoundId,
-                        c.Round.User.UserName,
+                        UserName = c.Round.User.Username,
                         c.Round.User.CasinoId
                     })
                 .FirstOrDefaultAsync(cancellationToken);

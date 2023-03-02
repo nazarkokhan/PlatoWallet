@@ -13,7 +13,7 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
 
     public async Task<IResult<string?>> GetLaunchUrlAsync(
         Uri baseUrl,
-        Guid token,
+        string token,
         string game,
         CancellationToken cancellationToken = default)
     {
@@ -36,7 +36,7 @@ public class GamesGlobalGamesApiClient : IGamesGlobalGamesApiClient
             var error = responseJsonNode?["error"]?.GetValue<string>();
 
             if (error is null)
-                return ResultFactory.Failure<string?>(ErrorCode.InvalidSignature);
+                return ResultFactory.Failure<string?>(ErrorCode.SecurityParameterIsInvalid);
 
             var url = responseJsonNode?["url"]?.GetValue<string>();
 

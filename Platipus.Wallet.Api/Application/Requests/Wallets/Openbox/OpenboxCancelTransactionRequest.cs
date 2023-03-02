@@ -2,12 +2,11 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Openbox;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Results.ResultToResultMappers;
+using Services.Wallet;
 
 public record OpenboxCancelTransactionRequest(
-    Guid Token,
+    string Token,
     string GameUid,
     string GameCycleUid,
     string OrderUid,
@@ -15,44 +14,28 @@ public record OpenboxCancelTransactionRequest(
 {
     public class Handler : IRequestHandler<OpenboxCancelTransactionRequest, IOpenboxResult<OpenboxBalanceResponse>>
     {
-        private readonly WalletDbContext _context;
+        private readonly IWalletService _wallet;
 
-        public Handler(WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
-            _context = context;
+            _wallet = wallet;
         }
 
         public async Task<IOpenboxResult<OpenboxBalanceResponse>> Handle(
             OpenboxCancelTransactionRequest request,
             CancellationToken cancellationToken)
         {
-            var round = await _context.Set<Round>()
-                .Where(r => r.Id == request.GameCycleUid && r.User.Sessions.Any(s => s.Id == request.Token))
-                .Include(r => r.User.Currency)
-                .Include(r => r.Transactions)
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.RollbackAsync(
+                request.Token,
+                request.OrderUid,
+                request.GameCycleUid,
+                cancellationToken: cancellationToken);
 
-            if (round is null)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
+            if (walletResult.IsFailure)
+                return walletResult.ToOpenboxResult<OpenboxBalanceResponse>();
+            var data = walletResult.Data;
 
-            if (round.Finished)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
-
-            var lastTransaction = round.Transactions.MaxBy(t => t.CreatedDate);
-            if (lastTransaction is null || lastTransaction.Id != request.OrderUid)
-                return OpenboxResultFactory.Failure<OpenboxBalanceResponse>(OpenboxErrorCode.ParameterError);
-
-            var user = round.User;
-
-            user.Balance += lastTransaction.Amount / 100;
-            _context.Update(user);
-
-            round.Transactions.Remove(lastTransaction);
-            _context.Update(round);
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var response = new OpenboxBalanceResponse((long)(user.Balance * 100));
+            var response = new OpenboxBalanceResponse((long)(data.Balance * 100));
 
             return OpenboxResultFactory.Success(response);
         }

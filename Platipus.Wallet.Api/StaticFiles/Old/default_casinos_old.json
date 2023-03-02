@@ -1,0 +1,218 @@
+[
+  {
+    "Id": "psw",
+    "SignatureKey": "12345678",
+    "Provider": 0,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD",
+      "EUR",
+      "XVG"
+    ],
+    "CasinoGames": [
+      "extragems"
+    ]
+  },
+  {
+    "Id": "wall",
+    "SignatureKey": "12345678",
+    "Provider": 0,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD",
+      "XVG"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "dafabet",
+    "SignatureKey": "12345678",
+    "Provider": 1,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "XVG",
+      "USD",
+      "EUR"
+    ],
+    "CasinoGames": [
+      "extragems"
+    ]
+  },
+  {
+    "Id": "openbox",
+    "SignatureKey": "1234567890123456",
+    "Provider": 2,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "CNY"
+    ],
+    "CasinoGames": [
+      "extragems",
+      "hallowin",
+      "coinfest"
+    ]
+  },
+  {
+    "Id": "hub88",
+    "SignatureKey": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnXQ7rU5lbYEGRSl4/PZVdAb9R\nTagu7k4M5m2sRg\u002Bx2c\u002BvC6DYVWTs3JWIcR8WxBYCcXIs8v7r10o55OOGxYTFLsZq\n28B8m3mVONm9jmXmrCRZQdjwLLRt2wdTf3riMrdTbBs5BTWq3uq7eIx1wyTb2mVL\nhOnSeMqN2ug9ZzMsdwIDAQAB\n-----END PUBLIC KEY-----",
+    "Provider": 3,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "softswiss",
+    "SignatureKey": "12345678",
+    "Provider": 4,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": [
+      "hallowin",
+      "frozenmirror",
+      "piedradelsol",
+      "coinfest",
+      "diamondhunt",
+      "poshcats",
+      "bookoflight",
+      "ninegems",
+      "undiademuertos",
+      "wildcrowns",
+      "waysofthegauls",
+      "extragems",
+      "pearlsoftheocean",
+      "jokerchase"
+    ]
+  },
+  {
+    "Id": "sw",
+    "SignatureKey": "12345678",
+    "Provider": 5,
+    "SwProviderId": 1,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "platipus_isoftbet",
+    "SignatureKey": "12345678",
+    "Provider": 6,
+    "SwProviderId": 3011,
+    "CasinoCurrencies": [
+      "USD",
+      "EUR"
+    ],
+    "CasinoGames": [
+      "bookoflight",
+      "rouletteeuropean",
+      "blackjackvip",
+      "ninegems",
+      "jacksorbetter",
+      "catchtheleprechaun",
+      "coinfest",
+      "thebigscore",
+      "wildcrowns",
+      "baccarat"
+    ]
+  },
+  {
+    "Id": "gg",
+    "SignatureKey": "12345678",
+    "Provider": 7,
+    "SwProviderId": 100,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "uis_platipus",
+    "SignatureKey": "12345678",
+    "Provider": 8,
+    "SwProviderId": 150794,
+    "CasinoCurrencies": [
+      "MYR",
+      "ARS",
+      "THB",
+      "AUD",
+      "TRY",
+      "UYU",
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "betflag_platipus",
+    "SignatureKey": "12345678",
+    "Provider": 9,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "reevo_local",
+    "SignatureKey": "12345678",
+    "Provider": 10,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": []
+  },
+  {
+    "Id": "reevo_platipus",
+    "SignatureKey": "12345678",
+    "Provider": 10,
+    "SwProviderId": 13213,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": [
+      "poshcats",
+      "diamondhunt",
+      "jokerchase",
+      "extragems",
+      "hallowin",
+      "ninegems",
+      "waysofthegauls",
+      "undiademuertos",
+      "frozenmirror",
+      "bookoflight",
+      "pearlsoftheocean",
+      "coinfest",
+      "piedradelsol",
+      "wildcrowns"
+    ]
+  },
+  {
+    "Id": "everymatrix_platipus",
+    "SignatureKey": "12345678",
+    "Provider": 11,
+    "SwProviderId": null,
+    "CasinoCurrencies": [
+      "USD"
+    ],
+    "CasinoGames": [
+      "extragems",
+      "bookoflight",
+      "hallowin",
+      "poshcats",
+      "coinfest",
+      "waysofthegauls",
+      "diamondhunt",
+      "undiademuertos",
+      "jokerchase",
+      "piedradelsol",
+      "frozenmirror",
+      "ninegems",
+      "pearlsoftheocean",
+      "wildcrowns"
+    ]
+  }
+]

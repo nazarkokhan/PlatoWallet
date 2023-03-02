@@ -1,15 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
 using Base;
-using Domain.Entities;
 using Extensions;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Results.Betflag;
 using Results.Betflag.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 using static Results.Betflag.BetflagResultFactory;
 
 public record BetflagCancelRequest(
@@ -34,41 +30,11 @@ public record BetflagCancelRequest(
             BetflagCancelRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
-                .Select(
-                    u => new
-                    {
-                        u.UserName,
-                        Currency = u.Currency.Name
-                    })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.RollbackAsync(
+                request.Key,
+                request.TransactionId,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.SessionExpired);
-
-            var transaction = await _context.Set<Transaction>()
-                .Where(t => t.Id == request.TransactionId)
-                .Select(
-                    u => new
-                    {
-                        u.RoundId,
-                        u.Amount
-                    })
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (transaction is null)
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.CancelReferBetNotExists);
-
-            var walletRequest = request.Map(
-                r => new RollbackRequest(
-                    new Guid(r.Key),
-                    user.UserName,
-                    string.Empty,
-                    transaction.RoundId,
-                    r.TransactionId));
-
-            var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToBetflagResult<BetflagBetWinCancelResponse>();
 

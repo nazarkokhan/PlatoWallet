@@ -1,17 +1,16 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using Domain.Entities;
+using DTO;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
-using Wallets.Psw.Base.Response;
 
 public record AddBalanceRequest(
-    Guid SessionId,
-    decimal Balance) : IRequest<IPswResult<PswBaseResponse>>
+    string SessionId,
+    decimal Balance) : IRequest<IResult<BalanceResponse>>
 {
-    public class Handler : IRequestHandler<AddBalanceRequest, IPswResult<PswBaseResponse>>
+    public class Handler : IRequestHandler<AddBalanceRequest, IResult<BalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -20,7 +19,7 @@ public record AddBalanceRequest(
             _context = context;
         }
 
-        public async Task<IPswResult<PswBaseResponse>> Handle(
+        public async Task<IResult<BalanceResponse>> Handle(
             AddBalanceRequest request,
             CancellationToken cancellationToken)
         {
@@ -37,7 +36,7 @@ public record AddBalanceRequest(
 
             var user = session.User;
             if (user.IsDisabled)
-                return PswResultFactory.Failure<PswBalanceResponse>(PswErrorCode.UserDisabled);
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.UserIsDisabled);
 
             user.Balance += request.Balance;
 
@@ -45,9 +44,9 @@ public record AddBalanceRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var result = new PswBalanceResponse(user.Balance);
+            var result = new BalanceResponse(user.Balance);
 
-            return PswResultFactory.Success(result);
+            return ResultFactory.Success(result);
         }
     }
 

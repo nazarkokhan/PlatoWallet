@@ -2,17 +2,15 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Hub88;
 
 using Base;
 using Base.Response;
-using Extensions;
 using Results.Hub88;
 using Results.Hub88.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 public record Hub88RollbackRequest(
     string SupplierUser,
     string TransactionUuid,
-    Guid Token,
+    string Token,
     bool RoundClosed,
     string Round,
     string RequestUuid,
@@ -34,24 +32,21 @@ public record Hub88RollbackRequest(
             Hub88RollbackRequest request,
             CancellationToken cancellationToken)
         {
-            var walletRequest = request.Map(
-                r => new RollbackRequest(
-                    r.Token,
-                    r.SupplierUser,
-                    r.GameCode,
-                    r.Round,
-                    r.TransactionUuid));
+            var walletResult = await _wallet.RollbackAsync(
+                request.Token,
+                request.TransactionUuid,
+                request.Round,
+                cancellationToken: cancellationToken);
 
-            var walletResult = await _wallet.RollbackAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToHub88Result<Hub88BalanceResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(
-                d => new Hub88BalanceResponse(
-                    (int)(d.Balance * 100000),
-                    request.SupplierUser,
-                    request.RequestUuid,
-                    d.Currency));
+            var response = new Hub88BalanceResponse(
+                (int)(data.Balance * 100000),
+                request.SupplierUser,
+                request.RequestUuid,
+                data.Currency);
 
             return Hub88ResultFactory.Success(response);
         }

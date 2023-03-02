@@ -2,16 +2,11 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sw;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Extensions;
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Results.ResultToResultMappers;
 using Results.Sw;
 using Results.Sw.WithData;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 public record SwRefundRequest(
     [property: BindProperty(Name = "providerid")] int ProviderId,
@@ -23,44 +18,32 @@ public record SwRefundRequest(
     [property: BindProperty(Name = "gameName")] string GameName,
     [property: BindProperty(Name = "roundid")] int RoundId,
     [property: BindProperty(Name = "trntype")] string TrnType,
-    [property: BindProperty(Name = "token")] Guid Token) : ISwMd5Request, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
+    [property: BindProperty(Name = "token")] string Token) : ISwMd5Request, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
 {
     public class Handler : IRequestHandler<SwBetWinRequest, ISwResult<SwBetWinRefundFreespinResponse>>
     {
         private readonly IWalletService _wallet;
-        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet, WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
             _wallet = wallet;
-            _context = context;
         }
 
         public async Task<ISwResult<SwBetWinRefundFreespinResponse>> Handle(
             SwBetWinRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.SwUserId == request.UserId)
-                .Select(u => new {u.UserName})
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.RollbackAsync(
+                request.Token,
+                request.RemotetranId,
+                request.RoundId.ToString(),
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return SwResultFactory.Failure<SwBetWinRefundFreespinResponse>(SwErrorCode.UserNotFound);
+            if (walletResult.IsFailure)
+                return walletResult.ToSwResult<SwBetWinRefundFreespinResponse>();
+            var data = walletResult.Data;
 
-            var winRequest = request.Map(
-                r => new RollbackRequest(
-                    r.Token,
-                    user.UserName,
-                    r.GameName,
-                    r.RoundId.ToString(),
-                    r.RemotetranId));
-
-            var winResult = await _wallet.RollbackAsync(winRequest, cancellationToken);
-            if (winResult.IsFailure)
-                winResult.ToSwResult();
-
-            var response = winResult.Data.Map(d => new SwBetWinRefundFreespinResponse(d.Balance));
+            var response = new SwBetWinRefundFreespinResponse(data.Balance);
 
             return SwResultFactory.Success(response);
         }

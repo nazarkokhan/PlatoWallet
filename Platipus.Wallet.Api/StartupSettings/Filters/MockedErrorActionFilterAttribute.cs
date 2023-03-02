@@ -3,6 +3,7 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json.Nodes;
+using Api.Extensions;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Everymatrix.Base;
@@ -16,7 +17,7 @@ using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
 using Controllers;
 using Domain.Entities;
-using Extensions;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -37,7 +38,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         var executedContext = await next();
 
-        ErrorMockMethod? currentMethod;
+        MockedErrorMethod? currentMethod;
         string? usernameOrSession;
 
         var actionArgumentsValues = context.ActionArguments.Values;
@@ -45,24 +46,24 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             var singleRequest = actionArgumentsValues.OfType<OpenboxSingleRequest>().Single();
 
-            if (!httpContext.Items.TryGetValue("OpenboxPayloadRequestObj", out var payloadRequestObj)
+            if (!httpContext.Items.TryGetValue(HttpContextItems.OpenboxPayloadRequestObj, out var payloadRequestObj)
              || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
             {
                 LogOpenboxMockingFailed(logger, singleRequest);
                 return;
             }
 
-            usernameOrSession = openboxPayloadObj.Token.ToString();
+            usernameOrSession = openboxPayloadObj.Token;
             currentMethod = singleRequest.Method switch
             {
-                OpenboxHelpers.GetPlayerBalance => ErrorMockMethod.Balance,
+                OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
                 OpenboxHelpers.MoneyTransactions => ((OpenboxMoneyTransactionRequest)openboxPayloadObj).OrderType switch
                 {
-                    3 => ErrorMockMethod.Bet,
-                    4 => ErrorMockMethod.Win,
+                    3 => MockedErrorMethod.Bet,
+                    4 => MockedErrorMethod.Win,
                     _ => null
                 },
-                OpenboxHelpers.CancelTransaction => ErrorMockMethod.Rollback,
+                OpenboxHelpers.CancelTransaction => MockedErrorMethod.Rollback,
                 _ => null
             };
         }
@@ -73,10 +74,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             usernameOrSession = singleRequest.Username;
             currentMethod = singleRequest.Action.Command switch
             {
-                "balance" => ErrorMockMethod.Balance,
-                "bet" => ErrorMockMethod.Bet,
-                "win" => ErrorMockMethod.Win,
-                "rollback" => ErrorMockMethod.Rollback,
+                "balance" => MockedErrorMethod.Balance,
+                "bet" => MockedErrorMethod.Bet,
+                "win" => MockedErrorMethod.Win,
+                "rollback" => MockedErrorMethod.Rollback,
                 _ => null
             };
         }
@@ -87,10 +88,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             usernameOrSession = singleRequest.Username;
             currentMethod = singleRequest.Action switch
             {
-                "balance" => ErrorMockMethod.Balance,
-                "debit" => ErrorMockMethod.Bet,
-                "credit" => ErrorMockMethod.Win,
-                "rollback" => ErrorMockMethod.Rollback,
+                "balance" => MockedErrorMethod.Balance,
+                "debit" => MockedErrorMethod.Bet,
+                "credit" => MockedErrorMethod.Win,
+                "rollback" => MockedErrorMethod.Rollback,
                 _ => null
             };
         }
@@ -124,11 +125,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             currentMethod = requestRoute switch
             {
-                "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" => ErrorMockMethod.Balance,
-                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" or "Bet" => ErrorMockMethod.Bet,
-                "win" or "result" or "transaction/win" or "credit" or "Win" => ErrorMockMethod.Win,
-                "award" or "bonusWin" or "freespin" or "freespins" => ErrorMockMethod.Award,
-                "rollback" or "cancel" or "refund" or "transaction/rollback" or "Cancel" => ErrorMockMethod.Rollback,
+                "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" => MockedErrorMethod.Balance,
+                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" or "Bet" => MockedErrorMethod.Bet,
+                "win" or "result" or "transaction/win" or "credit" or "Win" => MockedErrorMethod.Win,
+                "award" or "bonusWin" or "freespin" or "freespins" => MockedErrorMethod.Award,
+                "rollback" or "cancel" or "refund" or "transaction/rollback" or "Cancel" => MockedErrorMethod.Rollback,
                 _ => null
             };
 
@@ -137,15 +138,15 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 WalletPswController => actionArgumentsValues
                     .OfType<IPswBaseRequest>()
                     .SingleOrDefault()
-                    ?.SessionId.ToString(),
+                    ?.SessionId,
                 WalletDafabetController => actionArgumentsValues
-                    .OfType<IDafabetBaseRequest>()
+                    .OfType<IDafabetRequest>()
                     .SingleOrDefault()
                     ?.PlayerId,
                 WalletOpenboxController => actionArgumentsValues
                     .OfType<IOpenboxBaseRequest>()
                     .SingleOrDefault()
-                    ?.Token.ToString(),
+                    ?.Token,
                 WalletHub88Controller => actionArgumentsValues
                     .OfType<IHub88BaseRequest>()
                     .SingleOrDefault()
@@ -153,11 +154,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 WalletSoftswissController => actionArgumentsValues
                     .OfType<ISoftswissBaseRequest>()
                     .SingleOrDefault()
-                    ?.SessionId.ToString(),
+                    ?.SessionId,
                 WalletSwController => actionArgumentsValues
                     .OfType<ISwBaseRequest>()
                     .SingleOrDefault()
-                    ?.Token.ToString(),
+                    ?.Token,
                 WalletBetflagController => actionArgumentsValues
                     .OfType<IBetflagRequest>()
                     .SingleOrDefault()
@@ -165,11 +166,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 WalletReevoController => actionArgumentsValues
                     .OfType<IReevoRequest>()
                     .SingleOrDefault()
-                    ?.GameSessionId.ToString(),
+                    ?.GameSessionId,
                 WalletEverymatrixController => actionArgumentsValues
                     .OfType<IEveryMatrixRequest>()
                     .SingleOrDefault()
-                    ?.Token.ToString(),
+                    ?.Token,
                 _ => null
             };
         }
@@ -194,12 +195,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         mockedErrorQuery = context.Controller switch
         {
-            WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == new Guid(usernameOrSession))),
-            _ => mockedErrorQuery.Where(e => e.User.UserName == usernameOrSession)
+            WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == usernameOrSession)),
+            _ => mockedErrorQuery.Where(e => e.User.Username == usernameOrSession)
         };
 
         dbContext.Database.SetCommandTimeout(TimeSpan.FromDays(1));
-        var mockedError = await mockedErrorQuery.FirstOrDefaultAsync();
+        var mockedErrors = await mockedErrorQuery.ToListAsync();
+        var mockedError = mockedErrors.MinBy(e => e.ExecutionOrder);
 
         if (mockedError is null)
         {

@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
-using Extensions;
+using Api.Extensions;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 public class EnrichActionFilterAttribute : ActionFilterAttribute

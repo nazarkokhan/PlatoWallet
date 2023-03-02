@@ -15,18 +15,47 @@ public static class CommonResultToUisMappers
             ? UisResultFactory.Success()
             : UisResultFactory.Failure(result.ErrorCode.ToUisErrorCode(), result.Exception);
 
-    public static UisErrorCode ToUisErrorCode(this ErrorCode source)
+    private static UisErrorCode ToUisErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => UisErrorCode.InvalidAmount,
-            ErrorCode.UserDisabled => UisErrorCode.UserNotFound,
-            ErrorCode.SessionExpired => UisErrorCode.ExpiredToken,
-            ErrorCode.MissingSignature or ErrorCode.InvalidSignature or ErrorCode.InvalidSign => UisErrorCode.InvalidMd5OrHash,
-            ErrorCode.InvalidCasinoId => UisErrorCode.InvalidPartnered,
-            ErrorCode.DuplicateTransaction => UisErrorCode.TransactionAlreadyProcessed,
-            ErrorCode.TransactionDoesNotExist => UisErrorCode.InvalidTransactionId,
-            ErrorCode.Unknown or _ => UisErrorCode.InternalSystemError
+             // UIS system to CP system API Error Calls
+             ErrorCode.InsufficientFunds => UisErrorCode.InsufficientFunds,
+             ErrorCode.SecurityParameterIsInvalid => UisErrorCode.InvalidHash,
+             ErrorCode.TransactionNotFound or ErrorCode.TransactionAlreadyExists =>
+                 UisErrorCode.UnknownTransactionIdOrWasAlreadyProcessed,
+             ErrorCode.UserNotFound => UisErrorCode.UnknownUserId,
+             ErrorCode.UnknownBetException or ErrorCode.UnknownWinException => UisErrorCode.OperationFailed,
+             ErrorCode.SessionNotFound => UisErrorCode.InvalidToken,
+             ErrorCode.Unknown or _ => UisErrorCode.InternalError,
+
+            // CP system to UIS system API Error Calls :
+            // ErrorCode. => UisErrorCode.TokenWasNotFound,
+            // ErrorCode. => UisErrorCode.ParametersMismatch,
+            // ErrorCode. => UisErrorCode.IntegratorUrlError,
+            // ErrorCode. => UisErrorCode.DatabaseError,
+            // ErrorCode. => UisErrorCode.IntegratorUrlDoesNotHaveMapping,
+            // ErrorCode. => UisErrorCode.IntegratorServerError,
+            // ErrorCode. => UisErrorCode.InvalidToken,
+            // ErrorCode. => UisErrorCode.SessionExpired,
+            // ErrorCode. => UisErrorCode.InvalidStatusTableGameReading,
+            // ErrorCode. => UisErrorCode.TableGameStatusDoesNotExist,
+            // ErrorCode. => UisErrorCode.LateBetsRejection,
+            // ErrorCode. => UisErrorCode.TableGameIsInClosingProcedure,
+            // ErrorCode. => UisErrorCode.TableGameIsClosedNotAvailable,
+            // ErrorCode. => UisErrorCode.NoProperBetsReported,
+            // ErrorCode. => UisErrorCode.InsufficientFundsAtStpSystem,
+            // ErrorCode. => UisErrorCode.PlayerRecordIsLockedForTooLong,
+            // ErrorCode. => UisErrorCode.PlayerBalanceUpdateError,
+            // ErrorCode. => UisErrorCode.IntegratorPlayerOperatorHasBeenChanged,
+            // ErrorCode. => UisErrorCode.IntegrationErrorUnableToBuildIntegratorPlayerInHostSystem,
+            // ErrorCode. => UisErrorCode.InternalDbErrorCouldNotLocateBuiltPlayerId,
+            // ErrorCode. => UisErrorCode.InternalDbErrorFailToInsertIntegratorToMappingTable,
+            // ErrorCode. => UisErrorCode.InvalidTableGameId,
+            // ErrorCode. => UisErrorCode.IntegrationBetErrorIntegrator,
+            // ErrorCode. => UisErrorCode.InsufficientFundsAtIntegratorSystem,
+            // ErrorCode. => UisErrorCode.PermissionDenied,
+            // ErrorCode. => UisErrorCode.IntegratorHasPastFaultThatNeedsAttentionPleaseContactYourSupplierFailSafetySystem
         };
     }
 }

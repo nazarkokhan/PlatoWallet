@@ -1,13 +1,15 @@
 namespace Platipus.Wallet.Infrastructure.EntityConfigurations;
 
+using Base;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class AwardConfiguration : IEntityTypeConfiguration<Award>
+public class AwardConfiguration : EntityTypeConfiguration<Award, string>
 {
-    public void Configure(EntityTypeBuilder<Award> builder)
+    public override void Configure(EntityTypeBuilder<Award> builder)
     {
+        base.Configure(builder);
         builder.ToTable("awards");
     }
 }

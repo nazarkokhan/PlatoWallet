@@ -27,16 +27,16 @@ public record BetflagAuthenticateRequest(
             CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
-                .Include(u => u.Currency)
+                .Where(u => u.Sessions.Any(s => s.Id == request.Key))
                 .Select(
                     u => new
                     {
+                        u.Id,
                         u.Balance,
-                        Currency = u.Currency.Name,
-                        u.UserName
+                        Currency = u.CurrencyId,
+                        u.Username
                     })
-                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return BetflagResultFactory.Failure<BetflagBalanceResponse>(BetflagErrorCode.InvalidParameter);
@@ -44,8 +44,8 @@ public record BetflagAuthenticateRequest(
             var response = new BetflagBalanceResponse(
                 (double)user.Balance,
                 user.Currency,
-                user.UserName,
-                user.UserName);
+                user.Id.ToString(),
+                user.Username);
 
             return BetflagResultFactory.Success(response);
         }

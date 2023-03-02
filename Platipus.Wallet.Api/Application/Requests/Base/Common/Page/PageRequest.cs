@@ -1,8 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.Base.Common.Page;
 
+using System.ComponentModel;
+
 public record PageRequest(
-    int Size = 10,
-    int Number = 1)
-{
-    public static readonly PageRequest Default = new();
-}
+    [property: DefaultValue(10)] int Size,
+    [property: DefaultValue(1)] int Number);

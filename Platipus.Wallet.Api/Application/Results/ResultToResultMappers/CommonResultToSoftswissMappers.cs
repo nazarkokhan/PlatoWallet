@@ -12,24 +12,40 @@ public static class CommonResultToSoftswissMappers
             ? SoftswissResultFactory.Success()
             : SoftswissResultFactory.Failure(result.ErrorCode.ToSoftswissErrorCode(), balance, result.Exception);
 
-    public static SoftswissErrorCode ToSoftswissErrorCode(this ErrorCode source)
+    private static SoftswissErrorCode ToSoftswissErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => SoftswissErrorCode.BadRequest,
-            ErrorCode.UserDisabled => SoftswissErrorCode.PlayerIsDisabled,
-            ErrorCode.SessionExpired => SoftswissErrorCode.Forbidden,
-            ErrorCode.MissingSignature or ErrorCode.InvalidSignature => SoftswissErrorCode.Forbidden,
-            ErrorCode.RoomIsWrongOrEmpty => SoftswissErrorCode.GameIsForbiddenToThePlayer,
+            ErrorCode.InsufficientFunds => SoftswissErrorCode.PlayerHasNotEnoughFundsToProcessAnAction,
+            ErrorCode.UserNotFound => SoftswissErrorCode.PlayerIsInvalid,
+            // ErrorCode. => SoftswissErrorCode.PlayerReachedCustomizedBetLimit,
+            // ErrorCode. => SoftswissErrorCode.BetExceededMaxBetLimit,
+            // ErrorCode. => SoftswissErrorCode.GameIsForbiddenToThePlayer,
+            ErrorCode.UserIsDisabled => SoftswissErrorCode.PlayerIsDisabled,
+            // ErrorCode. => SoftswissErrorCode.GameIsNotAvailableInPlayerCountry,
+            // ErrorCode. => SoftswissErrorCode.CurrencyIsNotAllowedForThePlayer,
+            // ErrorCode. => SoftswissErrorCode.ForbiddenToChangeAlreadySetField,
             ErrorCode.BadParametersInTheRequest => SoftswissErrorCode.BadRequest,
-            ErrorCode.InvalidCasinoId => SoftswissErrorCode.BadRequest,
-            ErrorCode.InvalidGame => SoftswissErrorCode.GameIsForbiddenToThePlayer,
-            ErrorCode.InvalidExpirationDate => SoftswissErrorCode.Forbidden,
-            ErrorCode.WrongCurrency => SoftswissErrorCode.CurrencyIsNotAllowedForThePlayer,
-            ErrorCode.DuplicateTransaction => SoftswissErrorCode.BadRequest,
-            ErrorCode.TransactionDoesNotExist => SoftswissErrorCode.BadRequest,
-            ErrorCode.InvalidSign => SoftswissErrorCode.Forbidden,
-            ErrorCode.Unknown or _ => SoftswissErrorCode.UnknownError
+            ErrorCode.SessionNotFound or ErrorCode.SecurityParameterIsEmpty or ErrorCode.SecurityParameterIsInvalid =>
+                SoftswissErrorCode.Forbidden,
+            ErrorCode.TransactionNotFound or ErrorCode.RoundNotFound => SoftswissErrorCode.NotFound,
+            ErrorCode.GameNotFound => SoftswissErrorCode.GameIsNotAvailableToYourCasino,
+            ErrorCode.AwardNotFound => SoftswissErrorCode.FreeSpinsAreNotAvailableForYourCasino,
+            // ErrorCode. => SoftswissErrorCode.UnknownErrorInExternalService,
+            // ErrorCode. => SoftswissErrorCode.ServiceIsUnavailable,
+            // ErrorCode. => SoftswissErrorCode.RequestTimedOut,
+            // ErrorCode. => SoftswissErrorCode.GameProviderDoesntProvideFreeSpins,
+            ErrorCode.UnknownAwardException => SoftswissErrorCode.ImpossibleToIssueFreeSpinsInRequestedGame,
+            // ErrorCode. => SoftswissErrorCode.YouShouldProvideAtLeastOneGameToIssueFreeSpins,
+            ErrorCode.SessionExpired => SoftswissErrorCode.BadExpirationDate,
+            // ErrorCode. => SoftswissErrorCode.CantChangeIssueStateFromItsCurrentToRequested,
+            // ErrorCode. => SoftswissErrorCode.YouCantChangeIssueStateWhenIssueStatusIsNotSynced,
+            // ErrorCode. => SoftswissErrorCode.CantIssueFreeSpinsForDifferentGameProviders,
+            // ErrorCode. => SoftswissErrorCode.InvalidFreeSpinsIssue,
+            // ErrorCode. => SoftswissErrorCode.FreeSpinsIssueHasAlreadyExpired,
+            // ErrorCode. => SoftswissErrorCode.FreeSpinsIssueCantBeCanceled,
+            // ErrorCode. => SoftswissErrorCode.RequestedLiveGameIsNotAvailableRightNow,
+            ErrorCode.Unknown or _ => SoftswissErrorCode.UnknownError,
         };
     }
 }

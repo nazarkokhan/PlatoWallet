@@ -4,7 +4,9 @@ using Requests.Base;
 
 public interface IPswBaseRequest : IBaseWalletRequest
 {
-    public Guid SessionId { get; }
+    public string SessionId { get; }
 
     public string User { get; }
 }
+
+

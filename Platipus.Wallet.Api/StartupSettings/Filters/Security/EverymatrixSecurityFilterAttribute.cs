@@ -1,11 +1,11 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
+using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Requests.Wallets.Everymatrix.Base;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Results.Everymatrix;
 using Domain.Entities;
-using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;

@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Services.Hub88GamesApi.DTOs.Requests;
 
 public record PswGetGameLinkGamesApiRequest(
     string CasinoId,
-    Guid SessionId,
+    string SessionId,
     string User,
     string Currency,
     string Game,

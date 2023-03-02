@@ -6,7 +6,7 @@ public interface IHub88BaseRequest : IBaseWalletRequest
 {
     public string SupplierUser { get; }
 
-    public Guid Token { get; }
+    public string Token { get; }
 
     public string RequestUuid { get; }
 }

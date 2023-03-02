@@ -1,15 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
 using Base;
-using Domain.Entities;
 using Extensions;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Results.Betflag;
 using Results.Betflag.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 using static Results.Betflag.BetflagResultFactory;
 
 public record BetflagWinRequest(
@@ -38,31 +34,14 @@ public record BetflagWinRequest(
             BetflagWinRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == new Guid(request.Key)))
-                .Select(
-                    u => new
-                    {
-                        u.UserName,
-                        Currency = u.Currency.Name
-                    })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.WinAsync(
+                request.Key,
+                request.RoundId,
+                request.TransactionId,
+                (decimal)request.Win,
+                request.RoundCompleted,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return Failure<BetflagBetWinCancelResponse>(BetflagErrorCode.SessionExpired);
-
-            var walletRequest = request.Map(
-                r => new WinRequest(
-                    new Guid(r.Key),
-                    user.UserName,
-                    user.Currency,
-                    string.Empty,
-                    r.RoundId,
-                    r.TransactionId,
-                    r.RoundCompleted,
-                    (decimal)r.Win));
-
-            var walletResult = await _wallet.WinAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToBetflagResult<BetflagBetWinCancelResponse>();
 

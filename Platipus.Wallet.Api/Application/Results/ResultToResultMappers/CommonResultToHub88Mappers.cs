@@ -15,23 +15,23 @@ public static class CommonResultToHub88Mappers
             ? Hub88ResultFactory.Success()
             : Hub88ResultFactory.Failure(result.ErrorCode.ToHub88ErrorCode(), result.Exception);
 
-    public static Hub88ErrorCode ToHub88ErrorCode(this ErrorCode source)
+    private static Hub88ErrorCode ToHub88ErrorCode(this ErrorCode source)
     {
         return source switch
         {
-            ErrorCode.NotEnoughMoney => Hub88ErrorCode.RS_ERROR_NOT_ENOUGH_MONEY,
-            ErrorCode.UserDisabled => Hub88ErrorCode.RS_ERROR_USER_DISABLED,
+            // ErrorCode. => Hub88ErrorCode.RS_OK,
+            ErrorCode.CasinoNotFound => Hub88ErrorCode.RS_ERROR_INVALID_PARTNER,
+            ErrorCode.SessionNotFound => Hub88ErrorCode.RS_ERROR_INVALID_TOKEN,
+            ErrorCode.GameNotFound => Hub88ErrorCode.RS_ERROR_INVALID_GAME,
+            ErrorCode.InvalidCurrency => Hub88ErrorCode.RS_ERROR_WRONG_CURRENCY,
+            ErrorCode.InsufficientFunds => Hub88ErrorCode.RS_ERROR_NOT_ENOUGH_MONEY,
+            ErrorCode.UserIsDisabled => Hub88ErrorCode.RS_ERROR_USER_DISABLED,
+            ErrorCode.SecurityParameterIsInvalid => Hub88ErrorCode.RS_ERROR_INVALID_SIGNATURE,
             ErrorCode.SessionExpired => Hub88ErrorCode.RS_ERROR_TOKEN_EXPIRED,
-            ErrorCode.MissingSignature or ErrorCode.InvalidSignature => Hub88ErrorCode.RS_ERROR_INVALID_SIGNATURE,
-            ErrorCode.RoomIsWrongOrEmpty => Hub88ErrorCode.RS_ERROR_INVALID_GAME,
             ErrorCode.BadParametersInTheRequest => Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX,
-            ErrorCode.InvalidCasinoId => Hub88ErrorCode.RS_ERROR_INVALID_PARTNER,
-            ErrorCode.InvalidGame => Hub88ErrorCode.RS_ERROR_INVALID_GAME,
-            ErrorCode.InvalidExpirationDate => Hub88ErrorCode.RS_ERROR_TOKEN_EXPIRED,
-            ErrorCode.WrongCurrency => Hub88ErrorCode.RS_ERROR_WRONG_CURRENCY,
-            ErrorCode.DuplicateTransaction => Hub88ErrorCode.RS_ERROR_DUPLICATE_TRANSACTION,
-            ErrorCode.TransactionDoesNotExist => Hub88ErrorCode.RS_ERROR_TRANSACTION_DOES_NOT_EXIST,
-            ErrorCode.InvalidSign => Hub88ErrorCode.RS_ERROR_INVALID_TOKEN,
+            // ErrorCode. => Hub88ErrorCode.RS_ERROR_WRONG_TYPES,
+            ErrorCode.TransactionAlreadyExists => Hub88ErrorCode.RS_ERROR_DUPLICATE_TRANSACTION,
+            ErrorCode.TransactionNotFound => Hub88ErrorCode.RS_ERROR_TRANSACTION_DOES_NOT_EXIST,
             ErrorCode.Unknown or _ => Hub88ErrorCode.RS_ERROR_UNKNOWN
         };
     }

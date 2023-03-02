@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.StartupSettings.Options;
 
 public class SoftswissCurrenciesOptions
 {
-    public Dictionary<string, long> CountryIndexes { get; init; } = null!;
+    public Dictionary<string, long> CountryIndexes { get; set; } = null!;
 
     public long GetSumOut(string currency, decimal balance)
     {

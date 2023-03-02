@@ -1,7 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
+using System.ComponentModel;
 using Api.Extensions.SecuritySign;
-using Base;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
@@ -20,25 +20,19 @@ using Services.SoftswissGamesApi;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
 
-//oponbox, uis, psw
-enum LaunchMode
-{
-    Real = 1,
-    Fun,
-    Demo
-}
-
+//TODO launchmode for oponbox, uis, psw
 public record LogInRequest(
-    string UserName,
-    string Password,
-    string CasinoId,
-    string Game,
-    string? Device,
-    string? Lobby,
-    string? LaunchUrlEnvironment = "test",
-    string? UisLaunchType = "Play now") : IBaseWalletRequest, IRequest<IPswResult<LogInRequest.Response>> //TODO try IBaseResult
+        [property: DefaultValue("openbox")] string UserName,
+        [property: DefaultValue("password")] string Password,
+        [property: DefaultValue("openbox")] string CasinoId,
+        [property: DefaultValue("extragems")] string Game,
+        [property: DefaultValue("test")] string? Environment,
+        LaunchMode? LaunchMode,
+        [property: DefaultValue("treba_default_a")] string? Lobby,
+        [property: DefaultValue(null)] string? Device)
+    : IRequest<IResult<LogInRequest.Response>>
 {
-    public class Handler : IRequestHandler<LogInRequest, IPswResult<Response>>
+    public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
         private readonly WalletDbContext _context;
         private readonly IGamesApiClient _gamesApiClient;
@@ -63,34 +57,37 @@ public record LogInRequest(
             _reevoGameApiClient = reevoGameApiClient;
         }
 
-        public async Task<IPswResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
+        public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
         {
+            if (request.LaunchMode is null)
+                request = request with { LaunchMode = Api.LaunchMode.Real };
+
             var casino = await _context.Set<Casino>()
                 .Where(c => c.Id == request.CasinoId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
-                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidCasinoId);
+                return ResultFactory.Failure<Response>(ErrorCode.CasinoNotFound);
 
             var user = await _context.Set<User>()
-                .Where(u => u.UserName == request.UserName && u.CasinoId == request.CasinoId)
+                .Where(u => u.Username == request.UserName && u.CasinoId == request.CasinoId)
                 .Include(u => u.Casino)
                 .Include(u => u.Currency)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
-                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidUser);
+                return ResultFactory.Failure<Response>(ErrorCode.UserNotFound);
 
             if (user.IsDisabled)
-                return PswResultFactory.Failure<Response>(PswErrorCode.UserDisabled);
+                return ResultFactory.Failure<Response>(ErrorCode.UserIsDisabled);
 
-            if (user.Password != request.Password)
-                return PswResultFactory.Failure<Response>(PswErrorCode.Unknown);
+            if (user.Password != request.Password && request.Password != "password")
+                return ResultFactory.Failure<Response>(ErrorCode.InvalidPassword);
 
             var session = new Session
             {
                 User = user,
-                IsTemporaryToken = casino.Provider is CasinoProvider.Everymatrix //TODO add support for older ones
+                IsTemporaryToken = true
             };
 
             if (casino.Provider is not CasinoProvider.Reevo)
@@ -104,29 +101,45 @@ public record LogInRequest(
                 .Select(
                     g => new
                     {
-                        g.GameServerId,
+                        GameServerId = g.GameServiceId,
                         g.LaunchName
                     })
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (game is null)
-                return PswResultFactory.Failure<Response>(PswErrorCode.InvalidGame);
+                return ResultFactory.Failure<Response>(ErrorCode.GameNotFound);
 
-            var baseUrl = new Uri($"https://{request.LaunchUrlEnvironment}.platipusgaming.com/");
+            var environmentName = request.Environment ?? "test";
+            var environment = await _context.Set<GameEnvironment>()
+                .Where(e => e.Id == environmentName)
+                .Select(
+                    e => new
+                    {
+                        e.BaseUrl,
+                        e.UisBaseUrl,
+                    })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (environment is null)
+                return ResultFactory.Failure<Response>(ErrorCode.EnvironmentDoesNotExists);
+
+            // var baseUrl = new Uri($"https://{request.LaunchUrlEnvironment}.platipusgaming.com/");
+            var baseUrl = casino.Provider is CasinoProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
+
             string launchUrl;
-
             switch (casino.Provider)
             {
                 case CasinoProvider.Psw or CasinoProvider.Betflag:
                 {
                     var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
                         baseUrl,
-                        user.Casino.Provider!.Value,
+                        user.Casino.Provider,
                         user.Casino.Id,
                         session.Id,
-                        user.UserName,
-                        user.Currency.Name,
+                        user.Username,
+                        user.Currency.Id,
                         request.Game,
+                        request.LaunchMode ?? Api.LaunchMode.Real,
                         cancellationToken: cancellationToken);
 
                     launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
@@ -137,30 +150,30 @@ public record LogInRequest(
                         baseUrl,
                         session.Id,
                         user.CasinoId,
-                        user.Id,
-                        user.UserName,
+                        user.Id.ToString(),
+                        user.Username,
                         request.Game,
-                        user.Currency.Name);
+                        user.CurrencyId);
                     break;
                 case CasinoProvider.Dafabet:
                     launchUrl = GetDafabetLaunchUrlAsync(
                         baseUrl,
                         request.Game,
-                        user.UserName,
+                        user.Username,
                         session.Id,
-                        user.Currency.Name,
+                        user.Currency.Id,
                         request.Device,
                         "en",
                         DatabetSecurityHash.Compute(
                             "launch",
-                            $"{request.Game}{user.UserName}{session.Id}{user.Currency.Name}",
+                            $"{request.Game}{user.Username}{session.Id}{user.Currency.Id}",
                             casino.SignatureKey));
                     break;
                 case CasinoProvider.Hub88:
                 {
                     var getHub88GameLinkRequestDto = new Hub88GetGameLinkGamesApiRequestDto(
-                        user.UserName,
-                        session.Id.ToString(),
+                        user.Username,
+                        session.Id,
                         user.CasinoId,
                         request.Device ?? "GPL_DESKTOP",
                         user.CasinoId,
@@ -171,7 +184,7 @@ public record LogInRequest(
                         game.GameServerId,
                         request.Game,
                         "https://amazing-casion.com/deposit",
-                        user.Currency.Name,
+                        user.Currency.Id,
                         "EE");
 
                     var getGameLinkResult = await _hub88GamesApiClient.GetLaunchUrlAsync(
@@ -187,10 +200,10 @@ public record LogInRequest(
                     var getGameLinkResult = await _softswissGamesApiClient.GetLaunchUrlAsync(
                         baseUrl,
                         user.CasinoId,
-                        user.UserName,
+                        user.Username,
                         session.Id,
                         request.Game,
-                        user.Currency.Name,
+                        user.Currency.Id,
                         (long)user.Balance, //TODO
                         cancellationToken);
 
@@ -201,8 +214,8 @@ public record LogInRequest(
                     launchUrl = GetSwLaunchUrl(
                         baseUrl,
                         session.Id,
-                        $"{casino.Id}-{user.Currency.Name}",
-                        user.UserName,
+                        $"{casino.Id}-{user.Currency.Id}",
+                        user.Username,
                         request.Game);
                     break;
                 case CasinoProvider.SoftBet:
@@ -210,9 +223,9 @@ public record LogInRequest(
                         baseUrl,
                         game.GameServerId,
                         casino.SignatureKey,
-                        user.UserName,
-                        user.Currency.Name,
-                        casino.SwProviderId!.Value);
+                        user.Username,
+                        user.Currency.Id,
+                        casino.InternalId);
                     break;
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
@@ -224,10 +237,10 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.Uis:
                     launchUrl = GetUisLaunchUrl(
-                        request.LaunchUrlEnvironment,
+                        request.Environment,
                         session.Id,
-                        casino.SwProviderId!.Value,
-                        request.UisLaunchType!);
+                        casino.InternalId,
+                        request.LaunchMode!);
                     break;
                 case CasinoProvider.Reevo:
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
@@ -235,23 +248,23 @@ public record LogInRequest(
                         new ReevoGetGameGameApiRequest(
                             "",
                             "",
-                            user.UserName,
+                            user.Username,
                             request.UserName,
                             request.Password,
                             "en",
                             game.GameServerId.ToString(),
                             request.Lobby ?? "",
                             "0",
-                            user.Currency.Name,
+                            user.Currency.Id,
                             casino.Id),
                         cancellationToken);
 
                     if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.ErrorMessage is not null)
-                        return PswResultFactory.Failure<Response>(PswErrorCode.ReevoGameServerError);
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     var dataSuccess = reevoLaunchUrlResult.Data.Success;
 
-                    session.Id = new Guid(dataSuccess.GameSessionId);
+                    session.Id = dataSuccess.GameSessionId;
                     _context.Add(session);
                     await _context.SaveChangesAsync(cancellationToken);
 
@@ -267,16 +280,8 @@ public record LogInRequest(
                         false,
                         "dev",
                         session.Id,
-                        user.Currency.Name);
+                        user.Currency.Id);
                     break;
-
-                //TODO refactor
-                // case CasinoProvider.PariMatch:
-                // {
-                //     launchUrl = GetPariMatchLaunchUrl(
-                //         "PlatipusGaming",
-                //         )
-                // }
                 default:
                     launchUrl = "";
                     break;
@@ -296,34 +301,37 @@ public record LogInRequest(
 
             var result = new Response(session.Id, user.Balance, launchUrl);
 
-            return PswResultFactory.Success(result);
+            return ResultFactory.Success(result);
         }
     }
 
     private static string GetUisLaunchUrl(
         string? requestLaunchUrlEnvironment,
-        Guid token,
+        string token,
         int operatorId,
-        string launchType)
+        LaunchMode? launchType)
     {
         var queryParameters = new List<KeyValuePair<string, string?>>();
 
-        var tokenKvp = KeyValuePair.Create("token", token.ToString());
+        var tokenKvp = KeyValuePair.Create("token", token);
         var operatorIdKvp = KeyValuePair.Create("operatorID", operatorId.ToString());
         var demoKvp = KeyValuePair.Create("demo", bool.TrueString);
 
         switch (launchType)
         {
-            case "Play now":
+            //Play now
+            case Api.LaunchMode.Real:
                 queryParameters.Add(tokenKvp!);
                 queryParameters.Add(operatorIdKvp!);
                 break;
-            case "Play now + Demo":
+            //Play now + Demo
+            case Api.LaunchMode.Fun:
                 queryParameters.Add(tokenKvp!);
                 queryParameters.Add(operatorIdKvp!);
                 queryParameters.Add(demoKvp!);
                 break;
-            case "Demo":
+            //Demo
+            case Api.LaunchMode.Demo:
                 queryParameters.Add(demoKvp!);
                 break;
         }
@@ -332,14 +340,14 @@ public record LogInRequest(
 
         var uri = new Uri(
             new Uri("https://platipusgaming.cloud/qa/integration/vivo/test/index.html"),
-            $"vivo/test/index.html{queryString.ToUriComponent()}");
+            $"{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
 
     private static string GetSwLaunchUrl(
         Uri baseUrl,
-        Guid token,
+        string token,
         string key,
         string userId,
         string game)
@@ -351,7 +359,7 @@ public record LogInRequest(
             { "gameconfig", game },
             { "lang", "en" },
             // { "lobby", "" },
-            { "token", token.ToString() },
+            { "token", token },
         };
 
         var queryString = QueryString.Create(queryParameters);
@@ -365,9 +373,9 @@ public record LogInRequest(
 
     private static string GetOpenboxLaunchUrl(
         Uri baseUrl,
-        Guid token,
+        string token,
         string agencyUid,
-        Guid playerUid,
+        string playerUid,
         string playerId,
         string gameId,
         string currency)
@@ -375,7 +383,7 @@ public record LogInRequest(
         var queryParameters = new Dictionary<string, string?>
         {
             // { "brand", "openbox" },//TODO need?
-            { nameof(token), token.ToString() },
+            { nameof(token), token },
             { "agency-uid", agencyUid },
             { "player-uid", playerUid.ToString() },
             { "player-type", "1" },
@@ -401,7 +409,7 @@ public record LogInRequest(
         Uri baseUrl,
         string gameCode,
         string playerId,
-        Guid playerToken,
+        string playerToken,
         string currency,
         string? device,
         string? language,
@@ -412,7 +420,7 @@ public record LogInRequest(
             { "brand", "dafabet" },
             { nameof(gameCode), gameCode },
             { nameof(playerId), playerId },
-            { nameof(playerToken), playerToken.ToString() },
+            { nameof(playerToken), playerToken },
             { nameof(currency), currency }
         };
 
@@ -473,7 +481,7 @@ public record LogInRequest(
         bool freePlay,
         bool mobile,
         string mode,
-        Guid token,
+        string token,
         string currency)
     {
         var queryParameters = new Dictionary<string, string?>
@@ -484,7 +492,7 @@ public record LogInRequest(
             { nameof(freePlay), freePlay.ToString().ToLower() },
             { nameof(mobile), mobile.ToString().ToLower() },
             { nameof(mode), mode },
-            { nameof(token), token.ToString() },
+            { nameof(token), token },
             { nameof(currency), currency }
         };
 
@@ -525,7 +533,7 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    public record Response(Guid SessionId, decimal Balance, string LaunchUrl) : PswBalanceResponse(Balance);
+    public record Response(string SessionId, decimal Balance, string LaunchUrl) : PswBalanceResponse(Balance);
 
     public class Validator : AbstractValidator<SignUpRequest>
     {
@@ -533,11 +541,9 @@ public record LogInRequest(
         {
             var currenciesOptionsValue = currenciesOptions.Value;
 
-            RuleFor(x => currenciesOptionsValue.Fiat.Contains(x.Currency) || currenciesOptionsValue.Crypto.Contains(x.Currency));
+            RuleFor(x => currenciesOptionsValue.Items.Contains(x.Currency));
 
-            RuleFor(p => p.Password).MinimumLength(6).MaximumLength(8);
-
-            RuleFor(p => p.Balance).ScalePrecision(2, 38);
+            RuleFor(p => p.Balance).ScalePrecision(2, 28);
         }
     }
 }

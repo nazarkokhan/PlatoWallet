@@ -8,11 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 using StartupSettings.Options;
 
 public record SoftswissRollbackRequest(
-        Guid SessionId,
+        string SessionId,
         string UserId,
         string Currency,
         string Game,
@@ -38,25 +37,22 @@ public record SoftswissRollbackRequest(
             SoftswissRollbackRequest request,
             CancellationToken cancellationToken)
         {
-            var action = request.Actions?.FirstOrDefault();
+            var action = request.Actions?.SingleOrDefault();
 
-            if (action is not {Action: "rollback"})
+            if (action is not { Action: "rollback" })
                 return SoftswissResultFactory.Failure<Response>(SoftswissErrorCode.BadRequest);
 
-            var rollbackRequest = request.Map(
-                r => new RollbackRequest(
-                    r.SessionId,
-                    r.UserId,
-                    r.Game,
-                    r.GameId,
-                    action.OriginalActionId));
+            var rollbackResult = await _wallet.RollbackAsync(
+                request.SessionId,
+                action.OriginalActionId,
+                request.GameId,
+                cancellationToken: cancellationToken);
 
-            var rollbackResult = await _wallet.RollbackAsync(rollbackRequest, cancellationToken);
             if (rollbackResult.IsFailure)
             {
                 var user = await _context.Set<User>()
                     .Where(u => u.Sessions.Any(s => s.Id == request.SessionId))
-                    .Select(u => new {u.Balance})
+                    .Select(u => new { u.Balance })
                     .FirstOrDefaultAsync(cancellationToken);
 
                 var balance = user?.Map(u => _currencyMultipliers.GetSumOut(request.Currency, u.Balance));
@@ -64,11 +60,15 @@ public record SoftswissRollbackRequest(
                 return rollbackResult.ToSoftswissResult<Response>(balance);
             }
 
-            var response = rollbackResult.Data.Map(
-                d => new Response(
-                    _currencyMultipliers.GetSumOut(request.Currency, d.Balance),
-                    request.GameId,
-                    new List<RollbackTransaction> {new(action.ActionId, d.InternalTransactionId, d.CreatedDate)}));
+            var data = rollbackResult.Data;
+
+            var response = new Response(
+                _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
+                request.GameId,
+                new List<RollbackTransaction>
+                {
+                    new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)
+                });
 
             return SoftswissResultFactory.Success(response);
         }

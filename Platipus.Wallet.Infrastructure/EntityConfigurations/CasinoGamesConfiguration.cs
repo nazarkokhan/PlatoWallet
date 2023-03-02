@@ -1,13 +1,15 @@
 namespace Platipus.Wallet.Infrastructure.EntityConfigurations;
 
+using Base;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class CasinoGamesConfiguration : IEntityTypeConfiguration<CasinoGames>
+public class CasinoGamesConfiguration : EntityTypeConfiguration<CasinoGames>
 {
-    public void Configure(EntityTypeBuilder<CasinoGames> builder)
+    public override void Configure(EntityTypeBuilder<CasinoGames> builder)
     {
+        base.Configure(builder);
         builder.ToTable("casino_games");
     }
 }

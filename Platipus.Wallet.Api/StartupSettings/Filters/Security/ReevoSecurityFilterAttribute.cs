@@ -1,10 +1,10 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
+using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Requests.Wallets.Reevo.Base;
 using Application.Results.Reevo;
 using Domain.Entities;
-using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +17,7 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
 
         var request = context.ActionArguments.Values
-            .OfType<IReevoRequest>()
+            .OfType<ReevoSingleRequest>()
             .Single();
 
         var session = await dbContext.Set<Session>()
@@ -27,19 +27,24 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
                 {
                     s.Id,
                     s.ExpirationDate,
-                    s.User.Casino.SignatureKey
+                    UserCasino = new
+                    {
+                        s.User.Casino.SignatureKey,
+                        CallerId = (string)s.User.Casino.Params[CasinoParams.ReevoCallerId]!,
+                        CallerPassword = (string)s.User.Casino.Params[CasinoParams.ReevoCallerPassword]!
+                    }
                 })
             .FirstOrDefaultAsync();
 
         if (session is null)
         {
-            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.GeneralError).ToActionResult();
+            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.InternalError).ToActionResult();
             return;
         }
 
         if (session.ExpirationDate < DateTime.UtcNow)
         {
-            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.GeneralError).ToActionResult();
+            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.InternalError).ToActionResult();
             return;
         }
 
@@ -47,14 +52,21 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
         requestQueryString.Remove("key");
         var withoutKey = QueryString.Create(requestQueryString).ToString();
 
+        var casino = session.UserCasino;
         var isHashValid = ReevoSecurityHash.IsValid(
             request.Key,
             withoutKey,
-            session.SignatureKey);
+            casino.SignatureKey);
 
         if (!isHashValid)
         {
-            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.GeneralError).ToActionResult();
+            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.InternalError).ToActionResult();
+            return;
+        }
+
+        if (casino.CallerId != request.CallerId && casino.CallerPassword != request.CallerPassword)
+        {
+            context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.InternalError).ToActionResult();
             return;
         }
 

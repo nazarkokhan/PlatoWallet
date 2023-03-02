@@ -1,17 +1,19 @@
 namespace Platipus.Wallet.Infrastructure.EntityConfigurations;
 
+using Base;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : EntityTypeConfiguration<User, int>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public override void Configure(EntityTypeBuilder<User> builder)
     {
+        base.Configure(builder);
         builder.ToTable("users");
 
-        builder.HasIndex(x => x.UserName).IsUnique();
+        builder.HasIndex(x => x.Username).IsUnique();
 
-        builder.Property(x => x.Balance).HasPrecision(38, 2);
+        builder.Property(x => x.Balance).DefaultMoneyPrecision();
     }
 }

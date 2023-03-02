@@ -11,7 +11,7 @@ using Results.Uis.WithData;
 
 #pragma warning disable CS8618
 [XmlRoot("REQUEST")]
-public class UisStatusRequest : IUisHashRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisStatusRequest : IUisUserIdRequest, IRequest<IUisResult<UisResponseContainer>>
 {
     [XmlElement("USERID")]
     [BindProperty(Name = "userId")]
@@ -49,7 +49,7 @@ public class UisStatusRequest : IUisHashRequest, IRequest<IUisResult<UisResponse
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (transaction is null)
-                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.ExpiredToken);
+                return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.UnknownTransactionIdOrWasAlreadyProcessed);
 
             var response = new UisStatusResponse { UisSystemTransactionId = transaction.InternalId };
 
@@ -74,6 +74,6 @@ public class UisStatusRequest : IUisHashRequest, IRequest<IUisResult<UisResponse
         public string Result { get; set; } = "OK";
 
         [XmlElement("UISSYSTEMTRANSACTIONID")]
-        public string UisSystemTransactionId { get; set; } = "123123123";
+        public string UisSystemTransactionId { get; set; }
     }
 }

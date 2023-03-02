@@ -2,28 +2,53 @@ namespace Platipus.Wallet.Api.Application.Results.Common;
 
 public enum ErrorCode
 {
-    NotEnoughMoney = 1,
-    UserDisabled = 2,
-    SessionExpired = 3,
-    InvalidSignature = 4,
-    MissingSignature = 5,
-    RoomIsWrongOrEmpty = 6,
-    BadParametersInTheRequest = 7,
-    CommandIsWrong = 8,
-    EmptySessionId = 9,
-    BetLimitReached = 10,
-    InvalidUser = 11,
-    InvalidCasinoId = 12,
-    InvalidGame = 13,
-    InvalidExpirationDate = 14,
-    WrongCurrency = 15,
-    DuplicateTransaction = 16,
-    TransactionDoesNotExist = 17,
-    DuplicateAward = 18,
-    AwardIsAlreadyCanceled = 19,
-    AwardDoesNotExist = 20,
-    Unknown = 100,
-    InvalidSign = 101,
-    CouldNotTryToMockSessionError = 1000,
-    Duplication = 1001
+    Unknown = 1,
+
+    BadParametersInTheRequest,
+
+    CasinoNotFound,
+    CasinoAlreadyExists,
+    ThisProviderSupportOnlyOneCasino,
+
+    SessionNotFound,
+    SessionExpired,
+
+    SecurityParameterIsInvalid,
+    SecurityParameterIsEmpty,
+
+    UserNotFound,
+    UserIsDisabled,
+    InvalidCurrency,
+    TransactionAlreadyExists,
+    TransactionNotFound,
+
+    RoundAlreadyExists,
+    RoundNotFound,
+    RoundAlreadyFinished,
+
+    InsufficientFunds,
+
+    AwardNotFound,
+    AwardIsAlreadyUsed,
+
+    RequestAlreadyExists,
+
+    UnknownGetBalanceException,
+    UnknownBetException,
+    UnknownWinException,
+    UnknownRollbackException,
+    UnknownAwardException,
+    UnknownAuthorizeException,
+    UnknownLogoutException,
+
+    GameNotFound,
+
+    ErrorMockApplianceError,
+
+
+    //external
+    InvalidPassword,
+    GameServerApiError,
+    EnvironmentDoesNotExists,
+    UserAlreadyExists,
 }

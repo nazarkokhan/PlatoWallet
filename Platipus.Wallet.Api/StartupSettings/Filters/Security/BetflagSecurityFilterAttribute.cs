@@ -1,10 +1,10 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
+using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Results.Betflag;
 using Domain.Entities;
-using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +21,21 @@ public class BetflagSecurityFilterAttribute : ActionFilterAttribute
             .Single();
 
         var session = await dbContext.Set<Session>()
-            .Where(s => s.Id == new Guid(request.Key))
+            .Where(
+                s => s.Id == request.Key
+                  && s.User.CasinoId == request.ApiName)
             .Select(
                 s => new
                 {
                     s.Id,
+                    s.ExpirationDate,
                     s.User.Casino.SignatureKey
                 })
             .FirstOrDefaultAsync();
 
         httpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
 
-        if (session is null)
+        if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = BetflagResultFactory.Failure<BetflagErrorResponse>(BetflagErrorCode.SessionExpired).ToActionResult();
             return;

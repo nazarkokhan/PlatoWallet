@@ -1,23 +1,22 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
+using System.ComponentModel;
 using Domain.Entities;
-using Domain.Entities.Enums;
+using DTO;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StartupSettings.Options;
-using Wallets.Psw.Base.Response;
 
 public record SignUpRequest(
-    string UserName,
-    string Password,
-    string CasinoId,
-    string Currency,
-    decimal Balance,
-    int? SwUserId) : IRequest<IPswResult<PswBaseResponse>>
+    [property: DefaultValue("psw_nazar_123")] string Username,
+    [property: DefaultValue("qwe123")] string Password,
+    [property: DefaultValue("psw")] string CasinoId,
+    [property: DefaultValue("USD")] string Currency,
+    [property: DefaultValue(1000)] decimal Balance) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<SignUpRequest, IPswResult<PswBaseResponse>>
+    public class Handler : IRequestHandler<SignUpRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -26,7 +25,7 @@ public record SignUpRequest(
             _context = context;
         }
 
-        public async Task<IPswResult<PswBaseResponse>> Handle(
+        public async Task<IResult> Handle(
             SignUpRequest request,
             CancellationToken cancellationToken)
         {
@@ -41,50 +40,39 @@ public record SignUpRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
-                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.InvalidCasinoId);
+                return ResultFactory.Failure(ErrorCode.CasinoNotFound);
 
             var user = await _context.Set<User>()
-                .Where(u => u.UserName == request.UserName && u.CasinoId == request.CasinoId)
+                .Where(u => u.Username == request.Username && u.CasinoId == request.CasinoId)
                 .Include(u => u.Casino.CasinoCurrencies)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is not null)
-                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.Unknown);
+                return ResultFactory.Failure(ErrorCode.UserAlreadyExists);
 
             var casinoCurrency = await _context.Set<CasinoCurrencies>()
-                .Where(c => c.CasinoId == request.CasinoId && c.Currency.Name == request.Currency)
+                .Where(c => c.CasinoId == request.CasinoId && c.Currency.Id == request.Currency)
                 .Select(c => c.Currency)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (casinoCurrency is null)
-                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.WrongCurrency);
-
-            int? swUserId = null;
-
-            if (casino.Provider is CasinoProvider.Sw or CasinoProvider.GamesGlobal or CasinoProvider.Uis)
-            {
-                if (request.SwUserId is null)
-                    return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.BadParametersInTheRequest);
-                swUserId = request.SwUserId;
-            }
+                return ResultFactory.Failure(ErrorCode.InvalidCurrency);
 
             user = new User
             {
-                UserName = request.UserName,
+                Username = request.Username,
                 Password = request.Password,
                 Balance = request.Balance,
                 CasinoId = request.CasinoId,
                 CurrencyId = casinoCurrency.Id,
-                SwUserId = swUserId
             };
-
             _context.Add(user);
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var result = new PswBalanceResponse(user.Balance);
+            var result = new BalanceResponse(user.Balance);
 
-            return PswResultFactory.Success(result);
+            return ResultFactory.Success(result);
         }
     }
 
@@ -94,14 +82,14 @@ public record SignUpRequest(
         {
             var currenciesOptionsValue = currenciesOptions.Value;
 
-            RuleFor(x => currenciesOptionsValue.Fiat.Contains(x.Currency) || currenciesOptionsValue.Crypto.Contains(x.Currency));
+            RuleFor(x => currenciesOptionsValue.Items.Contains(x.Currency));
 
             RuleFor(p => p.Password)
                 .MinimumLength(6)
-                .MaximumLength(8);
+                .MaximumLength(20);
 
             RuleFor(p => p.Balance)
-                .ScalePrecision(2, 38);
+                .ScalePrecision(2, 28);
         }
     }
 }

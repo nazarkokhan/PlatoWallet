@@ -1,17 +1,14 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
-using Application.DTOs;
+using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Extensions;
 using Application.Requests.Wallets.Sw.Base;
 using Application.Results.Sw;
 using Domain.Entities;
-using Extensions;
-using Extensions.SecuritySign;
 using Infrastructure.Persistence;
-using LazyCache;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 public class SwSecurityFilterAttribute : ActionFilterAttribute
 {
@@ -19,40 +16,26 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
     {
         var httpContext = context.HttpContext;
 
-        var request = context.ActionArguments
-            .Select(a => a.Value as ISwBaseRequest)
-            .Single(a => a is not null);
+        var request = context.ActionArguments.Values
+            .OfType<ISwBaseRequest>()
+            .Single();
 
-        if (request is null)
-        {
-            context.Result = SwResultFactory.Failure(SwErrorCode.ExpiredToken).ToActionResult();
-            return;
-        }
+        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
 
-        var sessionId = request.Token;
-
-        var services = httpContext.RequestServices;
-        var cache = services.GetRequiredService<IAppCache>();
-        var dbContext = services.GetRequiredService<WalletDbContext>();
-
-        var session = await cache.GetOrAddAsync(
-            sessionId.ToString(),
-            async _ =>
-            {
-                var session = await dbContext.Set<Session>()
-                    .Where(c => c.Id == sessionId)
-                    .Select(
-                        s => new CachedSessionDto(
-                            s.Id,
-                            s.ExpirationDate,
-                            s.User.Id,
-                            s.User.IsDisabled,
-                            s.User.Casino.SignatureKey))
-                    .FirstOrDefaultAsync(httpContext.RequestAborted);
-
-                return session;
-            },
-            new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10) });
+        var session = await dbContext.Set<Session>()
+            .Where(s => s.Id == request.Token)
+            .Select(
+                s => new
+                {
+                    s.Id,
+                    s.ExpirationDate,
+                    User = new
+                    {
+                        s.User.IsDisabled,
+                        CasinoSignatureKey = s.User.Casino.SignatureKey
+                    }
+                })
+            .FirstOrDefaultAsync(httpContext.RequestAborted);
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
@@ -60,7 +43,7 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        if (session.UserIsDisabled)
+        if (session.User.IsDisabled)
         {
             context.Result = SwResultFactory.Failure(SwErrorCode.UserNotFound).ToActionResult();
             return;
@@ -73,13 +56,13 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
                     r.Md5,
                     r.ProviderId,
                     r.UserId,
-                    session.CasinoSignatureKey)),
+                    session.User.CasinoSignatureKey)),
             ISwHashRequest hashRequest => hashRequest.Map(
                 r => SwSecurityHash.IsValid(
                     r.Hash,
                     r.ProviderId,
                     r.UserId,
-                    session.CasinoSignatureKey)),
+                    session.User.CasinoSignatureKey)),
             _ => false
         };
 
@@ -89,6 +72,6 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var executedContext = await next();
+        await next();
     }
 }

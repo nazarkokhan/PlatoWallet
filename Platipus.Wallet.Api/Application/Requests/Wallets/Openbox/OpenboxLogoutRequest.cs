@@ -5,7 +5,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record OpenboxLogoutRequest(Guid Token)
+public record OpenboxLogoutRequest(string Token)
     : IOpenboxBaseRequest, IRequest<IOpenboxResult<OpenboxLogoutRequest.Response>>
 {
     public class Handler : IRequestHandler<OpenboxLogoutRequest, IOpenboxResult<Response>>
@@ -24,7 +24,7 @@ public record OpenboxLogoutRequest(Guid Token)
                 .Where(u => u.Id == request.Token)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (session is null)
+            if (session is null || session.IsTemporaryToken)
                 return OpenboxResultFactory.Failure<Response>(OpenboxErrorCode.TokenRelatedErrors);
 
             _context.Remove(session);

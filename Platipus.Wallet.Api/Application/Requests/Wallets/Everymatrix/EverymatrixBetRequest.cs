@@ -2,19 +2,13 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Extensions;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using Services.Wallet.DTOs;
-using static Results.Everymatrix.EverymatrixResultFactory;
 
 public record EverymatrixBetRequest(
-        Guid Token,
+        string Token,
         decimal Amount,
         string Currency,
         int GameId,
@@ -27,43 +21,31 @@ public record EverymatrixBetRequest(
     public class Handler : IRequestHandler<EverymatrixBetRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
         private readonly IWalletService _wallet;
-        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet, WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
             _wallet = wallet;
-            _context = context;
         }
 
         public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixBetRequest request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Set<User>()
-                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
-                .Select(u => new { u.UserName })
-                .FirstOrDefaultAsync(cancellationToken);
+            var walletResult = await _wallet.BetAsync(
+                request.Token,
+                request.RoundId,
+                request.ExternalId,
+                request.Amount,
+                request.Currency,
+                cancellationToken: cancellationToken);
 
-            if (user is null)
-                return Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound);
-
-            var walletRequest = request.Map(
-                r => new BetRequest(
-                    r.Token,
-                    user.UserName,
-                    r.Currency,
-                    r.RoundId,
-                    r.ExternalId,
-                    false,
-                    r.Amount));
-
-            var walletResult = await _wallet.BetAsync(walletRequest, cancellationToken);
             if (walletResult.IsFailure)
                 return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
+            var data = walletResult.Data;
 
-            var response = walletResult.Data.Map(d => new EverymatrixBalanceResponse(d.Balance, d.Currency));
+            var response = new EverymatrixBalanceResponse(data.Balance, data.Currency);
 
-            return Success(response);
+            return EverymatrixResultFactory.Success(response);
         }
     }
 }

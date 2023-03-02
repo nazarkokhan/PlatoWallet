@@ -9,43 +9,58 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="34.0.2"/>
-        <PackageReference Include="Bogus.Text" Version="34.0.2"/>
-        <PackageReference Include="EFCore.NamingConventions" Version="7.0.2"/>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2"/>
-        <PackageReference Include="Horizon.XmlRpc.AspNetCore" Version="2.5.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1"/>
-        <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0"/>
-        <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0"/>
-        <PackageReference Include="MediatR" Version="11.1.0"/>
-        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2"/>
+        <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="Bogus.Text" Version="34.0.2" />
+        <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
+        <PackageReference Include="Horizon.XmlRpc.AspNetCore" Version="2.5.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
+        <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0" />
+        <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
+        <PackageReference Include="MediatR" Version="11.1.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.2"/>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1"/>
-        <PackageReference Include="Platipus.Serilog" Version="1.0.0-beta2"/>
-        <PackageReference Include="Serilog.AspNetCore" Version="6.1.0"/>
-        <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0"/>
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0"/>
-        <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.0-beta7"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
+        <PackageReference Include="Platipus.Api.Common.Lib" Version="1.0.0-beta.9" />
+        <PackageReference Include="Platipus.Serilog" Version="1.0.0-beta2" />
+        <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+        <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+        <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.0-beta7" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Platipus.Wallet.Infrastructure\Platipus.Wallet.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Platipus.Wallet.Infrastructure\Platipus.Wallet.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Extensions\SecuritySign\hub88.pem"/>
+        <None Remove="Extensions\SecuritySign\hub88.pem" />
+        <None Remove="logs\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Application\Requests\Wallets\GamesGlobal\Admin"/>
-        <Folder Include="Application\Services\GamesApi\DTOs\Requests"/>
+        <Folder Include="Application\Services\GamesApi\DTOs\Requests" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Application\Requests\Wallets\BetConstruct\Base\BetConstructBaseResponse.cs" />
+      <Compile Remove="Application\Requests\Wallets\EmaraPlay\Base\EmaraPlayErrorResponse.cs" />
+      <Compile Remove="logs\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="logs\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="logs\**" />
     </ItemGroup>
 
 </Project>

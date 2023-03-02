@@ -1,19 +1,21 @@
 namespace Platipus.Wallet.Api.Application.Requests.Test;
 
+using System.ComponentModel;
 using System.Net;
 using System.Net.Mime;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public record CreateErrorMockRequest(
-    string UserName,
-    ErrorMockMethod Method,
-    string Body,
-    HttpStatusCode HttpStatusCode,
-    string ContentType,
-    int Count,
-    TimeSpan? Timeout) : IRequest<IPswResult>
+    [property: DefaultValue("reevo_nazar")] string Username,
+    MockedErrorMethod Method,
+    [property: DefaultValue("your_json_or_xml")] string Body,
+    [property: DefaultValue(200)] HttpStatusCode HttpStatusCode,
+    [property: DefaultValue("json")] string ContentType,
+    [property: DefaultValue(1)] int Count,
+    [property: DefaultValue("00:00:10")] TimeSpan? Timeout) : IRequest<IPswResult>
 {
     public class Handler : IRequestHandler<CreateErrorMockRequest, IPswResult>
     {
@@ -30,7 +32,7 @@ public record CreateErrorMockRequest(
         {
             var user = await _context.Set<User>()
                 .TagWith("GetUserWithMockedError")
-                .Where(e => e.UserName == request.UserName)
+                .Where(e => e.Username == request.Username)
                 .Include(u => u.MockedErrors)
                 .FirstOrDefaultAsync(cancellationToken);
 

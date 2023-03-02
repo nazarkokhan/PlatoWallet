@@ -1,9 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
+using System.Text.Json.Nodes;
 using Base.Common.Page;
 using Domain.Entities;
 using Domain.Entities.Enums;
-using DTOs;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -41,18 +41,23 @@ public record GetCasinosPageRequest(
             var totalCount = await casinosQuery.CountAsync(cancellationToken);
 
             casinosQuery = casinosQuery
-                .OrderByDescending(p => p.Id);
+                .OrderByDescending(p => p.CreatedDate);
 
             var casinos = await casinosQuery
                 .SkipTake(request.Page)
                 .Select(
                     c => new Response(
                         c.Id,
-                        c.SignatureKey,
                         c.Provider,
+                        c.SignatureKey,
+                        c.InternalId,
+                        c.GameEnvironmentId,
+                        c.Params,
                         c.CasinoCurrencies
-                            .Select(cu => cu.Currency)
-                            .Select(cu => new GetCurrencyDto(cu.Id, cu.Name))
+                            .Select(cu => cu.CurrencyId)
+                            .ToList(),
+                        c.CasinoGames
+                            .Select(g => g.Game.LaunchName)
                             .ToList()))
                 .ToListAsync(cancellationToken);
 
@@ -64,7 +69,11 @@ public record GetCasinosPageRequest(
 
     public record Response(
         string Id,
-        string SignatureKey,
         CasinoProvider? Provider,
-        List<GetCurrencyDto> Currencies);
+        string SignatureKey,
+        int InternalId,
+        string GameEnvironmentId,
+        Dictionary<string, JsonNode> Params,
+        List<string> Currencies,
+        List<string> Games);
 }

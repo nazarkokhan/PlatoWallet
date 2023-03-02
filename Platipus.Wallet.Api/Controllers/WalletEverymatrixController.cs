@@ -3,9 +3,13 @@ namespace Platipus.Wallet.Api.Controllers;
 using Abstract;
 using Application.Requests.Wallets.Everymatrix;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
+using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.Security;
@@ -56,10 +60,31 @@ public class WalletEverymatrixController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("Reconciliation")]
-    [ProducesResponseType(typeof(EverymatrixReconciliationRequest.ReconciliationResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Reconciliation(
-        EverymatrixReconciliationRequest request,
+    //TODO
+    // [HttpPost("Reconciliation")]
+    // [ProducesResponseType(typeof(EverymatrixReconciliationRequest.ReconciliationResponse), StatusCodes.Status200OK)]
+    // public async Task<IActionResult> Reconciliation(
+    //     EverymatrixReconciliationRequest request,
+    //     CancellationToken cancellationToken)
+    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("private/test/get-security-value")]
+    public async Task<IActionResult> GetSecurityValue(
+        string username,
+        string route,
+        [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    {
+        var user = await dbContext.Set<User>()
+            .Where(u => u.Username == username)
+            .Select(u => new { CasinoSignatureKey = u.Casino.SignatureKey })
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+
+        if (user is null)
+            return ResultFactory.Failure(ErrorCode.UserNotFound).ToActionResult();
+
+        var securityValue = EverymatrixSecurityHash.Compute(route, user.CasinoSignatureKey);
+
+        return Ok(securityValue);
+    }
 }

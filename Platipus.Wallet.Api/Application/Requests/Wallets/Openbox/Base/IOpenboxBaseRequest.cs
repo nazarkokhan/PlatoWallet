@@ -4,5 +4,5 @@ using Requests.Base;
 
 public interface IOpenboxBaseRequest : IBaseWalletRequest
 {
-    public Guid Token { get; }
+    public string Token { get; }
 }
