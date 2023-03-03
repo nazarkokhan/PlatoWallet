@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Controllers;
 
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Abstract;
 using Application.Requests.Wallets.Openbox;
 using Application.Requests.Wallets.Openbox.Base;
@@ -49,7 +48,7 @@ public class WalletOpenboxController : RestApiController
             var casino = await _context.Set<Casino>()
                 .Where(
                     c => c.Provider == CasinoProvider.Openbox
-                      && (string)c.Params[CasinoParams.OpenboxVendorUid]! == request.VendorUid)
+                      && c.Params.OpenboxVendorUid == request.VendorUid)
                 .Select(
                     c => new
                     {
@@ -106,17 +105,18 @@ public class WalletOpenboxController : RestApiController
         }
     }
 
+
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string vendorUid,
-        [FromBody] JsonNode request,
+        [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
         var casino = await _context.Set<Casino>()
             .Where(
                 c => c.Provider == CasinoProvider.Openbox
-                  && (string)c.Params[CasinoParams.OpenboxVendorUid]! == vendorUid)
+                  && c.Params.OpenboxVendorUid == vendorUid)
             .Select(
                 c => new
                 {

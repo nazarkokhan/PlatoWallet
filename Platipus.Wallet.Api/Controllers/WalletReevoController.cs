@@ -20,7 +20,7 @@ using StartupSettings.Filters.Security;
 
 [Route("wallet/reevo")]
 [MockedErrorActionFilter(Order = 1)]
-[ReevoSecurityFilter(Order = 0)]
+[ReevoSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Reevo))]
 [ProducesResponseType(typeof(ReevoErrorResponse), StatusCodes.Status200OK)]
 [ProducesResponseType(typeof(ReevoSuccessResponse), StatusCodes.Status200OK)]

@@ -28,8 +28,14 @@ public class AdminController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("environments")]
-    public async Task<IActionResult> GetEnvironments(
+    public async Task<IActionResult> CreateEnvironment(
         CreateGameEnvironmentRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPut("environments")]
+    public async Task<IActionResult> UpdateEnvironment(
+        UpdateGameEnvironmentRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 

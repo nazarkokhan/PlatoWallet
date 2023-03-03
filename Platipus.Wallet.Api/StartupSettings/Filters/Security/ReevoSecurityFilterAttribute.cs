@@ -30,8 +30,8 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
                     UserCasino = new
                     {
                         s.User.Casino.SignatureKey,
-                        CallerId = (string)s.User.Casino.Params[CasinoParams.ReevoCallerId]!,
-                        CallerPassword = (string)s.User.Casino.Params[CasinoParams.ReevoCallerPassword]!
+                        CallerId = s.User.Casino.Params.ReevoCallerId!,
+                        CallerPassword = s.User.Casino.Params.ReevoCallerPassword
                     }
                 })
             .FirstOrDefaultAsync();

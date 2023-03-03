@@ -2,7 +2,7 @@
 
 namespace Platipus.Wallet.Api.Controllers;
 
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.Hub88;
 using Application.Requests.Wallets.Hub88.Base.Response;
@@ -63,7 +63,7 @@ public class WalletHub88Controller : RestApiController
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
-        [FromBody] JsonNode request,
+        [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
@@ -73,7 +73,7 @@ public class WalletHub88Controller : RestApiController
                 c => new
                 {
                     c.SignatureKey,
-                    PrivateWalletSecuritySign = (string)c.Params[CasinoParams.Hub88PrivateWalletSecuritySign]!
+                    PrivateWalletSecuritySign = c.Params.Hub88PrivateWalletSecuritySign
                 })
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Controllers;
@@ -20,6 +19,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
 
         var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
         var request = httpContext.Items[HttpContextItems.RequestObject];
+        // var objectResult = context.Result as ObjectResult; //TODO
         var response = (context.Result as ObjectResult)?.Value;
 
         var requestHeaders = httpContext.Request.Headers.ToDictionary(x => x.Key, x => x.Value);
@@ -44,11 +44,11 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             _ => "Other"
         };
 
-        if (response is JsonNode responseJsonNode)
+        if (response is JsonDocument responseJsonNode)
         {
             try
             {
-                response = responseJsonNode.Deserialize<Dictionary<string, string>>() ?? new Dictionary<string, string>();
+                response = GetConcreteObject(responseJsonNode);
             }
             catch (Exception e)
             {
@@ -72,5 +72,35 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             response,
             requestHeaders,
             responseHeaders);
+    }
+
+    private static object? GetConcreteObject(JsonDocument dataJsonNode)
+    {
+        return ConvertElementToObject(dataJsonNode.RootElement);
+
+        object? ConvertElementToObject(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Object:
+                {
+                    var dic = element.EnumerateObject()
+                        .ToDictionary(k => k.Name, v => ConvertElementToObject(v.Value))!
+                        .Append(new KeyValuePair<string, object>("$type", "ErrorMock"))
+                        .ToDictionary(x => x.Key, x => x.Value);
+                    return dic;
+                }
+                case JsonValueKind.Array:
+                    return element.EnumerateArray()
+                        .Select(ConvertElementToObject)
+                        .ToArray();
+                case JsonValueKind.Number:
+                    return element.GetDecimal();
+                case JsonValueKind.True or JsonValueKind.False:
+                    return element.GetBoolean();
+                default:
+                    return element.GetString();
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Controllers;
 
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Abstract;
 using Application.Extensions;
 using Application.Requests.Wallets.SoftBet;
@@ -159,7 +158,7 @@ public class WalletISoftBetController : RestApiController
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string username,
-        [FromBody] JsonNode request,
+        [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {

@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Controllers;
 
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Softswiss;
@@ -55,7 +55,7 @@ public class WalletSoftswissController : RestApiController
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
-        [FromBody] JsonNode request,
+        [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {

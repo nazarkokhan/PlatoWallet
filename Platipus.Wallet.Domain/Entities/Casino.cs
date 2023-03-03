@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Domain.Entities;
 
-using System.Text.Json.Nodes;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 using Abstract.Generic;
 using Enums;
 
@@ -28,8 +29,7 @@ public class Casino : Entity<string>
 
     public GameEnvironment GameEnvironment { get; set; } = null!;
 
-    // public JsonNode Params { get; set; } = DefaultParams;
-    public Dictionary<string, JsonNode> Params { get; set; } = new();
+    public SpecificParams Params { get; set; } = new();
 
     public List<User> Users { get; set; } = new();
 
@@ -37,5 +37,24 @@ public class Casino : Entity<string>
 
     public List<CasinoGames> CasinoGames { get; set; } = new();
 
-    // private static readonly JsonNode DefaultParams = JsonNode.Parse("{}")!;
+    public record SpecificParams
+    {
+        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string OpenboxVendorUid { get; set; } = null!;
+
+        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string ReevoCallerId { get; set; } = null!;
+
+        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string ReevoCallerPassword { get; set; } = null!;
+
+        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Hub88PrivateWalletSecuritySign { get; set; } = null!;
+
+        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Hub88PublicGameServiceSecuritySign { get; set; } = null!;
+
+        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Hub88PrivateGameServiceSecuritySign { get; set; } = null!;
+    }
 }

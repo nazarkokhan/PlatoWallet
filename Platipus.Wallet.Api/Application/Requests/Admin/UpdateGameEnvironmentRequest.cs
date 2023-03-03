@@ -5,7 +5,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record CreateGameEnvironmentRequest(
+public record UpdateGameEnvironmentRequest(
         [property: DefaultValue("test")] string Id,
         [property: DefaultValue("https://test.platipusgaming.com/")] Uri BaseUrl,
         [property: DefaultValue("https://platipusgaming.cloud/qa/integration/vivo/test/index.html")] Uri UisBaseUrl)
@@ -24,16 +24,17 @@ public record CreateGameEnvironmentRequest(
             CreateGameEnvironmentRequest request,
             CancellationToken cancellationToken)
         {
-            var environmentExist = await _context.Set<GameEnvironment>()
+            var environment = await _context.Set<GameEnvironment>()
                 .Where(e => e.Id == request.Id)
-                .AnyAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (environmentExist)
+            if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentAlreadyExists);
 
-            var environment = new GameEnvironment(request.Id, request.BaseUrl, request.UisBaseUrl);
+            environment.BaseUrl = request.BaseUrl;
+            environment.UisBaseUrl = request.UisBaseUrl;
 
-            _context.Add(environment);
+            _context.Update(environment);
             await _context.SaveChangesAsync(cancellationToken);
 
             return ResultFactory.Success();

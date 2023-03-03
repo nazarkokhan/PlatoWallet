@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Controllers;
 
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.Dafabet;
 using Application.Requests.Wallets.Dafabet.Base.Response;
@@ -11,6 +11,7 @@ using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Platipus.Api.Common;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.Security;
@@ -70,7 +71,7 @@ public class WalletDafabetController : RestApiController
 
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
-        [FromBody] Dictionary<string, JsonNode> request,
+        [FromBody] Dictionary<string, JsonDocument> request,
         string casinoId,
         string method,
         [FromServices] WalletDbContext dbContext,
@@ -86,9 +87,10 @@ public class WalletDafabetController : RestApiController
 
         var sourceValues = request.Values
             .Select(
-                v => bool.TryParse(v.ToJsonString(), out var boolV)
-                    ? boolV.ToString().ToLower()
-                    : v.ToString())
+                v => v.RootElement.Map(
+                    r => r.ValueKind is JsonValueKind.True or JsonValueKind.False
+                        ? r.GetString()!.ToLower()
+                        : r.GetString()))
             .ToArray();
 
         var source = string.Concat(sourceValues);
