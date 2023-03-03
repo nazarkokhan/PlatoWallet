@@ -50,5 +50,6 @@ public enum ErrorCode
     InvalidPassword,
     GameServerApiError,
     EnvironmentDoesNotExists,
+    EnvironmentAlreadyExists,
     UserAlreadyExists,
 }

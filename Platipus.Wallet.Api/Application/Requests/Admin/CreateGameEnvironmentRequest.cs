@@ -28,8 +28,8 @@ public record CreateGameEnvironmentRequest(
                 .Where(e => e.Id == request.Id)
                 .AnyAsync(cancellationToken);
 
-            if (!environmentExist)
-                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
+            if (environmentExist)
+                return ResultFactory.Failure(ErrorCode.EnvironmentAlreadyExists);
 
             var environment = new GameEnvironment(request.Id, request.BaseUrl, request.UisBaseUrl);
 
