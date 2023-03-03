@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using Api.Extensions;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
@@ -225,10 +225,32 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         if (mockedError.Timeout is not null)
             await Task.Delay(mockedError.Timeout.Value);
 
+        const string responseItem = "response";
         switch (mockedError.ContentType)
         {
-            case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html:
-                context.HttpContext.Items.Add("response", mockedError.Body);
+            case MediaTypeNames.Application.Json:
+            {
+                object? response = null;
+                try
+                {
+                    response = JsonDocument.Parse(mockedError.Body);
+                    context.HttpContext.Items.Add(responseItem, response);
+                }
+                catch (Exception e)
+                {
+                    logger.LogWarning(e, "Error deserializing mocked error body");
+                    context.HttpContext.Items.Add(responseItem, mockedError.Body);
+                }
+
+                executedContext.Result = new ObjectResult(response ?? mockedError.Body)
+                {
+                    StatusCode = (int?)mockedError.HttpStatusCode
+                };
+                break;
+            }
+            case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html or _:
+            {
+                context.HttpContext.Items.Add(responseItem, mockedError.Body);
                 executedContext.Result = new ContentResult
                 {
                     Content = mockedError.Body,
@@ -236,24 +258,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     ContentType = mockedError.ContentType
                 };
                 break;
-            case MediaTypeNames.Application.Json or _:
-                object? response = null;
-                try
-                {
-                    response = JsonNode.Parse(mockedError.Body);
-                    context.HttpContext.Items.Add("response", response);
-                }
-                catch (Exception e)
-                {
-                    logger.LogWarning(e, "Error deserializing mocked error body");
-                    context.HttpContext.Items.Add("response", mockedError.Body);
-                }
-
-                executedContext.Result = new ObjectResult(response ?? mockedError.Body)
-                {
-                    StatusCode = (int?)mockedError.HttpStatusCode,
-                };
-                break;
+            }
         }
 
         mockedError.Count -= 1;

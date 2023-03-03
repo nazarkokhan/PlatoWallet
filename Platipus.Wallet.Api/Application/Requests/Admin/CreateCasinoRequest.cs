@@ -1,7 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using System.ComponentModel;
-using System.Text.Json.Nodes;
+using System.Diagnostics.CodeAnalysis;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
@@ -12,7 +12,7 @@ public record CreateCasinoRequest(
     [property: DefaultValue("12345678")] string SignatureKey,
     CasinoProvider Provider,
     List<string> Currencies,
-    Dictionary<string, JsonNode>? Params,
+    Casino.SpecificParams Params,
     [property: DefaultValue("test")] string? Environment) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<CreateCasinoRequest, IResult>
@@ -70,32 +70,31 @@ public record CreateCasinoRequest(
                 CasinoCurrencies = matchedCurrencies
                     .Select(c => new CasinoCurrencies { CurrencyId = c.Id })
                     .ToList(),
+                Params = request.Params
             };
 
-            if (request.Params is not null)
-                casino.Params = request.Params;
-
-            if (casino.Provider is CasinoProvider.Reevo)
-            {
-                var callerId = (string?)casino.Params[CasinoParams.ReevoCallerId];
-                var callerPassword = (string?)casino.Params[CasinoParams.ReevoCallerPassword];
-
-                if (callerId is null || callerPassword is null)
-                    return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
-            }
-
-            if (casino.Provider is CasinoProvider.Openbox)
-            {
-                var vendorId = (string?)casino.Params[CasinoParams.OpenboxVendorUid];
-
-                if (vendorId is null)
-                    return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
-            }
+            if (!ValidateParams(casino))
+                return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
 
             _context.Add(casino);
-            await _context.SaveChangesAsync(cancellationToken);
 
+            await _context.SaveChangesAsync(cancellationToken);
             return ResultFactory.Success();
+        }
+
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
+        private static bool ValidateParams(Casino casino)
+        {
+            return casino.Provider switch
+            {
+                CasinoProvider.Openbox when (casino.Params.OpenboxVendorUid is null) => false,
+                CasinoProvider.Hub88 when (casino.Params.Hub88PrivateWalletSecuritySign is null
+                                        || casino.Params.Hub88PublicGameServiceSecuritySign is null
+                                        || casino.Params.Hub88PrivateGameServiceSecuritySign is null) => false,
+                CasinoProvider.Reevo when (casino.Params.ReevoCallerId is null || casino.Params.ReevoCallerPassword is null) =>
+                    false,
+                _ => true
+            };
         }
     }
 }

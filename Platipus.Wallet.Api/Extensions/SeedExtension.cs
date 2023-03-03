@@ -4,7 +4,6 @@
 namespace Platipus.Wallet.Api.Extensions;
 
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
@@ -20,7 +19,7 @@ public static class SeedExtension
         public string SignatureKey { get; set; }
         public int? InternalId { get; set; }
         public string GameEnvironmentId { get; set; }
-        public Dictionary<string, JsonNode> Params { get; set; }
+        public Casino.SpecificParams Params { get; set; }
         public List<string> CasinoCurrencies { get; set; }
         public List<string> CasinoGames { get; set; }
     }

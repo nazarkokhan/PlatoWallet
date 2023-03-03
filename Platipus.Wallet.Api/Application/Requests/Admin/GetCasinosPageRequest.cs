@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
-using System.Text.Json.Nodes;
 using Base.Common.Page;
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -72,7 +71,7 @@ public record GetCasinosPageRequest(
         string SignatureKey,
         int InternalId,
         string GameEnvironmentId,
-        Dictionary<string, JsonNode> Params,
+        Casino.SpecificParams Params,
         List<string> Currencies,
         List<string> Games);
 }

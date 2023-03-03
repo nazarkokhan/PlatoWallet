@@ -2,7 +2,7 @@
 
 namespace Platipus.Wallet.Api.Controllers;
 
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.Psw;
 using Application.Requests.Wallets.Psw.Base.Response;
@@ -72,7 +72,7 @@ public class WalletPswController : RestApiController
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
-        [FromBody] JsonNode request,
+        [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
