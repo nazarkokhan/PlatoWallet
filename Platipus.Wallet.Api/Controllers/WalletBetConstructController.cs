@@ -7,11 +7,13 @@ using Application.Requests.Wallets.BetConstruct;
 using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Requests.Wallets.Everymatrix.Base;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Extensions;
 using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.SkipFilterToGetHash;
 using StartupSettings.Filters.TODO;
@@ -20,7 +22,7 @@ using BetConstructBaseResponse = Application.Requests.Wallets.BetConstruct.Base.
 [Route("wallet/betconstruct")]
 [MockedErrorActionFilter(Order = 1)]
 [BetConstructVerifyHashFilter(Order = 2)]
-// [JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
 [ProducesResponseType(typeof(BetConstructErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetConstructController : RestApiController
 {

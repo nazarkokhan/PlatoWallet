@@ -7,7 +7,10 @@ using Results.ResultToResultMappers;
 using Services.Wallet;
 using static Results.BetConstruct.BetConstructResultFactory;
 
-public record BetConstructGetPlayerInfoRequest(GetPlayerInfoData Data, DateTime Time, string Hash)
+public record BetConstructGetPlayerInfoRequest(
+        GetPlayerInfoData Data,
+        DateTime Time,
+        string Hash)
     : IBetConstructBaseRequest<GetPlayerInfoData>, IRequest<IBetConstructResult<BetConstructGetPlayerInfoResponse>>
 {
     public class Handler

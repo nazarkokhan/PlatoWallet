@@ -1,8 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct.Base.Response;
 
-public record BetConstructGetPlayerInfoResponse(bool Result,
-    string? ErrorDescription,
-    int? ErrorCode,
+using System.Text.Json.Serialization;
+
+public record BetConstructGetPlayerInfoResponse(
+    bool Result,
+    [property: JsonPropertyName("err_desc")] string? ErrDesc,
+    [property: JsonPropertyName("err_code")] int? ErrCode,
     string CurrencyId,
     decimal TotalBalance,
     string NickName,

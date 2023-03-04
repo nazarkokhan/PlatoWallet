@@ -7,7 +7,10 @@ using Results.BetConstruct.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
-public record BetConstructDepositRequest(DepositData Data, DateTime Time, string Hash)
+public record BetConstructDepositRequest(
+        DepositData Data,
+        DateTime Time,
+        string Hash)
     : IBetConstructBaseRequest<DepositData>, IRequest<IBetConstructResult<BetConstructBaseResponse>>
 {
     public class Handler : IRequestHandler<BetConstructWithdrawRequest, IBetConstructResult<BetConstructBaseResponse>>
