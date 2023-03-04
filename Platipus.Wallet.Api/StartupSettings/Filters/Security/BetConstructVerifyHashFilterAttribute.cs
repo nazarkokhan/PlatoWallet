@@ -66,7 +66,7 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
 
         var isHashValid = BetConstructSecurityHash.IsValid(
             baseRequest.Hash,
-            baseRequest.Time.ToString(CultureInfo.InvariantCulture),
+            baseRequest.Time.ToString(),
             dataToCompare,
             session.CasinoSignatureKey);
 

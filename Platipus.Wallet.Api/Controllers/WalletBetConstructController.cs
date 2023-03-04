@@ -13,6 +13,7 @@ using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 using StartupSettings.Filters.SkipFilterToGetHash;
@@ -22,7 +23,7 @@ using BetConstructBaseResponse = Application.Requests.Wallets.BetConstruct.Base.
 [Route("wallet/betconstruct")]
 [MockedErrorActionFilter(Order = 1)]
 [BetConstructVerifyHashFilter(Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+[JsonSettingsName(nameof(CasinoProvider.BetConstruct))]
 [ProducesResponseType(typeof(BetConstructErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetConstructController : RestApiController
 {
@@ -65,11 +66,13 @@ public class WalletBetConstructController : RestApiController
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
         DateTime time,
-        [FromBody] JsonDocument requestData,
+        BetConstructDataRequest data,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
-        if (requestData is null)
+
+        //TODO some problem
+        if (data is null)
         {
             return ResultFactory.Failure(ErrorCode.Unknown).ToActionResult();
         }
@@ -87,9 +90,11 @@ public class WalletBetConstructController : RestApiController
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
+        var dataToCompare = JsonConvert.SerializeObject(data);
+
         var hash = BetConstructSecurityHash.Compute(
-            time.ToString(CultureInfo.InvariantCulture),
-            requestData.ToString()!,
+            time.ToString(),
+            dataToCompare,
             casino.SecuritySignKey);
 
         return Ok(hash);
