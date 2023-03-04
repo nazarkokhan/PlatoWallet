@@ -1,14 +1,14 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct;
 
+using Base;
+using Base.Response;
 using Results.BetConstruct;
 using Results.BetConstruct.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using BetConstructBaseResponse = Base.Response.BetConstructBaseResponse;
-using IBetConstructBaseRequest = Base.IBetConstructBaseRequest;
 
 public record BetConstructDepositRequest(DepositData Data, DateTime Time, string Hash)
-    : IBetConstructBaseRequest, IRequest<IBetConstructResult<BetConstructBaseResponse>>
+    : IBetConstructBaseRequest<DepositData>, IRequest<IBetConstructResult<BetConstructBaseResponse>>
 {
     public class Handler : IRequestHandler<BetConstructWithdrawRequest, IBetConstructResult<BetConstructBaseResponse>>
     {

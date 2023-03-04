@@ -9,7 +9,7 @@ using Results.ResultToResultMappers;
 using Services.Wallet;
 
 public record BetConstructWithdrawRequest(WithdrawData Data, DateTime Time, string Hash)
-    : IBetConstructBaseRequest, IRequest<IBetConstructResult<BetConstructBaseResponse>>
+    : IBetConstructBaseRequest<WithdrawData>, IRequest<IBetConstructResult<BetConstructBaseResponse>>
 {
     public class Handler : IRequestHandler<BetConstructWithdrawRequest, IBetConstructResult<BetConstructBaseResponse>>
     {

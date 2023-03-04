@@ -9,7 +9,7 @@ using Services.Wallet;
 using static Results.BetConstruct.BetConstructResultFactory;
 
 public record BetConstructRollbackTransactionRequest(RollbackData Data, DateTime Time, string Hash)
-    : IBetConstructBaseRequest, IRequest<IBetConstructResult<BetConstructBaseResponse>>
+    : IBetConstructBaseRequest<RollbackData>, IRequest<IBetConstructResult<BetConstructBaseResponse>>
 {
     public class Handler : IRequestHandler<BetConstructRollbackTransactionRequest, IBetConstructResult<BetConstructBaseResponse>>
     {

@@ -8,7 +8,7 @@ using Services.Wallet;
 using static Results.BetConstruct.BetConstructResultFactory;
 
 public record BetConstructGetPlayerInfoRequest(GetPlayerInfoData Data, DateTime Time, string Hash)
-    : IBetConstructBaseRequest, IRequest<IBetConstructResult<BetConstructGetPlayerInfoResponse>>
+    : IBetConstructBaseRequest<GetPlayerInfoData>, IRequest<IBetConstructResult<BetConstructGetPlayerInfoResponse>>
 {
     public class Handler
         : IRequestHandler<BetConstructGetPlayerInfoRequest, IBetConstructResult<BetConstructGetPlayerInfoResponse>>
