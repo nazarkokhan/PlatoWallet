@@ -46,4 +46,4 @@ public record BetConstructGetPlayerInfoRequest(GetPlayerInfoData Data, DateTime 
     }
 }
 
-public record GetPlayerInfoData(string Token);
+public record GetPlayerInfoData(string Token) : IBetConstructDataRequest;

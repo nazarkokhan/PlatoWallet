@@ -49,4 +49,4 @@ public record RollbackData(
     string Token,
     string TransactionId,
     string GameId
-);
+) : IBetConstructDataRequest;

@@ -54,4 +54,4 @@ public record DepositData(
     string GameId,
     string CurrencyId,
     decimal BetAmount,
-    string BetInfo);
+    string BetInfo) : IBetConstructDataRequest;

@@ -55,4 +55,4 @@ public record WithdrawData(
     string GameId,
     string CurrencyId,
     decimal BetAmount,
-    string BetInfo);
+    string BetInfo) : IBetConstructDataRequest;
