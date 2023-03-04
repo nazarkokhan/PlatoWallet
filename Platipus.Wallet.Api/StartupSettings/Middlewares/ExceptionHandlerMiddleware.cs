@@ -2,9 +2,9 @@ namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 
 using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
+using Application.Requests.Wallets.Everymatrix.Base;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
-using Application.Requests.Wallets.TODO.BetConstruct.Base;
 using Application.Requests.Wallets.TODO.EmaraPlay.Base;
 using Application.Requests.Wallets.TODO.PariMatch.Base;
 using Application.Results.BetConstruct;

@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.Wallets.TODO.BetConstruct.Base;
+namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix.Base;
 
 public record BetConstructErrorResponse(
     bool Result,

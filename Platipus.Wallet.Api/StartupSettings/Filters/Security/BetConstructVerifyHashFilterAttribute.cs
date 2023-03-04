@@ -19,7 +19,7 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var suppress =
-            context.ActionDescriptor.FilterDescriptors.FirstOrDefault(f => f.Filter.GetTypeName() == "SkipVerifyFilterAttribute");
+            context.ActionDescriptor.FilterDescriptors.FirstOrDefault(f => f.Filter.GetTypeName() == nameof(SkipVerifyFilterAttribute));
 
         if (suppress is not null)
         {
