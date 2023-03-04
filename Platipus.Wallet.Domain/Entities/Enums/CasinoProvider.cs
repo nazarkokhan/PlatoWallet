@@ -15,5 +15,6 @@ public enum CasinoProvider
     Reevo,
     Everymatrix,
     PariMatch,
-    EmaraPlay
+    EmaraPlay,
+    BetConstruct
 }

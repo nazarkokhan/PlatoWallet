@@ -9,7 +9,7 @@ public static class BetConstructSecurityHash
         string externalMd5,
         string time,
         string data,
-        string secretKey = "BetConstructPrivateKey")
+        string secretKey)
     {
         var md5 = Compute(time, data, secretKey);
 
@@ -18,7 +18,7 @@ public static class BetConstructSecurityHash
         return isValid;
     }
 
-    public static string Compute(string time, string data, string secretKey = "BetConstructPrivateKey")
+    public static string Compute(string time, string data, string secretKey)
     {
         var dataString = $"{secretKey}{time}{data}";
         var dataBytes = Encoding.UTF8.GetBytes(dataString);

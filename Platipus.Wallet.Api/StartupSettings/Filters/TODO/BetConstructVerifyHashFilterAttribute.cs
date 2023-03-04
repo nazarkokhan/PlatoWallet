@@ -9,13 +9,23 @@ using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Results.BetConstruct;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using SkipFilterToGetHash;
 
 public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        var suppress =
+            context.ActionDescriptor.FilterDescriptors.FirstOrDefault(f => f.Filter.GetTypeName() == "SkipVerifyFilterAttribute");
+
+        if (suppress is not null)
+        {
+            await next();
+            return;
+        }
 
         var baseRequest = context.ActionArguments.Values
             .OfType<IBetConstructBaseRequest<IBetConstructDataRequest>>()
@@ -23,7 +33,8 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
 
         if (baseRequest is null)
         {
-            context.Result = BetConstructResultFactory.Failure<BetConstructBaseResponse>(BetConstructErrorCode.GeneralError).ToActionResult();
+            context.Result = BetConstructResultFactory.Failure<BetConstructBaseResponse>(BetConstructErrorCode.GeneralError)
+                .ToActionResult();
             return;
         }
 
@@ -51,10 +62,13 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
             return;
         }
 
-
         var dataToCompare = JsonSerializer.Serialize(baseRequest.Data);
 
-        var isHashValid = BetConstructSecurityHash.IsValid(baseRequest.Hash, baseRequest.Time.ToString(CultureInfo.InvariantCulture), dataToCompare);
+        var isHashValid = BetConstructSecurityHash.IsValid(
+            baseRequest.Hash,
+            baseRequest.Time.ToString(CultureInfo.InvariantCulture),
+            dataToCompare,
+            session.CasinoSignatureKey);
 
         if (!isHashValid)
         {
@@ -66,5 +80,4 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
 
         await next();
     }
-
 }

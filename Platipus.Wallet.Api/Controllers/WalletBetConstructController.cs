@@ -1,5 +1,7 @@
 namespace Platipus.Wallet.Api.Controllers;
 
+using System.Globalization;
+using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.BetConstruct;
 using Application.Requests.Wallets.BetConstruct.Base.Response;
@@ -10,11 +12,12 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StartupSettings.Filters;
+using StartupSettings.Filters.SkipFilterToGetHash;
 using StartupSettings.Filters.TODO;
 
 [Route("wallet/betconstruct")]
 [MockedErrorActionFilter(Order = 1)]
-[BetConstructVerifyHashFilter (Order = 2)]
+[BetConstructVerifyHashFilter(Order = 2)]
 // [JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
 // [ProducesResponseType(typeof(EverymatrixErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetConstructController : RestApiController
@@ -53,23 +56,38 @@ public class WalletBetConstructController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
 
+    [SkipVerifyFilter]
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
-        string username,
-        string route,
+        string casinoId,
+        DateTime time,
+        [FromBody] JsonDocument requestData,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
-        var user = await dbContext.Set<User>()
-            .Where(u => u.Username == username)
-            .Select(u => new { CasinoSignatureKey = u.Casino.SignatureKey })
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        if (requestData is null)
+        {
+            return ResultFactory.Failure(ErrorCode.Unknown).ToActionResult();
+        }
 
-        if (user is null)
-            return ResultFactory.Failure(ErrorCode.UserNotFound).ToActionResult();
+        var casino = await dbContext.Set<Casino>()
+            .Where(c => c.Id == casinoId)
+            .Select(
+                c => new
+                {
+                    c.SignatureKey,
+                    SecuritySignKey = c.SignatureKey
+                })
+            .FirstOrDefaultAsync(cancellationToken);
 
-        var securityValue = EverymatrixSecurityHash.Compute(route, user.CasinoSignatureKey);
+        if (casino is null)
+            return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
-        return Ok(securityValue);
+        var hash = BetConstructSecurityHash.Compute(
+            time.ToString(CultureInfo.InvariantCulture),
+            requestData.ToString()!,
+            casino.SecuritySignKey);
+
+        return Ok(hash);
     }
 }
