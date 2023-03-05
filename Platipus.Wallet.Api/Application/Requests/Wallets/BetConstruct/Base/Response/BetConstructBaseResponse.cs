@@ -6,5 +6,5 @@ public record class BetConstructBaseResponse(
     bool Result,
     [property: JsonPropertyName("err_desc")] string? ErrDesc,
     [property: JsonPropertyName("err_code")] int? ErrCode,
-    long TransactionId,
+    string TransactionId, //TODO must be long
     decimal Balance);

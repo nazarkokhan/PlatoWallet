@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.StartupSettings.Filters.TODO;
 
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
@@ -62,11 +63,13 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var dataToCompare = JsonSerializer.Serialize(baseRequest.Data);
+        var dataToSerialize = baseRequest.Data as object;
+
+        var dataToCompare = JsonSerializer.Serialize(dataToSerialize);
 
         var isHashValid = BetConstructSecurityHash.IsValid(
             baseRequest.Hash,
-            baseRequest.Time.ToString(),
+            baseRequest.Time.ToString("dd-MM-yyyy HH:mm:ss"),
             dataToCompare,
             session.CasinoSignatureKey);
 

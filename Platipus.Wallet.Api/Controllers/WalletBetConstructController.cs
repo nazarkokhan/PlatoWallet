@@ -44,7 +44,7 @@ public class WalletBetConstructController : RestApiController
     public async Task<IActionResult> Bet(
         BetConstructWithdrawRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("deposit")]
     [ProducesResponseType(typeof(BetConstructBaseResponse), StatusCodes.Status200OK)]
@@ -70,8 +70,6 @@ public class WalletBetConstructController : RestApiController
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
-
-        //TODO some problem
         if (data is null)
         {
             return ResultFactory.Failure(ErrorCode.Unknown).ToActionResult();
@@ -93,7 +91,7 @@ public class WalletBetConstructController : RestApiController
         var dataToCompare = JsonConvert.SerializeObject(data);
 
         var hash = BetConstructSecurityHash.Compute(
-            time.ToString(),
+            time.ToString("dd-MM-yyyy HH:mm:ss"),
             dataToCompare,
             casino.SecuritySignKey);
 

@@ -87,7 +87,6 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                    options.JsonSerializerOptions.Converters.Add(new JsonDateTimeFormat());
                 });
 
         return builder.Services;

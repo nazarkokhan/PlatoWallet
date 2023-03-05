@@ -28,7 +28,7 @@ public record BetConstructWithdrawRequest(WithdrawData Data, DateTime Time, stri
                 request.Data.Token,
                 request.Data.RoundId,
                 request.Data.TransactionId,
-                request.Data.BetAmount / 100000m,
+                request.Data.BetAmount,
                 request.Data.CurrencyId,
                 cancellationToken: cancellationToken);
 
@@ -40,7 +40,7 @@ public record BetConstructWithdrawRequest(WithdrawData Data, DateTime Time, stri
                 true,
                 null,
                 null,
-               long.Parse(data.Transaction.Id), //TODO transaction.id is guid but required long
+                data.Transaction.Id, //TODO transaction.id is guid but required long
                 data.Balance);
 
             return BetConstructResultFactory.Success(response);
@@ -51,7 +51,7 @@ public record BetConstructWithdrawRequest(WithdrawData Data, DateTime Time, stri
 public record WithdrawData(
     string Token,
     string TransactionId,
-    string RoundId,
+    string? RoundId,
     string GameId,
     string CurrencyId,
     decimal BetAmount,

@@ -37,7 +37,7 @@ public record BetConstructRollbackTransactionRequest(RollbackData Data, DateTime
                 true,
                 null,
                 null,
-                long.Parse(data.Transaction.Id), //TODO transaction.id is guid but required long
+                data.Transaction.Id,
                 data.Balance);
 
             return Success(response);

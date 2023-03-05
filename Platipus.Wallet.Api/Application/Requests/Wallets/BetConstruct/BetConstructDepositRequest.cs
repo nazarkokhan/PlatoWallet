@@ -13,7 +13,7 @@ public record BetConstructDepositRequest(
         string Hash)
     : IBetConstructBaseRequest<DepositData>, IRequest<IBetConstructResult<BetConstructBaseResponse>>
 {
-    public class Handler : IRequestHandler<BetConstructWithdrawRequest, IBetConstructResult<BetConstructBaseResponse>>
+    public class Handler : IRequestHandler<BetConstructDepositRequest, IBetConstructResult<BetConstructBaseResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -23,14 +23,14 @@ public record BetConstructDepositRequest(
         }
 
         public async Task<IBetConstructResult<BetConstructBaseResponse>> Handle(
-            BetConstructWithdrawRequest request,
+            BetConstructDepositRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.WinAsync(
                 request.Data.Token,
                 request.Data.RoundId,
                 request.Data.TransactionId,
-                request.Data.BetAmount / 100000m,
+                request.Data.BetAmount,
                 currency: request.Data.CurrencyId,
                 cancellationToken: cancellationToken);
 
@@ -42,7 +42,7 @@ public record BetConstructDepositRequest(
                 true,
                 null,
                 null,
-                long.Parse(data.Transaction.Id),
+                data.Transaction.Id,
                 data.Balance);
 
             return BetConstructResultFactory.Success(response);
@@ -53,7 +53,7 @@ public record BetConstructDepositRequest(
 public record DepositData(
     string Token,
     string TransactionId,
-    string RoundId,
+    string? RoundId,
     string GameId,
     string CurrencyId,
     decimal BetAmount,
