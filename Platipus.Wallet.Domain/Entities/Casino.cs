@@ -37,24 +37,17 @@ public class Casino : Entity<string>
 
     public List<CasinoGames> CasinoGames { get; set; } = new();
 
-    public record SpecificParams
-    {
-        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string OpenboxVendorUid { get; set; } = null!;
-
-        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string ReevoCallerId { get; set; } = null!;
-
-        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string ReevoCallerPassword { get; set; } = null!;
-
-        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string Hub88PrivateWalletSecuritySign { get; set; } = null!;
-
-        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string Hub88PublicGameServiceSecuritySign { get; set; } = null!;
-
-        [DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string Hub88PrivateGameServiceSecuritySign { get; set; } = null!;
-    }
+    public record SpecificParams(
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string OpenboxVendorUid = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string ReevoCallerId = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string ReevoCallerPassword = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string Hub88PrivateWalletSecuritySign = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string Hub88PublicGameServiceSecuritySign = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string Hub88PrivateGameServiceSecuritySign = null!);
 }

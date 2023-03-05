@@ -27,9 +27,9 @@ public record LogInRequest(
         [property: DefaultValue("openbox")] string CasinoId,
         [property: DefaultValue("extragems")] string Game,
         [property: DefaultValue("test")] string? Environment,
-        LaunchMode? LaunchMode,
         [property: DefaultValue("treba_default_a")] string? Lobby,
-        [property: DefaultValue(null)] string? Device)
+        LaunchMode LaunchMode,
+        [property: DefaultValue(null)] string? Device = null)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
@@ -59,9 +59,6 @@ public record LogInRequest(
 
         public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
         {
-            if (request.LaunchMode is null)
-                request = request with { LaunchMode = Api.LaunchMode.Real };
-
             var casino = await _context.Set<Casino>()
                 .Where(c => c.Id == request.CasinoId)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -139,7 +136,7 @@ public record LogInRequest(
                         user.Username,
                         user.Currency.Id,
                         request.Game,
-                        request.LaunchMode ?? Api.LaunchMode.Real,
+                        request.LaunchMode,
                         cancellationToken: cancellationToken);
 
                     launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
@@ -237,10 +234,10 @@ public record LogInRequest(
                     break;
                 case CasinoProvider.Uis:
                     launchUrl = GetUisLaunchUrl(
-                        request.Environment,
+                        environment.UisBaseUrl,
                         session.Id,
                         casino.InternalId,
-                        request.LaunchMode!);
+                        request.LaunchMode);
                     break;
                 case CasinoProvider.Reevo:
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
@@ -306,10 +303,10 @@ public record LogInRequest(
     }
 
     private static string GetUisLaunchUrl(
-        string? requestLaunchUrlEnvironment,
+        Uri baseUri,
         string token,
         int operatorId,
-        LaunchMode? launchType)
+        LaunchMode launchType)
     {
         var queryParameters = new List<KeyValuePair<string, string?>>();
 
@@ -338,9 +335,7 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(
-            new Uri("https://platipusgaming.cloud/qa/integration/vivo/test/index.html"),
-            $"{queryString.ToUriComponent()}");
+        var uri = new Uri(baseUri, queryString.ToUriComponent());
 
         return uri.AbsoluteUri;
     }

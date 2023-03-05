@@ -13,7 +13,7 @@ using StartupSettings.Filters.Security;
 
 [Route("wallet/uis")]
 [MockedErrorActionFilter(Order = 1)]
-[UisSecurityFilter(Order = 2)]
+// [UisSecurityFilter(Order = 2)]
 [Produces(MediaTypeNames.Application.Xml)]
 [Consumes(MediaTypeNames.Application.Xml)]
 public class WalletUisController : ApiController
