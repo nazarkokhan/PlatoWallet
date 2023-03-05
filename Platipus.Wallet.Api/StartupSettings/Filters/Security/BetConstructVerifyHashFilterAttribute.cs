@@ -63,7 +63,7 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var dataToSerialize = baseRequest.Data as object;
+        var dataToSerialize = baseRequest.Data as object; //TODO because its cast as object? when it serialized decimal value becomes like int
 
         var dataToCompare = JsonSerializer.Serialize(dataToSerialize);
 
