@@ -188,7 +188,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
 
         var mockedErrorQuery = dbContext.Set<MockedError>()
-            .FromSqlRaw("select * from mocked_errors for update")
+            // .FromSqlRaw("select * from mocked_errors for update")
             .Where(e => e.Method == currentMethod);
 
         mockedErrorQuery = context.Controller switch
