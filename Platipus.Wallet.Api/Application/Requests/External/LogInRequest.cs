@@ -317,18 +317,18 @@ public record LogInRequest(
         switch (launchType)
         {
             //Play now
-            case Api.LaunchMode.Real:
+            case LaunchMode.Real:
                 queryParameters.Add(tokenKvp!);
                 queryParameters.Add(operatorIdKvp!);
                 break;
             //Play now + Demo
-            case Api.LaunchMode.Fun:
+            case LaunchMode.Fun:
                 queryParameters.Add(tokenKvp!);
                 queryParameters.Add(operatorIdKvp!);
                 queryParameters.Add(demoKvp!);
                 break;
             //Demo
-            case Api.LaunchMode.Demo:
+            case LaunchMode.Demo:
                 queryParameters.Add(demoKvp!);
                 break;
         }

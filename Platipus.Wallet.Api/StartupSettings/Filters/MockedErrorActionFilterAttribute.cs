@@ -187,8 +187,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var dbTransaction = await dbContext.Database.BeginTransactionAsync();
-
         var mockedErrorQuery = dbContext.Set<MockedError>()
             .FromSqlRaw("select * from mocked_errors for update")
             .Where(e => e.Method == currentMethod);
@@ -273,7 +271,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             dbContext.Update(mockedError);
 
         await dbContext.SaveChangesAsync();
-        await dbTransaction.CommitAsync();
     }
 
     private static void LogOpenboxMockingFailed(ILogger logger, OpenboxSingleRequest openboxRequest)

@@ -52,4 +52,7 @@ public enum ErrorCode
     EnvironmentDoesNotExists,
     EnvironmentAlreadyExists,
     UserAlreadyExists,
+
+    MaxTimeout3Mins,
+    ErrorMockAlreadyExists
 }
