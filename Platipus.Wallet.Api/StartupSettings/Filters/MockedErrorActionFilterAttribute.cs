@@ -183,7 +183,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         if (usernameOrSession is null)
         {
-            logger.LogDebug("Can not mock error for request because UserName is empty");
+            logger.LogDebug("Can not mock error for request because Username is empty");
             return;
         }
 
