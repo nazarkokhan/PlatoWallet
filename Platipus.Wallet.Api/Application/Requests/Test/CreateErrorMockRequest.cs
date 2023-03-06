@@ -75,7 +75,7 @@ public record CreateErrorMockRequest(
                     HttpStatusCode = item.HttpStatusCode,
                     ContentType = contentType,
                     Count = item.Count <= 0 ? 1 : item.Count,
-                    ExecutionOrder = i,
+                    ExecutionOrder = i + 1,
                     Timeout = item.Timeout,
                     UserId = user.Id
                 };
