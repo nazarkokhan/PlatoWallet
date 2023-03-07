@@ -16,9 +16,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
+using StartupSettings.Filters.Security;
 using StartupSettings.Filters.SkipFilterToGetHash;
-using StartupSettings.Filters.TODO;
 using BetConstructBaseResponse = Application.Requests.Wallets.BetConstruct.Base.Response.BetConstructBaseResponse;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 [Route("wallet/betconstruct")]
 [MockedErrorActionFilter(Order = 1)]
@@ -88,7 +89,7 @@ public class WalletBetConstructController : RestApiController
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
-        var dataToCompare = JsonConvert.SerializeObject(data);
+        var dataToCompare = JsonSerializer.Serialize(data);
 
         var hash = BetConstructSecurityHash.Compute(
             time.ToString("dd-MM-yyyy HH:mm:ss"),

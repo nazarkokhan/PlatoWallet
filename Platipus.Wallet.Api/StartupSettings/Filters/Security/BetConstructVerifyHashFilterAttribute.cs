@@ -1,7 +1,5 @@
-namespace Platipus.Wallet.Api.StartupSettings.Filters.TODO;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
@@ -10,7 +8,6 @@ using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Results.BetConstruct;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using SkipFilterToGetHash;
@@ -20,7 +17,8 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var suppress =
-            context.ActionDescriptor.FilterDescriptors.FirstOrDefault(f => f.Filter.GetTypeName() == nameof(SkipVerifyFilterAttribute));
+            context.ActionDescriptor.FilterDescriptors.FirstOrDefault(
+                f => f.Filter.GetTypeName() == nameof(SkipVerifyFilterAttribute));
 
         if (suppress is not null)
         {
@@ -63,7 +61,7 @@ public class BetConstructVerifyHashFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var dataToSerialize = baseRequest.Data as object; //TODO because its cast as object? when it serialized decimal value becomes like int
+        var dataToSerialize = Convert.ChangeType(baseRequest.Data, baseRequest.Data.GetType());
 
         var dataToCompare = JsonSerializer.Serialize(dataToSerialize);
 
