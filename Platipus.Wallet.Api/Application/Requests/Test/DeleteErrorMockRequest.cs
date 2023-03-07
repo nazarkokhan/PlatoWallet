@@ -23,6 +23,13 @@ public record DeleteErrorMockRequest(
             DeleteErrorMockRequest request,
             CancellationToken cancellationToken)
         {
+            var userExists = await _context.Set<User>()
+                .Where(u => u.Username == request.Username)
+                .AnyAsync(cancellationToken);
+
+            if (!userExists)
+                return ResultFactory.Failure(ErrorCode.UserNotFound);
+
             var deletedErrorMocks = await _context.Set<MockedError>()
                 .Where(e => e.User.Username == request.Username && e.Method == request.Method)
                 .ExecuteDeleteAsync(cancellationToken: cancellationToken);
