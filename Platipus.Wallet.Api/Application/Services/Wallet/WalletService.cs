@@ -67,7 +67,7 @@ public class WalletService : IWalletService
     {
         try
         {
-            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            // await using var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var transactionAlreadyExists = await _context.Set<Transaction>()
                 .TagWith("Bet")
@@ -108,7 +108,7 @@ public class WalletService : IWalletService
                 round = new Round(roundId) { UserId = user.Id };
                 _context.Add(round);
 
-                await _context.SaveChangesAsync(cancellationToken);
+                // await _context.SaveChangesAsync(cancellationToken);
             }
 
             if (round.Finished)
@@ -119,17 +119,21 @@ public class WalletService : IWalletService
 
             user.Balance -= amount;
             if (roundFinished)
+            {
                 round.Finish();
+                _context.Update(round);
+            }
 
-            var transaction = new Transaction(transactionId, amount, TransactionType.Bet);
+            var transaction = new Transaction(transactionId, amount, TransactionType.Bet)
+            {
+                Round = round
+            };
 
             _context.Add(transaction);
-            round.Transactions.Add(transaction);
 
-            _context.Update(round);
             await _context.SaveChangesAsync(cancellationToken);
 
-            await dbTransaction.CommitAsync(cancellationToken);
+            // await dbTransaction.CommitAsync(cancellationToken);
 
             var response = new WalletBetWinRollbackResponse(
                 user.Id,
@@ -160,7 +164,7 @@ public class WalletService : IWalletService
     {
         try
         {
-            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            // var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var transactionAlreadyExists = await _context.Set<Transaction>()
                 .TagWith("Win")
@@ -205,7 +209,7 @@ public class WalletService : IWalletService
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            await dbTransaction.CommitAsync(cancellationToken);
+            // await dbTransaction.CommitAsync(cancellationToken);
 
             var response = new WalletBetWinRollbackResponse(
                 user.Id,
@@ -233,7 +237,7 @@ public class WalletService : IWalletService
     {
         try
         {
-            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            // var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var user = await _context.Set<User>()
                 .TagWith("Rollback")
@@ -270,7 +274,7 @@ public class WalletService : IWalletService
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            await dbTransaction.CommitAsync(cancellationToken);
+            // await dbTransaction.CommitAsync(cancellationToken);
 
             var response = new WalletBetWinRollbackResponse(
                 user.Id,
@@ -301,7 +305,7 @@ public class WalletService : IWalletService
     {
         try
         {
-            var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            // var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var transactionAlreadyExists = await _context.Set<Transaction>()
                 .TagWith("Award")
@@ -361,7 +365,7 @@ public class WalletService : IWalletService
             _context.Update(user);
 
             await _context.SaveChangesAsync(cancellationToken);
-            await dbTransaction.CommitAsync(cancellationToken);
+            // await dbTransaction.CommitAsync(cancellationToken);
 
             var response = new WalletGetBalanceResponse(
                 user.Id,

@@ -22,7 +22,7 @@ public class AdminController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpDelete("error-mock")]
-    public async Task<IActionResult> MockError(DeleteErrorMockRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> MockError([FromQuery] DeleteErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpGet("environments")]

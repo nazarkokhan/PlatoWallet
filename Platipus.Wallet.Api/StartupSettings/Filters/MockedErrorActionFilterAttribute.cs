@@ -33,14 +33,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         var httpContext = context.HttpContext;
         var services = httpContext.RequestServices;
         var logger = services.GetRequiredService<ILogger<MockedErrorActionFilterAttribute>>();
-        var dbContext = services.GetRequiredService<WalletDbContext>();
 
-        logger.LogInformation("Handling request with possible mocked error");
+        logger.LogDebug("Handling request with possible mocked error");
 
         var executedContext = await next();
 
         MockedErrorMethod? currentMethod;
-        string? usernameOrSession;
+        string? sessionOrUsername;
 
         var actionArgumentsValues = context.ActionArguments.Values;
         if (context.Controller is WalletOpenboxController)
@@ -54,7 +53,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 return;
             }
 
-            usernameOrSession = openboxPayloadObj.Token;
+            sessionOrUsername = openboxPayloadObj.Token;
             currentMethod = singleRequest.Method switch
             {
                 OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
@@ -72,7 +71,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             var singleRequest = actionArgumentsValues.OfType<SoftBetSingleRequest>().Single();
 
-            usernameOrSession = singleRequest.Username;
+            sessionOrUsername = singleRequest.Username;
             currentMethod = singleRequest.Action.Command switch
             {
                 "balance" => MockedErrorMethod.Balance,
@@ -86,7 +85,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             var singleRequest = actionArgumentsValues.OfType<ReevoSingleRequest>().Single();
 
-            usernameOrSession = singleRequest.Username;
+            sessionOrUsername = singleRequest.Username;
             currentMethod = singleRequest.Action switch
             {
                 "balance" => MockedErrorMethod.Balance,
@@ -134,7 +133,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 _ => null
             };
 
-            usernameOrSession = context.Controller switch
+            sessionOrUsername = context.Controller switch
             {
                 WalletPswController => actionArgumentsValues
                     .OfType<IPswBaseRequest>()
@@ -178,34 +177,38 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         if (currentMethod is null)
         {
-            logger.LogDebug("ErrorMockMethod not found");
+            logger.LogCritical("ErrorMockMethod not found");
             return;
         }
 
-        if (usernameOrSession is null)
+        if (sessionOrUsername is null)
         {
-            logger.LogDebug("Can not mock error for request because Username is empty");
+            logger.LogCritical("Can not mock error for request because Username is empty");
             return;
         }
 
         var cache = httpContext.RequestServices.GetRequiredService<IAppCache>();
 
+        var concurrencyKey = $"em:{sessionOrUsername}:{currentMethod.ToString()}";
         var slim = cache.GetOrAdd<SemaphoreSlim>(
-            $"em:{usernameOrSession}:{((int)currentMethod).ToString()}",
+            concurrencyKey,
             _ => new SemaphoreSlim(1));
 
         try
         {
             await slim.WaitAsync();
 
+            var dbContext = services.GetRequiredService<WalletDbContext>();
+
+            // dbContext.
             var mockedErrorQuery = dbContext.Set<MockedError>()
                 // .FromSqlRaw("select * from mocked_errors for update")
                 .Where(e => e.Method == currentMethod);
 
             mockedErrorQuery = context.Controller switch
             {
-                WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == usernameOrSession)),
-                _ => mockedErrorQuery.Where(e => e.User.Username == usernameOrSession)
+                WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == sessionOrUsername)),
+                _ => mockedErrorQuery.Where(e => e.User.Username == sessionOrUsername)
             };
 
             // dbContext.Database.SetCommandTimeout(TimeSpan.FromDays(1));
@@ -215,7 +218,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             if (mockedError is null)
             {
-                logger.LogInformation("Mocked error not found");
+                logger.LogDebug("Mocked error not found");
                 return;
             }
 
@@ -224,6 +227,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 new
                 {
                     mockedError.Id,
+                    ExecutionConcurrencyKey = concurrencyKey,
+                    SessionOrUsername = sessionOrUsername,
                     mockedError.Method,
                     mockedError.Body,
                     mockedError.HttpStatusCode,
@@ -273,18 +278,32 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 }
             }
 
-            mockedError.Count -= 1;
+            var updMockQuery = dbContext.Set<MockedError>()
+                .Where(e => e.Id == mockedError.Id);
 
-            if (mockedError.Count <= 0)
-            {
-                logger.LogInformation("Mocked error count is 0, deleting it");
-                dbContext.Remove(mockedError);
-                logger.LogInformation("Mocked error deleted");
-            }
+            int updMockRows;
+            if (mockedError.Count > 1)
+                updMockRows = await updMockQuery
+                    .ExecuteUpdateAsync(e => e.SetProperty(p => p.Count, p => p.Count - 1));
             else
-                dbContext.Update(mockedError);
+                updMockRows = await updMockQuery
+                    .ExecuteDeleteAsync();
 
-            await dbContext.SaveChangesAsync();
+            if (updMockRows is not 1)
+                logger.LogCritical("Error mock executed but {AffectedRows} rows affected on upd/del", updMockRows);
+
+            // mockedError.Count -= 1;
+            //
+            // if (mockedError.Count <= 0)
+            // {
+            //     logger.LogInformation("Mocked error count is 0, deleting it");
+            //     dbContext.Remove(mockedError);
+            //     logger.LogInformation("Mocked error deleted");
+            // }
+            // else
+            //     dbContext.Update(mockedError);
+            //
+            // await dbContext.SaveChangesAsync();
         }
         catch (Exception e)
         {

@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.Test;
 
 using System.ComponentModel;
 using System.Net;
-using System.Net.Mime;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;

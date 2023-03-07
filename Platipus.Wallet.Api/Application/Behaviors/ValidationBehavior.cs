@@ -2,10 +2,11 @@ namespace Platipus.Wallet.Api.Application.Behaviors;
 
 using Extensions;
 using FluentValidation;
+using Results.Base;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
-    where TResponse : class, IPswResult
+    where TResponse : class, IBaseResult
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -30,6 +31,6 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         if (result.IsValid)
             return await next();
 
-        return DynamicResultFactory.CreateFailureResult<TResponse>(PswErrorCode.BadParametersInTheRequest);
+        return DynamicResultFactory.CreateFailureResult<TResponse>();
     }
 }

@@ -9,7 +9,8 @@ public record BaseResult<TError, TData> : BaseResult<TError>, IBaseResult<TError
 
     public BaseResult(
         TError errorCode,
-        Exception? exception = null) : base(errorCode, exception)
+        Exception? exception = null)
+        : base(errorCode, exception)
     {
         Data = default!;
     }
