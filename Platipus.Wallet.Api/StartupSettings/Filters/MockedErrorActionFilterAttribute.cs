@@ -19,10 +19,12 @@ using Controllers;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
+using LazyCache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 {
@@ -187,90 +189,110 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var mockedErrorQuery = dbContext.Set<MockedError>()
-            // .FromSqlRaw("select * from mocked_errors for update")
-            .Where(e => e.Method == currentMethod);
+        var cache = httpContext.RequestServices.GetRequiredService<IAppCache>();
 
-        mockedErrorQuery = context.Controller switch
+        var slim = cache.GetOrAdd<SemaphoreSlim>(
+            $"em:{usernameOrSession}:{((int)currentMethod).ToString()}",
+            _ => new SemaphoreSlim(1));
+
+        try
         {
-            WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == usernameOrSession)),
-            _ => mockedErrorQuery.Where(e => e.User.Username == usernameOrSession)
-        };
+            await slim.WaitAsync();
 
-        dbContext.Database.SetCommandTimeout(TimeSpan.FromDays(1));
-        var mockedErrors = await mockedErrorQuery.ToListAsync();
-        var mockedError = mockedErrors.MinBy(e => e.ExecutionOrder);
+            var mockedErrorQuery = dbContext.Set<MockedError>()
+                // .FromSqlRaw("select * from mocked_errors for update")
+                .Where(e => e.Method == currentMethod);
 
-        if (mockedError is null)
-        {
-            logger.LogInformation("Mocked error not found");
-            return;
-        }
-
-        logger.LogInformation(
-            "Executing mocked error {@MockedError}",
-            new
+            mockedErrorQuery = context.Controller switch
             {
-                mockedError.Method,
-                mockedError.Body,
-                mockedError.HttpStatusCode,
-                mockedError.ContentType,
-                mockedError.Count,
-                mockedError.UserId,
-                mockedError.Timeout
-            });
+                WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == usernameOrSession)),
+                _ => mockedErrorQuery.Where(e => e.User.Username == usernameOrSession)
+            };
 
-        if (mockedError.Timeout is not null)
-            await Task.Delay(mockedError.Timeout.Value);
+            // dbContext.Database.SetCommandTimeout(TimeSpan.FromDays(1));
+            var mockedError = await mockedErrorQuery
+                .OrderBy(e => e.ExecutionOrder)
+                .FirstOrDefaultAsync();
 
-        const string responseItem = "response";
-        switch (mockedError.ContentType)
-        {
-            case MediaTypeNames.Application.Json:
+            if (mockedError is null)
             {
-                object? response = null;
-                try
+                logger.LogInformation("Mocked error not found");
+                return;
+            }
+
+            logger.LogInformation(
+                "Executing mocked error {@MockedError}",
+                new
                 {
-                    response = JsonDocument.Parse(mockedError.Body);
-                    context.HttpContext.Items.Add(responseItem, response);
+                    mockedError.Method,
+                    mockedError.Body,
+                    mockedError.HttpStatusCode,
+                    mockedError.ContentType,
+                    mockedError.Count,
+                    mockedError.UserId,
+                    mockedError.Timeout
+                });
+
+            if (mockedError.Timeout is not null)
+                await Task.Delay(mockedError.Timeout.Value);
+
+            const string responseItem = "response";
+            switch (mockedError.ContentType)
+            {
+                case MediaTypeNames.Application.Json:
+                {
+                    object? response = null;
+                    try
+                    {
+                        response = JsonDocument.Parse(mockedError.Body);
+                        context.HttpContext.Items.Add(responseItem, response);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogWarning(e, "Error deserializing mocked error body");
+                        context.HttpContext.Items.Add(responseItem, mockedError.Body);
+                    }
+
+                    executedContext.Result = new ObjectResult(response ?? mockedError.Body)
+                    {
+                        StatusCode = (int?)mockedError.HttpStatusCode
+                    };
+                    break;
                 }
-                catch (Exception e)
+                case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html or _:
                 {
-                    logger.LogWarning(e, "Error deserializing mocked error body");
                     context.HttpContext.Items.Add(responseItem, mockedError.Body);
+                    executedContext.Result = new ContentResult
+                    {
+                        Content = mockedError.Body,
+                        StatusCode = (int?)mockedError.HttpStatusCode,
+                        ContentType = mockedError.ContentType
+                    };
+                    break;
                 }
-
-                executedContext.Result = new ObjectResult(response ?? mockedError.Body)
-                {
-                    StatusCode = (int?)mockedError.HttpStatusCode
-                };
-                break;
             }
-            case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html or _:
+
+            mockedError.Count -= 1;
+
+            if (mockedError.Count <= 0)
             {
-                context.HttpContext.Items.Add(responseItem, mockedError.Body);
-                executedContext.Result = new ContentResult
-                {
-                    Content = mockedError.Body,
-                    StatusCode = (int?)mockedError.HttpStatusCode,
-                    ContentType = mockedError.ContentType
-                };
-                break;
+                logger.LogInformation("Mocked error count is 0, deleting it");
+                dbContext.Remove(mockedError);
+                logger.LogInformation("Mocked error deleted");
             }
+            else
+                dbContext.Update(mockedError);
+
+            await dbContext.SaveChangesAsync();
         }
-
-        mockedError.Count -= 1;
-
-        if (mockedError.Count <= 0)
+        catch (Exception e)
         {
-            logger.LogInformation("Mocked error count is 0, deleting it");
-            dbContext.Remove(mockedError);
-            logger.LogInformation("Mocked error deleted");
+            logger.LogCritical(e, "Mocking error failed");
         }
-        else
-            dbContext.Update(mockedError);
-
-        await dbContext.SaveChangesAsync();
+        finally
+        {
+            slim.Release();
+        }
     }
 
     private static void LogOpenboxMockingFailed(ILogger logger, OpenboxSingleRequest openboxRequest)
