@@ -7,10 +7,10 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public record DeleteErrorMockRequest(
-    [property: DefaultValue("reevo_nazar_123")] string Username,
-    MockedErrorMethod Method) : IRequest<IPswResult>
+    [property: DefaultValue("reevo_platipus")] string Username,
+    MockedErrorMethod Method) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<DeleteErrorMockRequest, IPswResult>
+    public class Handler : IRequestHandler<DeleteErrorMockRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -19,7 +19,7 @@ public record DeleteErrorMockRequest(
             _context = context;
         }
 
-        public async Task<IPswResult> Handle(
+        public async Task<IResult> Handle(
             DeleteErrorMockRequest request,
             CancellationToken cancellationToken)
         {
@@ -28,9 +28,9 @@ public record DeleteErrorMockRequest(
                 .ExecuteDeleteAsync(cancellationToken: cancellationToken);
 
             if (deletedErrorMocks is 0)
-                return PswResultFactory.Failure(PswErrorCode.BadParametersInTheRequest);
+                return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
 
-            return PswResultFactory.Success();
+            return ResultFactory.Success();
         }
     }
 }

@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 {
@@ -224,11 +223,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 "Executing mocked error {@MockedError}",
                 new
                 {
+                    mockedError.Id,
                     mockedError.Method,
                     mockedError.Body,
                     mockedError.HttpStatusCode,
                     mockedError.ContentType,
                     mockedError.Count,
+                    mockedError.ExecutionOrder,
                     mockedError.UserId,
                     mockedError.Timeout
                 });
