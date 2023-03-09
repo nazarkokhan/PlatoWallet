@@ -15,6 +15,8 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
+using Application.Requests.Wallets.Uis;
+using Application.Requests.Wallets.Uis.Base;
 using Controllers;
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -39,7 +41,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         var executedContext = await next();
 
         MockedErrorMethod? currentMethod;
-        string? sessionOrUsername;
+        string? usernameOrSession;
+        var searchMockBySession = false;
+
+        var requestRoute = context.ActionDescriptor.EndpointMetadata
+            .OfType<HttpMethodAttribute>()
+            .SingleOrDefault()
+            ?.Template;
 
         var actionArgumentsValues = context.ActionArguments.Values;
         if (context.Controller is WalletOpenboxController)
@@ -53,7 +61,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 return;
             }
 
-            sessionOrUsername = openboxPayloadObj.Token;
+            usernameOrSession = openboxPayloadObj.Token;
             currentMethod = singleRequest.Method switch
             {
                 OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
@@ -71,7 +79,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             var singleRequest = actionArgumentsValues.OfType<SoftBetSingleRequest>().Single();
 
-            sessionOrUsername = singleRequest.Username;
+            usernameOrSession = singleRequest.Username;
             currentMethod = singleRequest.Action.Command switch
             {
                 "balance" => MockedErrorMethod.Balance,
@@ -85,7 +93,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         {
             var singleRequest = actionArgumentsValues.OfType<ReevoSingleRequest>().Single();
 
-            sessionOrUsername = singleRequest.Username;
+            usernameOrSession = singleRequest.Username;
             currentMethod = singleRequest.Action switch
             {
                 "balance" => MockedErrorMethod.Balance,
@@ -95,28 +103,37 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 _ => null
             };
         }
-        //TODO
-        // else if (context.Controller is WalletUisController)
-        // {
-        //     var singleRequest = context.ActionArguments.Values.OfType<IUisHashRequest>().Single();
-        //
-        //     usernameOrSession = singleRequest.Username;
-        //     currentMethod = singleRequest.Action.Command switch
-        //     {
-        //         "balance" => ErrorMockMethod.Balance,
-        //         "bet" => ErrorMockMethod.Bet,
-        //         "win" => ErrorMockMethod.Win,
-        //         "rollback" => ErrorMockMethod.Rollback,
-        //         _ => null
-        //     };
-        // }
+        else if (context.Controller is WalletUisController)
+        {
+            var request = context.ActionArguments.Values.OfType<IUisUserIdRequest>().Single();
+
+            if (requestRoute is null)
+            {
+                logger.LogCritical("Request route not found");
+                return;
+            }
+
+            if (requestRoute is "get-balance")
+                currentMethod = MockedErrorMethod.Balance;
+            else if (requestRoute is "change-balance")
+            {
+                var changeBalanceRequest = (UisChangeBalanceRequest)request;
+
+                currentMethod = changeBalanceRequest.TrnType switch
+                {
+                    "BET" => MockedErrorMethod.Bet,
+                    "WIN" => MockedErrorMethod.Win,
+                    "CANCELBET" => MockedErrorMethod.Rollback,
+                    _ => null
+                };
+            }
+            else
+                return;
+
+            usernameOrSession = request.UserId;
+        }
         else
         {
-            var requestRoute = context.ActionDescriptor.EndpointMetadata
-                .OfType<HttpMethodAttribute>()
-                .SingleOrDefault()
-                ?.Template;
-
             if (requestRoute is null)
             {
                 logger.LogCritical("Request route not found");
@@ -133,46 +150,43 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 _ => null
             };
 
-            sessionOrUsername = context.Controller switch
+            switch (context.Controller)
             {
-                WalletPswController => actionArgumentsValues
-                    .OfType<IPswBaseRequest>()
-                    .SingleOrDefault()
-                    ?.SessionId,
-                WalletDafabetController => actionArgumentsValues
-                    .OfType<IDafabetRequest>()
-                    .SingleOrDefault()
-                    ?.PlayerId,
-                WalletOpenboxController => actionArgumentsValues
-                    .OfType<IOpenboxBaseRequest>()
-                    .SingleOrDefault()
-                    ?.Token,
-                WalletHub88Controller => actionArgumentsValues
-                    .OfType<IHub88BaseRequest>()
-                    .SingleOrDefault()
-                    ?.SupplierUser,
-                WalletSoftswissController => actionArgumentsValues
-                    .OfType<ISoftswissBaseRequest>()
-                    .SingleOrDefault()
-                    ?.SessionId,
-                WalletSwController => actionArgumentsValues
-                    .OfType<ISwBaseRequest>()
-                    .SingleOrDefault()
-                    ?.Token,
-                WalletBetflagController => actionArgumentsValues
-                    .OfType<IBetflagRequest>()
-                    .SingleOrDefault()
-                    ?.Key,
-                WalletReevoController => actionArgumentsValues
-                    .OfType<IReevoRequest>()
-                    .SingleOrDefault()
-                    ?.GameSessionId,
-                WalletEverymatrixController => actionArgumentsValues
-                    .OfType<IEveryMatrixRequest>()
-                    .SingleOrDefault()
-                    ?.Token,
-                _ => null
-            };
+                case WalletPswController:
+                    usernameOrSession = actionArgumentsValues.OfType<IPswBaseRequest>().SingleOrDefault()?.User;
+                    break;
+                case WalletDafabetController:
+                    usernameOrSession = actionArgumentsValues.OfType<IDafabetRequest>().SingleOrDefault()?.PlayerId;
+                    break;
+                case WalletOpenboxController:
+                    usernameOrSession = actionArgumentsValues.OfType<IOpenboxBaseRequest>().SingleOrDefault()?.Token;
+                    searchMockBySession = true;
+                    break;
+                case WalletHub88Controller:
+                    usernameOrSession = actionArgumentsValues.OfType<IHub88BaseRequest>().SingleOrDefault()?.SupplierUser;
+                    break;
+                case WalletSoftswissController:
+                    usernameOrSession = actionArgumentsValues.OfType<ISoftswissBaseRequest>().SingleOrDefault()?.UserId;
+                    break;
+                case WalletSwController:
+                    usernameOrSession = actionArgumentsValues.OfType<ISwBaseRequest>().SingleOrDefault()?.Token;
+                    searchMockBySession = true;
+                    break;
+                case WalletBetflagController:
+                    usernameOrSession = actionArgumentsValues.OfType<IBetflagRequest>().SingleOrDefault()?.Key;
+                    searchMockBySession = true;
+                    break;
+                case WalletReevoController:
+                    usernameOrSession = actionArgumentsValues.OfType<IReevoRequest>().SingleOrDefault()?.Username;
+                    break;
+                case WalletEverymatrixController:
+                    usernameOrSession = actionArgumentsValues.OfType<IEveryMatrixRequest>().SingleOrDefault()?.Token;
+                    searchMockBySession = true;
+                    break;
+                default:
+                    usernameOrSession = null;
+                    break;
+            }
         }
 
         if (currentMethod is null)
@@ -181,7 +195,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        if (sessionOrUsername is null)
+        if (usernameOrSession is null)
         {
             logger.LogCritical("Can not mock error for request because Username is empty");
             return;
@@ -189,7 +203,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
         var cache = httpContext.RequestServices.GetRequiredService<IAppCache>();
 
-        var concurrencyKey = $"em:{sessionOrUsername}:{currentMethod.ToString()}";
+        var concurrencyKey = $"em:{usernameOrSession}:{currentMethod.ToString()}";
         var slim = cache.GetOrAdd<SemaphoreSlim>(
             concurrencyKey,
             _ => new SemaphoreSlim(1));
@@ -200,18 +214,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             var dbContext = services.GetRequiredService<WalletDbContext>();
 
-            // dbContext.
             var mockedErrorQuery = dbContext.Set<MockedError>()
-                // .FromSqlRaw("select * from mocked_errors for update")
-                .Where(e => e.Method == currentMethod);
+                .Where(e => e.Method == currentMethod)
+                .Where(
+                    e => searchMockBySession
+                        ? e.User.Sessions.Any(s => s.Id == usernameOrSession)
+                        : e.User.Username == usernameOrSession);
 
-            mockedErrorQuery = context.Controller switch
-            {
-                WalletOpenboxController => mockedErrorQuery.Where(e => e.User.Sessions.Any(s => s.Id == sessionOrUsername)),
-                _ => mockedErrorQuery.Where(e => e.User.Username == sessionOrUsername)
-            };
-
-            // dbContext.Database.SetCommandTimeout(TimeSpan.FromDays(1));
             var mockedError = await mockedErrorQuery
                 .OrderBy(e => e.ExecutionOrder)
                 .FirstOrDefaultAsync();
@@ -228,7 +237,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 {
                     mockedError.Id,
                     ExecutionConcurrencyKey = concurrencyKey,
-                    SessionOrUsername = sessionOrUsername,
+                    SessionOrUsername = usernameOrSession,
                     mockedError.Method,
                     mockedError.Body,
                     mockedError.HttpStatusCode,
@@ -281,29 +290,12 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             var updMockQuery = dbContext.Set<MockedError>()
                 .Where(e => e.Id == mockedError.Id);
 
-            int updMockRows;
-            if (mockedError.Count > 1)
-                updMockRows = await updMockQuery
-                    .ExecuteUpdateAsync(e => e.SetProperty(p => p.Count, p => p.Count - 1));
-            else
-                updMockRows = await updMockQuery
-                    .ExecuteDeleteAsync();
+            var updMockRows = mockedError.Count > 1
+                ? await updMockQuery.ExecuteUpdateAsync(e => e.SetProperty(p => p.Count, p => p.Count - 1))
+                : await updMockQuery.ExecuteDeleteAsync();
 
             if (updMockRows is not 1)
                 logger.LogCritical("Error mock executed but {AffectedRows} rows affected on upd/del", updMockRows);
-
-            // mockedError.Count -= 1;
-            //
-            // if (mockedError.Count <= 0)
-            // {
-            //     logger.LogInformation("Mocked error count is 0, deleting it");
-            //     dbContext.Remove(mockedError);
-            //     logger.LogInformation("Mocked error deleted");
-            // }
-            // else
-            //     dbContext.Update(mockedError);
-            //
-            // await dbContext.SaveChangesAsync();
         }
         catch (Exception e)
         {
