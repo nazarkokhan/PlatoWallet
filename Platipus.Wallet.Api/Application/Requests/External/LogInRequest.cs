@@ -120,7 +120,6 @@ public record LogInRequest(
             if (environment is null)
                 return ResultFactory.Failure<Response>(ErrorCode.EnvironmentDoesNotExists);
 
-            // var baseUrl = new Uri($"https://{request.LaunchUrlEnvironment}.platipusgaming.com/");
             var baseUrl = casino.Provider is CasinoProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
 
             string launchUrl;
@@ -528,7 +527,10 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    public record Response(string SessionId, decimal Balance, string LaunchUrl) : PswBalanceResponse(Balance);
+    public record Response(
+        string SessionId,
+        decimal Balance,
+        string LaunchUrl) : PswBalanceResponse(Balance);
 
     public class Validator : AbstractValidator<SignUpRequest>
     {

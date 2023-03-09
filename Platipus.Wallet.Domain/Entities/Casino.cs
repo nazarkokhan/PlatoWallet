@@ -39,6 +39,9 @@ public class Casino : Entity<string>
 
     public record SpecificParams(
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        // ReSharper disable once InconsistentNaming
+        int? ISoftBetProviderId = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         string OpenboxVendorUid = null!,
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         string ReevoCallerId = null!,

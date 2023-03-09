@@ -8,6 +8,7 @@ using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.SoftBet.Base.Params;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Results.ISoftBet;
+using Application.Results.ISoftBet.WithData;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -55,14 +56,19 @@ public class WalletISoftBetController : RestApiController
         {
             var casino = await _context.Set<Casino>()
                 .Where(
-                    c =>
-                        c.InternalId == request.LicenseeId
-                     && c.Users.Select(u => u.Username).Contains(request.Username))
-                .Select(c => new { c.SignatureKey })
+                    c => c.InternalId == request.LicenseeId
+                      && c.Users.Any(u => u.Username == request.Username))
+                .Select(
+                    c => new
+                    {
+                        c.SignatureKey,
+                        c.Params.ISoftBetProviderId
+                    })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (casino is null)
-                return SoftBetResultFactory.Failure(SoftBetErrorMessage.IncorrectFormatOfParameters).ToActionResult();
+            if (casino is null || casino.ISoftBetProviderId != providerId)
+                return SoftBetResultFactory.Failure(SoftBetErrorMessage.ConfigurationForGivenParametersDoesNotExist)
+                    .ToActionResult();
 
             var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
             var isValidHash = SoftbetSecurityHash.IsValid(hash, rawRequestBytes, casino.SignatureKey);
@@ -74,10 +80,16 @@ public class WalletISoftBetController : RestApiController
 
             if (action.Command is "initsession")
             {
+                if (request.Token is null)
+                    return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
+
                 var initSessionRequest = new SoftBetInitSessionRequest(request.Token, request.Username);
                 var initSessionResponse = await _mediator.Send(initSessionRequest, cancellationToken);
                 return initSessionResponse.ToActionResult();
             }
+
+            if (request.SessionId is null)
+                return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
             var session = await _context.Set<Session>()
                 .Where(c => c.Id == request.SessionId)
@@ -92,7 +104,7 @@ public class WalletISoftBetController : RestApiController
             if (session is null || session.ExpirationDate < DateTime.UtcNow)
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
-            object? payloadRequestObj = null;
+            IRequest<ISoftBetResult<SoftBetBalanceResponse>>? payloadRequestObj = null;
             switch (action.Command)
             {
                 case "balance":
@@ -142,9 +154,7 @@ public class WalletISoftBetController : RestApiController
             if (payloadRequestObj is null)
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.IncorrectFormatOfParameters).ToActionResult();
 
-            var responseObj = await _mediator.Send(payloadRequestObj, cancellationToken);
-            if (responseObj is not ISoftBetResult response)
-                return SoftBetResultFactory.Failure(SoftBetErrorMessage.GeneralRequestError).ToActionResult();
+            var response = await _mediator.Send(payloadRequestObj, cancellationToken);
 
             return response.ToActionResult();
         }
