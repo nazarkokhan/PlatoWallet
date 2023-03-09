@@ -105,30 +105,37 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
         else if (context.Controller is WalletUisController)
         {
-            var request = context.ActionArguments.Values.OfType<IUisUserIdRequest>().Single();
-
             if (requestRoute is null)
             {
                 logger.LogCritical("Request route not found");
                 return;
             }
 
-            if (requestRoute is "get-balance")
-                currentMethod = MockedErrorMethod.Balance;
-            else if (requestRoute is "change-balance")
-            {
-                var changeBalanceRequest = (UisChangeBalanceRequest)request;
-
-                currentMethod = changeBalanceRequest.TrnType switch
-                {
-                    "BET" => MockedErrorMethod.Bet,
-                    "WIN" => MockedErrorMethod.Win,
-                    "CANCELBET" => MockedErrorMethod.Rollback,
-                    _ => null
-                };
-            }
-            else
+            var baseRequest = context.ActionArguments.Values.OfType<IUisRequest>().Single();
+            if (baseRequest is not IUisUserIdRequest request)
                 return;
+
+            switch (requestRoute)
+            {
+                case "get-balance":
+                    currentMethod = MockedErrorMethod.Balance;
+                    break;
+                case "change-balance":
+                {
+                    var changeBalanceRequest = (UisChangeBalanceRequest)request;
+
+                    currentMethod = changeBalanceRequest.TrnType switch
+                    {
+                        "BET" => MockedErrorMethod.Bet,
+                        "WIN" => MockedErrorMethod.Win,
+                        "CANCELBET" => MockedErrorMethod.Rollback,
+                        _ => null
+                    };
+                    break;
+                }
+                default:
+                    return;
+            }
 
             usernameOrSession = request.UserId;
         }
