@@ -87,7 +87,7 @@ public record LogInRequest(
                 IsTemporaryToken = true
             };
 
-            if (casino.Provider is not CasinoProvider.Reevo) //TODO same softswiss?
+            if (casino.Provider is not CasinoProvider.Reevo or CasinoProvider.Softswiss)
             {
                 _context.Add(session);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -203,7 +203,16 @@ public record LogInRequest(
                         (long)user.Balance, //TODO //TODO why i left first todo here?
                         cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
+                    if (getGameLinkResult.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = getGameLinkResult.Data;
+
+                    session.Id = data.SessionId;
+                    _context.Add(session);
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    launchUrl = data.LaunchOptions.GameUrl;
                     break;
                 }
                 case CasinoProvider.Sw:
