@@ -87,7 +87,7 @@ public record LogInRequest(
                 IsTemporaryToken = true
             };
 
-            if (casino.Provider is not CasinoProvider.Reevo)
+            if (casino.Provider is not CasinoProvider.Reevo) //TODO same softswiss?
             {
                 _context.Add(session);
                 await _context.SaveChangesAsync(cancellationToken);
