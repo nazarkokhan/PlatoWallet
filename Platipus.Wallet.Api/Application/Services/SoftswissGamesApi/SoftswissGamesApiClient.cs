@@ -44,34 +44,18 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         string casinoId,
         string user,
         string sessionId,
-        string game,
+        int gameId,
         string currency,
         long balance,
         CancellationToken cancellationToken = default)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<WalletDbContext>();
-
-        var gameEntity = await dbContext.Set<Game>()
-            .Where(g => g.LaunchName == game)
-            .Select(
-                c => new
-                {
-                    GameServerId = c.GameServiceId,
-                })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (gameEntity is null)
-            return SoftswissResultFactory.Failure<SoftswissGetGameLinkGameApiResponse>(
-                SoftswissErrorCode.GameIsNotAvailableToYourCasino);
-
         var response = await PostSignedRequestAsync<SoftswissGetLaunchUrlGameApiRequest, SoftswissGetGameLinkGameApiResponse>(
-            baseUrl.AbsoluteUri,
+            new Uri(baseUrl, "softswiss/sessions").AbsoluteUri,
             new SoftswissGetLaunchUrlGameApiRequest(
                 casinoId,
-                gameEntity.GameServerId,
+                gameId,
                 currency,
-                "de",
+                "en",
                 "46.53.162.55",
                 _currencyMultipliers.GetSumOut(currency, balance),
                 "desktop",
@@ -92,7 +76,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync(
-            "freespins/issue",
+            "softswiss/freespins/issue",
             request,
             cancellationToken);
 
@@ -104,7 +88,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync(
-            "freespins/cancel",
+            "softswiss/freespins/cancel",
             request,
             cancellationToken);
 
@@ -116,7 +100,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<SoftswissRoundDetailsGameApiRequest, SoftswissRoundDetailsGameApiResponse>(
-            "rounds/details",
+            "softswiss/rounds/details",
             request,
             cancellationToken);
 

@@ -10,7 +10,7 @@ public interface ISoftswissGamesApiClient
         string casinoId,
         string user,
         string sessionId,
-        string game,
+        int gameId,
         string currency,
         long balance,
         CancellationToken cancellationToken = default);

@@ -198,9 +198,9 @@ public record LogInRequest(
                         user.CasinoId,
                         user.Username,
                         session.Id,
-                        request.Game,
+                        game.GameServerId,
                         user.Currency.Id,
-                        (long)user.Balance, //TODO
+                        (long)user.Balance, //TODO //TODO why i left first todo here?
                         cancellationToken);
 
                     launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
