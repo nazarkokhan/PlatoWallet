@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
+using System.Xml;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
@@ -53,20 +54,33 @@ public record CreateErrorMockRequest(
                 };
 
                 var body = item.Body;
-                if (contentType is MediaTypeNames.Application.Json)
+                switch (contentType)
                 {
-                    try
-                    {
-                        body = JsonDocument.Parse(body).RootElement.ToString();
-                    }
-                    catch (Exception e)
-                    {
-                        return ResultFactory.Failure(ErrorCode.MaxTimeout3Mins, e);
-                    }
-                }
+                    case MediaTypeNames.Application.Json:
+                        try
+                        {
+                            body = JsonDocument.Parse(body).RootElement.ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            return ResultFactory.Failure(ErrorCode.InvalidJsonContent, e);
+                        }
 
-                if (item.Timeout > TimeSpan.FromMinutes(3))
-                    return ResultFactory.Failure(ErrorCode.MaxTimeout3Mins);
+                        break;
+                    case MediaTypeNames.Text.Xml:
+                        try
+                        {
+                            var doc = new XmlDocument();
+                            doc.LoadXml(body);
+                            body = doc.OuterXml;
+                        }
+                        catch (Exception e)
+                        {
+                            return ResultFactory.Failure(ErrorCode.InvalidXmlContent, e);
+                        }
+
+                        break;
+                }
 
                 var mockedError = new MockedError
                 {

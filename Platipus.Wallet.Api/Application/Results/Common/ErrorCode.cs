@@ -53,6 +53,11 @@ public enum ErrorCode
     EnvironmentAlreadyExists,
     UserAlreadyExists,
 
-    MaxTimeout3Mins,
-    ErrorMockAlreadyExists
+    ErrorMockAlreadyExists,
+    InvalidJsonContent,
+    InvalidXmlContent,
+
+    //game api
+    EmptyResponse,
+    InvalidResponse
 }
