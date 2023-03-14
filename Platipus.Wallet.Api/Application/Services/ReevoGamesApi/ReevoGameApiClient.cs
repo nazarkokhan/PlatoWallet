@@ -6,8 +6,6 @@ using Domain.Entities.Enums;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Results.Reevo;
-using Results.Reevo.WithData;
 
 public class ReevoGameApiClient : IReevoGameApiClient
 {
@@ -20,7 +18,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
         _hub88JsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Reevo)).JsonSerializerOptions;
     }
 
-    public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoGetGameGameApiResponse>>> GetGameAsync(
+    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameGameApiResponse>>> GetGameAsync(
         Uri baseUrl,
         ReevoGetGameGameApiRequest request,
         CancellationToken cancellationToken = default)
@@ -31,8 +29,8 @@ public class ReevoGameApiClient : IReevoGameApiClient
             cancellationToken);
     }
 
-    public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundAsync(
-        Uri? baseUrl,
+    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundAsync(
+        Uri baseUrl,
         ReevoAddFreeRoundsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -42,8 +40,8 @@ public class ReevoGameApiClient : IReevoGameApiClient
             cancellationToken);
     }
 
-    public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoGetGameHistoryGameApiResponse>>> GetGameHistory(
-        Uri? baseUrl,
+    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameHistoryGameApiResponse>>> GetGameHistoryAsync(
+        Uri baseUrl,
         ReevoGetGameHistoryGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -53,8 +51,8 @@ public class ReevoGameApiClient : IReevoGameApiClient
             cancellationToken);
     }
 
-    public async Task<IReevoResult<ReevoCommonBoxGameApiResponse<ReevoGetGameListGameApiResponse>>> CreateRewardAsync(
-        Uri? baseUrl,
+    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameListGameApiResponse>>> GetGameListAsync(
+        Uri baseUrl,
         ReevoGetGameListGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -64,18 +62,14 @@ public class ReevoGameApiClient : IReevoGameApiClient
             cancellationToken);
     }
 
-    private async Task<IReevoResult<ReevoCommonBoxGameApiResponse<TResponse>>> PostSignedRequestAsync<TRequest, TResponse>(
-        Uri? baseUrl,
+    private async Task<IResult<ReevoCommonBoxGameApiResponse<TResponse>>> PostSignedRequestAsync<TRequest, TResponse>(
+        Uri baseUrl,
         TRequest request,
         CancellationToken cancellationToken)
     {
         try
         {
-            if (baseUrl is not null)
-            {
-                // baseUrl = new Uri("http://localhost:5143");
-                baseUrl = new Uri(baseUrl, "reevo");
-            }
+            baseUrl = new Uri(baseUrl, "reevo");
 
             var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
 
@@ -84,7 +78,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
             if (string.IsNullOrWhiteSpace(responseString))
-                return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError);
+                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.EmptyResponse);
 
             var responseJsonNode = JsonNode.Parse(responseString);
 
@@ -93,22 +87,22 @@ public class ReevoGameApiClient : IReevoGameApiClient
             {
                 var errorResponse = responseJsonNode.Deserialize<ReevoErrorGameApiResponse>(_hub88JsonSerializerOptions);
                 if (errorResponse is null)
-                    return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError);
+                    return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidResponse);
                 var errorBox = new ReevoCommonBoxGameApiResponse<TResponse>(errorResponse, default!);
 
-                return ReevoResultFactory.Success(errorBox);
+                return ResultFactory.Success(errorBox);
             }
 
             var successResponse = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
             if (successResponse is null)
-                return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError);
+                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidResponse);
             var successBox = new ReevoCommonBoxGameApiResponse<TResponse>(null, successResponse);
 
-            return ReevoResultFactory.Success(successBox);
+            return ResultFactory.Success(successBox);
         }
         catch (Exception e)
         {
-            return ReevoResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ReevoErrorCode.InternalError, e);
+            return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.Unknown, e);
         }
     }
 }

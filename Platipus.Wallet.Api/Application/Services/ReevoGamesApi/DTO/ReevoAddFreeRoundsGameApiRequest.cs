@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Services.ReevoGamesApi.DTO;
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 public record ReevoAddFreeRoundsGameApiRequest(
@@ -13,4 +14,4 @@ public record ReevoAddFreeRoundsGameApiRequest(
     [property: JsonPropertyName("validFrom")] string ValidFrom,
     [property: JsonPropertyName("betlevel")] string BetLevel,
     string Currency,
-    string Method = "addFreeRounds");
+    [DefaultValue("addFreeRounds")] string Method = "addFreeRounds");

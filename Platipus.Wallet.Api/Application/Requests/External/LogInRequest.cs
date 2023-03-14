@@ -220,7 +220,7 @@ public record LogInRequest(
                         baseUrl,
                         session.Id,
                         $"{casino.Id}-{user.Currency.Id}",
-                        user.Username,
+                        user.Id.ToString(),
                         request.Game);
                     break;
                 case CasinoProvider.SoftBet:
@@ -251,15 +251,15 @@ public record LogInRequest(
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
                         baseUrl,
                         new ReevoGetGameGameApiRequest(
-                            "",
-                            "",
+                            casino.Params.ReevoCallerId,
+                            casino.Params.ReevoCallerPassword,
                             user.Username,
                             request.UserName,
                             request.Password,
                             "en",
                             game.GameServerId.ToString(),
                             request.Lobby ?? "",
-                            "0",
+                            request.LaunchMode is LaunchMode.Real ? "0" : "1",
                             user.Currency.Id,
                             casino.Id),
                         cancellationToken);
@@ -316,29 +316,17 @@ public record LogInRequest(
         int operatorId,
         LaunchMode launchType)
     {
-        var queryParameters = new List<KeyValuePair<string, string?>>();
+        var queryParameters = new Dictionary<string, string?>();
 
-        var tokenKvp = KeyValuePair.Create("token", token);
-        var operatorIdKvp = KeyValuePair.Create("operatorID", operatorId.ToString());
-        var demoKvp = KeyValuePair.Create("demo", bool.TrueString);
-
-        switch (launchType)
+        if (launchType is LaunchMode.Real or LaunchMode.Fun)
         {
-            //Play now
-            case LaunchMode.Real:
-                queryParameters.Add(tokenKvp!);
-                queryParameters.Add(operatorIdKvp!);
-                break;
-            //Play now + Demo
-            case LaunchMode.Fun:
-                queryParameters.Add(tokenKvp!);
-                queryParameters.Add(operatorIdKvp!);
-                queryParameters.Add(demoKvp!);
-                break;
-            //Demo
-            case LaunchMode.Demo:
-                queryParameters.Add(demoKvp!);
-                break;
+            queryParameters.Add("token", token);
+            queryParameters.Add("operatorID", operatorId.ToString());
+        }
+
+        if (launchType is LaunchMode.Fun or LaunchMode.Demo)
+        {
+            queryParameters.Add("demo", bool.TrueString);
         }
 
         var queryString = QueryString.Create(queryParameters);
@@ -374,6 +362,7 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
+    //TODO launchmode
     private static string GetOpenboxLaunchUrl(
         Uri baseUrl,
         string token,
@@ -388,7 +377,7 @@ public record LogInRequest(
             // { "brand", "openbox" },//TODO need?
             { nameof(token), token },
             { "agency-uid", agencyUid },
-            { "player-uid", playerUid.ToString() },
+            { "player-uid", playerUid },
             { "player-type", "1" },
             { "player-id", playerId },
             { "game-id", gameId },

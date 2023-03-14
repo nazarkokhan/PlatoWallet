@@ -1,8 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Services.ReevoGamesApi.DTO;
 
+using System.ComponentModel;
+
 public record ReevoGetGameListGameApiRequest(
     string ApiLogin,
     string ApiPassword,
     string RoundId,
     string Currency,
-    string Method = "getGameList");
+    [DefaultValue("getGameList")] string Method = "getGameList");

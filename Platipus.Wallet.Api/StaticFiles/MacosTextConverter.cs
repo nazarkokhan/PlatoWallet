@@ -1,3 +1,5 @@
+namespace Platipus.Wallet.Api.StaticFiles;
+
 using System.Text;
 
 public enum Layout
