@@ -12,13 +12,13 @@ public record SwRefundRequest(
     [property: BindProperty(Name = "providerid")] int ProviderId,
     [property: BindProperty(Name = "userid")] int UserId,
     [property: BindProperty(Name = "md5")] string Md5,
-    [property: BindProperty(Name = "amount")] decimal Amount,
+    [property: BindProperty(Name = "amount")] string Amount,
     [property: BindProperty(Name = "remotetranid")] string RemotetranId,
     [property: BindProperty(Name = "gameid")] int GameId,
     [property: BindProperty(Name = "gameName")] string GameName,
-    [property: BindProperty(Name = "roundid")] int RoundId,
+    [property: BindProperty(Name = "roundid")] long RoundId,
     [property: BindProperty(Name = "trntype")] string TrnType,
-    [property: BindProperty(Name = "token")] string Token) : ISwMd5Request, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
+    [property: BindProperty(Name = "token")] string Token) : ISwMd5AmountRequest, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
 {
     public class Handler : IRequestHandler<SwBetWinRequest, ISwResult<SwBetWinRefundFreespinResponse>>
     {
