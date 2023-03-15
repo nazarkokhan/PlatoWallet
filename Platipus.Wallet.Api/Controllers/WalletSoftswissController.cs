@@ -51,8 +51,13 @@ public class WalletSoftswissController : RestApiController
         SoftswissFreespinsRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}
 
-    [HttpPost("private/test/get-security-value")]
+[Route("wallet/private/softswiss")]
+[JsonSettingsName(nameof(CasinoProvider.Softswiss))]
+public class WalletSoftswissPrivateTestController : RestApiController
+{
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
         [FromBody] JsonDocument request,

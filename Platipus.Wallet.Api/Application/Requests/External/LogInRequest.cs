@@ -205,11 +205,24 @@ public record LogInRequest(
 
                     if (getGameLinkResult.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
-
                     var data = getGameLinkResult.Data;
 
-                    session.Id = data.SessionId;
-                    _context.Add(session);
+                    var existingSession = await _context.Set<Session>()
+                        .Where(s => s.Id == data.SessionId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (existingSession is not null)
+                    {
+                        existingSession.ExpirationDate = session.ExpirationDate;
+                        _context.Update(existingSession);
+                        session = existingSession;
+                    }
+                    else
+                    {
+                        session.Id = data.SessionId;
+                        _context.Add(session);
+                    }
+
                     await _context.SaveChangesAsync(cancellationToken);
 
                     launchUrl = data.LaunchOptions.GameUrl;

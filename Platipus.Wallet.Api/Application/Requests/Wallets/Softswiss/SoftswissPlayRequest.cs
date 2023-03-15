@@ -57,9 +57,6 @@ public record SoftswissPlayRequest(
 
                 case "bet":
                 {
-                    if (request.GameId is null)
-                        return SoftswissResultFactory.Failure<Response>(SoftswissErrorCode.BadRequest);
-
                     var walletResult = await _wallet.BetAsync(
                         request.SessionId,
                         request.GameId,

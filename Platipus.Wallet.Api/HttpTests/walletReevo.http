@@ -16,8 +16,8 @@ POST http://localhost:5143/reevo
 Content-Type: application/json
 
 {
-  "api_login": "",
-  "api_password": "",
+  "api_login": "reevo01",
+  "api_password": "reevo01",
   "user_id": "reevo_nazar",
   "user_nickname": "reevo_nazar",
   "user_password": "qwe123",
