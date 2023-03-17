@@ -45,7 +45,7 @@ public class WalletReevoController : RestApiController
                         r.CallerId,
                         r.CallerPassword,
                         r.Action,
-                        r.RemoteId ?? throw new ReevoMissingParameterException(nameof(r.RemoteId)),
+                        r.RemoteId,
                         r.Username,
                         r.GameIdHash ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.SessionId,

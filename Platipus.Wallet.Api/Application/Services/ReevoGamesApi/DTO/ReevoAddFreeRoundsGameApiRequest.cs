@@ -14,4 +14,4 @@ public record ReevoAddFreeRoundsGameApiRequest(
     [property: JsonPropertyName("validFrom")] string ValidFrom,
     [property: JsonPropertyName("betlevel")] string BetLevel,
     string Currency,
-    [DefaultValue("addFreeRounds")] string Method = "addFreeRounds");
+    [property: DefaultValue("addFreeRounds")] string Method = "addFreeRounds");

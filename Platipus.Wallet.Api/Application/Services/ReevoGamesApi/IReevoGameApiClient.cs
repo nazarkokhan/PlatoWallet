@@ -9,9 +9,14 @@ public interface IReevoGameApiClient
         ReevoGetGameGameApiRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundAsync(
+    Task<IResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundsAsync(
         Uri baseUrl,
         ReevoAddFreeRoundsGameApiRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<IResult<ReevoCommonBoxGameApiResponse<ReevoErrorGameApiResponse>>> RemoveFreeRoundsAsync(
+        Uri baseUrl,
+        ReevoRemoveFreeRoundsGameApiRequest request,
         CancellationToken cancellationToken = default);
 
     Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameHistoryGameApiResponse>>> GetGameHistoryAsync(

@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 
-public record ReevoAddFreeRoundRequest(
+public record ReevoRemoveFreeRoundsRequest(
     string Environment,
-    ReevoAddFreeRoundsGameApiRequest ApiRequest) : IRequest<IResult<object>>
+    ReevoRemoveFreeRoundsGameApiRequest ApiRequest) : IRequest<IResult<object>>
 {
-    public class Handler : IRequestHandler<ReevoAddFreeRoundRequest, IResult<object>>
+    public class Handler : IRequestHandler<ReevoRemoveFreeRoundsRequest, IResult<object>>
     {
         private readonly IReevoGameApiClient _gamesApiClient;
         private readonly WalletDbContext _context;
@@ -22,7 +22,7 @@ public record ReevoAddFreeRoundRequest(
         }
 
         public async Task<IResult<object>> Handle(
-            ReevoAddFreeRoundRequest request,
+            ReevoRemoveFreeRoundsRequest request,
             CancellationToken cancellationToken)
         {
             var environment = await _context.Set<GameEnvironment>()
@@ -32,7 +32,7 @@ public record ReevoAddFreeRoundRequest(
             if (environment is null)
                 return ResultFactory.Failure<object>(ErrorCode.EnvironmentDoesNotExists);
 
-            return await _gamesApiClient.AddFreeRoundsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+            return await _gamesApiClient.RemoveFreeRoundsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
         }
     }
 }

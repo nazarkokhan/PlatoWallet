@@ -266,8 +266,8 @@ public record LogInRequest(
                         new ReevoGetGameGameApiRequest(
                             casino.Params.ReevoCallerId,
                             casino.Params.ReevoCallerPassword,
+                            user.Id.ToString(),
                             user.Username,
-                            request.UserName,
                             request.Password,
                             "en",
                             game.GameServerId.ToString(),

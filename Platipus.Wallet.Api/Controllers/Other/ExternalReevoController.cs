@@ -13,9 +13,14 @@ public class ExternalReevoController : RestApiController
 
     public ExternalReevoController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("add-free-round")]
+    [HttpPost("add-free-rounds")]
     [ProducesResponseType(typeof(ReevoAddFreeRoundsGameApiResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddFreeRound(ReevoAddFreeRoundRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddFreeRounds(ReevoAddFreeRoundRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("remove-free-rounds")]
+    [ProducesResponseType(typeof(ReevoAddFreeRoundsGameApiResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RemoveFreeRounds(ReevoRemoveFreeRoundsRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("get-game-history")]

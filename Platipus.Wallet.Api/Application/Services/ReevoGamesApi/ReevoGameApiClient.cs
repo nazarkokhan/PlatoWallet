@@ -29,12 +29,23 @@ public class ReevoGameApiClient : IReevoGameApiClient
             cancellationToken);
     }
 
-    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundAsync(
+    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundsAsync(
         Uri baseUrl,
         ReevoAddFreeRoundsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         return await PostSignedRequestAsync<ReevoAddFreeRoundsGameApiRequest, ReevoAddFreeRoundsGameApiResponse>(
+            baseUrl,
+            request,
+            cancellationToken);
+    }
+
+    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoErrorGameApiResponse>>> RemoveFreeRoundsAsync(
+        Uri baseUrl,
+        ReevoRemoveFreeRoundsGameApiRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await PostSignedRequestAsync<ReevoRemoveFreeRoundsGameApiRequest, ReevoErrorGameApiResponse>(
             baseUrl,
             request,
             cancellationToken);
