@@ -33,7 +33,21 @@ public record ReevoRemoveFreeRoundsRequest(
             if (environment is null)
                 return ResultFactory.Failure<object>(ErrorCode.EnvironmentDoesNotExists);
 
-            return await _gamesApiClient.RemoveFreeRoundsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+            var apiRequest = request.ApiRequest;
+
+            var response = await _gamesApiClient.RemoveFreeRoundsAsync(environment.BaseUrl, apiRequest, cancellationToken);
+            if (response.IsFailure)
+                return response;
+
+            var data = response.Data;
+            if (data.ErrorMessage is not null)
+                return ResultFactory.Success(data.ErrorMessage);
+
+            await _context.Set<Award>()
+                .Where(e => e.Id == apiRequest.FreeroundId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            return ResultFactory.Success(data.Success);
         }
     }
 }

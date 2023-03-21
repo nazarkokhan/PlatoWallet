@@ -1,6 +1,8 @@
 namespace Platipus.Wallet.Api.Application.Requests.External.Reevo;
 
 using System.ComponentModel;
+using System.Globalization;
+using System.Text.Json.Nodes;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +35,34 @@ public record ReevoAddFreeRoundRequest(
             if (environment is null)
                 return ResultFactory.Failure<object>(ErrorCode.EnvironmentDoesNotExists);
 
-            return await _gamesApiClient.AddFreeRoundsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+            var response = await _gamesApiClient.AddFreeRoundsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+            if (response.IsFailure)
+                return response;
+
+            var data = response.Data;
+            if (data.ErrorMessage is not null)
+                return ResultFactory.Success(data.ErrorMessage);
+            var successData = data.Success;
+
+            var validTo = DateTime.ParseExact(request.ApiRequest.ValidTo, "yyyy-MM-dd", CultureInfo.DefaultThreadCurrentCulture)
+                .ToUniversalTime();
+
+            var awardId = JsonNode.Parse(successData.Response)?["freeround_id"]?.GetValue<string>();
+            if (awardId is null)
+                return ResultFactory.Failure<object>(ErrorCode.InvalidExternalResponse);
+
+            var user = await _context.Set<User>()
+                .Where(e => e.Username == request.ApiRequest.PlayerIds)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
+
+            var award = new Award(awardId, validTo) { UserId = user.Id };
+            _context.Add(award);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return response;
         }
     }
 }

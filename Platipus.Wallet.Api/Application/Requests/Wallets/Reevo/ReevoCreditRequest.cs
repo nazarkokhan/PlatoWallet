@@ -1,7 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Reevo;
 
 using Base;
+using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Reevo;
 using Results.Reevo.WithData;
 using Results.ResultToResultMappers;
@@ -43,6 +45,16 @@ public record ReevoCreditRequest(
             ReevoCreditRequest request,
             CancellationToken cancellationToken)
         {
+            if (request.IsFreeRoundWin is 1)
+            {
+                var award = await _context.Set<Award>()
+                    .Where(a => a.Id == request.FreeRoundId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (award is null || award.ValidUntil < DateTime.UtcNow)
+                    return ReevoResultFactory.Failure<ReevoSuccessResponse>(ReevoErrorCode.InternalError);
+            }
+
             var walletResult = await _wallet.WinAsync(
                 request.SessionId,
                 request.RoundId,

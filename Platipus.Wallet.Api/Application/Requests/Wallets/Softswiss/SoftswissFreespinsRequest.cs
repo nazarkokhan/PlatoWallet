@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Softswiss;
 
 using Base.Response;
 using Microsoft.Extensions.Options;
+using Results.ResultToResultMappers;
 using Services.Wallet;
 using StartupSettings.Options;
 
@@ -23,26 +24,25 @@ public record SoftswissFreespinsRequest(
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
-        public Task<ISoftswissResult<SoftswissBalanceResponse>> Handle(
+        public async Task<ISoftswissResult<SoftswissBalanceResponse>> Handle(
             SoftswissFreespinsRequest request,
             CancellationToken cancellationToken)
         {
-            // _wallet.AwardAsync(
-            //     request.SessionId,
-            //     "",
-            //     "",
-            //     request.TotalAmount,
-            //     request.IssueId, cancellationToken: cancellationToken);
-            // var walletRequest = request.Map(r => new AwardRequest(r.SessionId, r.Game));
-            //
-            // var walletResult = await _wallet.GetBalanceAsync(walletRequest, cancellationToken);
-            // if (walletResult.IsFailure)
-            //     walletResult.ToSoftswissResult();
-            //
-            // var response = walletResult.Data.Map(
-            //     d => new SoftswissBalanceResponse(_currencyMultipliers.GetSumOut(request.Currency, d.Balance)));
+            var walletResult = await _wallet.AwardAsync(
+                request.SessionId,
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                request.TotalAmount,
+                request.IssueId,
+                cancellationToken: cancellationToken);
 
-            return Task.FromResult<ISoftswissResult<SoftswissBalanceResponse>>(SoftswissResultFactory.Success(new SoftswissBalanceResponse(-9999)));
+            if (walletResult.IsFailure)
+                return walletResult.ToSoftswissResult<SoftswissBalanceResponse>();
+            var data = walletResult.Data;
+
+            var response = new SoftswissBalanceResponse(_currencyMultipliers.GetSumOut(data.Currency, data.Balance));
+
+            return SoftswissResultFactory.Success(response);
         }
     }
 }
