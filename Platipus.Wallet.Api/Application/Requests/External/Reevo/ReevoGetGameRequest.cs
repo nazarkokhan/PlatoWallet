@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.External.Reevo;
 
+using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 
 public record ReevoGetGameRequest(
-    string Environment,
+    [property: DefaultValue("test")] string Environment,
     ReevoGetGameGameApiRequest ApiRequest) : IRequest<IResult<object>>
 {
     public class Handler : IRequestHandler<ReevoGetGameRequest, IResult<object>>

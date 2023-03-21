@@ -58,6 +58,6 @@ public enum ErrorCode
     InvalidXmlContent,
 
     //game api
-    EmptyResponse,
-    InvalidResponse
+    EmptyExternalResponse,
+    InvalidExternalResponse
 }

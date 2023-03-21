@@ -89,7 +89,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
             if (string.IsNullOrWhiteSpace(responseString))
-                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.EmptyResponse);
+                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.EmptyExternalResponse);
 
             var responseJsonNode = JsonNode.Parse(responseString);
 
@@ -98,7 +98,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
             {
                 var errorResponse = responseJsonNode.Deserialize<ReevoErrorGameApiResponse>(_hub88JsonSerializerOptions);
                 if (errorResponse is null)
-                    return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidResponse);
+                    return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidExternalResponse);
                 var errorBox = new ReevoCommonBoxGameApiResponse<TResponse>(errorResponse, default!);
 
                 return ResultFactory.Success(errorBox);
@@ -106,7 +106,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
 
             var successResponse = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
             if (successResponse is null)
-                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidResponse);
+                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidExternalResponse);
             var successBox = new ReevoCommonBoxGameApiResponse<TResponse>(null, successResponse);
 
             return ResultFactory.Success(successBox);
