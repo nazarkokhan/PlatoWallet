@@ -1,37 +1,39 @@
 namespace Platipus.Wallet.Api.Application.Requests.External.Softswiss;
 
-using Extensions;
+using Domain.Entities;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Services.SoftswissGamesApi;
 using Services.SoftswissGamesApi.DTOs.Requests;
 
 public record ExternalSoftswissCancelFreespinsRequest(
-        string CasinoId,
-        string IssueId)
-    : IRequest<ISoftswissResult>
+        string Environment,
+        SoftswissCancelFreespinsGameApiRequest ApiRequest)
+    : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<ExternalSoftswissIssueFreespinsRequest, ISoftswissResult>
+    public class Handler : IRequestHandler<ExternalSoftswissCancelFreespinsRequest, IResult>
     {
         private readonly ISoftswissGamesApiClient _gamesApiClient;
+        private readonly WalletDbContext _context;
 
-        public Handler(ISoftswissGamesApiClient gamesApiClient)
+        public Handler(ISoftswissGamesApiClient gamesApiClient, WalletDbContext context)
         {
             _gamesApiClient = gamesApiClient;
+            _context = context;
         }
 
-        public async Task<ISoftswissResult> Handle(
-            ExternalSoftswissIssueFreespinsRequest request,
+        public async Task<IResult> Handle(
+            ExternalSoftswissCancelFreespinsRequest request,
             CancellationToken cancellationToken)
         {
-            var externalRequest = request.Map(
-                r => new SoftswissCancelFreespinsGameApiRequest(
-                    r.CasinoId,
-                    r.IssueId));
+            var environment = await _context.Set<GameEnvironment>()
+                .Where(e => e.Id == request.Environment)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var casinoGamesResponse = await _gamesApiClient.CancelFreespinsAsync(
-                externalRequest,
-                cancellationToken);
+            if (environment is null)
+                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
 
-            return casinoGamesResponse;
+            return await _gamesApiClient.CancelFreespinsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
         }
     }
 }

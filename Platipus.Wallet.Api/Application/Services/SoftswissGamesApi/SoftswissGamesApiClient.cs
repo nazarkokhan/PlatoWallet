@@ -39,7 +39,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         _softswissJsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Softswiss)).JsonSerializerOptions;
     }
 
-    public async Task<ISoftswissResult<SoftswissGetGameLinkGameApiResponse>> GetLaunchUrlAsync(
+    public async Task<IResult<SoftswissGetGameLinkGameApiResponse>> GetLaunchUrlAsync(
         Uri baseUrl,
         string casinoId,
         string user,
@@ -50,7 +50,8 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<SoftswissGetLaunchUrlGameApiRequest, SoftswissGetGameLinkGameApiResponse>(
-            new Uri(baseUrl, "softswiss/sessions").AbsoluteUri,
+            "softswiss/sessions",
+            baseUrl,
             new SoftswissGetLaunchUrlGameApiRequest(
                 casinoId,
                 gameId,
@@ -71,44 +72,51 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         return response;
     }
 
-    public async Task<ISoftswissResult> IssueFreespinsAsync(
+    public async Task<IResult> IssueFreespinsAsync(
+        Uri baseUrl,
         SoftswissIssueFreespinsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync(
             "softswiss/freespins/issue",
+            baseUrl,
             request,
             cancellationToken);
 
         return response;
     }
 
-    public async Task<ISoftswissResult> CancelFreespinsAsync(
+    public async Task<IResult> CancelFreespinsAsync(
+        Uri baseUrl,
         SoftswissCancelFreespinsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync(
             "softswiss/freespins/cancel",
+            baseUrl,
             request,
             cancellationToken);
 
         return response;
     }
 
-    public async Task<ISoftswissResult<SoftswissRoundDetailsGameApiResponse>> RoundDetailsAsync(
+    public async Task<IResult<SoftswissRoundDetailsGameApiResponse>> RoundDetailsAsync(
+        Uri baseUrl,
         SoftswissRoundDetailsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<SoftswissRoundDetailsGameApiRequest, SoftswissRoundDetailsGameApiResponse>(
             "softswiss/rounds/details",
+            baseUrl,
             request,
             cancellationToken);
 
         return response;
     }
 
-    private async Task<ISoftswissResult<TResponse>> PostSignedRequestAsync<TRequest, TResponse>(
+    private async Task<IResult<TResponse>> PostSignedRequestAsync<TRequest, TResponse>(
         string requestUri,
+        Uri baseUrl,
         TRequest request,
         CancellationToken cancellationToken)
         where TRequest : IPswGamesApiBaseRequest
@@ -117,7 +125,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         {
             var jsonContent = await CreateSignedContentAsync(request, cancellationToken);
 
-            var httpResponse = await _httpClient.PostAsync(requestUri, jsonContent, cancellationToken);
+            var httpResponse = await _httpClient.PostAsync(new Uri(baseUrl, requestUri), jsonContent, cancellationToken);
 
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
             var responseJsonNode = JsonNode.Parse(responseString);
@@ -125,26 +133,27 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
             var error = responseJsonNode?["code"]?.GetValue<string>();
 
             if (error is not null)
-                return SoftswissResultFactory.Failure<TResponse>(Enum.Parse<SoftswissErrorCode>(error));
+                return ResultFactory.Failure<TResponse>(Enum.Parse<ErrorCode>(error));
 
             if (httpResponse.StatusCode is not (HttpStatusCode.OK or HttpStatusCode.Created))
-                return SoftswissResultFactory.Failure<TResponse>(SoftswissErrorCode.UnknownError);
+                return ResultFactory.Failure<TResponse>(ErrorCode.InvalidExternalResponse);
 
             var response = responseJsonNode.Deserialize<TResponse>(_softswissJsonSerializerOptions);
 
             if (response is null)
-                return SoftswissResultFactory.Failure<TResponse>(SoftswissErrorCode.UnknownError);
+                return ResultFactory.Failure<TResponse>(ErrorCode.InvalidExternalResponse);
 
-            return SoftswissResultFactory.Success(response);
+            return ResultFactory.Success(response);
         }
         catch (Exception e)
         {
-            return SoftswissResultFactory.Failure<TResponse>(SoftswissErrorCode.UnknownError, null, e);
+            return ResultFactory.Failure<TResponse>(ErrorCode.Unknown, e);
         }
     }
 
-    private async Task<ISoftswissResult> PostSignedRequestAsync<TRequest>(
+    private async Task<IResult> PostSignedRequestAsync<TRequest>(
         string requestUri,
+        Uri baseUrl,
         TRequest request,
         CancellationToken cancellationToken)
         where TRequest : IPswGamesApiBaseRequest
@@ -153,25 +162,25 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         {
             var jsonContent = await CreateSignedContentAsync(request, cancellationToken);
 
-            var httpResponse = await _httpClient.PostAsync(requestUri, jsonContent, cancellationToken);
+            var httpResponse = await _httpClient.PostAsync(new Uri(baseUrl, requestUri), jsonContent, cancellationToken);
 
             var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
             if (string.IsNullOrEmpty(responseString) && httpResponse.StatusCode is HttpStatusCode.OK)
-                return SoftswissResultFactory.Success();
+                return ResultFactory.Success();
 
             var responseJsonNode = JsonNode.Parse(responseString);
 
             var error = responseJsonNode?["code"]?.GetValue<string>();
 
             if (error is null)
-                return SoftswissResultFactory.Failure(SoftswissErrorCode.UnknownError);
+                return ResultFactory.Failure(ErrorCode.InvalidExternalResponse);
 
-            return SoftswissResultFactory.Failure(Enum.Parse<SoftswissErrorCode>(error));
+            return ResultFactory.Failure(Enum.Parse<ErrorCode>(error));
         }
         catch (Exception e)
         {
-            return SoftswissResultFactory.Failure(SoftswissErrorCode.UnknownError, null, e);
+            return ResultFactory.Failure(ErrorCode.Unknown, e);
         }
     }
 

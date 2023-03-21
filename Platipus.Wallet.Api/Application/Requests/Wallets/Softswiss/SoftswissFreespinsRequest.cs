@@ -27,6 +27,12 @@ public record SoftswissFreespinsRequest(
             SoftswissFreespinsRequest request,
             CancellationToken cancellationToken)
         {
+            // _wallet.AwardAsync(
+            //     request.SessionId,
+            //     "",
+            //     "",
+            //     request.TotalAmount,
+            //     request.IssueId, cancellationToken: cancellationToken);
             // var walletRequest = request.Map(r => new AwardRequest(r.SessionId, r.Game));
             //
             // var walletResult = await _wallet.GetBalanceAsync(walletRequest, cancellationToken);
