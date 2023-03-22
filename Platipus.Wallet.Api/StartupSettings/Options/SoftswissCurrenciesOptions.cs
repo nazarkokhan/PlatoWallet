@@ -4,18 +4,18 @@ public class SoftswissCurrenciesOptions
 {
     public Dictionary<string, long> CountryIndexes { get; set; } = null!;
 
-    public long GetSumOut(string currency, decimal balance)
+    public long GetSumOut(string currency, decimal sum)
     {
         var multiplier = GetMultiplier(currency);
 
-        return (long)(balance * multiplier);
+        return (long)(sum * multiplier);
     }
 
-    public long GetSumIn(string currency, decimal balance)
+    public decimal GetSumIn(string currency, decimal sum)
     {
         var multiplier = GetMultiplier(currency);
 
-        return (long)(balance / multiplier);
+        return sum / multiplier;
     }
 
     public long GetMultiplier(string currency)

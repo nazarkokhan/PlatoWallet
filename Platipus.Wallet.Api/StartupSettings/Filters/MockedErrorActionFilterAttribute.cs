@@ -85,7 +85,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 "balance" => MockedErrorMethod.Balance,
                 "bet" => MockedErrorMethod.Bet,
                 "win" => MockedErrorMethod.Win,
-                "rollback" => MockedErrorMethod.Rollback,
+                "cancel" => MockedErrorMethod.Rollback,
                 _ => null
             };
         }
