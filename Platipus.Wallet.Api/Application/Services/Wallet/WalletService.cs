@@ -124,10 +124,7 @@ public class WalletService : IWalletService
                 _context.Update(round);
             }
 
-            var transaction = new Transaction(transactionId, amount, TransactionType.Bet)
-            {
-                Round = round
-            };
+            var transaction = new Transaction(transactionId, amount, TransactionType.Bet) { Round = round };
 
             _context.Add(transaction);
 
@@ -329,7 +326,7 @@ public class WalletService : IWalletService
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Include(u => u.Awards.FirstOrDefault(r => r.Id == awardId))
+                .Include(u => u.Awards.Where(r => r.Id == awardId))
                 .ThenInclude(r => r!.AwardRound)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -342,7 +339,8 @@ public class WalletService : IWalletService
             var award = user.Awards.FirstOrDefault();
             if (award is null)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardNotFound);
-
+            if (award.ValidUntil < DateTime.UtcNow)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardExpired);
             if (award.AwardRound is not null)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardIsAlreadyUsed);
 

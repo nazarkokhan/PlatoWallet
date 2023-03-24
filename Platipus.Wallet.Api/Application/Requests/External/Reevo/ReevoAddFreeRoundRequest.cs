@@ -39,10 +39,9 @@ public record ReevoAddFreeRoundRequest(
             if (response.IsFailure)
                 return response;
 
-            var data = response.Data;
-            if (data.ErrorMessage is not null)
-                return ResultFactory.Success(data.ErrorMessage);
-            var successData = data.Success;
+            var (errorData, successData) = response.Data;
+            if (errorData is not null)
+                return ResultFactory.Success(errorData);
 
             var validTo = DateTime.ParseExact(request.ApiRequest.ValidTo, "yyyy-MM-dd", CultureInfo.DefaultThreadCurrentCulture)
                 .ToUniversalTime();
@@ -58,7 +57,7 @@ public record ReevoAddFreeRoundRequest(
             if (user is null)
                 return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
 
-            var award = new Award(awardId, validTo) { UserId = user.Id };
+            var award = new Award(awardId, validTo) { UserId = user.Id, Currency = request.ApiRequest.Currency};
             _context.Add(award);
             await _context.SaveChangesAsync(cancellationToken);
 

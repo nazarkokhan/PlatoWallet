@@ -2,6 +2,8 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
+using Application.Requests.Base;
+using Application.Requests.Wallets.Softswiss;
 using Application.Requests.Wallets.Softswiss.Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -23,7 +25,13 @@ public class SoftswissSecurityFilterAttribute : ActionFilterAttribute
 
         var request = context.ActionArguments.Values
             .OfType<ISoftswissBaseRequest>()
-            .Single();
+            .FirstOrDefault();
+
+        if (request is null)
+        {
+            await next();
+            return;
+        }
 
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
 

@@ -51,7 +51,11 @@ public record ExternalSoftswissIssueFreespinsRequest(
             if (response.IsFailure)
                 return response;
 
-            award = new Award(apiRequest.IssueId, apiRequest.ValidUntil) { UserId = user.Id };
+            award = new Award(apiRequest.IssueId, apiRequest.ValidUntil)
+            {
+                UserId = user.Id,
+                Currency = apiRequest.Currency
+            };
             _context.Add(award);
             await _context.SaveChangesAsync(cancellationToken);
 

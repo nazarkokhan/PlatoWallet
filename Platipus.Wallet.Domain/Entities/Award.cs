@@ -12,7 +12,7 @@ public class Award : Entity<string>
 
     public DateTime ValidUntil { get; private set; }
 
-    // public string? GameId { get; set; }
+    public string? Currency { get; set; }
 
     public AwardRound? AwardRound { get; set; }
 
