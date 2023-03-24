@@ -122,6 +122,8 @@ public record LogInRequest(
 
             var baseUrl = casino.Provider is CasinoProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
 
+            string? httpRequestMessage = null;
+            string? httpResponseMessage = null;
             string launchUrl;
             switch (casino.Provider)
             {
@@ -207,8 +209,12 @@ public record LogInRequest(
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
                     var data = getGameLinkResult.Data;
 
+                    httpRequestMessage = data.HttpRequest;
+                    httpResponseMessage = data.HttpResponse;
+
+                    var content = data.Content!;
                     var existingSession = await _context.Set<Session>()
-                        .Where(s => s.Id == data.SessionId)
+                        .Where(s => s.Id == content.SessionId)
                         .FirstOrDefaultAsync(cancellationToken);
 
                     if (existingSession is not null)
@@ -219,13 +225,13 @@ public record LogInRequest(
                     }
                     else
                     {
-                        session.Id = data.SessionId;
+                        session.Id = content.SessionId;
                         _context.Add(session);
                     }
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    launchUrl = data.LaunchOptions.GameUrl;
+                    launchUrl = content.LaunchOptions.GameUrl;
                     break;
                 }
                 case CasinoProvider.Sw:
@@ -317,7 +323,12 @@ public record LogInRequest(
                 launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             }
 
-            var result = new Response(session.Id, user.Balance, launchUrl);
+            var result = new Response(
+                session.Id,
+                user.Balance,
+                launchUrl,
+                httpRequestMessage,
+                httpResponseMessage);
 
             return ResultFactory.Success(result);
         }
@@ -541,7 +552,9 @@ public record LogInRequest(
     public record Response(
         string SessionId,
         decimal Balance,
-        string LaunchUrl) : PswBalanceResponse(Balance);
+        string LaunchUrl,
+        string? HttpRequestMessage,
+        string? HttpResponseMessage) : PswBalanceResponse(Balance);
 
     public class Validator : AbstractValidator<SignUpRequest>
     {

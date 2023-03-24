@@ -33,7 +33,17 @@ public record ExternalSoftswissCancelFreespinsRequest(
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
 
-            return await _gamesApiClient.CancelFreespinsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+            var response = await _gamesApiClient.CancelFreespinsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+
+            var data = response.Data;
+            if (data.Content is null)
+                return response;
+
+            await _context.Set<Award>()
+                .Where(e => e.Id == request.ApiRequest.IssueId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            return response;
         }
     }
 }

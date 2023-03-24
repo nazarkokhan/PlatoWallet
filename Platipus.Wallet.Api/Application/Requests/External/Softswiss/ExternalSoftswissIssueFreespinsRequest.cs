@@ -30,27 +30,32 @@ public record ExternalSoftswissIssueFreespinsRequest(
             var environment = await _context.Set<GameEnvironment>()
                 .Where(e => e.Id == request.Environment)
                 .FirstOrDefaultAsync(cancellationToken);
-
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
+
             var apiRequest = request.ApiRequest;
+
+            var award = await _context.Set<Award>()
+                .Where(a => a.Id == apiRequest.IssueId)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (award is not null)
+                return ResultFactory.Failure<object>(ErrorCode.AwardIsAlreadyUsed);
+
+            var user = await _context.Set<User>()
+                .Where(e => e.Username == apiRequest.User.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+                return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
 
             var response = await _gamesApiClient.IssueFreespinsAsync(environment.BaseUrl, apiRequest, cancellationToken);
             if (response.IsFailure)
                 return response;
 
-            var user = await _context.Set<User>()
-                .Where(e => e.Username == apiRequest.User.Id)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (user is null)
-                return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
-
-            var award = new Award(apiRequest.IssueId, apiRequest.ValidUntil) { UserId = user.Id };
+            award = new Award(apiRequest.IssueId, apiRequest.ValidUntil) { UserId = user.Id };
             _context.Add(award);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return ResultFactory.Success();
+            return response;
         }
     }
 }
