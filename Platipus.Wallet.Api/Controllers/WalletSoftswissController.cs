@@ -55,7 +55,7 @@ public class WalletSoftswissController : RestApiController
 
 [Route("wallet/private/softswiss")]
 [JsonSettingsName(nameof(CasinoProvider.Softswiss))]
-public class WalletSoftswissPrivateTestController : RestApiController
+public class WalletSoftswissPrivateController : RestApiController
 {
     [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(

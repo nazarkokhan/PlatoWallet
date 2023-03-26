@@ -1,13 +1,14 @@
 namespace Platipus.Wallet.Api.Application.Services.SoftswissGamesApi.DTOs.Requests;
 
+using System.ComponentModel;
 using Hub88GamesApi.DTOs.Requests;
 
 public record SoftswissIssueFreespinsGameApiRequest(
-    string CasinoId,
-    string Currency,
-    string IssueId,
-    string[] Games,
-    int FreespinsQuantity,
-    int BetLevel,
+    [property: DefaultValue("softswiss")] string CasinoId,
+    [property: DefaultValue("USD")] string Currency,
+    [property: DefaultValue("123hfksdnf1e")] string IssueId,
+    [property: DefaultValue(new[] { "568", "123" })] string[] Games,
+    [property: DefaultValue(5)] int FreespinsQuantity,
+    [property: DefaultValue(1)] int BetLevel,
     DateTime ValidUntil,
     SoftswissGamesApiUser User) : IPswGamesApiBaseRequest;

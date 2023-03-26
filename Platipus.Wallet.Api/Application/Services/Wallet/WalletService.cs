@@ -242,7 +242,11 @@ public class WalletService : IWalletService
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Include(u => u.Rounds.Where(r => r.Id == roundId))
+                .Include(
+                    u => u.Rounds.Where(
+                        r => roundId != null
+                            ? r.Id == roundId
+                            : r.Transactions.Any(t => t.Id == transactionId)))
                 .ThenInclude(r => r.Transactions.Where(t => t.Id == transactionId))
                 .FirstOrDefaultAsync(cancellationToken);
 
