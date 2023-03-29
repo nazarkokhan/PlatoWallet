@@ -163,7 +163,7 @@ public class GamesApiClient : IGamesApiClient
 
         var xRequestSign = PswSecuritySign.Compute(requestBytes, casino.SignatureKey);
 
-        jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToUpper());
+        jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToLower());
 
         _logger.LogInformation(
             "GamesApi Request: {GamesApiRequest}, X-REQUEST-SIGN: {GamesApiRequestSign}",

@@ -40,6 +40,7 @@ public record LogInRequest(
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
         private readonly IReevoGameApiClient _reevoGameApiClient;
+        private readonly SoftswissCurrenciesOptions _currencyMultipliers;
 
         public Handler(
             WalletDbContext context,
@@ -47,7 +48,8 @@ public record LogInRequest(
             IHub88GamesApiClient hub88GamesApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
             IGamesGlobalGamesApiClient globalGamesApiClient,
-            IReevoGameApiClient reevoGameApiClient)
+            IReevoGameApiClient reevoGameApiClient,
+            IOptions<SoftswissCurrenciesOptions> currencyMultipliers)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
@@ -55,6 +57,7 @@ public record LogInRequest(
             _softswissGamesApiClient = softswissGamesApiClient;
             _globalGamesApiClient = globalGamesApiClient;
             _reevoGameApiClient = reevoGameApiClient;
+            _currencyMultipliers = currencyMultipliers.Value;
         }
 
         public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
@@ -202,7 +205,7 @@ public record LogInRequest(
                         session.Id,
                         game.GameServerId,
                         user.Currency.Id,
-                        (long)user.Balance, //TODO //TODO why i left first todo here?
+                        _currencyMultipliers.GetSumOut(user.Currency.Id, user.Balance),
                         cancellationToken);
 
                     if (getGameLinkResult.IsFailure)
