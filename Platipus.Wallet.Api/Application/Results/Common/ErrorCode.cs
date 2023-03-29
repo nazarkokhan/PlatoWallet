@@ -57,6 +57,7 @@ public enum ErrorCode
     ErrorMockAlreadyExists,
     InvalidJsonContent,
     InvalidXmlContent,
+    MaxErrorMockTimeoutIs3Minutes,
 
     //game api
     EmptyExternalResponse,

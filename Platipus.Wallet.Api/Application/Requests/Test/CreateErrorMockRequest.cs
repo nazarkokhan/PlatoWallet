@@ -82,6 +82,9 @@ public record CreateErrorMockRequest(
                         break;
                 }
 
+                if (item.Timeout > TimeSpan.FromMinutes(3))
+                    return ResultFactory.Failure(ErrorCode.MaxErrorMockTimeoutIs3Minutes);
+
                 var mockedError = new MockedError
                 {
                     Method = request.Method,

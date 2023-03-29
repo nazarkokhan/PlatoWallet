@@ -211,13 +211,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         var cache = httpContext.RequestServices.GetRequiredService<IAppCache>();
 
         var concurrencyKey = $"em:{usernameOrSession}:{currentMethod.ToString()}";
-        var slim = cache.GetOrAdd<SemaphoreSlim>(
-            concurrencyKey,
-            _ => new SemaphoreSlim(1));
+        var semaphoreSlim = cache.GetOrAdd(concurrencyKey, () => new SemaphoreSlim(1), TimeSpan.FromHours(1));
 
         try
         {
-            await slim.WaitAsync();
+            await semaphoreSlim.WaitAsync();
 
             var dbContext = services.GetRequiredService<WalletDbContext>();
 
@@ -310,7 +308,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         }
         finally
         {
-            slim.Release();
+            semaphoreSlim.Release();
         }
     }
 
