@@ -13,8 +13,7 @@ public class AdminController : RestApiController
 
     public AdminController(IMediator mediator) => _mediator = mediator;
 
-    [HttpGet("a-why")]
-    public IActionResult MockError() => Ok("ok");
+    [HttpGet("error-mock")]
     public async Task<IActionResult> MockError([FromQuery] GetErrorMocksRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
