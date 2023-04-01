@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uis.Base;
 
 using System.Xml.Serialization;
+using Response;
 
 #pragma warning disable CS8618
 [XmlRoot("UIS")]
@@ -8,6 +9,7 @@ using System.Xml.Serialization;
 [XmlInclude(typeof(UisChangeBalanceRequest)), XmlInclude(typeof(UisChangeBalanceRequest.UisChangeBalanceResponse))]
 [XmlInclude(typeof(UisStatusRequest)), XmlInclude(typeof(UisStatusRequest.UisStatusResponse))]
 [XmlInclude(typeof(UisAuthenticateRequest)), XmlInclude(typeof(UisAuthenticateRequest.UisAuthenticateResponse))]
+[XmlInclude(typeof(UisErrorResponse))]
 public class UisResponseContainer
 {
     [XmlElement("REQUEST", Type = null)]

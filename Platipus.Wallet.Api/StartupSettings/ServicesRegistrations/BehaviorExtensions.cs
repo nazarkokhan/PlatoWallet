@@ -5,22 +5,21 @@ using Application.Behaviors;
 
 public static class BehaviorExtensions
 {
-    public static IServiceCollection AddAllBehaviors(this IServiceCollection services)
-        => services
+    public static IServiceCollection AddAllBehaviors(this IServiceCollection services) => services;
             // .AddLoggingBehavior()
             // .AddLocalizationBehavior()
-            .AddValidationBehavior()
-            .AddExceptionBehavior();
+            // .AddValidationBehavior()
+            // .AddExceptionBehavior();
 
     public static IServiceCollection AddLoggingBehavior(this IServiceCollection services)
-        => services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        => services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
     public static IServiceCollection AddLocalizationBehavior(this IServiceCollection services)
-        => services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LocalizationBehavior<,>));
+        => services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LocalizationBehavior<,>));
 
     public static IServiceCollection AddValidationBehavior(this IServiceCollection services)
-        => services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        => services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
     public static IServiceCollection AddExceptionBehavior(this IServiceCollection services)
-        => services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehavior<,>));
+        => services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ExceptionBehavior<,>));
 }

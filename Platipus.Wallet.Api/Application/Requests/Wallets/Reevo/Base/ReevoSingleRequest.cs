@@ -17,7 +17,7 @@ public record ReevoSingleRequest : IReevoRequest
 
     // required for balance
     [FromQuery(Name = "remote_id")]
-    public int? RemoteId { get; init; }
+    public int RemoteId { get; init; }
 
     [FromQuery(Name = "username")]
     public string Username { get; init; } = null!;

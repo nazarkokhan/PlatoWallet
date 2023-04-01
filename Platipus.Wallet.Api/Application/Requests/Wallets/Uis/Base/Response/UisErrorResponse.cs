@@ -1,13 +1,24 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uis.Base.Response;
 
+using System.Xml.Serialization;
 using Results.Uis;
 
-public record UisErrorResponse(
-    int Status,
-    string Message)
+[XmlRoot("RESPONSE")]
+public class UisErrorResponse
 {
-    public UisErrorResponse(UisErrorCode errorCode)
-        : this((int)errorCode, "FAILED")
+    public UisErrorResponse()
+        : this(UisErrorCode.InternalError)
     {
     }
+
+    public UisErrorResponse(UisErrorCode code)
+    {
+        Code = (int)code;
+    }
+
+    [XmlElement("CODE")]
+    public int Code { get; init; }
+
+    [XmlElement("RESULT")]
+    public string Result { get; init; } = "FAILED";
 }

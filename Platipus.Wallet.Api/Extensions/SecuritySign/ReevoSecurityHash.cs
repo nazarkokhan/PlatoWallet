@@ -21,7 +21,7 @@ public static class ReevoSecurityHash
         string queryString,
         string secretKey)
     {
-        var secretBytes = Encoding.UTF8.GetBytes(queryString + secretKey);
+        var secretBytes = Encoding.UTF8.GetBytes(secretKey + queryString);
         var hash = SHA1.HashData(secretBytes);
 
         var hashString = Convert.ToHexString(hash);

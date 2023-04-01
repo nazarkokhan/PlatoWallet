@@ -50,7 +50,7 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
 
         var requestQueryString = httpContext.Request.Query.ToDictionary(x => x.Key, x => x.Value);
         requestQueryString.Remove("key");
-        var withoutKey = QueryString.Create(requestQueryString).ToString();
+        var withoutKey = QueryString.Create(requestQueryString).ToString()[1..];
 
         var casino = session.UserCasino;
         var isHashValid = ReevoSecurityHash.IsValid(

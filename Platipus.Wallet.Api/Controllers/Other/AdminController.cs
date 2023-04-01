@@ -13,12 +13,16 @@ public class AdminController : RestApiController
 
     public AdminController(IMediator mediator) => _mediator = mediator;
 
+    [HttpGet("error-mock")]
+    public async Task<IActionResult> MockError([FromQuery] GetErrorMocksRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
     [HttpPost("error-mock")]
     public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpDelete("error-mock")]
-    public async Task<IActionResult> MockError(DeleteErrorMockRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> MockError([FromQuery] DeleteErrorMockRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpGet("environments")]

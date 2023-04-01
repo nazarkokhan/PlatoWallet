@@ -9,18 +9,27 @@ public static class SwSecurityMd5
         string externalMd5,
         int providerId,
         int userId,
-        string secretKey)
+        string secretKey,
+        string? amount = null)
     {
-        var md5 = Compute(providerId, userId, secretKey);
+        var md5 = Compute(
+            providerId,
+            userId,
+            secretKey,
+            amount);
 
-        var isValid = externalMd5.Equals(md5);
+        var isValid = externalMd5.Equals(md5, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }
 
-    public static string Compute(int providerId, int userId, string secretKey)
+    public static string Compute(
+        int providerId,
+        int userId,
+        string secretKey,
+        string? amount = null)
     {
-        var dataString = $"{providerId.ToString()}{secretKey}{userId.ToString()}";
+        var dataString = $"{providerId.ToString()}{secretKey}{userId.ToString()}{amount}";
         var dataBytes = Encoding.UTF8.GetBytes(dataString);
 
         var md5 = MD5.HashData(dataBytes);

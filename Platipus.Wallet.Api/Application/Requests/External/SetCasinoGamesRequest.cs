@@ -29,12 +29,14 @@ public record SetCasinoGamesRequest(string CasinoId, List<string> GameLaunchName
 
             var games = await _context.Set<Game>()
                 .Where(g => request.GameLaunchNames.Contains(g.LaunchName))
-                .Select(g => g.GameServiceId)
+                .Select(g => g.Id)
                 .ToListAsync(cancellationToken);
-
             _context.RemoveRange(casino.CasinoGames);
 
-            var casinoGamesToAdd = games.Select(g => new CasinoGames { GameId = g }).ToList();
+            var casinoGamesToAdd = games
+                .Select(g => new CasinoGames { GameId = g })
+                .ToList();
+
             _context.AddRange(casinoGamesToAdd);
             casino.CasinoGames.AddRange(casinoGamesToAdd);
 

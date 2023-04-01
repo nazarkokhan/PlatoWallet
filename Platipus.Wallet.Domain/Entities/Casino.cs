@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Domain.Entities;
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Abstract.Generic;
 using Enums;
@@ -38,16 +39,19 @@ public class Casino : Entity<string>
     public List<CasinoGames> CasinoGames { get; set; } = new();
 
     public record SpecificParams(
-        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string OpenboxVendorUid = null!,
-        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string ReevoCallerId = null!,
-        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string ReevoCallerPassword = null!,
-        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string Hub88PrivateWalletSecuritySign = null!,
-        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string Hub88PublicGameServiceSecuritySign = null!,
-        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string Hub88PrivateGameServiceSecuritySign = null!);
+        // ReSharper disable once InconsistentNaming
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        int? ISoftBetProviderId = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? OpenboxVendorUid = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? ReevoCallerId = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? ReevoCallerPassword = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? Hub88PrivateWalletSecuritySign = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? Hub88PublicGameServiceSecuritySign = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? Hub88PrivateGameServiceSecuritySign = null!);
 }

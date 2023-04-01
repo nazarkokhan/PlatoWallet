@@ -48,9 +48,10 @@ public class GamesApiClient : IGamesApiClient
         string launchMode = "url",
         CancellationToken cancellationToken = default)
     {
-        //launchmodetype
+        var launchModePath = launchModeType is LaunchMode.Real ? "session" : "demo";
+
         var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
-            new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/session").AbsoluteUri,
+            new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/{launchModePath}").AbsoluteUri,
             new PswGetGameLinkGamesApiRequest(
                 casinoId,
                 sessionId,
@@ -162,7 +163,7 @@ public class GamesApiClient : IGamesApiClient
 
         var xRequestSign = PswSecuritySign.Compute(requestBytes, casino.SignatureKey);
 
-        jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToUpper());
+        jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToLower());
 
         _logger.LogInformation(
             "GamesApi Request: {GamesApiRequest}, X-REQUEST-SIGN: {GamesApiRequestSign}",

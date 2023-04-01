@@ -12,15 +12,6 @@ public static class OpenboxHelpers
                         Logout = "562db5a013634b7195b1d0c650c414cf",
                         KeepTokenAlive = "09caee7b676f4c1c95050cd2e0bb5074";
 
-    public static string? GetCasinoId(string vendorUid)
-    {
-        return vendorUid switch
-        {
-            "00000000000000000000000000000001" => "openbox", //TODO move to db
-            _ => null
-        };
-    }
-
     public static Type? GetRequestType(string method)
     {
         var payloadType = method switch

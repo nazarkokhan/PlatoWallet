@@ -102,20 +102,19 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                if (uisResult.Data is not UisResponseContainer container)
-                    return;
+                var container = new UisResponseContainer
+                {
+                    Request = httpContext.Items[HttpContextItems.RequestObject]!,
+                    Time = DateTime.UtcNow,
+                    Response = new UisErrorResponse(uisResult.ErrorCode)
+                };
 
-                var errorCode = uisResult.ErrorCode;
-                var errorResponse = new UisErrorResponse(errorCode);
-
-                container.Response = errorResponse;
-
-                context.Result = new OkObjectResult(errorResponse)
+                context.Result = new OkObjectResult(container)
                 {
                     ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
                 };
 
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                context.HttpContext.Items.Add(responseItemsKey, container);
             }
 
             if (baseExternalActionResult.Result is IBetflagResult<object> betflagResult)

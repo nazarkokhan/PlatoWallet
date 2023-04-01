@@ -1,52 +1,65 @@
 namespace Platipus.Wallet.Api.Application.Requests.External.Softswiss;
 
-using Extensions;
+using System.ComponentModel;
+using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Services.SoftswissGamesApi;
 using Services.SoftswissGamesApi.DTOs.Requests;
 
 public record ExternalSoftswissIssueFreespinsRequest(
-        string CasinoId,
-        string Currency,
-        string IssueId,
-        string[] Games,
-        int FreespinsQuantity,
-        int BetLevel,
-        DateTime ValidUntil,
-        string User)
-    : IRequest<ISoftswissResult>
+        [property: DefaultValue("test")] string Environment,
+        SoftswissIssueFreespinsGameApiRequest ApiRequest)
+    : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<ExternalSoftswissIssueFreespinsRequest, ISoftswissResult>
+    public class Handler : IRequestHandler<ExternalSoftswissIssueFreespinsRequest, IResult>
     {
-        private readonly WalletDbContext _context;
         private readonly ISoftswissGamesApiClient _gamesApiClient;
+        private readonly WalletDbContext _context;
 
-        public Handler(WalletDbContext context, ISoftswissGamesApiClient gamesApiClient)
+        public Handler(ISoftswissGamesApiClient gamesApiClient, WalletDbContext context)
         {
-            _context = context;
             _gamesApiClient = gamesApiClient;
+            _context = context;
         }
 
-        public async Task<ISoftswissResult> Handle(
+        public async Task<IResult> Handle(
             ExternalSoftswissIssueFreespinsRequest request,
             CancellationToken cancellationToken)
         {
-            var externalRequest = request.Map(
-                r => new SoftswissIssueFreespinsGameApiRequest(
-                    r.CasinoId,
-                    r.Currency,
-                    r.IssueId,
-                    r.Games,
-                    r.FreespinsQuantity,
-                    r.BetLevel,
-                    r.ValidUntil,
-                    new SoftswissGamesApiUser(r.User, r.User)));
+            var environment = await _context.Set<GameEnvironment>()
+                .Where(e => e.Id == request.Environment)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (environment is null)
+                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
 
-            var casinoGamesResponse = await _gamesApiClient.IssueFreespinsAsync(
-                externalRequest,
-                cancellationToken);
+            var apiRequest = request.ApiRequest;
 
-            return casinoGamesResponse;
+            var award = await _context.Set<Award>()
+                .Where(a => a.Id == apiRequest.IssueId)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (award is not null)
+                return ResultFactory.Failure<object>(ErrorCode.AwardIsAlreadyUsed);
+
+            var user = await _context.Set<User>()
+                .Where(e => e.Username == apiRequest.User.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+                return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
+
+            var response = await _gamesApiClient.IssueFreespinsAsync(environment.BaseUrl, apiRequest, cancellationToken);
+            if (response.IsFailure)
+                return response;
+
+            award = new Award(apiRequest.IssueId, apiRequest.ValidUntil)
+            {
+                UserId = user.Id,
+                Currency = apiRequest.Currency
+            };
+            _context.Add(award);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return response;
         }
     }
 }

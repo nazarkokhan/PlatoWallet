@@ -1,35 +1,39 @@
 namespace Platipus.Wallet.Api.Application.Requests.External.Softswiss;
 
-using Extensions;
+using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Services.SoftswissGamesApi;
 using Services.SoftswissGamesApi.DTOs.Requests;
 
-public record ExternalSoftswissRoundDetailsRequest(SoftswissRoundDetailsGameApiRequest ExternalRequest)
-    : IRequest<ISoftswissResult>
+public record ExternalSoftswissRoundDetailsRequest(
+        string Environment,
+        SoftswissRoundDetailsGameApiRequest ApiRequest)
+    : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<ExternalSoftswissRoundDetailsRequest, ISoftswissResult>
+    public class Handler : IRequestHandler<ExternalSoftswissRoundDetailsRequest, IResult>
     {
-        private readonly WalletDbContext _context;
         private readonly ISoftswissGamesApiClient _gamesApiClient;
+        private readonly WalletDbContext _context;
 
-        public Handler(WalletDbContext context, ISoftswissGamesApiClient gamesApiClient)
+        public Handler(ISoftswissGamesApiClient gamesApiClient, WalletDbContext context)
         {
-            _context = context;
             _gamesApiClient = gamesApiClient;
+            _context = context;
         }
 
-        public async Task<ISoftswissResult> Handle(
+        public async Task<IResult> Handle(
             ExternalSoftswissRoundDetailsRequest request,
             CancellationToken cancellationToken)
         {
-            var externalRequest = request.Map(r => r.ExternalRequest);
+            var environment = await _context.Set<GameEnvironment>()
+                .Where(e => e.Id == request.Environment)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var casinoGamesResponse = await _gamesApiClient.RoundDetailsAsync(
-                externalRequest,
-                cancellationToken);
+            if (environment is null)
+                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
 
-            return casinoGamesResponse;
+            return await _gamesApiClient.RoundDetailsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
         }
     }
 }

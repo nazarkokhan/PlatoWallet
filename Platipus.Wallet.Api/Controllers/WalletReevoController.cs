@@ -6,6 +6,7 @@ using Application.Extensions;
 using Application.Requests.Wallets.Reevo;
 using Application.Requests.Wallets.Reevo.Base;
 using Application.Results.Reevo;
+using Application.Results.Reevo.WithData;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -37,14 +38,14 @@ public class WalletReevoController : RestApiController
     {
         try
         {
-            object? concreteRequest = request.Action switch
+            IRequest<IReevoResult<ReevoSuccessResponse>>? concreteRequest = request.Action switch
             {
                 "balance" => request.Map(
                     r => new ReevoBalanceRequest(
                         r.CallerId,
                         r.CallerPassword,
                         r.Action,
-                        r.RemoteId ?? throw new ReevoMissingParameterException(nameof(r.RemoteId)),
+                        r.RemoteId,
                         r.Username,
                         r.GameIdHash ?? throw new ReevoMissingParameterException(nameof(r.GameIdHash)),
                         r.SessionId,
@@ -114,12 +115,7 @@ public class WalletReevoController : RestApiController
 
             var result = await _mediator.Send(concreteRequest, cancellationToken);
 
-            if (result is not IReevoResult reevoResult)
-                return ReevoResultFactory
-                    .Failure(request.Action is "debit" ? ReevoErrorCode.BetRefused : ReevoErrorCode.InternalError)
-                    .ToActionResult();
-
-            return reevoResult.ToActionResult();
+            return result.ToActionResult();
         }
         catch (ReevoMissingParameterException e)
         {

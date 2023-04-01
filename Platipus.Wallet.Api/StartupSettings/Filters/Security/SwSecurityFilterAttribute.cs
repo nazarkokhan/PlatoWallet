@@ -51,6 +51,13 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
 
         var isValidSign = request switch
         {
+            ISwMd5AmountRequest md5Request => md5Request.Map(
+                r => SwSecurityMd5.IsValidSign(
+                    r.Md5,
+                    r.ProviderId,
+                    r.UserId,
+                    session.User.CasinoSignatureKey,
+                    r.Amount)),
             ISwMd5Request md5Request => md5Request.Map(
                 r => SwSecurityMd5.IsValidSign(
                     r.Md5,

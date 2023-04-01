@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sw;
 
+using System.Globalization;
 using Base;
 using Base.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +13,14 @@ public record SwBetWinRequest(
     [property: BindProperty(Name = "providerid")] int ProviderId,
     [property: BindProperty(Name = "userid")] int UserId,
     [property: BindProperty(Name = "md5")] string Md5,
-    [property: BindProperty(Name = "amount")] decimal Amount,
+    [property: BindProperty(Name = "amount")] string Amount,
     [property: BindProperty(Name = "remotetranid")] string RemotetranId,
     [property: BindProperty(Name = "gameid")] int GameId,
     [property: BindProperty(Name = "gameName")] string GameName,
-    [property: BindProperty(Name = "roundid")] int RoundId,
+    [property: BindProperty(Name = "roundid")] long RoundId,
     [property: BindProperty(Name = "trntype")] string TrnType,
-    [property: BindProperty(Name = "finished")] bool Finished,
-    [property: BindProperty(Name = "token")] string Token) : ISwMd5Request, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
+    [property: BindProperty(Name = "finished")] int Finished,
+    [property: BindProperty(Name = "token")] string Token) : ISwMd5AmountRequest, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
 {
     public class Handler : IRequestHandler<SwBetWinRequest, ISwResult<SwBetWinRefundFreespinResponse>>
     {
@@ -43,8 +44,8 @@ public record SwBetWinRequest(
                         request.Token,
                         request.RoundId.ToString(),
                         request.RemotetranId,
-                        request.Amount,
-                        roundFinished: request.Finished,
+                        -decimal.Parse(request.Amount, CultureInfo.InvariantCulture),
+                        roundFinished: request.Finished is 1,
                         cancellationToken: cancellationToken);
                     if (walletResult.IsFailure)
                         return walletResult.ToSwResult<SwBetWinRefundFreespinResponse>();
@@ -61,8 +62,8 @@ public record SwBetWinRequest(
                         request.Token,
                         request.RoundId.ToString(),
                         request.RemotetranId,
-                        request.Amount,
-                        request.Finished,
+                        decimal.Parse(request.Amount, CultureInfo.InvariantCulture),
+                        request.Finished is 1,
                         cancellationToken: cancellationToken);
                     if (walletResult.IsFailure)
                         return walletResult.ToSwResult<SwBetWinRefundFreespinResponse>();
