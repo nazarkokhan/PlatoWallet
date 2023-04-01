@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
 using Api.Extensions;
+using Application.Requests.Wallets.BetConstruct.Base;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Everymatrix.Base;
@@ -149,11 +150,13 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             currentMethod = requestRoute switch
             {
-                "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" => MockedErrorMethod.Balance,
-                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" or "Bet" => MockedErrorMethod.Bet,
-                "win" or "result" or "transaction/win" or "credit" or "Win" => MockedErrorMethod.Win,
+                "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" or "GetPlayerInfo"
+                    => MockedErrorMethod.Balance,
+                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" or "Bet" or "Deposit" => MockedErrorMethod.Bet,
+                "win" or "result" or "transaction/win" or "credit" or "Win" or "Withdraw" => MockedErrorMethod.Win,
                 "award" or "bonusWin" or "freespin" or "freespins" => MockedErrorMethod.Award,
-                "rollback" or "cancel" or "refund" or "transaction/rollback" or "Cancel" => MockedErrorMethod.Rollback,
+                "rollback" or "cancel" or "refund" or "transaction/rollback" or "Cancel" or "Rollback"
+                    => MockedErrorMethod.Rollback,
                 _ => null
             };
 
@@ -188,6 +191,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     break;
                 case WalletEverymatrixController:
                     usernameOrSession = actionArgumentsValues.OfType<IEveryMatrixRequest>().SingleOrDefault()?.Token;
+                    searchMockBySession = true;
+                    break;
+                case WalletBetConstructController:
+                    usernameOrSession = actionArgumentsValues.OfType<IBetconstructRequest>().SingleOrDefault()?.Token;
                     searchMockBySession = true;
                     break;
                 default:

@@ -2,15 +2,15 @@ namespace Platipus.Wallet.Api.Application.Results.BetConstruct;
 
 using Base;
 
-public record BetConstructResult : BaseResult<BetConstructErrorCode>, IBetConstructResult
+public record BetconstructResult : BaseResult<BetconstructErrorCode>, IBetconstructResult
 {
-    public BetConstructResult()
+    public BetconstructResult()
     {
         ErrorDescription = string.Empty;
     }
 
-    public BetConstructResult(
-        BetConstructErrorCode errorCode,
+    public BetconstructResult(
+        BetconstructErrorCode errorCode,
         Exception? exception = null,
         string? description = null)
         : base(errorCode, exception)

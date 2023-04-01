@@ -2,8 +2,6 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
-using Application.Requests.Base;
-using Application.Requests.Wallets.Softswiss;
 using Application.Requests.Wallets.Softswiss.Base;
 using Domain.Entities;
 using Infrastructure.Persistence;

@@ -1,4 +1,3 @@
-// ReSharper disable NotAccessedPositionalProperty.Global
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct;
 
 using Base;
@@ -6,12 +5,15 @@ using Base.Response;
 using Results.BetConstruct.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using static Results.BetConstruct.BetConstructResultFactory;
+using static Results.BetConstruct.BetconstructResultFactory;
 
-public record BetConstructRollbackTransactionRequest(RollbackData Data, DateTime Time, string Hash)
-    : IBetConstructBaseRequest<RollbackData>, IRequest<IBetConstructResult<BetConstructBaseResponse>>
+public record BetConstructRollbackTransactionRequest(
+        string Token,
+        string TransactionId,
+        string GameId)
+    : IBetconstructRequest, IRequest<IBetconstructResult<BetconstructPlayResponse>>
 {
-    public class Handler : IRequestHandler<BetConstructRollbackTransactionRequest, IBetConstructResult<BetConstructBaseResponse>>
+    public class Handler : IRequestHandler<BetConstructRollbackTransactionRequest, IBetconstructResult<BetconstructPlayResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -20,23 +22,20 @@ public record BetConstructRollbackTransactionRequest(RollbackData Data, DateTime
             _wallet = wallet;
         }
 
-        public async Task<IBetConstructResult<BetConstructBaseResponse>> Handle(
+        public async Task<IBetconstructResult<BetconstructPlayResponse>> Handle(
             BetConstructRollbackTransactionRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.RollbackAsync(
-                request.Data.Token,
-                request.Data.TransactionId,
+                request.Token,
+                request.TransactionId,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToBetConstructResult<BetConstructBaseResponse>();
+                return walletResult.ToBetConstructResult<BetconstructPlayResponse>();
             var data = walletResult.Data;
 
-            var response = new BetConstructBaseResponse(
-                true,
-                null,
-                null,
+            var response = new BetconstructPlayResponse(
                 data.Transaction.Id,
                 data.Balance);
 
@@ -44,9 +43,3 @@ public record BetConstructRollbackTransactionRequest(RollbackData Data, DateTime
         }
     }
 }
-
-public record RollbackData(
-    string Token,
-    string TransactionId,
-    string GameId
-) : IBetConstructDataRequest;

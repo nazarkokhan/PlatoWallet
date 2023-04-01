@@ -2,6 +2,6 @@
 
 using Platipus.Wallet.Api.Application.Results.Base.WithData;
 
-public interface IBetConstructResult<out TData> : IBaseResult<BetConstructErrorCode, TData>, IBetConstructResult
+public interface IBetconstructResult<out TData> : IBaseResult<BetconstructErrorCode, TData>, IBetconstructResult
 {
 }

@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 public class BetConstructExternalActionResult : ActionResult
 {
-    public BetConstructExternalActionResult(IBetConstructResult result)
+    public BetConstructExternalActionResult(IBetconstructResult result)
     {
         Result = result;
     }
 
-    public IBetConstructResult Result { get; }
+    public IBetconstructResult Result { get; }
 }

@@ -7,7 +7,7 @@ using Results.BetConstruct.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
-public record BetConstructWithdrawRequest(
+public record BetconstructDepositRequest(
         string Token,
         string TransactionId,
         string RoundId,
@@ -17,7 +17,7 @@ public record BetConstructWithdrawRequest(
         string BetInfo)
     : IBetconstructRequest, IRequest<IBetconstructResult<BetconstructPlayResponse>>
 {
-    public class Handler : IRequestHandler<BetConstructWithdrawRequest, IBetconstructResult<BetconstructPlayResponse>>
+    public class Handler : IRequestHandler<BetconstructDepositRequest, IBetconstructResult<BetconstructPlayResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -27,7 +27,7 @@ public record BetConstructWithdrawRequest(
         }
 
         public async Task<IBetconstructResult<BetconstructPlayResponse>> Handle(
-            BetConstructWithdrawRequest request,
+            BetconstructDepositRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.BetAsync(
@@ -35,7 +35,7 @@ public record BetConstructWithdrawRequest(
                 request.RoundId,
                 request.TransactionId,
                 request.BetAmount,
-                request.CurrencyId,
+                currency: request.CurrencyId,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
