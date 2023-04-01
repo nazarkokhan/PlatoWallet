@@ -5,8 +5,8 @@ using Horizon.XmlRpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Results.GamesGlobal;
 using Platipus.Wallet.Api.Application.Results.GamesGlobal.WithData;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record GamesGlobalGetBalanceRequest(GamesGlobalGetBalanceDto[] GetBalances)
     : IGamesGlobalBaseRequest, IRequest<IGamesGlobalResult<GamesGlobalGetBalanceRequest.Response>>

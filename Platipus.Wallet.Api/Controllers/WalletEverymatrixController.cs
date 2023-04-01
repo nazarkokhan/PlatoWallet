@@ -59,16 +59,13 @@ public class WalletEverymatrixController : RestApiController
         EverymatrixCancelRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}
 
-    //TODO
-    // [HttpPost("Reconciliation")]
-    // [ProducesResponseType(typeof(EverymatrixReconciliationRequest.ReconciliationResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Reconciliation(
-    //     EverymatrixReconciliationRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpPost("private/test/get-security-value")]
+[Route("wallet/private/everymatrix")]
+[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+public class WalletEverymatrixPrivateController : RestApiController
+{
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string username,
         string route,

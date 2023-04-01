@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Results.GamesGlobal;
 using Platipus.Wallet.Api.Application.Results.GamesGlobal.WithData;
 using Platipus.Wallet.Api.Application.Services.Wallet;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record GamesGlobalCancelFundGamesRequest(GamesGlobalCancelFundGameDto[] Cancels)
     : IGamesGlobalBaseRequest, IRequest<IGamesGlobalResult<GamesGlobalCancelFundGamesRequest.Response>>

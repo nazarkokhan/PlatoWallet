@@ -10,7 +10,7 @@ public record ReevoRollbackRequest(
     string CallerId,
     string CallerPassword,
     string Action,
-    int? RemoteId,
+    int RemoteId,
     string Username,
     string SessionId,
     double Amount,

@@ -13,7 +13,7 @@ public static class SwSecurityHash
     {
         var hash = Compute(providerId, userId, secretKey);
 
-        var isValid = externalHash.Equals(hash);
+        var isValid = externalHash.Equals(hash, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }

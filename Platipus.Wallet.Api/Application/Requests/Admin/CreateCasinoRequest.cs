@@ -87,6 +87,7 @@ public record CreateCasinoRequest(
         {
             return casino.Provider switch
             {
+                CasinoProvider.SoftBet when (casino.Params.ISoftBetProviderId is null) => false,
                 CasinoProvider.Openbox when (casino.Params.OpenboxVendorUid is null) => false,
                 CasinoProvider.Hub88 when (casino.Params.Hub88PrivateWalletSecuritySign is null
                                         || casino.Params.Hub88PublicGameServiceSecuritySign is null

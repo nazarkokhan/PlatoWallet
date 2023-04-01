@@ -12,7 +12,7 @@ public record SoftswissPlayRequest(
         string UserId,
         string Currency,
         string Game,
-        string GameId,
+        string? GameId,
         bool? Finished,
         List<SoftswissPlayRequest.PlayAction>? Actions)
     : ISoftswissBaseRequest, IRequest<ISoftswissResult<SoftswissPlayRequest.Response>>
@@ -46,11 +46,14 @@ public record SoftswissPlayRequest(
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.GameId,
+                        request.GameId!,
                         null);
 
                     break;
                 }
+
+                case "bet" or "win" when request.GameId is null:
+                    return SoftswissResultFactory.Failure<Response>(SoftswissErrorCode.BadRequest);
 
                 case "bet":
                 {

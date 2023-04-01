@@ -5,8 +5,8 @@ using Requests.Base;
 public record SoftBetSingleRequest(
     string ProviderGameId,
     int LicenseeId,
-    string Token,
-    string SessionId,
+    string? Token,
+    string? SessionId,
     string PlayerId,
     string Username,
     string Currency,

@@ -56,6 +56,9 @@ public record GetCasinosPageRequest(
                             .ToList(),
                         c.CasinoGames
                             .Select(g => g.Game.LaunchName)
+                            .ToList(),
+                        c.Users
+                            .Select(g => g.Username)
                             .ToList()))
                 .ToListAsync(cancellationToken);
 
@@ -73,5 +76,6 @@ public record GetCasinosPageRequest(
         string GameEnvironmentId,
         Casino.SpecificParams Params,
         List<string> Currencies,
-        List<string> Games);
+        List<string> Games,
+        List<string> Users);
 }

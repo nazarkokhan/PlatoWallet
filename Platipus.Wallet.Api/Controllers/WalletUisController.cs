@@ -9,7 +9,6 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StartupSettings.Filters;
-using StartupSettings.Filters.Security;
 
 [Route("wallet/uis")]
 [MockedErrorActionFilter(Order = 1)]

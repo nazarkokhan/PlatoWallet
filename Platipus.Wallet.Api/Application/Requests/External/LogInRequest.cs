@@ -40,6 +40,7 @@ public record LogInRequest(
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
         private readonly IReevoGameApiClient _reevoGameApiClient;
+        private readonly SoftswissCurrenciesOptions _currencyMultipliers;
 
         public Handler(
             WalletDbContext context,
@@ -47,7 +48,8 @@ public record LogInRequest(
             IHub88GamesApiClient hub88GamesApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
             IGamesGlobalGamesApiClient globalGamesApiClient,
-            IReevoGameApiClient reevoGameApiClient)
+            IReevoGameApiClient reevoGameApiClient,
+            IOptions<SoftswissCurrenciesOptions> currencyMultipliers)
         {
             _context = context;
             _gamesApiClient = gamesApiClient;
@@ -55,6 +57,7 @@ public record LogInRequest(
             _softswissGamesApiClient = softswissGamesApiClient;
             _globalGamesApiClient = globalGamesApiClient;
             _reevoGameApiClient = reevoGameApiClient;
+            _currencyMultipliers = currencyMultipliers.Value;
         }
 
         public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
@@ -87,7 +90,7 @@ public record LogInRequest(
                 IsTemporaryToken = true
             };
 
-            if (casino.Provider is not CasinoProvider.Reevo)
+            if (casino.Provider is not CasinoProvider.Reevo or CasinoProvider.Softswiss)
             {
                 _context.Add(session);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -120,9 +123,10 @@ public record LogInRequest(
             if (environment is null)
                 return ResultFactory.Failure<Response>(ErrorCode.EnvironmentDoesNotExists);
 
-            // var baseUrl = new Uri($"https://{request.LaunchUrlEnvironment}.platipusgaming.com/");
             var baseUrl = casino.Provider is CasinoProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
 
+            string? httpRequestMessage = null;
+            string? httpResponseMessage = null;
             string launchUrl;
             switch (casino.Provider)
             {
@@ -199,12 +203,38 @@ public record LogInRequest(
                         user.CasinoId,
                         user.Username,
                         session.Id,
-                        request.Game,
+                        game.GameServerId,
                         user.Currency.Id,
-                        (long)user.Balance, //TODO
+                        _currencyMultipliers.GetSumOut(user.Currency.Id, user.Balance),
                         cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.LaunchOptions?.GameUrl ?? "";
+                    if (getGameLinkResult.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+                    var data = getGameLinkResult.Data;
+
+                    httpRequestMessage = data.HttpRequest;
+                    httpResponseMessage = data.HttpResponse;
+
+                    var content = data.Content!;
+                    var existingSession = await _context.Set<Session>()
+                        .Where(s => s.Id == content.SessionId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (existingSession is not null)
+                    {
+                        existingSession.ExpirationDate = session.ExpirationDate;
+                        _context.Update(existingSession);
+                        session = existingSession;
+                    }
+                    else
+                    {
+                        session.Id = content.SessionId;
+                        _context.Add(session);
+                    }
+
+                    await _context.SaveChangesAsync(cancellationToken);
+
+                    launchUrl = content.LaunchOptions.GameUrl;
                     break;
                 }
                 case CasinoProvider.Sw:
@@ -212,7 +242,7 @@ public record LogInRequest(
                         baseUrl,
                         session.Id,
                         $"{casino.Id}-{user.Currency.Id}",
-                        user.Username,
+                        user.Id.ToString(),
                         request.Game);
                     break;
                 case CasinoProvider.SoftBet:
@@ -243,15 +273,15 @@ public record LogInRequest(
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
                         baseUrl,
                         new ReevoGetGameGameApiRequest(
-                            "",
-                            "",
+                            casino.Params.ReevoCallerId,
+                            casino.Params.ReevoCallerPassword,
+                            user.Id.ToString(),
                             user.Username,
-                            request.UserName,
                             request.Password,
                             "en",
                             game.GameServerId.ToString(),
                             request.Lobby ?? "",
-                            "0",
+                            request.LaunchMode is LaunchMode.Real ? "0" : "1",
                             user.Currency.Id,
                             casino.Id),
                         cancellationToken);
@@ -296,7 +326,12 @@ public record LogInRequest(
                 launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             }
 
-            var result = new Response(session.Id, user.Balance, launchUrl);
+            var result = new Response(
+                session.Id,
+                user.Balance,
+                launchUrl,
+                httpRequestMessage,
+                httpResponseMessage);
 
             return ResultFactory.Success(result);
         }
@@ -308,29 +343,17 @@ public record LogInRequest(
         int operatorId,
         LaunchMode launchType)
     {
-        var queryParameters = new List<KeyValuePair<string, string?>>();
+        var queryParameters = new Dictionary<string, string?>();
 
-        var tokenKvp = KeyValuePair.Create("token", token);
-        var operatorIdKvp = KeyValuePair.Create("operatorID", operatorId.ToString());
-        var demoKvp = KeyValuePair.Create("demo", bool.TrueString);
-
-        switch (launchType)
+        if (launchType is LaunchMode.Real or LaunchMode.Fun)
         {
-            //Play now
-            case Api.LaunchMode.Real:
-                queryParameters.Add(tokenKvp!);
-                queryParameters.Add(operatorIdKvp!);
-                break;
-            //Play now + Demo
-            case Api.LaunchMode.Fun:
-                queryParameters.Add(tokenKvp!);
-                queryParameters.Add(operatorIdKvp!);
-                queryParameters.Add(demoKvp!);
-                break;
-            //Demo
-            case Api.LaunchMode.Demo:
-                queryParameters.Add(demoKvp!);
-                break;
+            queryParameters.Add("token", token);
+            queryParameters.Add("operatorID", operatorId.ToString());
+        }
+
+        if (launchType is LaunchMode.Fun or LaunchMode.Demo)
+        {
+            queryParameters.Add("demo", bool.TrueString);
         }
 
         var queryString = QueryString.Create(queryParameters);
@@ -366,6 +389,7 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
+    //TODO launchmode
     private static string GetOpenboxLaunchUrl(
         Uri baseUrl,
         string token,
@@ -380,7 +404,7 @@ public record LogInRequest(
             // { "brand", "openbox" },//TODO need?
             { nameof(token), token },
             { "agency-uid", agencyUid },
-            { "player-uid", playerUid.ToString() },
+            { "player-uid", playerUid },
             { "player-type", "1" },
             { "player-id", playerId },
             { "game-id", gameId },
@@ -528,7 +552,12 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    public record Response(string SessionId, decimal Balance, string LaunchUrl) : PswBalanceResponse(Balance);
+    public record Response(
+        string SessionId,
+        decimal Balance,
+        string LaunchUrl,
+        string? HttpRequestMessage,
+        string? HttpResponseMessage) : PswBalanceResponse(Balance);
 
     public class Validator : AbstractValidator<SignUpRequest>
     {

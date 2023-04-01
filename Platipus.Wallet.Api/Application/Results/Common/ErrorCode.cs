@@ -30,6 +30,7 @@ public enum ErrorCode
 
     AwardNotFound,
     AwardIsAlreadyUsed,
+    AwardExpired,
 
     RequestAlreadyExists,
 
@@ -52,4 +53,13 @@ public enum ErrorCode
     EnvironmentDoesNotExists,
     EnvironmentAlreadyExists,
     UserAlreadyExists,
+
+    ErrorMockAlreadyExists,
+    InvalidJsonContent,
+    InvalidXmlContent,
+    MaxErrorMockTimeoutIs3Minutes,
+
+    //game api
+    EmptyExternalResponse,
+    InvalidExternalResponse
 }

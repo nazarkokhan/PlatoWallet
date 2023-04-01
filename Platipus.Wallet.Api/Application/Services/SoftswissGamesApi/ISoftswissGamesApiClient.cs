@@ -5,25 +5,28 @@ using DTOs.Responses;
 
 public interface ISoftswissGamesApiClient
 {
-    Task<ISoftswissResult<SoftswissGetGameLinkGameApiResponse>> GetLaunchUrlAsync(
+    Task<IResult<SoftswissBoxGamesApiResponse<SoftswissGetGameLinkGameApiResponse>>> GetLaunchUrlAsync(
         Uri baseUrl,
         string casinoId,
         string user,
         string sessionId,
-        string game,
+        int gameId,
         string currency,
         long balance,
         CancellationToken cancellationToken = default);
 
-    Task<ISoftswissResult> IssueFreespinsAsync(
+    Task<IResult<SoftswissBoxGamesApiResponse<string>>> IssueFreespinsAsync(
+        Uri baseUrl,
         SoftswissIssueFreespinsGameApiRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<ISoftswissResult> CancelFreespinsAsync(
+    Task<IResult<SoftswissBoxGamesApiResponse<SoftswissCancelFreespinsGameApiResponse>>> CancelFreespinsAsync(
+        Uri baseUrl,
         SoftswissCancelFreespinsGameApiRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<ISoftswissResult<SoftswissRoundDetailsGameApiResponse>> RoundDetailsAsync(
+    Task<IResult<SoftswissBoxGamesApiResponse<SoftswissRoundDetailsGameApiResponse>>> RoundDetailsAsync(
+        Uri baseUrl,
         SoftswissRoundDetailsGameApiRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,8 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Softswiss.Base;
 
-public interface ISoftswissBaseRequest
+using Requests.Base;
+
+public interface ISoftswissBaseRequest : IBaseWalletRequest
 {
     public string SessionId { get; }
 
