@@ -32,6 +32,7 @@ public enum SoftswissErrorCode
 //6xx
     GameProviderDoesntProvideFreeSpins = 600,
     ImpossibleToIssueFreeSpinsInRequestedGame = 601,
+
     YouShouldProvideAtLeastOneGameToIssueFreeSpins = 602,
     BadExpirationDate = 603,
     CantChangeIssueStateFromItsCurrentToRequested = 605,
