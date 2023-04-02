@@ -2,6 +2,6 @@
 
 using Base;
 
-public interface IBetConstructResult : IBaseResult<BetConstructErrorCode>
+public interface IBetconstructResult : IBaseResult<BetconstructErrorCode>
 {
 }

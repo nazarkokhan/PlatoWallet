@@ -13,7 +13,7 @@ public record CreateCasinoRequest(
     CasinoProvider Provider,
     List<string> Currencies,
     Casino.SpecificParams Params,
-    [property: DefaultValue("test")] string? Environment) : IRequest<IResult>
+    [property: DefaultValue("test")] string Environment) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<CreateCasinoRequest, IResult>
     {
@@ -67,6 +67,7 @@ public record CreateCasinoRequest(
                 request.Provider,
                 request.SignatureKey)
             {
+                GameEnvironmentId = request.Environment,
                 CasinoCurrencies = matchedCurrencies
                     .Select(c => new CasinoCurrencies { CurrencyId = c.Id })
                     .ToList(),
