@@ -314,7 +314,7 @@ public record LogInRequest(
                         baseUrl,
                         request.Game,
                         "en",
-                        "test",
+                        "demo",
                         session.Id);
                     break;
                 default:
@@ -545,7 +545,7 @@ public record LogInRequest(
             { nameof(gameId), gameId },
         };
 
-        if (mode is "real")
+        if (mode is "real_play")
         {
             queryParameters.Add(nameof(token), token);
         }
