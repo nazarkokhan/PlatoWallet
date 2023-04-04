@@ -84,7 +84,6 @@ public class WalletService : IWalletService
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
                 .Include(u => u.Rounds.Where(r => r.Id == roundId))
-                .ThenInclude(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
@@ -107,8 +106,6 @@ public class WalletService : IWalletService
 
                 round = new Round(roundId) { UserId = user.Id };
                 _context.Add(round);
-
-                // await _context.SaveChangesAsync(cancellationToken);
             }
 
             if (round.Finished)
@@ -124,7 +121,7 @@ public class WalletService : IWalletService
                 _context.Update(round);
             }
 
-            var transaction = new Transaction(transactionId, amount, TransactionType.Bet) { Round = round };
+            var transaction = new Transaction(transactionId, amount, TransactionType.Bet) { RoundId = round.Id };
 
             _context.Add(transaction);
 
@@ -178,7 +175,6 @@ public class WalletService : IWalletService
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
                 .Include(u => u.Rounds.Where(r => r.Id == roundId))
-                .ThenInclude(r => r.Transactions)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
@@ -248,6 +244,7 @@ public class WalletService : IWalletService
                             ? r.Id == roundId
                             : r.Transactions.Any(t => t.Id == transactionId)))
                 .ThenInclude(r => r.Transactions.Where(t => t.Id == transactionId))
+                .AsSingleQuery()
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
