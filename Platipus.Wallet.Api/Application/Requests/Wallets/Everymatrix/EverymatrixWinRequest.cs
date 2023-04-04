@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Everymatrix;
 
 using Base;
 using Base.Response;
-using Infrastructure.Persistence;
 using Results.Everymatrix;
 using Results.Everymatrix.WithData;
 using Results.ResultToResultMappers;
@@ -24,32 +23,52 @@ public record EverymatrixWinRequest(
     public class Handler : IRequestHandler<EverymatrixWinRequest, IEverymatrixResult<EverymatrixBalanceResponse>>
     {
         private readonly IWalletService _wallet;
-        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet, WalletDbContext context)
+        public Handler(IWalletService wallet)
         {
             _wallet = wallet;
-            _context = context;
         }
 
         public async Task<IEverymatrixResult<EverymatrixBalanceResponse>> Handle(
             EverymatrixWinRequest request,
             CancellationToken cancellationToken)
         {
-            var walletResult = await _wallet.WinAsync(
-                request.Token,
-                request.RoundId,
-                request.ExternalId,
-                request.Amount,
-                request.RoundEnd ?? false,
-                request.Currency,
-                cancellationToken: cancellationToken);
+            EverymatrixBalanceResponse response;
 
-            if (walletResult.IsFailure)
-                return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
-            var data = walletResult.Data;
+            if (request.BonusId is not null)
+            {
+                var walletResult = await _wallet.AwardAsync(
+                    request.Token,
+                    request.RoundId,
+                    request.ExternalId,
+                    request.Amount,
+                    request.BonusId,
+                    request.Currency,
+                    cancellationToken: cancellationToken);
 
-            var response = new EverymatrixBalanceResponse(data.Balance, data.Currency);
+                if (walletResult.IsFailure)
+                    return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
+                var data = walletResult.Data;
+
+                response = new EverymatrixBalanceResponse(data.Balance, data.Currency);
+            }
+            else
+            {
+                var walletResult = await _wallet.WinAsync(
+                    request.Token,
+                    request.RoundId,
+                    request.ExternalId,
+                    request.Amount,
+                    request.RoundEnd ?? false,
+                    request.Currency,
+                    cancellationToken: cancellationToken);
+
+                if (walletResult.IsFailure)
+                    return walletResult.ToEverymatrixResult<EverymatrixBalanceResponse>();
+                var data = walletResult.Data;
+
+                response = new EverymatrixBalanceResponse(data.Balance, data.Currency);
+            }
 
             return EverymatrixResultFactory.Success(response);
         }
