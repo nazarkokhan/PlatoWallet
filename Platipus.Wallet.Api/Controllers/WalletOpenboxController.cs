@@ -104,16 +104,20 @@ public class WalletOpenboxController : RestApiController
             return OpenboxResultFactory.Failure(OpenboxErrorCode.InternalServiceError, e).ToActionResult();
         }
     }
+}
 
-
-    [HttpPost("private/test/get-security-value")]
+[Route("wallet/private/everymatrix")]
+[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+public class WalletOpenboxPrivateController : RestApiController
+{
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string vendorUid,
         [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
-        var casino = await _context.Set<Casino>()
+        var casino = await dbContext.Set<Casino>()
             .Where(
                 c => c.Provider == CasinoProvider.Openbox
                   && c.Params.OpenboxVendorUid == vendorUid)
