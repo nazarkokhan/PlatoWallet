@@ -106,7 +106,7 @@ public class WalletOpenboxController : RestApiController
     }
 }
 
-[Route("wallet/private/everymatrix")]
+[Route("wallet/private/openbox")]
 [JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
 public class WalletOpenboxPrivateController : RestApiController
 {
