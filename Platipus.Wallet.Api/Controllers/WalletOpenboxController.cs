@@ -140,7 +140,7 @@ public class WalletOpenboxPrivateController : RestApiController
         return Ok(securityValue);
     }
 
-    [HttpPost("decrypt-payload")]
+    [HttpGet("decrypt-payload")]
     public async Task<IActionResult> OpenboxDecryptPayload(
         string vendorUid,
         string requestPayload,
