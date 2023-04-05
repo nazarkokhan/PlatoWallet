@@ -63,6 +63,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             }
 
             usernameOrSession = openboxPayloadObj.Token;
+            searchMockBySession = true;
             currentMethod = singleRequest.Method switch
             {
                 OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
