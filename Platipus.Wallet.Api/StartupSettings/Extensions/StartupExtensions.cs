@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.StartupSettings.Extensions;
 
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using ControllerSpecificJsonOptions;
@@ -80,7 +81,14 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                });
+                })
+            .AddJsonOptions(
+            nameof(CasinoProvider.PariMatch),
+            options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new ParimatchJsonDateTimeConverter());
+            });
 
         return builder.Services;
     }
