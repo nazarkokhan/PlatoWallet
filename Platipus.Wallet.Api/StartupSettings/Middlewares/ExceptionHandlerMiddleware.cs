@@ -89,7 +89,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
         return new PariMatchErrorResponse(
             PariMatchErrorCode.ErrorInternal.ToString(),
             "Internal error",
-            DateTimeOffset.UtcNow.ToString("yyyy:MM:dd:HH:mm:ss:fff t zzz"));
+            DateTimeOffset.Now);
     }
 
     // private static object GetPariBetflagErrorResponse()
