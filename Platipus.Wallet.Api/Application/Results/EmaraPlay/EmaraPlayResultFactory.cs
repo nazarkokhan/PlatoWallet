@@ -8,22 +8,21 @@ public static class EmaraPlayResultFactory
 
     public static EmaraPlayResult<TData> Success<TData>(TData data) => new(data);
 
-    public static EmaraPlayResult Failure(EmaraPlayErrorCode errorCode, long? balance = null, Exception? exception = null)
-        => new(errorCode, balance, exception);
+    public static EmaraPlayResult Failure(EmaraPlayErrorCode errorCode, Exception? exception = null)
+        => new(errorCode, exception);
 
     public static EmaraPlayResult Failure(IEmaraPlayResult result)
         => result.IsFailure
-            ? Failure(result.ErrorCode, result.Balance, result.Exception)
+            ? Failure(result.ErrorCode, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static EmaraPlayResult<TData> Failure<TData>(
         EmaraPlayErrorCode errorCode,
-        Exception? exception = null,
-        long? balance = null)
-        => new(errorCode, balance, exception);
+        Exception? exception = null)
+        => new(errorCode, exception);
 
     public static EmaraPlayResult<TData> Failure<TData, TSourceData>(IEmaraPlayResult<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Exception, result.Balance)
+            ? Failure<TData>(result.ErrorCode, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

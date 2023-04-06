@@ -11,12 +11,10 @@ public record EmaraPlayResult : BaseResult<EmaraPlayErrorCode>, IEmaraPlayResult
 
     public EmaraPlayResult(
         EmaraPlayErrorCode errorCode,
-        long? balance = null,
         Exception? exception = null,
         string? description = null)
         : base(errorCode, exception)
     {
-        Balance = balance;
         ErrorDescription = description ?? string.Empty;
     }
 

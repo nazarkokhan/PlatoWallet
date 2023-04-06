@@ -16,10 +16,13 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
+using Application.Requests.Wallets.TODO.EmaraPlay.Base;
 using Application.Requests.Wallets.Uis.Base;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
+using Application.Results.EmaraPlay;
+using Application.Results.EmaraPlay.WithData;
 using Application.Results.Everymatrix.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
@@ -193,6 +196,23 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 var errorCode = betConstructResult.ErrorCode;
 
                 var errorResponse = new BetconstructErrorResponse(errorCode);
+
+                context.Result = new OkObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+
+            if (baseExternalActionResult.Result is IEmaraPlayResult<object> emaraPlayResult)
+            {
+                if (emaraPlayResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(emaraPlayResult.Data);
+                    return;
+                }
+
+                var errorCode = (int)emaraPlayResult.ErrorCode;
+
+                var errorResponse = new EmaraPlayErrorResponse(errorCode.ToString(), emaraPlayResult.ErrorCode.ToString());
 
                 context.Result = new OkObjectResult(errorResponse);
 

@@ -16,6 +16,7 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
+using Application.Requests.Wallets.TODO.EmaraPlay.Base;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base;
 using Controllers;
@@ -196,6 +197,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     break;
                 case WalletBetConstructController:
                     usernameOrSession = actionArgumentsValues.OfType<IBetconstructRequest>().SingleOrDefault()?.Token;
+                    searchMockBySession = true;
+                    break;
+                case WalletEmaraPlayController:
+                    usernameOrSession = actionArgumentsValues.OfType<IEmaraPlayBaseRequest>().SingleOrDefault()?.Token;
                     searchMockBySession = true;
                     break;
                 default:

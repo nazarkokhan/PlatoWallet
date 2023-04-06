@@ -1,4 +1,4 @@
-﻿namespace Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
+namespace Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 
 using Base.WithData;
 

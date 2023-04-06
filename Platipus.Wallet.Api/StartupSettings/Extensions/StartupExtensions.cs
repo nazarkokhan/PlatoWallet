@@ -87,6 +87,12 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                })
+            .AddJsonOptions(
+                nameof(CasinoProvider.EmaraPlay),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
 
         return builder.Services;
