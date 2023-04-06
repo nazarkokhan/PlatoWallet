@@ -2,6 +2,6 @@
 
 using Base;
 
-public interface IPariMatchResult : IBaseResult<PariMatchErrorCode>
+public interface IParimatchResult : IBaseResult<ParimatchErrorCode>
 {
 }

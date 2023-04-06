@@ -15,6 +15,7 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base;
+using Application.Requests.Wallets.TODO.PariMatch.Base;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base;
 using Controllers;
@@ -190,6 +191,9 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 case WalletEverymatrixController:
                     usernameOrSession = actionArgumentsValues.OfType<IEveryMatrixRequest>().SingleOrDefault()?.Token;
                     searchMockBySession = true;
+                    break;
+                case WalletPariMatchController:
+                    usernameOrSession = actionArgumentsValues.OfType<IPariMatchRequest>().SingleOrDefault()?.PlayerId;
                     break;
                 default:
                     usernameOrSession = null;

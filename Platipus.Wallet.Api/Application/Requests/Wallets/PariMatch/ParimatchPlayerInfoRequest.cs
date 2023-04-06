@@ -9,13 +9,13 @@ using Results.PariMatch.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 using TODO.PariMatch.Base;
-using static Results.PariMatch.PariMatchResultFactory;
+using static Results.PariMatch.ParimatchResultFactory;
 
-public record PariMatchPlayerInfoRequest(string Cid, string SessionToken)
-    : IRequest<IPariMatchResult<PariMatchPlayerInfoResponse>>
+public record ParimatchPlayerInfoRequest(string Cid, string SessionToken)
+    : IRequest<IParimatchResult<ParimatchPlayerInfoResponse>>, IPariMatchRequest
 {
 
-    public class Handler : IRequestHandler<PariMatchPlayerInfoRequest, IPariMatchResult<PariMatchPlayerInfoResponse>>
+    public class Handler : IRequestHandler<ParimatchPlayerInfoRequest, IParimatchResult<ParimatchPlayerInfoResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -25,8 +25,8 @@ public record PariMatchPlayerInfoRequest(string Cid, string SessionToken)
         }
 
 
-        public async Task<IPariMatchResult<PariMatchPlayerInfoResponse>> Handle(
-            PariMatchPlayerInfoRequest request,
+        public async Task<IParimatchResult<ParimatchPlayerInfoResponse>> Handle(
+            ParimatchPlayerInfoRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.GetBalanceAsync(
@@ -34,17 +34,17 @@ public record PariMatchPlayerInfoRequest(string Cid, string SessionToken)
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToParimatchResult<PariMatchPlayerInfoResponse>();
+                return walletResult.ToParimatchResult<ParimatchPlayerInfoResponse>();
             var data = walletResult.Data;
 
-            var response = new PariMatchPlayerInfoResponse(
+            var response = new ParimatchPlayerInfoResponse(
                 data.UserId.ToString(),
                 (int)data.Balance,
                 data.Currency,
                 "Ukraine",
                 data.Username);
 
-            return Success<PariMatchPlayerInfoResponse>(response);
+            return Success<ParimatchPlayerInfoResponse>(response);
         }
     }
 }

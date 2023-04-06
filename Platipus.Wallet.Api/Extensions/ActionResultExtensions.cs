@@ -22,5 +22,5 @@ public static class ActionResultExtensions
 
     public static IActionResult ToActionResult(this ISoftswissResult result) => new SoftswissExternalActionResult(result);
 
-    public static IActionResult ToActionResult(this IPariMatchResult result) => new PariMatchExternalActionResult(result);
+    public static IActionResult ToActionResult(this IParimatchResult result) => new ParimatchExternalActionResult(result);
 }

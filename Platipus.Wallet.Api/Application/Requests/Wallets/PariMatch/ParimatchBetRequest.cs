@@ -6,13 +6,13 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Results.PariMatch;
 using Results.PariMatch.WithData;
-using static Results.PariMatch.PariMatchResultFactory;
+using static Results.PariMatch.ParimatchResultFactory;
 using Microsoft.EntityFrameworkCore;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 using TODO.PariMatch.Base;
 
-public record PariMatchBetRequest(
+public record ParimatchBetRequest(
     string Cid,
     string SessionToken,
     string PlayerId,
@@ -21,9 +21,9 @@ public record PariMatchBetRequest(
     string RoundId,
     bool RoundClosed,
     int Amount,
-    string Currency) : IRequest<IPariMatchResult<ParimatchBaseResponse>>
+    string Currency) : IRequest<IParimatchResult<ParimatchBaseResponse>>, IPariMatchRequest
 {
-    public class Handler : IRequestHandler<PariMatchBetRequest, IPariMatchResult<ParimatchBaseResponse>>
+    public class Handler : IRequestHandler<ParimatchBetRequest, IParimatchResult<ParimatchBaseResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -32,8 +32,8 @@ public record PariMatchBetRequest(
             _wallet = wallet;
         }
 
-        public async Task<IPariMatchResult<ParimatchBaseResponse>> Handle(
-            PariMatchBetRequest request,
+        public async Task<IParimatchResult<ParimatchBaseResponse>> Handle(
+            ParimatchBetRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.BetAsync(

@@ -86,8 +86,8 @@ public class ExceptionHandlerMiddleware : IMiddleware
 
     private static object GetPariMatchErrorResponse()
     {
-        return new PariMatchErrorResponse(
-            PariMatchErrorCode.ErrorInternal.ToString(),
+        return new ParimatchErrorResponse(
+            ParimatchErrorCode.ErrorInternal.ToString(),
             "Internal error",
             DateTimeOffset.Now);
     }

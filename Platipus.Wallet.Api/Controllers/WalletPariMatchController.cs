@@ -12,7 +12,7 @@ using StartupSettings.Filters;
 [Route("wallet/parimatch")]
 [MockedErrorActionFilter(Order = 1)]
 [JsonSettingsName(nameof(CasinoProvider.PariMatch))]
-[ProducesResponseType(typeof(PariMatchErrorResponse), StatusCodes.Status400BadRequest)]
+[ProducesResponseType(typeof(ParimatchErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletPariMatchController : RestApiController
 {
     private readonly IMediator _mediator;
@@ -20,30 +20,30 @@ public class WalletPariMatchController : RestApiController
     public WalletPariMatchController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("player-info")]
-    [ProducesResponseType(typeof(PariMatchPlayerInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ParimatchPlayerInfoResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
-        PariMatchPlayerInfoRequest request,
+        ParimatchPlayerInfoRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
     [ProducesResponseType(typeof(ParimatchBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        PariMatchBetRequest request,
+        ParimatchBetRequest request,
         CancellationToken cancellationToken)
         => Ok(await _mediator.Send(request, cancellationToken));
 
     [HttpPost("win")]
     [ProducesResponseType(typeof(ParimatchBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
-        PariMatchWinRequest request,
+        ParimatchWinRequest request,
         CancellationToken cancellationToken)
         => (Ok(await _mediator.Send(request, cancellationToken)));
 
     [HttpPost("cancel")]
     [ProducesResponseType(typeof(ParimatchBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Cancel(
-        PariMatchCancelRequest request,
+        ParimatchCancelRequest request,
         CancellationToken cancellationToken)
         => (Ok(await _mediator.Send(request, cancellationToken)));
 }

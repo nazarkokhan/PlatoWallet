@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.TODO.PariMatch.Base;
 
-public record PariMatchPlayerInfoResponse(
+public record ParimatchPlayerInfoResponse(
     string PlayerId,
     int Balance,
     string Currency,

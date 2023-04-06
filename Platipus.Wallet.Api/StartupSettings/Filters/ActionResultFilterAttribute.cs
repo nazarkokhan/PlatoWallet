@@ -15,6 +15,7 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
+using Application.Requests.Wallets.TODO.PariMatch.Base;
 using Application.Requests.Wallets.Uis.Base;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.Betflag.WithData;
@@ -23,11 +24,13 @@ using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
+using Application.Results.PariMatch.WithData;
 using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
 using Application.Results.Uis.WithData;
 using Domain.Entities.Enums;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -97,7 +100,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 {
                     context.Result = new OkObjectResult(uisResult.Data)
                     {
-                        ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                        ContentTypes = new MediaTypeCollection {MediaTypeNames.Application.Xml}
                     };
                     return;
                 }
@@ -111,7 +114,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
                 context.Result = new OkObjectResult(container)
                 {
-                    ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                    ContentTypes = new MediaTypeCollection {MediaTypeNames.Application.Xml}
                 };
 
                 context.HttpContext.Items.Add(responseItemsKey, container);
@@ -121,11 +124,11 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
             {
                 var errorCode = betflagResult.ErrorCode;
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                var secretKey = (string?)httpContext.Items[HttpContextItems.BetflagCasinoSecretKey];
+                var secretKey = (string?) httpContext.Items[HttpContextItems.BetflagCasinoSecretKey];
 
                 if (betflagResult.IsSuccess)
                 {
-                    var data = (BetflagBaseResponse)betflagResult.Data;
+                    var data = (BetflagBaseResponse) betflagResult.Data;
                     data.Hash = BetflagSecurityHash.Compute(data.Result.ToString(), timestamp, secretKey!);
                     data.Timestamp = timestamp;
                     context.Result = new OkObjectResult(data);
@@ -133,7 +136,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 }
 
                 var hash = secretKey is not null
-                    ? BetflagSecurityHash.Compute(((int)errorCode).ToString(), timestamp, secretKey)
+                    ? BetflagSecurityHash.Compute(((int) errorCode).ToString(), timestamp, secretKey)
                     : string.Empty;
 
                 var errorResponse = new BetflagErrorResponse(
@@ -179,9 +182,29 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
                 context.HttpContext.Items.Add(responseItemsKey, errorResponse);
             }
+
+            if (baseExternalActionResult.Result is IParimatchResult<object> parimatchResult)
+            {
+                if (parimatchResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(parimatchResult.Data);
+                    return;
+                }
+
+                var errorCode = (int) parimatchResult.ErrorCode;
+
+                var errorResponse = new ParimatchErrorResponse(
+                    errorCode.ToString(),
+                    parimatchResult.ErrorCode.Humanize(),
+                    DateTimeOffset.Now);
+
+                context.Result = new OkObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
         }
 
-        if (context.Result is PswExternalActionResult { Result: { } pswActionResult })
+        if (context.Result is PswExternalActionResult {Result: { } pswActionResult})
         {
             if (pswActionResult.IsSuccess)
             {
@@ -198,7 +221,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = pswActionResult.ErrorCode;
 
-            var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
+            var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int) errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
 
@@ -223,7 +246,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = dafabetActionResult.Result.ErrorCode;
 
-            var errorResponse = new DafabetErrorResponse((int)errorCode, errorCode.ToString());
+            var errorResponse = new DafabetErrorResponse((int) errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
 
@@ -299,7 +322,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = softswissActionResult.Result.ErrorCode;
 
-            var statusCode = (int)errorCode;
+            var statusCode = (int) errorCode;
             var balance = softswissActionResult.Result.Balance;
 
             if (statusCode is not (>= 400 and <= 599))
@@ -311,7 +334,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             var errorResponse = new SoftswissErrorResponse(errorCode, balance);
 
-            context.Result = new BadRequestObjectResult(errorResponse) { StatusCode = statusCode };
+            context.Result = new BadRequestObjectResult(errorResponse) {StatusCode = statusCode};
 
             context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }

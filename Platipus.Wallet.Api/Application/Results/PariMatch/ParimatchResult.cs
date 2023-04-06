@@ -2,15 +2,15 @@ namespace Platipus.Wallet.Api.Application.Results.PariMatch;
 
 using Base;
 
-public record PariMatchResult : BaseResult<PariMatchErrorCode>, IPariMatchResult
+public record ParimatchResult : BaseResult<ParimatchErrorCode>, IParimatchResult
 {
-    public PariMatchResult()
+    public ParimatchResult()
     {
         ErrorDescription = string.Empty;
     }
 
-    public PariMatchResult(
-        PariMatchErrorCode errorCode,
+    public ParimatchResult(
+        ParimatchErrorCode errorCode,
         Exception? exception = null,
         string? description = null)
         : base(errorCode, exception)

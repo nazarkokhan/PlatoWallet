@@ -11,20 +11,20 @@ using Results.PariMatch.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 using TODO.PariMatch.Base;
-using static Results.PariMatch.PariMatchResultFactory;
+using static Results.PariMatch.ParimatchResultFactory;
 
-public record PariMatchCancelRequest(
+public record ParimatchCancelRequest(
     string Cid,
     string PlayerId,
     string ProductId,
     string TxId,
     string RoundId,
     int Amount,
-    string Currency) : IRequest<IPariMatchResult<ParimatchBaseResponse>>
+    string Currency) : IRequest<IParimatchResult<ParimatchBaseResponse>>, IPariMatchRequest
 {
 
 
-    public class Handler : IRequestHandler<PariMatchCancelRequest, IPariMatchResult<ParimatchBaseResponse>>
+    public class Handler : IRequestHandler<ParimatchCancelRequest, IParimatchResult<ParimatchBaseResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -34,8 +34,8 @@ public record PariMatchCancelRequest(
             _wallet = wallet;
         }
 
-        public async Task<IPariMatchResult<ParimatchBaseResponse>> Handle(
-            PariMatchCancelRequest request,
+        public async Task<IParimatchResult<ParimatchBaseResponse>> Handle(
+            ParimatchCancelRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.RollbackAsync(

@@ -3,7 +3,7 @@ namespace Platipus.Wallet.Api.Application.Results.PariMatch;
 using System.Diagnostics.CodeAnalysis;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public enum PariMatchErrorCode
+public enum ParimatchErrorCode
 {
     InvalidSessionKey,
     InsufficientBalance,
