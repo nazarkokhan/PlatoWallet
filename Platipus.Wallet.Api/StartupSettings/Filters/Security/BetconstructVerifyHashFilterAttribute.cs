@@ -16,7 +16,7 @@ public class BetconstructVerifyHashFilterAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
-            .OfType<BetconstructBoxRequest<IBetconstructRequest>>()
+            .OfType<IBetconstructBoxRequest<IBetconstructRequest>>()
             .Single();
 
         var httpContext = context.HttpContext;
