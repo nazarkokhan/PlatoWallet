@@ -9,11 +9,10 @@ public record BetconstructBoxRequest<TRequestData>(TRequestData Data, string Tim
     public TRequestData Data { get; } = Data;
 }
 
-public interface IBetconstructBoxRequest<TRequestData>
+public interface IBetconstructBoxRequest<out TRequestData>
     where TRequestData : IBetconstructRequest
 {
     public string Hash { get; }
     public string Time { get; }
     public TRequestData Data { get; }
 }
-
