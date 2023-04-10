@@ -155,6 +155,7 @@ public class UisChangeBalanceRequest
         public decimal Balance { get; set; }
     }
 
+    [XmlRoot("UIS")]
     public class ChangeBalanceBoxResponse : UisResponseContainer<UisChangeBalanceRequest, UisChangeBalanceResponse>
     {
         public ChangeBalanceBoxResponse()
