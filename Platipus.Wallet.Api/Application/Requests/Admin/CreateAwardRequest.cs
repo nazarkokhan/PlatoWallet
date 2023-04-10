@@ -4,7 +4,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Results.Psw;
-using Services.GamesApi;
+using Services.PswGamesApi;
 using Wallets.Psw.Base.Response;
 
 public record CreateAwardRequest(

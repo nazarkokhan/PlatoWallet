@@ -1,19 +1,19 @@
-namespace Platipus.Wallet.Api.Application.Services.GamesApi;
+namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Api.Extensions;
-using Api.Extensions.SecuritySign;
-using Domain.Entities;
-using Domain.Entities.Enums;
 using DTOs.Responses;
-using Hub88GamesApi.DTOs.Requests;
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Platipus.Wallet.Api.Application.Services.Hub88GamesApi.DTOs.Requests;
+using Platipus.Wallet.Api.Extensions;
+using Platipus.Wallet.Api.Extensions.SecuritySign;
+using Domain.Entities;
+using Domain.Entities.Enums;
+using Infrastructure.Persistence;
 
 public class GamesApiClient : IGamesApiClient
 {

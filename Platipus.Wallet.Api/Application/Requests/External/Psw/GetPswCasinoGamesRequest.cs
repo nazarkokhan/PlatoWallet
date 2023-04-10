@@ -2,11 +2,11 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Psw;
 
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Results.Psw;
-using Services.GamesApi;
-using Platipus.Wallet.Api.Application.Services.GamesApi.DTOs.Responses;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
+using Services.PswGamesApi;
+using Services.PswGamesApi.DTOs.Responses;
 
 public record GetPswCasinoGamesRequest(string CasinoId) : IRequest<IPswResult<PswGetCasinoGamesListGamesApiResponseDto>>
 {

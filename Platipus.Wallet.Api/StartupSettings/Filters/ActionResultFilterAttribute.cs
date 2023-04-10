@@ -15,6 +15,7 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
+using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.Betflag.WithData;
@@ -102,11 +103,20 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                var container = new UisResponseContainer
+                var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
+                var responseObject = new UisErrorResponse(uisResult.ErrorCode);
+
+                object container = requestObject switch
                 {
-                    Request = httpContext.Items[HttpContextItems.RequestObject]!,
-                    Time = DateTime.UtcNow,
-                    Response = new UisErrorResponse(uisResult.ErrorCode)
+                    UisAuthenticateRequest uisRequest
+                        => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(uisRequest, responseObject),
+                    UisChangeBalanceRequest uisRequest
+                        => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
+                    UisGetBalanceRequest uisRequest
+                        => new UisResponseContainer<UisGetBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
+                    UisStatusRequest uisRequest
+                        => new UisResponseContainer<UisStatusRequest, UisErrorResponse>(uisRequest, responseObject),
+                    _ => throw new ArgumentOutOfRangeException()
                 };
 
                 context.Result = new OkObjectResult(container)

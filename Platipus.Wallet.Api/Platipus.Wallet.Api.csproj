@@ -50,7 +50,7 @@
 
     <ItemGroup>
         <Folder Include="Application\Results\Base\WithData\WithError" />
-        <Folder Include="Application\Services\GamesApi\DTOs\Requests" />
+        <Folder Include="Application\Services\PswGamesApi\DTOs\Requests" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,7 +1,7 @@
-namespace Platipus.Wallet.Api.Application.Services.GamesApi;
+namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
-using Domain.Entities.Enums;
 using DTOs.Responses;
+using Domain.Entities.Enums;
 
 public interface IGamesApiClient
 {
