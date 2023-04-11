@@ -8,8 +8,7 @@ using Microsoft.EntityFrameworkCore;
 public record CreateAwardRequest(
     string Username,
     string AwardId,
-    DateTime ValidUntil,
-    string Game) : IRequest<IResult>
+    DateTime ValidUntil) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<CreateAwardRequest, IResult>
     {
