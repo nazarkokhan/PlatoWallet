@@ -8,11 +8,10 @@ using Results.ResultToResultMappers;
 using Results.Uis;
 using Results.Uis.WithData;
 using Services.Wallet;
+using Services.Wallet.DTOs;
 
 [XmlRoot("REQUEST")]
-public class UisChangeBalanceRequest
-    : IUisUserIdRequest,
-        IRequest<IUisResult<UisChangeBalanceRequest.ChangeBalanceBoxResponse>>
+public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisChangeBalanceRequest.ChangeBalanceBoxResponse>>
 {
     [XmlElement("USERID")]
     [BindProperty(Name = "userId")]
@@ -64,76 +63,45 @@ public class UisChangeBalanceRequest
             UisChangeBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            UisChangeBalanceResponse response;
-            switch (request.TrnType)
+            var walletResult = request.TrnType switch
             {
-                case "BET":
-                {
-                    var walletResult = await _wallet.BetAsync(
-                        request.UserId,
-                        request.RoundId,
-                        request.TransactionId,
-                        request.Amount,
-                        roundFinished: request.IsRoundFinish,
-                        searchByUsername: true,
-                        cancellationToken: cancellationToken);
+                "BET" => await _wallet.BetAsync(
+                    request.UserId,
+                    request.RoundId,
+                    request.TransactionId,
+                    request.Amount,
+                    roundFinished: request.IsRoundFinish,
+                    searchByUsername: true,
+                    cancellationToken: cancellationToken),
+                "WIN" => await _wallet.WinAsync(
+                    request.UserId,
+                    request.RoundId,
+                    request.TransactionId,
+                    request.Amount,
+                    request.IsRoundFinish,
+                    searchByUsername: true,
+                    cancellationToken: cancellationToken),
+                "CANCELBET" => await _wallet.RollbackAsync(
+                    request.UserId,
+                    request.TransactionId,
+                    request.RoundId,
+                    true,
+                    cancellationToken),
+                _ => null
+            };
 
-                    if (walletResult.IsFailure)
-                        return walletResult
-                            .ToUisResult<ChangeBalanceBoxResponse>();
-                    var data = walletResult.Data;
+            if (walletResult is null)
+                return UisResultFactory.Failure<ChangeBalanceBoxResponse>(UisErrorCode.InternalError);
 
-                    response = new UisChangeBalanceResponse { Balance = data.Balance };
+            if (walletResult.IsFailure)
+                return walletResult.ToUisResult<ChangeBalanceBoxResponse>();
+            var data = walletResult.Data;
 
-                    break;
-                }
-
-                case "WIN":
-                {
-                    var walletResult = await _wallet.WinAsync(
-                        request.UserId,
-                        request.RoundId,
-                        request.TransactionId,
-                        request.Amount,
-                        request.IsRoundFinish,
-                        searchByUsername: true,
-                        cancellationToken: cancellationToken);
-
-                    if (walletResult.IsFailure)
-                        return walletResult
-                            .ToUisResult<ChangeBalanceBoxResponse>();
-                    var data = walletResult.Data;
-
-                    response = new UisChangeBalanceResponse { Balance = data.Balance };
-
-                    break;
-                }
-
-                case "CANCELBET":
-                {
-                    var walletResult = await _wallet.RollbackAsync(
-                        request.UserId,
-                        request.TransactionId,
-                        request.RoundId,
-                        true,
-                        cancellationToken);
-
-                    if (walletResult.IsFailure)
-                        return walletResult
-                            .ToUisResult<ChangeBalanceBoxResponse>();
-                    var data = walletResult.Data;
-
-                    response = new UisChangeBalanceResponse
-                    {
-                        Balance = data.Balance,
-                        ExSystemTransactionId = data.Transaction.InternalId
-                    };
-
-                    break;
-                }
-                default:
-                    return UisResultFactory.Failure<ChangeBalanceBoxResponse>(UisErrorCode.InternalError);
-            }
+            var response = new UisChangeBalanceResponse
+            {
+                Balance = data.Balance,
+                ExSystemTransactionId = data.Transaction.InternalId
+            };
 
             var container = new ChangeBalanceBoxResponse(request, response);
 
