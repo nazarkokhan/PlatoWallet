@@ -8,7 +8,6 @@ using Results.ResultToResultMappers;
 using Results.Uis;
 using Results.Uis.WithData;
 using Services.Wallet;
-using Services.Wallet.DTOs;
 
 [XmlRoot("REQUEST")]
 public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisChangeBalanceRequest.ChangeBalanceBoxResponse>>

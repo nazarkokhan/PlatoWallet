@@ -16,7 +16,6 @@ using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis;
-using Application.Requests.Wallets.Uis.Base;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.Betflag.WithData;
 using Application.Results.Everymatrix.WithData;
