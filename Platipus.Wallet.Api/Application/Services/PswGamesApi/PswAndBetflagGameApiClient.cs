@@ -15,18 +15,18 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 
-public class GamesApiClient : IGamesApiClient
+public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
 {
-    private readonly ILogger<GamesApiClient> _logger;
+    private readonly ILogger<PswAndBetflagGameApiClient> _logger;
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _pswJsonSerializerOptions;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public GamesApiClient(
+    public PswAndBetflagGameApiClient(
         HttpClient httpClient,
         IOptionsMonitor<JsonOptions> jsonOptions,
         IServiceScopeFactory scopeFactory,
-        ILogger<GamesApiClient> logger)
+        ILogger<PswAndBetflagGameApiClient> logger)
     {
         _httpClient = httpClient;
         _scopeFactory = scopeFactory;
@@ -43,13 +43,13 @@ public class GamesApiClient : IGamesApiClient
         string currency,
         string game,
         LaunchMode launchModeType,
+        int? rci,
         string locale = "en",
         string lobby = "",
         string launchMode = "url",
         CancellationToken cancellationToken = default)
     {
         var launchModePath = launchModeType is LaunchMode.Real ? "session" : "demo";
-
         var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
             new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/{launchModePath}").AbsoluteUri,
             new PswGetGameLinkGamesApiRequest(
@@ -60,7 +60,8 @@ public class GamesApiClient : IGamesApiClient
                 game,
                 locale,
                 lobby,
-                launchMode),
+                launchMode,
+                rci),
             cancellationToken);
 
         return response;

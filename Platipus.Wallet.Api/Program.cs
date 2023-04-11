@@ -121,8 +121,8 @@ try
                     optionsBuilder.EnableSensitiveDataLogging();
                 }
             })
-        .AddSingleton<IGamesApiClient, GamesApiClient>()
-        .AddHttpClient<IGamesApiClient, GamesApiClient>(
+        .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
+        .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}psw/");

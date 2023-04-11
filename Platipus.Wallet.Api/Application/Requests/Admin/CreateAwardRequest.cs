@@ -17,14 +17,14 @@ public record CreateAwardRequest(
     public class Handler : IRequestHandler<CreateAwardRequest, IPswResult<PswBaseResponse>>
     {
         private readonly WalletDbContext _context;
-        private readonly IGamesApiClient _gamesApiClient;
+        private readonly IPswAndBetflagGameApiClient _pswAndBetflagGameApiClient;
 
         public Handler(
             WalletDbContext context,
-            IGamesApiClient gamesApiClient)
+            IPswAndBetflagGameApiClient pswAndBetflagGameApiClient)
         {
             _context = context;
-            _gamesApiClient = gamesApiClient;
+            _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
         }
 
         public async Task<IPswResult<PswBaseResponse>> Handle(
@@ -52,7 +52,7 @@ public record CreateAwardRequest(
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var createFreebetAwardResult = await _gamesApiClient.CreateFreebetAwardAsync(
+            var createFreebetAwardResult = await _pswAndBetflagGameApiClient.CreateFreebetAwardAsync(
                 user.CasinoId,
                 user.Username,
                 award.Id,

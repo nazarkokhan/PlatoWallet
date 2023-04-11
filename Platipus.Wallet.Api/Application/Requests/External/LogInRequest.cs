@@ -29,13 +29,14 @@ public record LogInRequest(
         [property: DefaultValue("test")] string? Environment,
         [property: DefaultValue("treba_default_a")] string? Lobby,
         LaunchMode LaunchMode,
-        [property: DefaultValue(null)] string? Device = null)
+        [property: DefaultValue(null)] int? PswRealityCheck,
+        [property: DefaultValue(null)] string? Device)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
         private readonly WalletDbContext _context;
-        private readonly IGamesApiClient _gamesApiClient;
+        private readonly IPswAndBetflagGameApiClient _pswAndBetflagGameApiClient;
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
@@ -44,7 +45,7 @@ public record LogInRequest(
 
         public Handler(
             WalletDbContext context,
-            IGamesApiClient gamesApiClient,
+            IPswAndBetflagGameApiClient pswAndBetflagGameApiClient,
             IHub88GamesApiClient hub88GamesApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
             IGamesGlobalGamesApiClient globalGamesApiClient,
@@ -52,7 +53,7 @@ public record LogInRequest(
             IOptions<SoftswissCurrenciesOptions> currencyMultipliers)
         {
             _context = context;
-            _gamesApiClient = gamesApiClient;
+            _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
             _hub88GamesApiClient = hub88GamesApiClient;
             _softswissGamesApiClient = softswissGamesApiClient;
             _globalGamesApiClient = globalGamesApiClient;
@@ -132,7 +133,7 @@ public record LogInRequest(
             {
                 case CasinoProvider.Psw or CasinoProvider.Betflag:
                 {
-                    var getGameLinkResult = await _gamesApiClient.GetLaunchUrlAsync(
+                    var getGameLinkResult = await _pswAndBetflagGameApiClient.GetLaunchUrlAsync(
                         baseUrl,
                         user.Casino.Provider,
                         user.Casino.Id,
@@ -141,6 +142,7 @@ public record LogInRequest(
                         user.Currency.Id,
                         request.Game,
                         request.LaunchMode,
+                        request.PswRealityCheck,
                         cancellationToken: cancellationToken);
 
                     launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";

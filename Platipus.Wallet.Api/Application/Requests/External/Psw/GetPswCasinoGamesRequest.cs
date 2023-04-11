@@ -13,12 +13,12 @@ public record GetPswCasinoGamesRequest(string CasinoId) : IRequest<IPswResult<Ps
     public class Handler : IRequestHandler<GetPswCasinoGamesRequest, IPswResult<PswGetCasinoGamesListGamesApiResponseDto>>
     {
         private readonly WalletDbContext _context;
-        private readonly IGamesApiClient _gamesApiClient;
+        private readonly IPswAndBetflagGameApiClient _pswAndBetflagGameApiClient;
 
-        public Handler(WalletDbContext context, IGamesApiClient gamesApiClient)
+        public Handler(WalletDbContext context, IPswAndBetflagGameApiClient pswAndBetflagGameApiClient)
         {
             _context = context;
-            _gamesApiClient = gamesApiClient;
+            _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
         }
 
         public async Task<IPswResult<PswGetCasinoGamesListGamesApiResponseDto>> Handle(
@@ -34,7 +34,7 @@ public record GetPswCasinoGamesRequest(string CasinoId) : IRequest<IPswResult<Ps
             if (!casinoExist)
                 return PswResultFactory.Failure<PswGetCasinoGamesListGamesApiResponseDto>(PswErrorCode.InvalidCasinoId);
 
-            var casinoGamesResponse = await _gamesApiClient.GetCasinoGamesAsync(request.CasinoId, cancellationToken);
+            var casinoGamesResponse = await _pswAndBetflagGameApiClient.GetCasinoGamesAsync(request.CasinoId, cancellationToken);
 
             return casinoGamesResponse;
         }
