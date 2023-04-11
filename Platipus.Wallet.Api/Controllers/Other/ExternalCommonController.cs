@@ -13,7 +13,7 @@ public class ExternalCommonController : RestApiController
     public ExternalCommonController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("award")]
-    public async Task<IActionResult> GetEnvironments(
+    public async Task<IActionResult> CreateAward(
         CreateAwardRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

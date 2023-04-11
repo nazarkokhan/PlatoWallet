@@ -31,7 +31,7 @@ public record CreateAwardRequest(
                 return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 
             var user = await _context.Set<User>()
-                .Where(u => u.Username == request.AwardId)
+                .Where(u => u.Username == request.Username)
                 .FirstOrDefaultAsync(cancellationToken);
             if (user.IsNullOrDisabled(out var userNullOrDisabledResult))
                 return userNullOrDisabledResult;
