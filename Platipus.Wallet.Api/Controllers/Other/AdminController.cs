@@ -2,7 +2,8 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.Admin;
-using Application.Requests.Test;
+using Application.Requests.External;
+using Application.Requests.Wallets.Psw.Base.Response;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,33 +14,27 @@ public class AdminController : RestApiController
 
     public AdminController(IMediator mediator) => _mediator = mediator;
 
-    [HttpGet("error-mock")]
-    public async Task<IActionResult> MockError([FromQuery] GetErrorMocksRequest request, CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpPost("error-mock")]
-    public async Task<IActionResult> MockError(CreateErrorMockRequest request, CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpDelete("error-mock")]
-    public async Task<IActionResult> MockError([FromQuery] DeleteErrorMockRequest request, CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpGet("environments")]
+    [HttpGet("environment/page")]
     public async Task<IActionResult> GetEnvironments(
         [FromQuery] GetGameEnvironmentsPageRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("environments")]
+    [HttpPost("environment")]
     public async Task<IActionResult> CreateEnvironment(
         CreateGameEnvironmentRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPut("environments")]
+    [HttpPut("environment")]
     public async Task<IActionResult> UpdateEnvironment(
         UpdateGameEnvironmentRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpGet("casino/page")]
+    public async Task<IActionResult> GetCasinosPage(
+        [FromQuery] GetCasinosPageRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
@@ -47,19 +42,15 @@ public class AdminController : RestApiController
     public async Task<IActionResult> CreateCasino(CreateCasinoRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpGet("casinos/page")]
-    public async Task<IActionResult> GetCasinosPage(
-        [FromQuery] GetCasinosPageRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpGet("users/page")]
+    [HttpGet("user/page")]
     public async Task<IActionResult> GetUsersPage(
         [FromQuery] GetUsersPageRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("award")]
-    public async Task<IActionResult> CreateAward(CreateAwardRequest request, CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    //TODO no need for it?
+    // [HttpPost("user/round")]
+    // [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
+    // public async Task<IActionResult> Round(AddRoundRequest request, CancellationToken cancellationToken)
+    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

@@ -1,68 +1,47 @@
 namespace Platipus.Wallet.Api.Application.Requests.Admin;
 
 using Domain.Entities;
+using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Results.Psw;
-using Services.PswGamesApi;
-using Wallets.Psw.Base.Response;
 
 public record CreateAwardRequest(
-    //TODO by user or session? Guid SessionId,
-    string User,
+    string Username,
+    string AwardId,
     DateTime ValidUntil,
-    string Game,
-    string AwardId) : IRequest<IPswResult<PswBaseResponse>>
+    string Game) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<CreateAwardRequest, IPswResult<PswBaseResponse>>
+    public class Handler : IRequestHandler<CreateAwardRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly IPswAndBetflagGameApiClient _pswAndBetflagGameApiClient;
 
-        public Handler(
-            WalletDbContext context,
-            IPswAndBetflagGameApiClient pswAndBetflagGameApiClient)
+        public Handler(WalletDbContext context)
         {
             _context = context;
-            _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
         }
 
-        public async Task<IPswResult<PswBaseResponse>> Handle(
+        public async Task<IResult> Handle(
             CreateAwardRequest request,
             CancellationToken cancellationToken)
         {
+            var awardExists = await _context.Set<Award>()
+                .Where(u => u.Id == request.AwardId)
+                .AnyAsync(cancellationToken);
+            if (awardExists)
+                return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
+
             var user = await _context.Set<User>()
-                .Where(u => u.Username == request.User)
-                .Include(
-                    u => u.Awards
-                        .Where(a => a.Id == request.AwardId))
-                .Include(u => u.Currency)
+                .Where(u => u.Username == request.AwardId)
                 .FirstOrDefaultAsync(cancellationToken);
+            if (user.IsNullOrDisabled(out var userNullOrDisabledResult))
+                return userNullOrDisabledResult;
 
-            if (user is null)
-                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.InvalidUser);
-
-            if (user.Awards.Any(a => a.Id == request.AwardId))
-                return PswResultFactory.Failure<PswBaseResponse>(PswErrorCode.DuplicateAward);
-
-            var award = new Award(request.AwardId, request.ValidUntil);
-
-            user.Awards.Add(award);
-            _context.Update(user);
+            var award = new Award(request.AwardId, request.ValidUntil) { UserId = user.Id };
+            _context.Add(award);
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var createFreebetAwardResult = await _pswAndBetflagGameApiClient.CreateFreebetAwardAsync(
-                user.CasinoId,
-                user.Username,
-                award.Id,
-                user.Currency.Id,
-                new[] { request.Game },
-                request.ValidUntil,
-                10, //TODO where to get from?
-                cancellationToken);
-
-            return createFreebetAwardResult;
+            return ResultFactory.Success();
         }
     }
 }

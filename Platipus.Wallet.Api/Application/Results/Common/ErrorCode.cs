@@ -31,6 +31,7 @@ public enum ErrorCode
     AwardNotFound,
     AwardIsAlreadyUsed,
     AwardExpired,
+    AwardAlreadyExists,
 
     RequestAlreadyExists,
 
