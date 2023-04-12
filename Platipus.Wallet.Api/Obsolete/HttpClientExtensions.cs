@@ -4,7 +4,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Application.Results.Psw;
-using Application.Services.GamesApi.DTOs.Responses;
+using Application.Services.PswGamesApi.DTOs.Responses;
 
 [Obsolete]
 public static class HttpClientExtensions

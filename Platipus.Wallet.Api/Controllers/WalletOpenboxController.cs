@@ -104,16 +104,20 @@ public class WalletOpenboxController : RestApiController
             return OpenboxResultFactory.Failure(OpenboxErrorCode.InternalServiceError, e).ToActionResult();
         }
     }
+}
 
-
-    [HttpPost("private/test/get-security-value")]
+[Route("wallet/private/openbox")]
+[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+public class WalletOpenboxPrivateController : RestApiController
+{
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string vendorUid,
         [FromBody] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
-        var casino = await _context.Set<Casino>()
+        var casino = await dbContext.Set<Casino>()
             .Where(
                 c => c.Provider == CasinoProvider.Openbox
                   && c.Params.OpenboxVendorUid == vendorUid)
@@ -128,11 +132,36 @@ public class WalletOpenboxController : RestApiController
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
-        var signatureKey = casino.SignatureKey;
-
         var serialize = JsonSerializer.Serialize(request);
-        var securityValue = OpenboxSecurityPayload.Encrypt(serialize, signatureKey);
+        var securityValue = OpenboxSecurityPayload.Encrypt(serialize, casino.SignatureKey);
 
         return Ok(securityValue);
+    }
+
+    [HttpGet("decrypt-payload")]
+    public async Task<IActionResult> OpenboxDecryptPayload(
+        string vendorUid,
+        string requestPayload,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var casino = await dbContext.Set<Casino>()
+            .Where(
+                c => c.Provider == CasinoProvider.Openbox
+                  && c.Params.OpenboxVendorUid == vendorUid)
+            .Select(
+                c => new
+                {
+                    c.Id,
+                    c.SignatureKey
+                })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (casino is null)
+            return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
+
+        var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, casino.SignatureKey);
+
+        return Ok(decryptedPayload);
     }
 }

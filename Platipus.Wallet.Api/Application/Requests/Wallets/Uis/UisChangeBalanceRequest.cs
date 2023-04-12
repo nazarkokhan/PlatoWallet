@@ -1,8 +1,8 @@
-#pragma warning disable CS8618
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uis;
 
 using System.Xml.Serialization;
 using Base;
+using Base.Response;
 using Microsoft.AspNetCore.Mvc;
 using Results.ResultToResultMappers;
 using Results.Uis;
@@ -10,44 +10,46 @@ using Results.Uis.WithData;
 using Services.Wallet;
 
 [XmlRoot("REQUEST")]
-public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisResponseContainer>>
+public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisChangeBalanceRequest.ChangeBalanceBoxResponse>>
 {
     [XmlElement("USERID")]
     [BindProperty(Name = "userId")]
-    public string UserId { get; set; }
+    public string UserId { get; set; } = null!;
 
     [XmlElement("AMOUNT")]
     public decimal Amount { get; set; }
 
     [XmlElement("TRANSACTIONID")]
-    public string TransactionId { get; set; }
+    public string TransactionId { get; set; } = null!;
 
-    [XmlElement("TRNTYPE")]
-    public string TrnType { get; set; }
+    [XmlIgnore]
+    public string TrnType { get; set; } = null!;
 
     [XmlElement("GAMEID")]
     [BindProperty(Name = "gameId")]
     public int GameId { get; set; }
 
-    [XmlElement("HISTORY")]
-    public string History { get; set; }
+    [XmlIgnore]
+    public string History { get; set; } = null!;
 
     [XmlElement("ROUNDID")]
     [BindProperty(Name = "roundId")]
-    public string RoundId { get; set; }
+    public string RoundId { get; set; } = null!;
 
     [XmlElement("TRNDESCRIPTION")]
-    public string TrnDescription { get; set; }
+    public string TrnDescription { get; set; } = null!;
 
     [XmlElement("ISROUNDFINISH")]
-    [BindProperty(Name = "isRoundFinished")]
+    [BindProperty(Name = "isRoundFinished2")]
     public bool IsRoundFinish { get; set; }
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
     public string? Hash { get; set; }
 
-    public class Handler : IRequestHandler<UisChangeBalanceRequest, IUisResult<UisResponseContainer>>
+    public class Handler
+        : IRequestHandler<UisChangeBalanceRequest,
+            IUisResult<ChangeBalanceBoxResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -56,79 +58,52 @@ public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<Ui
             _wallet = wallet;
         }
 
-        public async Task<IUisResult<UisResponseContainer>> Handle(
+        public async Task<IUisResult<ChangeBalanceBoxResponse>> Handle(
             UisChangeBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            UisChangeBalanceResponse response;
-            switch (request.TrnType)
+            var walletResult = request.TrnType switch
             {
-                case "BET":
-                {
-                    var walletResult = await _wallet.BetAsync(
-                        request.UserId,
-                        request.RoundId,
-                        request.TransactionId,
-                        request.Amount,
-                        roundFinished: request.IsRoundFinish,
-                        searchByUsername: true,
-                        cancellationToken: cancellationToken);
-
-                    if (walletResult.IsFailure)
-                        return walletResult.ToUisResult<UisResponseContainer>();
-                    var data = walletResult.Data;
-
-                    response = new UisChangeBalanceResponse { Balance = data.Balance };
-
-                    break;
-                }
-
-                case "WIN":
-                {
-                    var walletResult = await _wallet.WinAsync(
-                        request.UserId,
-                        request.RoundId,
-                        request.TransactionId,
-                        request.Amount,
-                        request.IsRoundFinish,
-                        searchByUsername: true,
-                        cancellationToken: cancellationToken);
-
-                    if (walletResult.IsFailure)
-                        return walletResult.ToUisResult<UisResponseContainer>();
-                    var data = walletResult.Data;
-
-                    response = new UisChangeBalanceResponse { Balance = data.Balance };
-
-                    break;
-                }
-
-                case "CANCELBET":
-                {
-                    var walletResult = await _wallet.RollbackAsync(
-                        request.UserId,
-                        request.TransactionId,
-                        request.RoundId,
-                        true,
-                        cancellationToken);
-
-                    if (walletResult.IsFailure)
-                        return walletResult.ToUisResult<UisResponseContainer>();
-                    var data = walletResult.Data;
-
-                    response = new UisChangeBalanceResponse { Balance = data.Balance };
-
-                    break;
-                }
-                default:
-                    return UisResultFactory.Failure<UisResponseContainer>(UisErrorCode.InternalError);
-            }
-
-            var container = new UisResponseContainer
-            {
-                Request = request,
-                Response = response
+                "BET" => await _wallet.BetAsync(
+                    request.UserId,
+                    request.RoundId,
+                    request.TransactionId,
+                    request.Amount,
+                    roundFinished: request.IsRoundFinish,
+                    searchByUsername: true,
+                    cancellationToken: cancellationToken),
+                "WIN" => await _wallet.WinAsync(
+                    request.UserId,
+                    request.RoundId,
+                    request.TransactionId,
+                    request.Amount,
+                    request.IsRoundFinish,
+                    searchByUsername: true,
+                    cancellationToken: cancellationToken),
+                "CANCELBET" => await _wallet.RollbackAsync(
+                    request.UserId,
+                    request.TransactionId,
+                    request.RoundId,
+                    true,
+                    cancellationToken),
+                _ => null
             };
+
+            if (walletResult is null)
+                return UisResultFactory.Failure<ChangeBalanceBoxResponse>(UisErrorCode.InternalError);
+
+            if (walletResult.IsFailure)
+                return walletResult.ToUisResult<ChangeBalanceBoxResponse>();
+            var data = walletResult.Data;
+
+            var response = new UisChangeBalanceResponse
+            {
+                Balance = data.Balance,
+                ExtSystemTransactionId = data.Transaction.InternalId
+            };
+
+            var container = new ChangeBalanceBoxResponse(request, response);
+
             return UisResultFactory.Success(container);
         }
     }
@@ -138,16 +113,26 @@ public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<Ui
         return UserId + Amount + TrnType + TrnDescription + RoundId + IsRoundFinish;
     }
 
-    [XmlRoot("RESPONSE")]
-    public record UisChangeBalanceResponse
+    public record UisChangeBalanceResponse : UisBaseResponse
     {
-        [XmlElement("RESULT")]
-        public string Result { get; set; } = "OK";
-
-        [XmlElement("ECSYSTEMTRANSACTIONID")]
-        public string EcSystemTransactionId { get; set; } = "123123123";
+        [XmlElement("EXTSYSTEMTRANSACTIONID")]
+        public string ExtSystemTransactionId { get; set; } = null!;
 
         [XmlElement("BALANCE")]
         public decimal Balance { get; set; }
+    }
+
+    [XmlRoot("UIS")]
+    public class ChangeBalanceBoxResponse : UisResponseContainer<UisChangeBalanceRequest, UisChangeBalanceResponse>
+    {
+        public ChangeBalanceBoxResponse()
+            : this(default!, default!)
+        {
+        }
+
+        public ChangeBalanceBoxResponse(UisChangeBalanceRequest request, UisChangeBalanceResponse response)
+            : base(request, response)
+        {
+        }
     }
 }

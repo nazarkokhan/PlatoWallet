@@ -122,7 +122,7 @@ public record SoftswissPlayRequest(
         string ActionId,
         string TxId,
         DateTime ProcessedAt,
-        long? BonusAmount = null);
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? BonusAmount = null);
 
     public record PlayAction(
         string Action,

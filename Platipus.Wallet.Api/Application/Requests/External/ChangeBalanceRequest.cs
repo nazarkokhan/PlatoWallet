@@ -6,11 +6,11 @@ using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public record AddBalanceRequest(
-    string SessionId,
+public record ChangeBalanceRequest(
+    string Username,
     decimal Balance) : IRequest<IResult<BalanceResponse>>
 {
-    public class Handler : IRequestHandler<AddBalanceRequest, IResult<BalanceResponse>>
+    public class Handler : IRequestHandler<ChangeBalanceRequest, IResult<BalanceResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -20,21 +20,15 @@ public record AddBalanceRequest(
         }
 
         public async Task<IResult<BalanceResponse>> Handle(
-            AddBalanceRequest request,
+            ChangeBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            var session = await _context.Set<Session>()
-                .Where(s => s.Id == request.SessionId)
-                .Select(
-                    s => new
-                    {
-                        s.Id,
-                        s.ExpirationDate,
-                        s.User
-                    })
-                .FirstAsync(cancellationToken);
+            var user = await _context.Set<User>()
+                .Where(s => s.Username == request.Username)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var user = session.User;
+            if (user is null)
+                return ResultFactory.Failure<BalanceResponse>(ErrorCode.UserNotFound);
             if (user.IsDisabled)
                 return ResultFactory.Failure<BalanceResponse>(ErrorCode.UserIsDisabled);
 
@@ -50,7 +44,7 @@ public record AddBalanceRequest(
         }
     }
 
-    public class Validator : AbstractValidator<AddBalanceRequest>
+    public class Validator : AbstractValidator<ChangeBalanceRequest>
     {
         public Validator()
         {

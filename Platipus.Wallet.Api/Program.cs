@@ -1,15 +1,19 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using System.Xml;
+using System.Xml.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
 using JorgeSerrano.Json;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
-using Platipus.Wallet.Api.Application.Services.GamesApi;
+using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
+using Platipus.Wallet.Api.Application.Services.PswGamesApi;
 using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
@@ -73,12 +77,19 @@ try
         .AddControllers(
             options =>
             {
+                var xmlFormatter = options.OutputFormatters.OfType<XmlSerializerOutputFormatter>().FirstOrDefault();
+                if (xmlFormatter != null)
+                {
+                    options.OutputFormatters.Remove(xmlFormatter);
+                }
+                options.OutputFormatters.Add(new CustomXmlSerializerOutputFormatter());
+
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
                 options.Filters.Add<ActionResultFilterAttribute>(1);
                 options.Filters.Add<LoggingResultFilterAttribute>(2);
             })
-        .AddXmlSerializerFormatters()
+        // .AddXmlSerializerFormatters()
         .AddJsonOptions(
             options =>
             {
@@ -110,8 +121,8 @@ try
                     optionsBuilder.EnableSensitiveDataLogging();
                 }
             })
-        .AddSingleton<IGamesApiClient, GamesApiClient>()
-        .AddHttpClient<IGamesApiClient, GamesApiClient>(
+        .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
+        .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
@@ -194,4 +205,16 @@ finally
 {
     Log.Fatal("Flushing before closing app");
     Log.CloseAndFlush();
+}
+
+namespace Platipus.Wallet.Api
+{
+    public class CustomXmlSerializerOutputFormatter : XmlSerializerOutputFormatter
+    {
+        protected override void Serialize(XmlSerializer xmlSerializer, XmlWriter xmlWriter, object value)
+        {
+            var emptyNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+            xmlSerializer.Serialize(xmlWriter, value, emptyNamespaces);
+        }
+    }
 }
