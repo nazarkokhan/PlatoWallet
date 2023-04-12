@@ -2,22 +2,25 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uis;
 
 using System.Xml.Serialization;
 using Base;
+using Base.Response;
 using Results.ResultToResultMappers;
 using Results.Uis;
 using Results.Uis.WithData;
 using Services.Wallet;
 
-#pragma warning disable CS8618
 [XmlRoot("REQUEST")]
-public record UisGetBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisResponseContainer>>
+public record UisGetBalanceRequest
+    : IUisUserIdRequest,
+        IRequest<IUisResult<UisResponseContainer<UisGetBalanceRequest, UisGetBalanceRequest.UisGetBalanceResponse>>>
 {
-    [XmlElement("USERID")]
-    public string UserId { get; set; }
+    [property: XmlElement("USERID")]
+    public string UserId { get; set; } = null!;
 
-    [XmlElement("HASH")]
-    public string? Hash { get; init; }
+    [property: XmlElement("HASH")]
+    public string? Hash { get; set; }
 
-    public class Handler : IRequestHandler<UisGetBalanceRequest, IUisResult<UisResponseContainer>>
+    public class Handler
+        : IRequestHandler<UisGetBalanceRequest, IUisResult<UisResponseContainer<UisGetBalanceRequest, UisGetBalanceResponse>>>
     {
         private readonly IWalletService _wallet;
 
@@ -26,7 +29,7 @@ public record UisGetBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisR
             _wallet = wallet;
         }
 
-        public async Task<IUisResult<UisResponseContainer>> Handle(
+        public async Task<IUisResult<UisResponseContainer<UisGetBalanceRequest, UisGetBalanceResponse>>> Handle(
             UisGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
@@ -36,16 +39,13 @@ public record UisGetBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisR
                 cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToUisResult<UisResponseContainer>();
+                return walletResult.ToUisResult<UisResponseContainer<UisGetBalanceRequest, UisGetBalanceResponse>>();
             var data = walletResult.Data;
 
             var response = new UisGetBalanceResponse { Balance = data.Balance };
 
-            var container = new UisResponseContainer
-            {
-                Request = request,
-                Response = response
-            };
+            var container = new UisResponseContainer<UisGetBalanceRequest, UisGetBalanceResponse>(request, response);
+
             return UisResultFactory.Success(container);
         }
     }
@@ -55,12 +55,8 @@ public record UisGetBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<UisR
         return UserId;
     }
 
-    [XmlRoot("RESPONSE")]
-    public record UisGetBalanceResponse
+    public record UisGetBalanceResponse : UisBaseResponse
     {
-        [XmlElement("RESULT")]
-        public string Result { get; set; } = "OK";
-
         [XmlElement("BALANCE")]
         public decimal Balance { get; set; }
     }

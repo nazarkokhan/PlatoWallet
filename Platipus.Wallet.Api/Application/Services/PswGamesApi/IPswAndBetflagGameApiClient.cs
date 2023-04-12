@@ -1,9 +1,9 @@
-namespace Platipus.Wallet.Api.Application.Services.GamesApi;
+namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
-using Domain.Entities.Enums;
 using DTOs.Responses;
+using Domain.Entities.Enums;
 
-public interface IGamesApiClient
+public interface IPswAndBetflagGameApiClient
 {
     Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
         Uri baseUrl,
@@ -14,6 +14,7 @@ public interface IGamesApiClient
         string currency,
         string game,
         LaunchMode launchModeType,
+        int? rci,
         string locale = "en",
         string lobby = "",
         string launchMode = "url",

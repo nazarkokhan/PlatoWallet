@@ -132,10 +132,8 @@ public class WalletOpenboxPrivateController : RestApiController
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
-        var signatureKey = casino.SignatureKey;
-
         var serialize = JsonSerializer.Serialize(request);
-        var securityValue = OpenboxSecurityPayload.Encrypt(serialize, signatureKey);
+        var securityValue = OpenboxSecurityPayload.Encrypt(serialize, casino.SignatureKey);
 
         return Ok(securityValue);
     }
@@ -162,9 +160,7 @@ public class WalletOpenboxPrivateController : RestApiController
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
-        var signatureKey = casino.SignatureKey;
-
-        var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, signatureKey);
+        var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, casino.SignatureKey);
 
         return Ok(decryptedPayload);
     }

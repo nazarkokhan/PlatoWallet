@@ -8,10 +8,18 @@ using Microsoft.AspNetCore.Mvc;
 [Route("test")]
 public class TestController : RestApiController
 {
-    [HttpPost("stringify")]
+    [HttpPost("stringify-json")]
     public IActionResult Stringify([FromBody] JsonNode request)
     {
-        return Ok(JsonSerializer.Serialize(request));
+        var jsonText = request.ToJsonString();
+        return Ok(jsonText);
+    }
+
+    [HttpGet("de-stringify-json")]
+    public IActionResult Stringify(string jsonString)
+    {
+        var jsonNode = JsonDocument.Parse(jsonString.Replace("\\\"", "\""));
+        return Ok(jsonNode);
     }
 
     [HttpGet("openbox/unix-now")]

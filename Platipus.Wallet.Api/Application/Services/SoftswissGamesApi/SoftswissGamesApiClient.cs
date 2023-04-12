@@ -62,7 +62,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
                 new SoftswissGamesApiUrls(
                     "https://bitstarz.com/accounts/BTC/deposit?redirected_from_game=true",
                     "https://bitstarz.com/exit_iframe"),
-                "DE",
+                // "DE",
                 new SoftswissGamesApiUser(
                     user,
                     user)),
