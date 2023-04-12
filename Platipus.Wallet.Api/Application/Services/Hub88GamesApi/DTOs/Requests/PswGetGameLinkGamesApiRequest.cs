@@ -9,4 +9,4 @@ public record PswGetGameLinkGamesApiRequest(
     string Locale,
     string Lobby,
     string LaunchMode,
-    int? Rci) : IPswGamesApiBaseRequest;
+    int Rci) : IPswGamesApiBaseRequest;

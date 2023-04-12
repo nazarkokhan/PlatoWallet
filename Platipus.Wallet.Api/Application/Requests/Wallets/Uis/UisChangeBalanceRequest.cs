@@ -99,7 +99,7 @@ public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<Ui
             var response = new UisChangeBalanceResponse
             {
                 Balance = data.Balance,
-                ExSystemTransactionId = data.Transaction.InternalId
+                ExtSystemTransactionId = data.Transaction.InternalId
             };
 
             var container = new ChangeBalanceBoxResponse(request, response);
@@ -115,8 +115,8 @@ public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<Ui
 
     public record UisChangeBalanceResponse : UisBaseResponse
     {
-        [XmlElement("EXSYSTEMTRANSACTIONID")]
-        public string ExSystemTransactionId { get; set; } = null!;
+        [XmlElement("EXTSYSTEMTRANSACTIONID")]
+        public string ExtSystemTransactionId { get; set; } = null!;
 
         [XmlElement("BALANCE")]
         public decimal Balance { get; set; }

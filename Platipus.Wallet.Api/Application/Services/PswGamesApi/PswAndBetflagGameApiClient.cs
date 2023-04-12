@@ -61,7 +61,7 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
                 locale,
                 lobby,
                 launchMode,
-                rci),
+                rci ?? 0),
             cancellationToken);
 
         return response;
@@ -166,9 +166,10 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
 
         jsonContent.Headers.Add(PswHeaders.XRequestSign, xRequestSign.ToLower());
 
+        var rawRequestJson = Encoding.UTF8.GetString(requestBytes);
         _logger.LogInformation(
             "GamesApi Request: {GamesApiRequest}, X-REQUEST-SIGN: {GamesApiRequestSign}",
-            Encoding.UTF8.GetString(requestBytes),
+            rawRequestJson,
             xRequestSign);
 
         return jsonContent;
