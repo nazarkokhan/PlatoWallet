@@ -4,7 +4,8 @@ using System.ComponentModel;
 
 public record SoftswissGamesApiUser(
     [property: DefaultValue("username")] string Id,
-    [property: DefaultValue("username")]string Nickname,
+    [property: DefaultValue("username")] string Nickname,
+    [property: DefaultValue("email")] string Email = "email@dodik.com",
     [property: DefaultValue("dodik")] string Firstname = "dodik",
     [property: DefaultValue("bobik")] string Lastname = "bobik",
     [property: DefaultValue("Moscow")] string City = "Moscow",
