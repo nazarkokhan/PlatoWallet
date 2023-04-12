@@ -10,5 +10,5 @@ public record SoftswissGamesApiUser(
     [property: DefaultValue("Moscow")] string City = "Moscow",
     [property: DefaultValue("UA")] string Country = "UA",
     [property: DefaultValue("1980-12-26")] string DateOfBirth = "1980-12-26",
-    [property: DefaultValue("m")] string Gender = "m",
+    // [property: DefaultValue("m")] string Gender = "m",
     [property: DefaultValue("2018-10-11")] string RegisteredAt = "2018-10-11");
