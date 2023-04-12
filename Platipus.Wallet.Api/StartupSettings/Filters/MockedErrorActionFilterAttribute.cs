@@ -193,7 +193,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     searchMockBySession = true;
                     break;
                 case WalletPariMatchController:
-                    usernameOrSession = actionArgumentsValues.OfType<IPariMatchRequest>().SingleOrDefault()?.PlayerId;
+                    usernameOrSession = actionArgumentsValues.OfType<IPariMatchBaseRequest>().SingleOrDefault()?.PlayerId ?? actionArgumentsValues.OfType<IPariMatchInfoRequest>().SingleOrDefault()?.Cid;
                     break;
                 default:
                     usernameOrSession = null;

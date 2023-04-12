@@ -11,11 +11,11 @@ using Services.Wallet;
 using TODO.PariMatch.Base;
 using static Results.PariMatch.ParimatchResultFactory;
 
-public record ParimatchPlayerInfoRequest(string Cid, string SessionToken)
-    : IRequest<IParimatchResult<ParimatchPlayerInfoResponse>>, IPariMatchRequest
+public record ParimatchPlayerInfoBaseRequest(string Cid, string SessionToken)
+    : IRequest<IParimatchResult<ParimatchPlayerInfoResponse>>, IPariMatchInfoRequest
 {
 
-    public class Handler : IRequestHandler<ParimatchPlayerInfoRequest, IParimatchResult<ParimatchPlayerInfoResponse>>
+    public class Handler : IRequestHandler<ParimatchPlayerInfoBaseRequest, IParimatchResult<ParimatchPlayerInfoResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -26,11 +26,11 @@ public record ParimatchPlayerInfoRequest(string Cid, string SessionToken)
 
 
         public async Task<IParimatchResult<ParimatchPlayerInfoResponse>> Handle(
-            ParimatchPlayerInfoRequest request,
+            ParimatchPlayerInfoBaseRequest baseRequest,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.GetBalanceAsync(
-                request.SessionToken,
+                baseRequest.SessionToken,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
@@ -47,5 +47,6 @@ public record ParimatchPlayerInfoRequest(string Cid, string SessionToken)
             return Success<ParimatchPlayerInfoResponse>(response);
         }
     }
+
 }
 

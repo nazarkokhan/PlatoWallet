@@ -22,29 +22,29 @@ public class WalletPariMatchController : RestApiController
     [HttpPost("player-info")]
     [ProducesResponseType(typeof(ParimatchPlayerInfoResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
-        ParimatchPlayerInfoRequest request,
+        ParimatchPlayerInfoBaseRequest baseRequest,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+        => (await _mediator.Send(baseRequest, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
     [ProducesResponseType(typeof(ParimatchBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        ParimatchBetRequest request,
+        ParimatchBetBaseRequest baseRequest,
         CancellationToken cancellationToken)
-        => Ok(await _mediator.Send(request, cancellationToken));
+        => Ok(await _mediator.Send(baseRequest, cancellationToken));
 
     [HttpPost("win")]
     [ProducesResponseType(typeof(ParimatchBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
-        ParimatchWinRequest request,
+        ParimatchWinBaseRequest baseRequest,
         CancellationToken cancellationToken)
-        => (Ok(await _mediator.Send(request, cancellationToken)));
+        => (Ok(await _mediator.Send(baseRequest, cancellationToken)));
 
     [HttpPost("cancel")]
     [ProducesResponseType(typeof(ParimatchBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Cancel(
-        ParimatchCancelRequest request,
+        ParimatchCancelBaseRequest baseRequest,
         CancellationToken cancellationToken)
-        => (Ok(await _mediator.Send(request, cancellationToken)));
+        => (Ok(await _mediator.Send(baseRequest, cancellationToken)));
 }
 

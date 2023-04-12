@@ -1,48 +1,58 @@
+// ReSharper disable IdentifierTypo
 // ReSharper disable NotAccessedPositionalProperty.Global
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.PariMatch;
 
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.PariMatch;
 using Results.PariMatch.WithData;
-using static Results.PariMatch.ParimatchResultFactory;
-using Microsoft.EntityFrameworkCore;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 using TODO.PariMatch.Base;
+using static Results.PariMatch.ParimatchResultFactory;
 
-public record ParimatchBetRequest(
+public record ParimatchCancelBaseRequest(
     string Cid,
-    string SessionToken,
     string PlayerId,
     string ProductId,
     string TxId,
     string RoundId,
-    bool RoundClosed,
     int Amount,
-    string Currency) : IRequest<IParimatchResult<ParimatchBaseResponse>>, IPariMatchRequest
+    string Currency) : IRequest<IParimatchResult<ParimatchBaseResponse>>, IPariMatchBaseRequest
 {
-    public class Handler : IRequestHandler<ParimatchBetRequest, IParimatchResult<ParimatchBaseResponse>>
+
+
+    public class Handler : IRequestHandler<ParimatchCancelBaseRequest, IParimatchResult<ParimatchBaseResponse>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _dbContext;
 
-        public Handler(IWalletService wallet)
+
+        public Handler(IWalletService wallet,
+            WalletDbContext dbContext)
         {
             _wallet = wallet;
+            _dbContext = dbContext;
         }
 
         public async Task<IParimatchResult<ParimatchBaseResponse>> Handle(
-            ParimatchBetRequest request,
+            ParimatchCancelBaseRequest baseRequest,
             CancellationToken cancellationToken)
         {
-            var walletResult = await _wallet.BetAsync(
-                request.SessionToken,
-                request.RoundId,
-                request.TxId,
-                request.Amount,
-                request.Currency,
-                roundFinished: request.RoundClosed,
+            var user = _dbContext.Set<User>().FirstOrDefault(u => u.Id == int.Parse(baseRequest.PlayerId));
+
+            if (user is null)
+            {
+                return Failure<ParimatchBaseResponse>(ParimatchErrorCode.LockedPlayer);
+            }
+
+            var walletResult = await _wallet.RollbackAsync(
+                user.Username,
+                baseRequest.TxId,
+                baseRequest.RoundId,
+                true,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

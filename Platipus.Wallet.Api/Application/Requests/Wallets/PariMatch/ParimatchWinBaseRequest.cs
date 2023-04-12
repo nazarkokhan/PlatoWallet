@@ -12,7 +12,7 @@ using Results.ResultToResultMappers;
 using Services.Wallet;
 using TODO.PariMatch.Base;
 using static Results.PariMatch.ParimatchResultFactory;
-public record ParimatchWinRequest(
+public record ParimatchWinBaseRequest(
     string Cid,
     string PlayerId,
     string Productid,
@@ -20,29 +20,38 @@ public record ParimatchWinRequest(
     string RoundId,
     bool RoundClosed,
     int Amount,
-    string Currency) : IRequest<IParimatchResult<ParimatchBaseResponse>>, IPariMatchRequest
+    string Currency) : IRequest<IParimatchResult<ParimatchBaseResponse>>, IPariMatchBaseRequest
 {
 
-    public class Handler : IRequestHandler<ParimatchWinRequest, IParimatchResult<ParimatchBaseResponse>>
+    public class Handler : IRequestHandler<ParimatchWinBaseRequest, IParimatchResult<ParimatchBaseResponse>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _dbContext;
 
-        public Handler(IWalletService wallet)
+        public Handler(IWalletService wallet, WalletDbContext dbContext)
         {
             _wallet = wallet;
+            _dbContext = dbContext;
         }
 
         public async Task<IParimatchResult<ParimatchBaseResponse>> Handle(
-            ParimatchWinRequest request,
+            ParimatchWinBaseRequest baseRequest,
             CancellationToken cancellationToken)
         {
+            var user = _dbContext.Set<User>().FirstOrDefault(u => u.Id == int.Parse(baseRequest.PlayerId));
+
+            if (user is null)
+            {
+                return Failure<ParimatchBaseResponse>(ParimatchErrorCode.LockedPlayer);
+            }
+
             var walletResult = await _wallet.WinAsync(
-                request.SessionToken, //TODO refactor walletservice
-                request.RoundId,
-                request.TxId,
-                request.Amount,
-                request.RoundClosed,
-                request.Currency,
+                user.Username,
+                baseRequest.RoundId,
+                baseRequest.TxId,
+                baseRequest.Amount,
+                baseRequest.RoundClosed,
+                baseRequest.Currency,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

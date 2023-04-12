@@ -15,6 +15,7 @@ using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base.Response;
 using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
+using Application.Requests.Wallets.TODO.PariMatch.Base;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Results.Betflag.WithData;
@@ -23,11 +24,13 @@ using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
+using Application.Results.PariMatch.WithData;
 using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
 using Application.Results.Uis.WithData;
 using Domain.Entities.Enums;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -188,6 +191,25 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
                 context.HttpContext.Items.Add(responseItemsKey, errorResponse);
             }
+            if (baseExternalActionResult.Result is IParimatchResult<object> parimatchResult)
+            {
+                if (parimatchResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(parimatchResult.Data);
+                    return;
+                }
+
+                var errorCode = (int) parimatchResult.ErrorCode;
+
+                var errorResponse = new ParimatchErrorResponse(
+                    errorCode.ToString(),
+                    parimatchResult.ErrorCode.Humanize(),
+                    DateTimeOffset.Now);
+
+                context.Result = new OkObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
         }
 
         if (context.Result is PswExternalActionResult { Result: { } pswActionResult })
@@ -324,6 +346,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
+
 
         if (context.Result is ExternalActionResult externalActionResult)
         {
