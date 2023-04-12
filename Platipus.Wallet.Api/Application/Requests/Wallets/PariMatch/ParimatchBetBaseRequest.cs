@@ -2,6 +2,7 @@
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.PariMatch;
 
+using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Results.PariMatch;
@@ -10,7 +11,6 @@ using static Results.PariMatch.ParimatchResultFactory;
 using Microsoft.EntityFrameworkCore;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using TODO.PariMatch.Base;
 
 public record ParimatchBetBaseRequest(
     string Cid,

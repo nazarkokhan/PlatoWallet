@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
 using Application.Requests.Wallets.PariMatch;
-using Application.Requests.Wallets.TODO.PariMatch.Base;
+using Application.Requests.Wallets.PariMatch.Base;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.Wallets.TODO.PariMatch.Base;
+namespace Platipus.Wallet.Api.Application.Requests.Wallets.PariMatch.Base;
 
 public record ParimatchPlayerInfoResponse(
     string PlayerId,

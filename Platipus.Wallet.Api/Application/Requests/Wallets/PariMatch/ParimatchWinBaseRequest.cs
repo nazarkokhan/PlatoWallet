@@ -3,6 +3,7 @@
 // ReSharper disable NotAccessedPositionalProperty.Global
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.PariMatch;
 
+using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,6 @@ using Results.PariMatch;
 using Results.PariMatch.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
-using TODO.PariMatch.Base;
 using static Results.PariMatch.ParimatchResultFactory;
 public record ParimatchWinBaseRequest(
     string Cid,
