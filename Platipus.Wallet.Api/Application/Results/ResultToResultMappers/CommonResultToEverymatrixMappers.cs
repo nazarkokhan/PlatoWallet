@@ -7,13 +7,13 @@ public static class CommonResultToEverymatrixMappers
 {
     public static IEverymatrixResult<TData> ToEverymatrixResult<TData>(this IResult result)
         => result.IsFailure
-            ? EverymatrixResultFactory.Failure<TData>(result.ErrorCode.ToEverymatrixErrorCode(), result.Exception)
+            ? EverymatrixResultFactory.Failure<TData>(result.Error.ToEverymatrixErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IEverymatrixResult ToEverymatrixResult(this IResult result)
         => result.IsSuccess
             ? EverymatrixResultFactory.Success()
-            : EverymatrixResultFactory.Failure(result.ErrorCode.ToEverymatrixErrorCode(), result.Exception);
+            : EverymatrixResultFactory.Failure(result.Error.ToEverymatrixErrorCode(), result.Exception);
 
     private static EverymatrixErrorCode ToEverymatrixErrorCode(this ErrorCode source)
     {

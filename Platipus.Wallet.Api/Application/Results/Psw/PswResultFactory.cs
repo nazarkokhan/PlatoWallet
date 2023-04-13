@@ -18,6 +18,6 @@ public static class PswResultFactory
 
     public static PswResult<TData> Failure<TData, TSourceData>(IPswResult<TSourceData> pswResult)
         => pswResult.IsFailure
-            ? Failure<TData>(pswResult.ErrorCode, pswResult.Exception)
+            ? Failure<TData>(pswResult.Error, pswResult.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(pswResult));
 }

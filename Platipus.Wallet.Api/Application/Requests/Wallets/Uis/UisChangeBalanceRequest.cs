@@ -40,12 +40,12 @@ public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<Ui
     public string TrnDescription { get; set; } = null!;
 
     [XmlElement("ISROUNDFINISH")]
-    [BindProperty(Name = "isRoundFinished2")]
+    [BindProperty(Name = "isRoundFinished")]
     public bool IsRoundFinish { get; set; }
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
-    public string? Hash { get; set; }
+    public string? Hash { get; set; } = "";
 
     public class Handler
         : IRequestHandler<UisChangeBalanceRequest,

@@ -4,13 +4,13 @@ public static class CommonResultToSoftswissMappers
 {
     public static ISoftswissResult<TData> ToSoftswissResult<TData>(this IResult result, long? balance = null)
         => result.IsFailure
-            ? SoftswissResultFactory.Failure<TData>(result.ErrorCode.ToSoftswissErrorCode(), balance, result.Exception)
+            ? SoftswissResultFactory.Failure<TData>(result.Error.ToSoftswissErrorCode(), balance, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static ISoftswissResult ToSoftswissResult(this IResult result, long? balance = null)
         => result.IsSuccess
             ? SoftswissResultFactory.Success()
-            : SoftswissResultFactory.Failure(result.ErrorCode.ToSoftswissErrorCode(), balance, result.Exception);
+            : SoftswissResultFactory.Failure(result.Error.ToSoftswissErrorCode(), balance, result.Exception);
 
     private static SoftswissErrorCode ToSoftswissErrorCode(this ErrorCode source)
     {

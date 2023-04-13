@@ -1,7 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Extensions;
 
 using System.Diagnostics.CodeAnalysis;
-using Platipus.Wallet.Domain.Entities;
+using Domain.Entities;
 
 public static class DefaultEntityChecks
 {

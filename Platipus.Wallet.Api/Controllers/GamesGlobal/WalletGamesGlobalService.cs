@@ -49,7 +49,7 @@ public class WalletGamesGlobalService : XmlRpcService, IWalletGamesGlobalService
     {
         if (result.IsFailure)
         {
-            throw result.ErrorCode.ToException();
+            throw result.Error.ToException();
         }
 
         return result.Data;

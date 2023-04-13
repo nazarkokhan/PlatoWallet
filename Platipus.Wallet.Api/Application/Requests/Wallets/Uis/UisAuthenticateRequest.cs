@@ -21,7 +21,7 @@ public class UisAuthenticateRequest
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
-    public string? Hash { get; set; }
+    public string? Hash { get; set; } = "";
 
     public class Handler
         : IRequestHandler<UisAuthenticateRequest,
@@ -89,16 +89,16 @@ public class UisAuthenticateRequest
         public string UserId { get; set; } = null!;
 
         [XmlElement("USERNAME")]
-        public string? Username { get; set; }
+        public string? Username { get; set; } = "";
 
         [XmlElement("FIRSTNAME")]
-        public string? Firstname { get; set; }
+        public string? Firstname { get; set; } = "";
 
         [XmlElement("LASTNAME")]
-        public string? Lastname { get; set; }
+        public string? Lastname { get; set; } = "";
 
         [XmlElement("EMAIL")]
-        public string? Email { get; set; }
+        public string? Email { get; set; } = "";
 
         [XmlElement("CURRENCY")]
         public string Currency { get; set; } = null!;

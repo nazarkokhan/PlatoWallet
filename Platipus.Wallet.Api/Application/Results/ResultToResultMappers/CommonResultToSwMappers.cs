@@ -7,13 +7,13 @@ public static class CommonResultToSwMappers
 {
     public static ISwResult<TData> ToSwResult<TData>(this IResult result)
         => result.IsFailure
-            ? SwResultFactory.Failure<TData>(result.ErrorCode.ToSwErrorCode(), result.Exception)
+            ? SwResultFactory.Failure<TData>(result.Error.ToSwErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static ISwResult ToSwResult(this IResult result)
         => result.IsSuccess
             ? SwResultFactory.Success()
-            : SwResultFactory.Failure(result.ErrorCode.ToSwErrorCode(), result.Exception);
+            : SwResultFactory.Failure(result.Error.ToSwErrorCode(), result.Exception);
 
     private static SwErrorCode ToSwErrorCode(this ErrorCode source)
     {

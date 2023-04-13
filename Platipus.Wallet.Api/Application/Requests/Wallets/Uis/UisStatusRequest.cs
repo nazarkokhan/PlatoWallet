@@ -24,7 +24,7 @@ public class UisStatusRequest
 
     [XmlElement("HASH")]
     [BindProperty(Name = "hash")]
-    public string? Hash { get; set; }
+    public string? Hash { get; set; } = "";
 
     public class Handler
         : IRequestHandler<UisStatusRequest, IUisResult<UisResponseContainer<UisStatusRequest, UisStatusResponse>>>

@@ -4,13 +4,13 @@ public static class CommonResultToOpenboxMappers
 {
     public static IOpenboxResult<TData> ToOpenboxResult<TData>(this IResult result)
         => result.IsFailure
-            ? OpenboxResultFactory.Failure<TData>(result.ErrorCode.ToErrorCode(), result.Exception)
+            ? OpenboxResultFactory.Failure<TData>(result.Error.ToErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IOpenboxResult ToOpenboxResult(this IResult result)
         => result.IsSuccess
             ? OpenboxResultFactory.Success()
-            : OpenboxResultFactory.Failure(result.ErrorCode.ToErrorCode(), result.Exception);
+            : OpenboxResultFactory.Failure(result.Error.ToErrorCode(), result.Exception);
 
     private static OpenboxErrorCode ToErrorCode(this ErrorCode source)
     {

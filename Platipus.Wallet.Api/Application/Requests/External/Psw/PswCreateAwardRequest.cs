@@ -3,9 +3,9 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Psw;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Psw.Base.Response;
 using Platipus.Wallet.Api.Application.Results.Psw;
-using Platipus.Wallet.Api.Application.Services.PswGamesApi;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Services.PswGamesApi;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record PswCreateAwardRequest(
     string User,

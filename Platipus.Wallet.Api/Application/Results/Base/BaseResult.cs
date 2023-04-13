@@ -5,14 +5,14 @@ public record BaseResult<TError> : IBaseResult<TError>
     public BaseResult()
     {
         IsSuccess = true;
-        ErrorCode = default!;
+        Error = default!;
         Exception = null;
     }
 
     public BaseResult(TError errorCode, Exception? exception = null)
     {
         IsSuccess = false;
-        ErrorCode = errorCode;
+        Error = errorCode;
         Exception = exception;
     }
 
@@ -20,17 +20,7 @@ public record BaseResult<TError> : IBaseResult<TError>
 
     public bool IsFailure => !IsSuccess;
 
-    public TError ErrorCode { get; }
+    public TError Error { get; }
 
     public Exception? Exception { get; }
-    
-    public IBaseResult<T> ConvertResult<T>(T error)
-    {
-        return new BaseResult<T>(error, Exception);
-    }
-    
-    public IBaseResult<T> ConvertResult<T>()
-    {
-        return new BaseResult<T>();
-    }
 }

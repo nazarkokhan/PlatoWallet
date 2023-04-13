@@ -20,6 +20,6 @@ public static class SoftBetResultFactory
 
     public static SoftBetResult<TData> Failure<TData, TSourceData>(ISoftBetResult<TSourceData> pswResult)
         => pswResult.IsFailure
-            ? Failure<TData>(pswResult.ErrorCode, pswResult.Exception)
+            ? Failure<TData>(pswResult.Error, pswResult.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(pswResult));
 }

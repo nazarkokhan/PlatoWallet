@@ -69,6 +69,12 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
             .AddJsonOptions(
+                nameof(CasinoProvider.Uis),
+                options =>
+                {
+                    // options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
+                })
+            .AddJsonOptions(
                 nameof(CasinoProvider.Reevo),
                 options =>
                 {

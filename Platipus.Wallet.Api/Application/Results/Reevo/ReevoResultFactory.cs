@@ -17,6 +17,6 @@ public static class ReevoResultFactory
 
     public static ReevoResult<TData> Failure<TData, TSourceData>(IReevoResult<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Exception)
+            ? Failure<TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

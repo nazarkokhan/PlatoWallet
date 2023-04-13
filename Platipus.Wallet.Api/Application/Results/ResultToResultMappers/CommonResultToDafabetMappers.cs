@@ -7,13 +7,13 @@ public static class CommonResultToDafabetMappers
 {
     public static IDafabetResult<TData> ToDafabetResult<TData>(this IResult result)
         => result.IsFailure
-            ? DafabetResultFactory.Failure<TData>(result.ErrorCode.ToDafabetErrorCode(), result.Exception)
+            ? DafabetResultFactory.Failure<TData>(result.Error.ToDafabetErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IDafabetResult ToDafabetResult(this IResult result)
         => result.IsSuccess
             ? DafabetResultFactory.Success()
-            : DafabetResultFactory.Failure(result.ErrorCode.ToDafabetErrorCode(), result.Exception);
+            : DafabetResultFactory.Failure(result.Error.ToDafabetErrorCode(), result.Exception);
 
     private static DafabetErrorCode ToDafabetErrorCode(this ErrorCode source)
     {

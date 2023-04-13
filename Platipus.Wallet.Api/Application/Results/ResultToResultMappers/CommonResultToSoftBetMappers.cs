@@ -7,13 +7,13 @@ public static class CommonResultToSoftBetMappers
 {
     public static ISoftBetResult<TData> ToSoftBetResult<TData>(this IResult result)
         => result.IsFailure
-            ? SoftBetResultFactory.Failure<TData>(result.ErrorCode.ToSoftBetErrorCode(), result.Exception)
+            ? SoftBetResultFactory.Failure<TData>(result.Error.ToSoftBetErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static ISoftBetResult ToSoftBetResult(this IResult result)
         => result.IsSuccess
             ? SoftBetResultFactory.Success()
-            : SoftBetResultFactory.Failure(result.ErrorCode.ToSoftBetErrorCode(), result.Exception);
+            : SoftBetResultFactory.Failure(result.Error.ToSoftBetErrorCode(), result.Exception);
 
     private static SoftBetErrorMessage ToSoftBetErrorCode(this ErrorCode source)
     {

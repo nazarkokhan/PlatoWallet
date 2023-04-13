@@ -7,6 +7,7 @@ using Extensions;
 using Extensions.SecuritySign;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using HttpRequestMessage = HttpRequestMessage;
 
 [Obsolete]
 public class RequestSignatureRelegatingHandler : DelegatingHandler

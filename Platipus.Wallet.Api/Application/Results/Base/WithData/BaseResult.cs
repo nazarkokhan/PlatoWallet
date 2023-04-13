@@ -9,16 +9,11 @@ public record BaseResult<TError, TData> : BaseResult<TError>, IBaseResult<TError
 
     public BaseResult(
         TError errorCode,
-        Exception? exception = null)
+        Exception? exception)
         : base(errorCode, exception)
     {
         Data = default!;
     }
 
     public TData Data { get; }
-
-    public IBaseResult<TNewError, TNewData> ConvertResult<TNewError, TNewData>(TNewError error, TNewData data)
-    {
-        return new BaseResult<TNewError, TNewData>(error, Exception);
-    }
 }

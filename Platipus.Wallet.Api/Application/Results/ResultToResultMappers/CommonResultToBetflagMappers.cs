@@ -7,13 +7,13 @@ public static class CommonResultToBetflagMappers
 {
     public static IBetflagResult<TData> ToBetflagResult<TData>(this IResult result)
         => result.IsFailure
-            ? BetflagResultFactory.Failure<TData>(result.ErrorCode.ToBetflagErrorCode(), result.Exception)
+            ? BetflagResultFactory.Failure<TData>(result.Error.ToBetflagErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IBetflagResult ToBetflagResult(this IResult result)
         => result.IsSuccess
             ? BetflagResultFactory.Success()
-            : BetflagResultFactory.Failure(result.ErrorCode.ToBetflagErrorCode(), result.Exception);
+            : BetflagResultFactory.Failure(result.Error.ToBetflagErrorCode(), result.Exception);
 
     private static BetflagErrorCode ToBetflagErrorCode(this ErrorCode source)
     {

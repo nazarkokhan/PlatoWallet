@@ -7,11 +7,9 @@ public interface IBaseResult
     bool IsFailure { get; }
 
     Exception? Exception { get; }
-
-    IBaseResult<TNewError> ConvertResult<TNewError>(TNewError error);
 }
 
 public interface IBaseResult<out TError> : IBaseResult
 {
-    TError ErrorCode { get; }
+    TError Error { get; }
 }

@@ -1,7 +1,5 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
-using System.Xml;
-using System.Xml.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
 using JorgeSerrano.Json;
@@ -10,20 +8,22 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
-using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.PswGamesApi;
 using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
+using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Controllers.GamesGlobal;
 using Platipus.Wallet.Api.Extensions;
+using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
 using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
+using Platipus.Wallet.Api.StartupSettings.Xml;
 using Platipus.Wallet.Infrastructure.Persistence;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
@@ -72,6 +72,7 @@ try
     services
         .AddScoped<IWalletService, WalletService>()
         .AddTransient<ExceptionHandlerMiddleware>()
+        .AddTransient<BufferResponseBodyMiddleware>()
         .AddTransient<GamesGlobalMiddleware>()
         .AddTransient<GamesGlobalAuthMiddleware>()
         .AddControllers(
@@ -82,6 +83,7 @@ try
                 {
                     options.OutputFormatters.Remove(xmlFormatter);
                 }
+
                 options.OutputFormatters.Add(new CustomXmlSerializerOutputFormatter());
 
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
@@ -89,7 +91,6 @@ try
                 options.Filters.Add<ActionResultFilterAttribute>(1);
                 options.Filters.Add<LoggingResultFilterAttribute>(2);
             })
-        // .AddXmlSerializerFormatters()
         .AddJsonOptions(
             options =>
             {
@@ -154,7 +155,10 @@ try
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
-            });
+            })
+        .Services
+        .AddSingleton<IUisGameApiClient, UisGameApiClient>()
+        .AddHttpClient<IUisGameApiClient, UisGameApiClient>();
 
     services.AddHealthChecks();
 
@@ -178,6 +182,7 @@ try
 
     app.UseRequestLocalization();
 
+    app.UseMiddleware<BufferResponseBodyMiddleware>();
     app.UseMiddleware<GamesGlobalMiddleware>();
     app.UseXmlRpc(
         configure =>
@@ -205,16 +210,4 @@ finally
 {
     Log.Fatal("Flushing before closing app");
     Log.CloseAndFlush();
-}
-
-namespace Platipus.Wallet.Api
-{
-    public class CustomXmlSerializerOutputFormatter : XmlSerializerOutputFormatter
-    {
-        protected override void Serialize(XmlSerializer xmlSerializer, XmlWriter xmlWriter, object value)
-        {
-            var emptyNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
-            xmlSerializer.Serialize(xmlWriter, value, emptyNamespaces);
-        }
-    }
 }

@@ -4,13 +4,13 @@ public static class CommonResultToPswMappers
 {
     public static IPswResult<TData> ToPswResult<TData>(this IResult result)
         => result.IsFailure
-            ? PswResultFactory.Failure<TData>(result.ErrorCode.ToCommonErrorCode(), result.Exception)
+            ? PswResultFactory.Failure<TData>(result.Error.ToCommonErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IPswResult ToPswResult(this IResult result)
         => result.IsSuccess
             ? PswResultFactory.Success()
-            : PswResultFactory.Failure(result.ErrorCode.ToCommonErrorCode(), result.Exception);
+            : PswResultFactory.Failure(result.Error.ToCommonErrorCode(), result.Exception);
 
     private static PswErrorCode ToCommonErrorCode(this ErrorCode source)
     {

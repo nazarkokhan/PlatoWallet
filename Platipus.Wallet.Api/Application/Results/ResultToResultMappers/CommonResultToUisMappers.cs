@@ -7,13 +7,13 @@ public static class CommonResultToUisMappers
 {
     public static IUisResult<TData> ToUisResult<TData>(this IResult result)
         => result.IsFailure
-            ? UisResultFactory.Failure<TData>(result.ErrorCode.ToUisErrorCode(), result.Exception)
+            ? UisResultFactory.Failure<TData>(result.Error.ToUisErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IUisResult ToUisResult(this IResult result)
         => result.IsSuccess
             ? UisResultFactory.Success()
-            : UisResultFactory.Failure(result.ErrorCode.ToUisErrorCode(), result.Exception);
+            : UisResultFactory.Failure(result.Error.ToUisErrorCode(), result.Exception);
 
     private static UisErrorCode ToUisErrorCode(this ErrorCode source)
     {

@@ -20,6 +20,6 @@ public static class PariMatchResultFactory
 
     public static PariMatchResult<TData> Failure<TData, TSourceData>(IPariMatchResult<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Exception)
+            ? Failure<TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }
