@@ -60,7 +60,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                var errorCode = swResult.ErrorCode;
+                var errorCode = swResult.Error;
 
                 var errorResponse = new SwErrorResponse(errorCode);
 
@@ -80,7 +80,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                var errorCode = softBetResult.ErrorCode;
+                var errorCode = softBetResult.Error;
 
                 var errorResponse = new SoftBetErrorResponse(
                     errorCode.ToCode(),
@@ -105,7 +105,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 }
 
                 var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
-                var responseObject = new UisErrorResponse(uisResult.ErrorCode);
+                var responseObject = new UisErrorResponse(uisResult.Error);
 
                 object container = requestObject switch
                 {
@@ -130,7 +130,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
             if (baseExternalActionResult.Result is IBetflagResult<object> betflagResult)
             {
-                var errorCode = betflagResult.ErrorCode;
+                var errorCode = betflagResult.Error;
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 var secretKey = (string?)httpContext.Items[HttpContextItems.BetflagCasinoSecretKey];
 
@@ -165,7 +165,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                var errorCode = reevoResult.ErrorCode;
+                var errorCode = reevoResult.Error;
 
                 var errorResponse = new ReevoErrorResponse(errorCode);
 
@@ -182,7 +182,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                var errorCode = everymatrixResult.ErrorCode;
+                var errorCode = everymatrixResult.Error;
 
                 var errorResponse = new EverymatrixErrorResponse(errorCode);
 
@@ -224,7 +224,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var errorCode = pswActionResult.ErrorCode;
+            var errorCode = pswActionResult.Error;
 
             var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
 
@@ -249,7 +249,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var errorCode = dafabetActionResult.Result.ErrorCode;
+            var errorCode = dafabetActionResult.Result.Error;
 
             var errorResponse = new DafabetErrorResponse((int)errorCode, errorCode.ToString());
 
@@ -278,7 +278,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var errorCode = openboxActionResult.Result.ErrorCode;
+            var errorCode = openboxActionResult.Result.Error;
 
             var errorResponse = new OpenboxSingleResponse(errorCode);
 
@@ -302,7 +302,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var errorCode = hub88ActionResult.Result.ErrorCode;
+            var errorCode = hub88ActionResult.Result.Error;
 
             var errorResponse = new Hub88ErrorResponse(errorCode);
 
@@ -325,7 +325,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var errorCode = softswissActionResult.Result.ErrorCode;
+            var errorCode = softswissActionResult.Result.Error;
 
             var statusCode = (int)errorCode;
             var balance = softswissActionResult.Result.Balance;
@@ -357,7 +357,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 return;
             }
 
-            var errorCode = externalActionResult.Result.ErrorCode;
+            var errorCode = externalActionResult.Result.Error;
 
             var errorResponse = new CommonErrorResponse(errorCode);
 

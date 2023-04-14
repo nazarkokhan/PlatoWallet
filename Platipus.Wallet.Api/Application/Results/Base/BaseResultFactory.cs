@@ -20,6 +20,6 @@ public static class BaseResultFactory
 
     public static BaseResult<TError, TData> Failure<TError, TData, TSourceData>(IBaseResult<TError, TSourceData> result)
         => result.IsFailure
-            ? Failure<TError, TData>(result.ErrorCode, result.Exception)
+            ? Failure<TError, TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

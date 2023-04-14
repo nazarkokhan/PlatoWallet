@@ -35,7 +35,8 @@ public record SwFreespinRequest(
             var walletResult = await _wallet.AwardAsync(
                 request.Token,
                 request.RoundId,
-                "", // request.TransactionId,
+                "",
+                // Guid.NewGuid().ToString(),
                 0, // request.Amount,
                 request.FreespinId,
                 cancellationToken: cancellationToken);

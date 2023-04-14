@@ -61,6 +61,7 @@ public enum ErrorCode
     MaxErrorMockTimeoutIs3Minutes,
 
     //game api
+    UnknownHttpClientError,
     EmptyExternalResponse,
     InvalidExternalResponse
 }

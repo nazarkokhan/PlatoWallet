@@ -20,6 +20,6 @@ public static class BetconstructResultFactory
 
     public static BetconstructResult<TData> Failure<TData, TSourceData>(IBetconstructResult<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Exception)
+            ? Failure<TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

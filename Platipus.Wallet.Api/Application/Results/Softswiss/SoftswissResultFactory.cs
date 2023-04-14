@@ -13,7 +13,7 @@ public static class SoftswissResultFactory
 
     public static SoftswissResult Failure(ISoftswissResult result)
         => result.IsFailure
-            ? Failure(result.ErrorCode, result.Balance, result.Exception)
+            ? Failure(result.Error, result.Balance, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static SoftswissResult<TData> Failure<TData>(
@@ -24,6 +24,6 @@ public static class SoftswissResultFactory
 
     public static SoftswissResult<TData> Failure<TData, TSourceData>(ISoftswissResult<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Balance, result.Exception)
+            ? Failure<TData>(result.Error, result.Balance, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

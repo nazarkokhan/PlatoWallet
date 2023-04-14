@@ -18,6 +18,6 @@ public static class DafabetResultFactory
 
     public static DafabetResult<TData> Failure<TData, TSourceData>(IDafabetResult<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Exception)
+            ? Failure<TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }

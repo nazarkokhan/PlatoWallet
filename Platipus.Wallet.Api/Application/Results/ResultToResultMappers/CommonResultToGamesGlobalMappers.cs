@@ -7,13 +7,13 @@ public static class CommonResultToGamesGlobalMappers
 {
     public static IGamesGlobalResult<TData> ToGamesGlobalResult<TData>(this IResult result)
         => result.IsFailure
-            ? GamesGlobalResultFactory.Failure<TData>(result.ErrorCode.ToGamesGlobalErrorCode(), result.Exception)
+            ? GamesGlobalResultFactory.Failure<TData>(result.Error.ToGamesGlobalErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IGamesGlobalResult ToGamesGlobalResult(this IResult result)
         => result.IsSuccess
             ? GamesGlobalResultFactory.Success()
-            : GamesGlobalResultFactory.Failure(result.ErrorCode.ToGamesGlobalErrorCode(), result.Exception);
+            : GamesGlobalResultFactory.Failure(result.Error.ToGamesGlobalErrorCode(), result.Exception);
 
     private static GamesGlobalErrorCode ToGamesGlobalErrorCode(this ErrorCode source)
     {

@@ -7,13 +7,13 @@ public static class CommonResultToHub88Mappers
 {
     public static IHub88Result<TData> ToHub88Result<TData>(this IResult result)
         => result.IsFailure
-            ? Hub88ResultFactory.Failure<TData>(result.ErrorCode.ToHub88ErrorCode(), result.Exception)
+            ? Hub88ResultFactory.Failure<TData>(result.Error.ToHub88ErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IHub88Result ToHub88Result(this IResult result)
         => result.IsSuccess
             ? Hub88ResultFactory.Success()
-            : Hub88ResultFactory.Failure(result.ErrorCode.ToHub88ErrorCode(), result.Exception);
+            : Hub88ResultFactory.Failure(result.Error.ToHub88ErrorCode(), result.Exception);
 
     private static Hub88ErrorCode ToHub88ErrorCode(this ErrorCode source)
     {

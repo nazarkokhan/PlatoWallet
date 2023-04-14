@@ -20,7 +20,7 @@ public record SwRefundRequest(
     [property: BindProperty(Name = "trntype")] string TrnType,
     [property: BindProperty(Name = "token")] string Token) : ISwMd5AmountRequest, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
 {
-    public class Handler : IRequestHandler<SwBetWinRequest, ISwResult<SwBetWinRefundFreespinResponse>>
+    public class Handler : IRequestHandler<SwRefundRequest, ISwResult<SwBetWinRefundFreespinResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -30,7 +30,7 @@ public record SwRefundRequest(
         }
 
         public async Task<ISwResult<SwBetWinRefundFreespinResponse>> Handle(
-            SwBetWinRequest request,
+            SwRefundRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _wallet.RollbackAsync(

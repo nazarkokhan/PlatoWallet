@@ -20,6 +20,6 @@ public static class SwResultFactory
 
     public static SwResult<TData> Failure<TData, TSourceData>(ISwResult<TSourceData> pswResult)
         => pswResult.IsFailure
-            ? Failure<TData>(pswResult.ErrorCode, pswResult.Exception)
+            ? Failure<TData>(pswResult.Error, pswResult.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(pswResult));
 }

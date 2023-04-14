@@ -20,6 +20,6 @@ public static class Hub88ResultFactory
 
     public static Hub88Result<TData> Failure<TData, TSourceData>(IHub88Result<TSourceData> result)
         => result.IsFailure
-            ? Failure<TData>(result.ErrorCode, result.Exception)
+            ? Failure<TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 }
