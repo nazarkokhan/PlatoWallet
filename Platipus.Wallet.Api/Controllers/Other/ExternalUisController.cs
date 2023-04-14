@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.External.Psw;
+using Application.Requests.External.Uis;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
