@@ -314,19 +314,18 @@ public record LogInRequest(
                 case CasinoProvider.BetConstruct:
                     launchUrl = GetBetConstructLaunchUrlAsync(
                         baseUrl,
-                        request.Game,
+                        game.GameServerId,
                         "en",
-                        "demo",
-                        session.Id);
+                        request.LaunchMode,
+                        session.Id,
+                        casino.Id);
                     break;
                 default:
                     launchUrl = "";
                     break;
             }
 
-
-
-        if (!string.IsNullOrWhiteSpace(launchUrl))
+            if (!string.IsNullOrWhiteSpace(launchUrl))
             {
                 var url = new Uri(launchUrl);
                 var queryParams = QueryHelpers.ParseQuery(url.Query);
@@ -536,23 +535,24 @@ public record LogInRequest(
 
     private static string GetBetConstructLaunchUrlAsync(
         Uri baseUrl,
-        string gameId,
-        string? language,
-        string mode,
-        string token)
+        int gameId,
+        string language,
+        LaunchMode launchMode,
+        string session,
+        string casinoId)
     {
+        var mode = launchMode is LaunchMode.Real ? "real_play" : "demo";
+
         var queryParameters = new Dictionary<string, string?>
         {
-            { nameof(mode), mode },
-            { nameof(gameId), gameId },
+            { "mode", mode },
+            { "gameId", gameId.ToString() },
+            { "language", language },
+            { "partner", casinoId }
         };
 
         if (mode is "real_play")
-        {
-            queryParameters.Add(nameof(token), token);
-        }
-
-        queryParameters.Add(nameof(language), language);
+            queryParameters.Add("token", session);
 
         var queryString = QueryString.Create(queryParameters);
 

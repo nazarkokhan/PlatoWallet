@@ -31,7 +31,8 @@ using Serilog.Sinks.Elasticsearch;
 try
 {
     const string appVersion = "AppVersion";
-    var assemblyVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString()!;
+    var assemblyName = Assembly.GetEntryAssembly()?.GetName();
+    var assemblyVersion = assemblyName.Version?.ToString()!;
 
     Log.Logger = new LoggerConfiguration()
         .Enrich.WithMachineName()
@@ -191,6 +192,15 @@ try
             configure.MapService<WalletGamesGlobalAdminService>("wallet/games-global/admin");
         });
 
+    app.MapGet(
+        string.Empty,
+        async (HttpContext context, IWebHostEnvironment environment) =>
+        {
+            if (!environment.IsProduction())
+                context.Response.Redirect("/swagger/index.html");
+            else
+                await context.Response.WriteAsync(assemblyName.Name!);
+        });
     app.MapVersion();
     app.MapConfigname();
     app.MapHealthz();

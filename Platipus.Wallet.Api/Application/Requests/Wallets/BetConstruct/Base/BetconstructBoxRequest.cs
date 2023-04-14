@@ -1,6 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct.Base;
 
-public record BetconstructBoxRequest<TRequestData>(TRequestData Data, string Time, string Hash)
+public record BetconstructBoxRequest<TRequestData>(
+        TRequestData Data,
+        string Time,
+        string Hash)
+    : IBetconstructBoxRequest<TRequestData>
     where TRequestData : IBetconstructRequest
 {
     public string Hash { get; } = Hash;

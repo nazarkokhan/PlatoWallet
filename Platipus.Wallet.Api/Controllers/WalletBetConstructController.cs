@@ -5,7 +5,6 @@ using Abstract;
 using Application.Requests.Wallets.BetConstruct;
 using Application.Requests.Wallets.BetConstruct.Base;
 using Application.Requests.Wallets.BetConstruct.Base.Response;
-using Application.Results.BetConstruct;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -61,7 +60,7 @@ public class WalletBetConstructController : RestApiController
 [JsonSettingsName(nameof(CasinoProvider.BetConstruct))]
 public class WalletBetConstructTestController : RestApiController
 {
-    [HttpPost]
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
         string time,

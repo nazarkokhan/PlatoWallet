@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Extensions;
 
 using Application.Results.Base;
-using Application.Results.BetConstruct;
 using Application.Results.Hub88;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ActionResults;
