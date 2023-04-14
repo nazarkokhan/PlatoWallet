@@ -199,7 +199,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                     return;
                 }
 
-                var errorCode = betConstructResult.ErrorCode;
+                var errorCode = betConstructResult.Error;
 
                 var errorResponse = new BetconstructErrorResponse(errorCode);
 

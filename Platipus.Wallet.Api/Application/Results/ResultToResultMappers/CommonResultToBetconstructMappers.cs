@@ -7,13 +7,13 @@ public static class CommonResultToBetconstructMappers
 {
     public static IBetconstructResult<TData> ToBetConstructResult<TData>(this IResult result)
         => result.IsFailure
-            ? BetconstructResultFactory.Failure<TData>(result.ErrorCode.ToBetConstructErrorCode(), result.Exception)
+            ? BetconstructResultFactory.Failure<TData>(result.Error.ToBetConstructErrorCode(), result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
     public static IBetconstructResult ToBetConstructResult(this IResult result)
         => result.IsSuccess
             ? BetconstructResultFactory.Success()
-            : BetconstructResultFactory.Failure(result.ErrorCode.ToBetConstructErrorCode(), result.Exception);
+            : BetconstructResultFactory.Failure(result.Error.ToBetConstructErrorCode(), result.Exception);
 
     private static BetconstructErrorCode ToBetConstructErrorCode(this ErrorCode source)
     {

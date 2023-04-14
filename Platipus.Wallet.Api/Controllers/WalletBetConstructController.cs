@@ -33,11 +33,7 @@ public class WalletBetConstructController : RestApiController
     public async Task<IActionResult> GetPlayerInfo(
         BetconstructBoxRequest<BetconstructGetPlayerInfoRequest> request,
         CancellationToken cancellationToken)
-    {
-        IRequest<IBetconstructResult> betconstructGetPlayerInfoRequest = request.Data;
-        var send = await _mediator.Send(betconstructGetPlayerInfoRequest, cancellationToken);
-        return send.ToActionResult();
-    }
+        => (await _mediator.Send(request.Data, cancellationToken)).ToActionResult();
 
     [HttpPost("Deposit")]
     [ProducesResponseType(typeof(BetconstructPlayResponse), StatusCodes.Status200OK)]
