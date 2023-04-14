@@ -14,6 +14,7 @@ using Application.Requests.Wallets.Psw.Base;
 using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.Softswiss.Base;
+using Application.Requests.Wallets.Sw;
 using Application.Requests.Wallets.Sw.Base;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base;
@@ -66,7 +67,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             currentMethod = singleRequest.Method switch
             {
                 OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
-                OpenboxHelpers.MoneyTransactions => ((OpenboxMoneyTransactionRequest)openboxPayloadObj).OrderType switch
+                OpenboxHelpers.MoneyTransactions => (openboxPayloadObj as OpenboxMoneyTransactionRequest)?.OrderType switch
                 {
                     3 => MockedErrorMethod.Bet,
                     4 => MockedErrorMethod.Win,
@@ -87,6 +88,27 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 "bet" => MockedErrorMethod.Bet,
                 "win" => MockedErrorMethod.Win,
                 "cancel" => MockedErrorMethod.Rollback,
+                _ => null
+            };
+        }
+        else if (context.Controller is WalletSwController)
+        {
+            var singleRequest = actionArgumentsValues.OfType<ISwBaseRequest>().Single();
+
+            usernameOrSession = singleRequest.Token;
+            searchMockBySession = true;
+
+            currentMethod = requestRoute switch
+            {
+                "balance-md5" or "balance-hash" => MockedErrorMethod.Balance,
+                "bet-win" => (singleRequest as SwBetWinRequest)?.TrnType switch
+                {
+                    "BET" => MockedErrorMethod.Bet,
+                    "WIN" => MockedErrorMethod.Win,
+                    _ => null
+                },
+                "refund" => MockedErrorMethod.Rollback,
+                "freespin" => MockedErrorMethod.Award,
                 _ => null
             };
         }
@@ -116,27 +138,18 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             if (baseRequest is not IUisUserIdRequest request)
                 return;
 
-            switch (requestRoute)
+            currentMethod = requestRoute switch
             {
-                case "get-balance":
-                    currentMethod = MockedErrorMethod.Balance;
-                    break;
-                case "change-balance":
+                "get-balance" => MockedErrorMethod.Balance,
+                "change-balance" => (request as UisChangeBalanceRequest)?.TrnType switch
                 {
-                    var changeBalanceRequest = (UisChangeBalanceRequest)request;
-
-                    currentMethod = changeBalanceRequest.TrnType switch
-                    {
-                        "BET" => MockedErrorMethod.Bet,
-                        "WIN" => MockedErrorMethod.Win,
-                        "CANCELBET" => MockedErrorMethod.Rollback,
-                        _ => null
-                    };
-                    break;
-                }
-                default:
-                    return;
-            }
+                    "BET" => MockedErrorMethod.Bet,
+                    "WIN" => MockedErrorMethod.Win,
+                    "CANCELBET" => MockedErrorMethod.Rollback,
+                    _ => null
+                },
+                _ => null
+            };
 
             usernameOrSession = request.UserId;
         }
@@ -150,11 +163,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             currentMethod = requestRoute switch
             {
-                "balance" or "balance-md5" or "balance-hash" or "user/balance" or "GetBalance" => MockedErrorMethod.Balance,
-                "bet" or "bet-win" or "play" or "transaction/bet" or "debit" or "Bet" => MockedErrorMethod.Bet,
+                "balance" or "user/balance" or "GetBalance" => MockedErrorMethod.Balance,
+                "bet" or "play" or "transaction/bet" or "debit" or "Bet" => MockedErrorMethod.Bet,
                 "win" or "result" or "transaction/win" or "credit" or "Win" => MockedErrorMethod.Win,
-                "award" or "bonusWin" or "freespin" or "freespins" => MockedErrorMethod.Award,
-                "rollback" or "cancel" or "refund" or "transaction/rollback" or "Cancel" => MockedErrorMethod.Rollback,
+                "award" or "bonusWin" or "freespins" => MockedErrorMethod.Award,
+                "rollback" or "cancel" or "transaction/rollback" or "Cancel" => MockedErrorMethod.Rollback,
                 _ => null
             };
 
@@ -175,10 +188,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     break;
                 case WalletSoftswissController:
                     usernameOrSession = actionArgumentsValues.OfType<ISoftswissBaseRequest>().SingleOrDefault()?.UserId;
-                    break;
-                case WalletSwController:
-                    usernameOrSession = actionArgumentsValues.OfType<ISwBaseRequest>().SingleOrDefault()?.Token;
-                    searchMockBySession = true;
                     break;
                 case WalletBetflagController:
                     usernameOrSession = actionArgumentsValues.OfType<IBetflagRequest>().SingleOrDefault()?.Key;

@@ -73,8 +73,13 @@ public class WalletSwController : ApiController
         [FromForm] SwFreespinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}
 
-    [HttpPost("private/test/get-security-value/hash")]
+[Route("wallet/private/softswiss")]
+[JsonSettingsName(nameof(CasinoProvider.Sw))]
+public class WalletSwPrivateController : RestApiController
+{
+    [HttpPost("get-security-value/hash")]
     public async Task<IActionResult> GetSecurityValueHash(
         string userName,
         [FromServices] WalletDbContext dbContext,
@@ -102,7 +107,7 @@ public class WalletSwController : ApiController
         return Ok(securityValue);
     }
 
-    [HttpPost("private/test/get-security-value/md5")]
+    [HttpPost("get-security-value/md5")]
     public async Task<IActionResult> GetSecurityValueMd5(
         string userName,
         [FromServices] WalletDbContext dbContext,
