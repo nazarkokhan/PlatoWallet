@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
 using Api.Extensions;
+using Application.Requests.Base;
+using Application.Requests.Wallets.BetConstruct.Base;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base;
 using Application.Requests.Wallets.Everymatrix.Base;
@@ -163,58 +165,42 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
 
             currentMethod = requestRoute switch
             {
-                "balance" or "user/balance" or "GetBalance" => MockedErrorMethod.Balance,
-                "bet" or "play" or "transaction/bet" or "debit" or "Bet" => MockedErrorMethod.Bet,
-                "win" or "result" or "transaction/win" or "credit" or "Win" => MockedErrorMethod.Win,
+                "balance" or "user/balance" or "GetBalance" or "GetPlayerInfo" => MockedErrorMethod.Balance,
+                "bet" or "play" or "transaction/bet" or "debit" or "Bet" or "Deposit" => MockedErrorMethod.Bet,
+                "win" or "result" or "transaction/win" or "credit" or "Win" or "Withdraw" => MockedErrorMethod.Win,
                 "award" or "bonusWin" or "freespins" => MockedErrorMethod.Award,
-                "rollback" or "cancel" or "transaction/rollback" or "Cancel" => MockedErrorMethod.Rollback,
+                "rollback" or "cancel" or "transaction/rollback" or "Cancel" or "Rollback" => MockedErrorMethod.Rollback,
                 _ => null
             };
 
-            switch (context.Controller)
+            var walletRequest = actionArgumentsValues
+                .OfType<IBaseWalletRequest>()
+                .SingleOrDefault();
+
+            (usernameOrSession, searchMockBySession) = walletRequest switch
             {
-                case WalletPswController:
-                    usernameOrSession = actionArgumentsValues.OfType<IPswBaseRequest>().SingleOrDefault()?.User;
-                    break;
-                case WalletDafabetController:
-                    usernameOrSession = actionArgumentsValues.OfType<IDafabetRequest>().SingleOrDefault()?.PlayerId;
-                    break;
-                case WalletOpenboxController:
-                    usernameOrSession = actionArgumentsValues.OfType<IOpenboxBaseRequest>().SingleOrDefault()?.Token;
-                    searchMockBySession = true;
-                    break;
-                case WalletHub88Controller:
-                    usernameOrSession = actionArgumentsValues.OfType<IHub88BaseRequest>().SingleOrDefault()?.SupplierUser;
-                    break;
-                case WalletSoftswissController:
-                    usernameOrSession = actionArgumentsValues.OfType<ISoftswissBaseRequest>().SingleOrDefault()?.UserId;
-                    break;
-                case WalletBetflagController:
-                    usernameOrSession = actionArgumentsValues.OfType<IBetflagRequest>().SingleOrDefault()?.Key;
-                    searchMockBySession = true;
-                    break;
-                case WalletReevoController:
-                    usernameOrSession = actionArgumentsValues.OfType<IReevoRequest>().SingleOrDefault()?.Username;
-                    break;
-                case WalletEverymatrixController:
-                    usernameOrSession = actionArgumentsValues.OfType<IEveryMatrixRequest>().SingleOrDefault()?.Token;
-                    searchMockBySession = true;
-                    break;
-                default:
-                    usernameOrSession = null;
-                    break;
-            }
+                IPswBaseRequest r => (r.User, false),
+                IDafabetRequest r => (r.PlayerId, false),
+                IOpenboxBaseRequest r => (r.Token, true),
+                IHub88BaseRequest r => (r.SupplierUser, false),
+                ISoftswissBaseRequest r => (r.UserId, false),
+                IBetflagRequest r => (r.Key, true),
+                IReevoRequest r => (r.Username, false),
+                IEveryMatrixRequest r => (r.Token, true),
+                IBetconstructBoxRequest<IBetconstructRequest> r => (r.Data.Token, true),
+                _ => (null, false)
+            };
         }
 
         if (currentMethod is null)
         {
-            logger.LogCritical("ErrorMockMethod not found");
+            logger.LogInformation("ErrorMockMethod not found");
             return;
         }
 
         if (usernameOrSession is null)
         {
-            logger.LogCritical("Can not mock error for request because Username is empty");
+            logger.LogInformation("Can not mock error for request because Username or Session is empty");
             return;
         }
 

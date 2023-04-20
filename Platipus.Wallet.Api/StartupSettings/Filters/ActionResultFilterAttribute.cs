@@ -5,6 +5,7 @@ using System.Text.Json;
 using ActionResults;
 using Api.Extensions.SecuritySign;
 using Application.Requests.Base.Common;
+using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
@@ -17,6 +18,7 @@ using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base.Response;
+using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Everymatrix.WithData;
 using Application.Results.Hub88;
@@ -183,6 +185,23 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
                 var errorCode = everymatrixResult.Error;
 
                 var errorResponse = new EverymatrixErrorResponse(errorCode);
+
+                context.Result = new OkObjectResult(errorResponse);
+
+                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            }
+
+            if (baseExternalActionResult.Result is IBetconstructResult<object> betConstructResult)
+            {
+                if (betConstructResult.IsSuccess)
+                {
+                    context.Result = new OkObjectResult(betConstructResult.Data);
+                    return;
+                }
+
+                var errorCode = betConstructResult.Error;
+
+                var errorResponse = new BetconstructErrorResponse(errorCode);
 
                 context.Result = new OkObjectResult(errorResponse);
 

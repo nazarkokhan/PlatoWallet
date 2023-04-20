@@ -1,6 +1,8 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Reevo.Base;
 
-public interface IReevoRequest
+using Requests.Base;
+
+public interface IReevoRequest : IBaseWalletRequest
 {
     public string CallerId { get; init; }
     public string CallerPassword { get; init; }

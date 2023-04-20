@@ -311,6 +311,15 @@ public record LogInRequest(
                         session.Id,
                         user.Currency.Id);
                     break;
+                case CasinoProvider.BetConstruct:
+                    launchUrl = GetBetConstructLaunchUrlAsync(
+                        baseUrl,
+                        game.GameServerId,
+                        "en",
+                        request.LaunchMode,
+                        session.Id,
+                        casino.Id);
+                    break;
                 default:
                     launchUrl = "";
                     break;
@@ -523,6 +532,35 @@ public record LogInRequest(
 
         return uri.AbsoluteUri;
     }
+
+    private static string GetBetConstructLaunchUrlAsync(
+        Uri baseUrl,
+        int gameId,
+        string language,
+        LaunchMode launchMode,
+        string session,
+        string casinoId)
+    {
+        var mode = launchMode is LaunchMode.Real ? "real_play" : "demo";
+
+        var queryParameters = new Dictionary<string, string?>
+        {
+            { "mode", mode },
+            { "gameId", gameId.ToString() },
+            { "language", language },
+            { "partner", casinoId }
+        };
+
+        if (mode is "real_play")
+            queryParameters.Add("token", session);
+
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(baseUrl, $"betconstruct/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
+    }
+
 
     private static string GetPariMatchLaunchUrl(
         Uri baseUrl,

@@ -188,6 +188,16 @@ try
             configure.MapService<WalletGamesGlobalAdminService>("wallet/games-global/admin");
         });
 
+    var assemblyName = Assembly.GetEntryAssembly()?.FullName!;
+    app.MapGet(
+        string.Empty,
+        async (HttpContext context, IWebHostEnvironment environment) =>
+        {
+            if (!environment.IsProduction())
+                context.Response.Redirect("/swagger/index.html");
+            else
+                await context.Response.WriteAsync(assemblyName);
+        });
     app.MapVersion();
     app.MapConfigname();
     app.MapHealthz();

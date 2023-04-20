@@ -3,7 +3,7 @@ namespace Platipus.Wallet.Api.Application.Results.BetConstruct;
 using System.Diagnostics.CodeAnalysis;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public enum BetConstructErrorCode
+public enum BetconstructErrorCode
 {
     WrongBetAmount = 4,
     WrongGameID = 7,

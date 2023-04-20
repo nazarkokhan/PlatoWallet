@@ -258,5 +258,19 @@
       "USD"
     ],
     "CasinoGames": []
+  },
+  {
+    "Id": "betConstruct",
+    "Provider": 14,
+    "SignatureKey": "12345678",
+    "InternalId": null,
+    "GameEnvironmentId": "test",
+    "Params": {},
+    "CasinoCurrencies": [
+      "EUR",
+      "XVG",
+      "USD"
+    ],
+    "CasinoGames": []
   }
 ]

@@ -2,15 +2,15 @@
 
 using Platipus.Wallet.Api.Application.Results.Base.WithData;
 
-public record BetConstructResult<TData> : BaseResult<BetConstructErrorCode, TData>, IBetConstructResult<TData>
+public record BetconstructResult<TData> : BaseResult<BetconstructErrorCode, TData>, IBetconstructResult<TData>
 {
-    public BetConstructResult(TData data)
+    public BetconstructResult(TData data)
         : base(data)
     {
     }
 
-    public BetConstructResult(
-        BetConstructErrorCode errorCode,
+    public BetconstructResult(
+        BetconstructErrorCode errorCode,
         Exception? exception = null)
         : base(errorCode, exception)
     {

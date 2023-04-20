@@ -4,10 +4,8 @@ using Application.Requests.Base.Common;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
-using Application.Requests.Wallets.TODO.BetConstruct.Base;
 using Application.Requests.Wallets.TODO.EmaraPlay.Base;
 using Application.Requests.Wallets.TODO.PariMatch.Base;
-using Application.Results.BetConstruct;
 using Application.Results.EmaraPlay;
 using Application.Results.Everymatrix;
 using Application.Results.PariMatch;
@@ -35,7 +33,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
             "parimatch" => GetPariMatchErrorResponse(),
             "enaraplay" => GetEnaraPlayErrorResponse(),
             // "betflag" => GetPariBetflagErrorResponse(),
-            "betconstruct" => GetBetConstructErrorResponse(),
+            // "betconstruct" => GetBetConstructErrorResponse(),
             _ => GetCommonErrorResponse(context)
         };
 
@@ -104,11 +102,11 @@ public class ExceptionHandlerMiddleware : IMiddleware
     //         hash);
     // }
 
-    private static object GetBetConstructErrorResponse()
-    {
-        return new BetConstructErrorResponse(
-            false,
-            BetConstructErrorCode.GeneralError.ToString(),
-            (int)BetConstructErrorCode.GeneralError);
-    }
+    // private static object GetBetConstructErrorResponse()
+    // {
+    //     return new BetconstructErrorResponse(
+    //         false,
+    //         BetconstructErrorCode.GeneralError.ToString(),
+    //         (int)BetconstructErrorCode.GeneralError);
+    // }
 }
