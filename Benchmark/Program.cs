@@ -1,160 +1,114 @@
 ﻿namespace Benchmark;
 
-using System.Collections;
-using System.Text.Json;
+using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using Bogus;
-using LazyCache;
-using Microsoft.Extensions.Caching.Memory;
-using StackExchange.Redis;
 
-[MemoryDiagnoser(true)]
 public static class Program
 {
     public static void Main(string[] args)
     {
-        // var test = new Benchmark();
-        // var redisGetString = test.Redis_Get_string();
-        // var redisGetObject = test.Redis_Get_object();
-        // var redisGetSetString = test.Redis_GetSet_string();
-        // var redisGetSetObject = test.Redis_GetSet_object();
-        // var memoryCacheGetOrCreate = test.MemoryCache_Get();
-        // var lazyCacheGet = test.LazyCache_Get();
         BenchmarkRunner.Run<Benchmark>();
     }
 }
 
+[MemoryDiagnoser()]
 public class Benchmark
 {
-    private readonly Random _random;
-    private readonly string[] _ids;
-    private readonly string _key;
-    private readonly BenchmarkSessionDto _value;
-    private readonly string _valueString;
-    private readonly IAppCache _lazyCache;
-    private readonly IMemoryCache _memoryCache;
-    private readonly IDatabase _redis;
-    private readonly IDatabase _redisLarge;
+    [Params("asdasdq31")]
+    public string value1;
 
-    public Benchmark()
+    [Params(" asmc02ld=1,x 3")]
+    public string value2;
+
+    [Params(" sadc3cs1,x 3")]
+    public string value3;
+
+    [Benchmark]
+    public string Join()
     {
-        _key = Guid.NewGuid().ToString();
-        _value = new BenchmarkSessionDto(
-            Guid.NewGuid(),
-            DateTime.UtcNow.AddDays(1),
-            false,
-            "1234567890");
-        _valueString = JsonSerializer.Serialize(_value);
+        return string.Join("", value1, value2);
+    }
 
-        _lazyCache = new CachingService();
-        _lazyCache.GetOrAdd(_key, () => _value);
+    [Benchmark]
+    public string Plus()
+    {
+        return value1 + value2;
+    }
 
-        _memoryCache = new MemoryCache(
-            new MemoryCacheOptions
-            {
-            });
-        _memoryCache.GetOrCreate(_key, entry => _value);
+    [Benchmark]
+    public string Concat()
+    {
+        return string.Concat(value1, value2);
+    }
 
-        _redis = ConnectionMultiplexer.Connect(
-                new ConfigurationOptions
-                {
-                    EndPoints = new EndPointCollection
-                    {
-                        "localhost"
-                    }
-                })
-            .GetDatabase();
-        
-        _redisLarge = ConnectionMultiplexer.Connect(
-                new ConfigurationOptions
-                {
-                    DefaultDatabase = 1,
-                    EndPoints = new EndPointCollection
-                    {
-                        "localhost"
-                    }
-                })
-            .GetDatabase();
-        var stringSet = _redis.StringSetAsync(_key, JsonSerializer.Serialize(_value), flags: CommandFlags.FireAndForget);
+    [Benchmark]
+    public string Format()
+    {
+        return string.Format("{0}{1}", value1, value2);
+    }
 
-        _random = new Random();
+    [Benchmark]
+    public string Interpolation()
+    {
+        return $"{value1}{value2}";
+    }
 
-        _ids = Enumerable.Range(0, 100_000)
-            .Select(x => Guid.NewGuid().ToString())
-            .ToArray();
+    [Benchmark]
+    public string StringBuilder()
+    {
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append(value1);
+        stringBuilder.Append(value2);
+        return stringBuilder.ToString();
     }
 
 
     [Benchmark]
-    public BenchmarkSessionDto MemoryCache_Get()
+    public string Join3()
     {
-        return _memoryCache.Get<BenchmarkSessionDto>(_key);
+        return string.Join(
+            "",
+            value1,
+            value2,
+            value3);
     }
 
     [Benchmark]
-    public BenchmarkSessionDto MemoryCache_GetOrCreate()
+    public string Plus3()
     {
-        return _memoryCache.GetOrCreate(_ids[_random.Next(100_000)], entry => _value);
+        return value1 + value2 + value3;
     }
 
     [Benchmark]
-    public BenchmarkSessionDto LazyCache_Get()
+    public string Concat3()
     {
-        return _lazyCache.Get<BenchmarkSessionDto>(_key);
+        return string.Concat(value1, value2, value3);
     }
 
     [Benchmark]
-    public BenchmarkSessionDto LazyCache_GetOrAdd()
+    public string Format3()
     {
-        return _lazyCache.GetOrAdd(_ids[_random.Next(100_000)], () => _value);
+        return string.Format(
+            "{0}{1}{2}",
+            value1,
+            value2,
+            value3);
     }
 
     [Benchmark]
-    public string Redis_Get_string()
+    public string Interpolation3()
     {
-        return _redis.StringGet(_key)!;
+        return $"{value1}{value2}{value3}";
     }
 
     [Benchmark]
-    public BenchmarkSessionDto Redis_Get_object()
+    public string StringBuilder3()
     {
-        var stringGet = _redis.StringGet(_key);
-        return JsonSerializer.Deserialize<BenchmarkSessionDto>(stringGet!)!;
-    }
-
-    [Benchmark]
-    public string Redis_GetSet_string()
-    {
-        return _redis.StringGetSet(_key, _valueString)!;
-    }
-    
-    [Benchmark]
-    public string Redis_Many_GetSet_string()
-    {
-        return _redis.StringGetSet(_ids[_random.Next(100_000)], _valueString)!;
-    }
-
-
-    [Benchmark]
-    public BenchmarkSessionDto Redis_GetSet_object()
-    {
-        var stringGetSet = _redis.StringGetSet(_key, JsonSerializer.Serialize(_value));
-
-        return JsonSerializer.Deserialize<BenchmarkSessionDto>(stringGetSet!)!;
-    }
-
-    [Benchmark]
-    public BenchmarkSessionDto Redis_Many_GetSet_object()
-    {
-        var stringGetSet = _redis.StringGetSet(_ids[_random.Next(100_000)], JsonSerializer.Serialize(_value));
-
-        return JsonSerializer.Deserialize<BenchmarkSessionDto>(stringGetSet!)!;
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append(value1);
+        stringBuilder.Append(value2);
+        stringBuilder.Append(value3);
+        return stringBuilder.ToString();
     }
 }
-
-public record BenchmarkSessionDto(
-    Guid SessionId,
-    DateTime ExpirationDate,
-    bool UserIsDisabled,
-    string CasinoSignatureKey);
