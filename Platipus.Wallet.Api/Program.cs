@@ -21,6 +21,7 @@ using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
+using Platipus.Wallet.Api.StartupSettings.Logging;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
 using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
 using Platipus.Wallet.Api.StartupSettings.Xml;
@@ -30,13 +31,10 @@ using Serilog.Sinks.Elasticsearch;
 
 try
 {
-    const string appVersion = "AppVersion";
-    var assemblyVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString()!;
-
     Log.Logger = new LoggerConfiguration()
         .Enrich.WithMachineName()
-        .Enrich.WithProperty(appVersion, assemblyVersion, true)
-        .WriteTo.Elasticsearch(
+        .Enrich.WithAppVersion()
+        .WriteTo.Elasticsearch( //TODO log to file
             nodeUris: "http://elastic.aws.intra:9200;",
             indexFormat: "platipus-wallet-api",
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
@@ -53,8 +51,7 @@ try
         (context, configuration) =>
         {
             configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration)
-                .Enrich.WithProperty(appVersion, assemblyVersion, true);
+                .ReadFrom.Configuration(context.Configuration);
         });
 
     Log.Warning("Reconfigured boostrap logger");
