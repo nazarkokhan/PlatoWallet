@@ -31,6 +31,7 @@ using Serilog.Sinks.Elasticsearch;
 
 try
 {
+    //relaunch
     Log.Logger = new LoggerConfiguration()
         .Enrich.WithMachineName()
         .Enrich.WithAppVersion()
