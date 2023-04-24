@@ -546,7 +546,7 @@ public record LogInRequest(
         var queryParameters = new Dictionary<string, string?>
         {
             { "mode", mode },
-            { "gameId", gameId.ToString() },
+            { "gameID", gameId.ToString() },
             { "language", language },
             { "partner", casinoId }
         };
@@ -556,7 +556,7 @@ public record LogInRequest(
 
         var queryString = QueryString.Create(queryParameters);
 
-        var uri = new Uri(baseUrl, $"betconstruct/launch{queryString.ToUriComponent()}");
+        var uri = new Uri(baseUrl, $"betconstruct{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
