@@ -13,7 +13,7 @@ public record BetconstructDepositRequest(
         string RoundId,
         string GameId,
         string CurrencyId,
-        decimal BetAmount,
+        decimal WinAmount,
         string BetInfo)
     : IBetconstructRequest, IRequest<IBetconstructResult<BetconstructPlayResponse>>
 {
@@ -34,7 +34,7 @@ public record BetconstructDepositRequest(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
-                request.BetAmount,
+                request.WinAmount,
                 currency: request.CurrencyId,
                 cancellationToken: cancellationToken);
 
