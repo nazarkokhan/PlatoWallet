@@ -30,7 +30,7 @@ public record BetconstructDepositRequest(
             BetconstructDepositRequest request,
             CancellationToken cancellationToken)
         {
-            var walletResult = await _wallet.BetAsync(
+            var walletResult = await _wallet.WinAsync(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
