@@ -76,7 +76,6 @@ public class WalletISoftBetController : RestApiController
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
             var action = request.Action;
-            var actionParams = request.Action.Parameters;
 
             if (action.Command is "initsession")
             {
@@ -104,6 +103,7 @@ public class WalletISoftBetController : RestApiController
             if (session is null || session.ExpirationDate < DateTime.UtcNow)
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
+            var actionParams = request.Action.Parameters!;
             IRequest<ISoftBetResult<SoftBetBalanceResponse>>? payloadRequestObj = null;
             switch (action.Command)
             {

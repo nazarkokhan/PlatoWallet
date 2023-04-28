@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
@@ -32,7 +34,10 @@ using Serilog.Sinks.Elasticsearch;
 try
 {
     Log.Logger = new LoggerConfiguration()
+        .Enrich.FromLogContext()
         .Enrich.WithMachineName()
+        .Enrich.WithEnvironmentName()
+        .Enrich.WithEnvironmentUserName()
         .Enrich.WithAppVersion()
         .WriteTo.Elasticsearch( //TODO log to file
             nodeUris: "http://elastic.aws.intra:9200;",
@@ -51,10 +56,10 @@ try
         (context, configuration) =>
         {
             configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration);
+                .ReadFrom.Configuration(context.Configuration)
+                .Destructure.AsScalar<JsonNode>() //TODO to config
+                .Destructure.AsScalar<JsonDocument>();
         });
-
-    Log.Warning("Reconfigured boostrap logger");
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
@@ -162,6 +167,8 @@ try
     services.AddXmlRpc();
 
     var app = builder.Build();
+
+    Log.Warning("Reconfigured boostrap logger");
 
     app.UseExceptionHandler(
         exceptionAppBuilder =>
