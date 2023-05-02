@@ -166,8 +166,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             currentMethod = requestRoute switch
             {
                 "balance" or "user/balance" or "GetBalance" or "GetPlayerInfo" => MockedErrorMethod.Balance,
-                "bet" or "play" or "transaction/bet" or "debit" or "Bet" or "Deposit" => MockedErrorMethod.Bet,
-                "win" or "result" or "transaction/win" or "credit" or "Win" or "Withdraw" => MockedErrorMethod.Win,
+                "bet" or "play" or "transaction/bet" or "debit" or "Bet" or "Withdraw" => MockedErrorMethod.Bet,
+                "win" or "result" or "transaction/win" or "credit" or "Win" or "Deposit" => MockedErrorMethod.Win,
                 "award" or "bonusWin" or "freespins" => MockedErrorMethod.Award,
                 "rollback" or "cancel" or "transaction/rollback" or "Cancel" or "Rollback" => MockedErrorMethod.Rollback,
                 _ => null

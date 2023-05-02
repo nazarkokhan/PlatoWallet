@@ -34,17 +34,17 @@ public class WalletBetConstructController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request.Data, cancellationToken)).ToActionResult();
 
-    [HttpPost("Deposit")]
-    [ProducesResponseType(typeof(BetconstructPlayResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Deposit(
-        BetconstructBoxRequest<BetconstructDepositRequest> request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request.Data, cancellationToken)).ToActionResult();
-
     [HttpPost("Withdraw")]
     [ProducesResponseType(typeof(BetconstructPlayResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Withdraw(
         BetconstructBoxRequest<BetConstructWithdrawRequest> request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request.Data, cancellationToken)).ToActionResult();
+
+    [HttpPost("Deposit")]
+    [ProducesResponseType(typeof(BetconstructPlayResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Deposit(
+        BetconstructBoxRequest<BetconstructDepositRequest> request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request.Data, cancellationToken)).ToActionResult();
 
