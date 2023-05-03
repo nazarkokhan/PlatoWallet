@@ -19,7 +19,9 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
         _logger = logger;
     }
 
-    protected abstract MockedErrorIdentifiers? GetMockedErrorIdentifiers(IBaseWalletRequest baseRequest);
+    protected abstract MockedErrorIdentifiers? GetMockedErrorIdentifiers(
+        IBaseWalletRequest baseRequest,
+        ActionExecutedContext actionExecutedContext);
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -31,7 +33,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
             .OfType<IBaseWalletRequest>()
             .Single();
 
-        var mockedErrorIdentifiers = GetMockedErrorIdentifiers(walletRequest);
+        var mockedErrorIdentifiers = GetMockedErrorIdentifiers(walletRequest, executedContext);
 
         if (mockedErrorIdentifiers is null)
         {

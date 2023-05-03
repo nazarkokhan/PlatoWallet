@@ -25,7 +25,7 @@ public static class StartupExtensions
             .AddScoped<BetflagSecurityFilter>()
             .AddSingleton<BetconstructMockedErrorActionFilter>()
             .AddScoped<BetconstructSecurityFilter>()
-            .AddScoped<OpenboxMockedErrorActionFilter>(); //scoped because it needs httpContext
+            .AddSingleton<OpenboxMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

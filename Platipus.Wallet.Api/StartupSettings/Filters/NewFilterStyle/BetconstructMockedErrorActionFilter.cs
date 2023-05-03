@@ -4,6 +4,7 @@ using Application.Requests.Base;
 using Application.Requests.Wallets.BetConstruct;
 using Application.Requests.Wallets.BetConstruct.Base;
 using Domain.Entities.Enums;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Other;
 
 public class BetconstructMockedErrorActionFilter : AbstractMockedErrorActionFilter
@@ -17,7 +18,9 @@ public class BetconstructMockedErrorActionFilter : AbstractMockedErrorActionFilt
         _logger = logger;
     }
 
-    protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(IBaseWalletRequest baseRequest)
+    protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(
+        IBaseWalletRequest baseRequest,
+        ActionExecutedContext actionExecutedContext)
     {
         var request = (IBetconstructBoxRequest<IBetconstructRequest>)baseRequest;
         var requestData = request.Data;

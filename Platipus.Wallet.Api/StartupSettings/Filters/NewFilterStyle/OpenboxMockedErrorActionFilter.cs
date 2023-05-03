@@ -5,27 +5,29 @@ using Application.Requests.Wallets.Openbox;
 using Application.Requests.Wallets.Openbox.Base;
 using Platipus.Wallet.Api.Extensions;
 using Domain.Entities.Enums;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Other;
 
 public class OpenboxMockedErrorActionFilter : AbstractMockedErrorActionFilter
 {
     private readonly ILogger<OpenboxMockedErrorActionFilter> _logger;
-    private readonly HttpContext _httpContext;
 
     public OpenboxMockedErrorActionFilter(
-        ILogger<OpenboxMockedErrorActionFilter> logger,
-        IHttpContextAccessor httpContextAccessor)
+        ILogger<OpenboxMockedErrorActionFilter> logger)
         : base(logger)
     {
         _logger = logger;
-        _httpContext = httpContextAccessor.HttpContext!;
     }
 
-    protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(IBaseWalletRequest baseRequest)
+    protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(
+        IBaseWalletRequest baseRequest,
+        ActionExecutedContext actionExecutedContext)
     {
         var request = (OpenboxSingleRequest)baseRequest;
 
-        if (!_httpContext.Items.TryGetValue(HttpContextItems.OpenboxPayloadRequestObj, out var payloadRequestObj)
+        if (!actionExecutedContext.HttpContext.Items.TryGetValue(
+                HttpContextItems.OpenboxPayloadRequestObj,
+                out var payloadRequestObj)
          || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
         {
             _logger.LogCritical("Failed mocking openbox request. {OpenboxRequest}", request);

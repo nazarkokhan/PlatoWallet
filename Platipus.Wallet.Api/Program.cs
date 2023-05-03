@@ -40,7 +40,7 @@ try
         .Enrich.WithEnvironmentUserName()
         .Enrich.WithAppVersion()
         .WriteTo.Elasticsearch( //TODO log to file
-            nodeUris: "http://elastic.drs.intra:9200;",
+            nodeUris: "http://elastic.aws.intra:9200;",
             indexFormat: "platipus-wallet-api",
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
