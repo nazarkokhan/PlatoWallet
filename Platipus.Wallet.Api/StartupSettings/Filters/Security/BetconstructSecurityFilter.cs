@@ -13,6 +13,13 @@ using Microsoft.EntityFrameworkCore;
 
 public class BetconstructSecurityFilter : IAsyncActionFilter
 {
+    private readonly WalletDbContext _dbContext;
+
+    public BetconstructSecurityFilter(WalletDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
@@ -21,9 +28,7 @@ public class BetconstructSecurityFilter : IAsyncActionFilter
 
         var httpContext = context.HttpContext;
 
-        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
-
-        var session = await dbContext
+        var session = await _dbContext
             .Set<Session>()
             .Where(s => s.Id == request.Data.Token)
             .Select(

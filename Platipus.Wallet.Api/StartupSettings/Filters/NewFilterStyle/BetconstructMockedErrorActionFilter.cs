@@ -9,13 +9,10 @@ using Other;
 
 public class BetconstructMockedErrorActionFilter : AbstractMockedErrorActionFilter
 {
-    private readonly ILogger<BetconstructMockedErrorActionFilter> _logger;
-
     public BetconstructMockedErrorActionFilter(
         ILogger<BetconstructMockedErrorActionFilter> logger)
         : base(logger)
     {
-        _logger = logger;
     }
 
     protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(
