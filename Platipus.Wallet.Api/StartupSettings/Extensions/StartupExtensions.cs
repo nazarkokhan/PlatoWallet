@@ -6,6 +6,8 @@ using System.Text.Json.Serialization;
 using ControllerSpecificJsonOptions;
 using Domain.Entities;
 using Domain.Entities.Enums;
+using Filters.NewFilterStyle;
+using Filters.Security;
 using Infrastructure.Persistence;
 using JorgeSerrano.Json;
 using JsonConverters;
@@ -16,6 +18,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 public static class StartupExtensions
 {
+    public static IServiceCollection AddSecurityAndErrorMockFilters(this IServiceCollection services)
+    {
+        return services
+            .AddSingleton<BetflagMockedErrorActionFilter>()
+            .AddScoped<BetflagSecurityFilter>()
+            .AddSingleton<BetconstructMockedErrorActionFilter>()
+            .AddScoped<BetconstructSecurityFilter>()
+            .AddSingleton<OpenboxMockedErrorActionFilter>();
+    }
+
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
     {
         builder

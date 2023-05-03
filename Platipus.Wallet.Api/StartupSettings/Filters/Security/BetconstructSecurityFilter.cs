@@ -11,9 +11,9 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
-public class BetconstructVerifyHashFilterAttribute : ActionFilterAttribute
+public class BetconstructSecurityFilter : IAsyncActionFilter
 {
-    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
             .OfType<IBetconstructBoxRequest<IBetconstructRequest>>()

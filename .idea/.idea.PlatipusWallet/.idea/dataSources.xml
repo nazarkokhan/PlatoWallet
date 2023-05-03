@@ -8,25 +8,11 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="LOCAL Elastic" uuid="16a390fc-4f4a-4ff2-afae-25d2ba9b95aa">
-      <driver-ref>elasticsearch</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.elasticsearch.xpack.sql.jdbc.EsDriver</jdbc-driver>
-      <jdbc-url>jdbc:es://localhost:9200/</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="PlatipusWallet DEV" uuid="58f32adc-6454-4458-abac-303785ce1819">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://10.0.2.224:5432/wallet_test</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="Platipus DEV" uuid="bb4384bf-0b96-4c1f-8893-f43abdc56946">
-      <driver-ref>elasticsearch</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.elasticsearch.xpack.sql.jdbc.EsDriver</jdbc-driver>
-      <jdbc-url>jdbc:es://http://10.0.3.46:9200/</jdbc-url>
+      <jdbc-url>jdbc:postgresql://10.5.0.240:5432/wallet_test</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="postgres@localhost" uuid="5ad3fb92-78f5-4fba-9438-6e3f4c1c36b3">

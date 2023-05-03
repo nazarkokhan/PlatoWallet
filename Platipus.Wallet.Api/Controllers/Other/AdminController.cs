@@ -13,10 +13,8 @@ public class AdminController : RestApiController
     public AdminController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet("environment/page")]
-    public async Task<IActionResult> GetEnvironments(
-        [FromQuery] GetGameEnvironmentsPageRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    public async Task<IActionResult> GetEnvironments(CancellationToken cancellationToken)
+        => (await _mediator.Send(new GetGameEnvironmentsPageRequest(), cancellationToken)).ToActionResult();
 
     [HttpPost("environment")]
     public async Task<IActionResult> CreateEnvironment(
@@ -45,10 +43,4 @@ public class AdminController : RestApiController
         [FromQuery] GetUsersPageRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    //TODO no need for it?
-    // [HttpPost("user/round")]
-    // [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Round(AddRoundRequest request, CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

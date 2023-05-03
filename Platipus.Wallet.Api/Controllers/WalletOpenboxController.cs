@@ -15,10 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StartupSettings;
 using StartupSettings.ControllerSpecificJsonOptions;
-using StartupSettings.Filters;
+using StartupSettings.Filters.NewFilterStyle;
 
 [Route("wallet/openbox/")]
-[MockedErrorActionFilter(Order = 1)]
+[ServiceFilter(typeof(OpenboxMockedErrorActionFilter), Order = 1)]
 [JsonSettingsName(nameof(CasinoProvider.Openbox))]
 public class WalletOpenboxController : RestApiController
 {

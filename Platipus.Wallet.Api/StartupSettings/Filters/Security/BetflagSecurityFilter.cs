@@ -9,18 +9,22 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
-public class BetflagSecurityFilterAttribute : ActionFilterAttribute
+public class BetflagSecurityFilter : IAsyncActionFilter
 {
-    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-    {
-        var httpContext = context.HttpContext;
-        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
+    private readonly WalletDbContext _dbContext;
 
+    public BetflagSecurityFilter(WalletDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
         var request = context.ActionArguments.Values
             .OfType<IBetflagRequest>()
             .Single();
 
-        var session = await dbContext.Set<Session>()
+        var session = await _dbContext.Set<Session>()
             .Where(
                 s => s.Id == request.Key
                   && s.User.CasinoId == request.ApiName)
@@ -33,7 +37,7 @@ public class BetflagSecurityFilterAttribute : ActionFilterAttribute
                 })
             .FirstOrDefaultAsync();
 
-        httpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
+        context.HttpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {

@@ -11,11 +11,16 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 public class LoggingResultFilterAttribute : ResultFilterAttribute
 {
+    private readonly ILogger<LoggingResultFilterAttribute> _logger;
+
+    public LoggingResultFilterAttribute(ILogger<LoggingResultFilterAttribute> logger)
+    {
+        _logger = logger;
+    }
+
     public override void OnResultExecuted(ResultExecutedContext context)
     {
         var httpContext = context.HttpContext;
-
-        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<LoggingResultFilterAttribute>>();
 
         var rawRequestBytes = httpContext.GetRequestBodyBytesItem();
         var request = httpContext.Items[HttpContextItems.RequestObject];
@@ -53,11 +58,11 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Failed serializing mocked error {@MockedErrorResponse}", response);
+                _logger.LogError(e, "Failed serializing mocked error {@MockedErrorResponse}", response);
             }
         }
 
-        logger.Log(
+        _logger.Log(
             isError ? LogLevel.Error : LogLevel.Information,
             "Provider: {Provider} \n"
           + "RawRequestBody: {RawRequestBody} \n"

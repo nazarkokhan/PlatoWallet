@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using Platipus.Wallet.Api.Application.Results.HttpClient;
 using Platipus.Wallet.Api.Application.Results.HttpClient.HttpData;
 using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
-using Platipus.Wallet.Domain.Entities.Enums;
+using Domain.Entities.Enums;
 
 public class UisGameApiClient : IUisGameApiClient
 {

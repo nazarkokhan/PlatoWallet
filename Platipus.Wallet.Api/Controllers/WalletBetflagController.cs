@@ -11,12 +11,12 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StartupSettings.ControllerSpecificJsonOptions;
-using StartupSettings.Filters;
+using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security;
 
 [Route("wallet/betflag")]
-[MockedErrorActionFilter(Order = 1)]
-[BetflagSecurityFilter(Order = 2)]
+[ServiceFilter(typeof(BetflagMockedErrorActionFilter), Order = 1)]
+[ServiceFilter(typeof(BetflagSecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Betflag))]
 [ProducesResponseType(typeof(BetflagErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetflagController : RestApiController

@@ -2,10 +2,10 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Uis;
 
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Services.UisGamesApi;
-using Platipus.Wallet.Api.Application.Services.UisGamesApi.Dto;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Services.UisGamesApi;
+using Services.UisGamesApi.Dto;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public record UisCreateAwardRequest(
     [property: DefaultValue("test")] string Environment,

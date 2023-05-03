@@ -22,6 +22,8 @@ using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
+using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
+using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Logging;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
@@ -64,6 +66,7 @@ try
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
 
+
     services.Configure<KestrelServerOptions>(
         options =>
         {
@@ -103,6 +106,7 @@ try
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
             })
         .AddJsonOptionsForProviders()
+        .AddSecurityAndErrorMockFilters()
         .AddOptions(builderConfiguration)
         .AddEndpointsApiExplorer()
         .AddSwaggerWithConfig()

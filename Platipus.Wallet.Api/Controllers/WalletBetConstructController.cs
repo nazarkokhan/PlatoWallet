@@ -13,12 +13,12 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StartupSettings.ControllerSpecificJsonOptions;
-using StartupSettings.Filters;
+using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security;
 
 [Route("wallet/betconstruct")]
-[MockedErrorActionFilter(Order = 1)]
-[BetconstructVerifyHashFilter(Order = 2)]
+[ServiceFilter(typeof(BetconstructMockedErrorActionFilter), Order = 1)]
+[ServiceFilter(typeof(BetconstructSecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.BetConstruct))]
 [ProducesResponseType(typeof(BetconstructErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetConstructController : RestApiController
@@ -48,7 +48,7 @@ public class WalletBetConstructController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request.Data, cancellationToken)).ToActionResult();
 
-    [HttpPost("Rollback")]
+    [HttpPost("RollbackTransaction")]
     [ProducesResponseType(typeof(BetconstructPlayResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
         BetconstructBoxRequest<BetConstructRollbackTransactionRequest> request,

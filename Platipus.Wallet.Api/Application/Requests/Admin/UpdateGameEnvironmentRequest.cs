@@ -11,7 +11,7 @@ public record UpdateGameEnvironmentRequest(
         [property: DefaultValue("https://platipusgaming.cloud/qa/integration/vivo/test/index.html")] Uri UisBaseUrl)
     : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<CreateGameEnvironmentRequest, IResult>
+    public class Handler : IRequestHandler<UpdateGameEnvironmentRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -21,7 +21,7 @@ public record UpdateGameEnvironmentRequest(
         }
 
         public async Task<IResult> Handle(
-            CreateGameEnvironmentRequest request,
+            UpdateGameEnvironmentRequest request,
             CancellationToken cancellationToken)
         {
             var environment = await _context.Set<GameEnvironment>()
