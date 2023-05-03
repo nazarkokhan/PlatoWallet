@@ -22,8 +22,6 @@ using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
-using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
-using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Logging;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
@@ -42,7 +40,7 @@ try
         .Enrich.WithEnvironmentUserName()
         .Enrich.WithAppVersion()
         .WriteTo.Elasticsearch( //TODO log to file
-            nodeUris: "http://elastic.aws.intra:9200;",
+            nodeUris: "http://elastic.drs.intra:9200;",
             indexFormat: "platipus-wallet-api",
             connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
             autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
