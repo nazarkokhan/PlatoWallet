@@ -40,7 +40,7 @@ public record CreateCasinoRequest(
                 .AnyAsync(cancellationToken);
 
             if (!environmentExist)
-                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var supportedCurrencies = await _context.Set<Currency>()
                 .ToListAsync(cancellationToken);

@@ -47,11 +47,12 @@ public enum ErrorCode
 
     ErrorMockApplianceError,
 
+    ValidationError,
 
     //external
     InvalidPassword,
     GameServerApiError,
-    EnvironmentDoesNotExists,
+    EnvironmentNotFound,
     EnvironmentAlreadyExists,
     UserAlreadyExists,
 
@@ -63,5 +64,5 @@ public enum ErrorCode
     //game api
     UnknownHttpClientError,
     EmptyExternalResponse,
-    InvalidExternalResponse
+    InvalidExternalResponse,
 }

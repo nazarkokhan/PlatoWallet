@@ -33,7 +33,7 @@ public record ReevoAddFreeRoundRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure<object>(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure<object>(ErrorCode.EnvironmentNotFound);
 
             var response = await _gamesApiClient.AddFreeRoundsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
             if (response.IsFailure)

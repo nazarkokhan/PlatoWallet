@@ -4,7 +4,9 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
+using Humanizer;
 using JorgeSerrano.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -29,49 +31,37 @@ using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
 using Platipus.Wallet.Api.StartupSettings.Xml;
 using Platipus.Wallet.Infrastructure.Persistence;
 using Serilog;
-using Serilog.Sinks.Elasticsearch;
 
 try
 {
+    SelfLogHelper.EnableConsoleAndFile();
     Log.Logger = new LoggerConfiguration()
         .Enrich.FromLogContext()
         .Enrich.WithMachineName()
         .Enrich.WithEnvironmentName()
         .Enrich.WithEnvironmentUserName()
         .Enrich.WithAppVersion()
-        .WriteTo.Elasticsearch( //TODO log to file
-            nodeUris: "http://elastic.aws.intra:9200;",
-            indexFormat: "platipus-wallet-api",
-            connectionGlobalHeaders: "Authorization=Basic cGxhdGlwdXNfZWxhc3RpYzpUaGFpcmFoUGgydXNob28=",
-            autoRegisterTemplateVersion: AutoRegisterTemplateVersion.ESv7,
-            batchAction: ElasticOpType.Create,
-            typeName: null,
-            customFormatter: new TargetedElasticsearchJsonFormatter())
+        .WriteTo.File("./logs/static-logger.txt")
         .CreateBootstrapLogger();
-
-    Log.Warning("Starting app");
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog(
-        (context, configuration) =>
-        {
-            configuration.EnableSelfLog(context)
-                .ReadFrom.Configuration(context.Configuration)
-                .Destructure.AsScalar<JsonNode>() //TODO to config
-                .Destructure.AsScalar<JsonDocument>();
-        });
+        (context, configuration) => configuration.ReadFrom
+            .Configuration(context.Configuration)
+            .Destructure.AsScalar<JsonNode>() //TODO to config
+            .Destructure.AsScalar<JsonDocument>());
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
 
-
+    //TODO remove GamesGlobal
     services.Configure<KestrelServerOptions>(
         options =>
         {
             options.AllowSynchronousIO = true;
         });
 
-    const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO now it is dynamyc from config
+    const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO now it is dynamic from config, remove
     services
         .AddScoped<IWalletService, WalletService>()
         .AddTransient<ExceptionHandlerMiddleware>()
@@ -82,16 +72,16 @@ try
             options =>
             {
                 var xmlFormatter = options.OutputFormatters.OfType<XmlSerializerOutputFormatter>().FirstOrDefault();
-                if (xmlFormatter != null)
-                {
+                if (xmlFormatter is not null)
                     options.OutputFormatters.Remove(xmlFormatter);
-                }
 
                 options.OutputFormatters.Add(new CustomXmlSerializerOutputFormatter());
 
+                // Action
                 options.Filters.Add<SaveRequestActionFilterAttribute>(1);
 
-                options.Filters.Add<ActionResultFilterAttribute>(1);
+                // Result
+                options.Filters.Add<ResultToResponseResultFilterAttribute>(1);
                 options.Filters.Add<LoggingResultFilterAttribute>(2);
             })
         .AddJsonOptions(
@@ -102,6 +92,30 @@ try
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
+            })
+        .ConfigureApiBehaviorOptions(
+            options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    //TODO suppress and move to ResultToResponseResultFilterAttribute
+                    var errors = context.ModelState
+                        .Where(x => x.Value?.Errors.Count > 0)
+                        .SelectMany(kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));
+
+                    const ErrorCode code = ErrorCode.ValidationError;
+                    var description = string.Join(". ", errors);
+
+                    var errorResponse = new
+                    {
+                        Code = (int)code,
+                        Description = !string.IsNullOrWhiteSpace(description)
+                            ? description
+                            : code.Humanize()
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
+                };
             })
         .AddJsonOptionsForProviders()
         .AddSecurityAndErrorMockFilters()
@@ -114,17 +128,14 @@ try
         .AddLocalization()
         .AddLazyCache()
         .AddDbContext<WalletDbContext>(
-            (provider, optionsBuilder) =>
+            (optionsBuilder) =>
             {
                 optionsBuilder
                     .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
                     .UseSnakeCaseNamingConvention();
 
                 if (builder.Environment.IsDevelopment() || builder.Environment.IsDebug())
-                {
-                    optionsBuilder.UseLoggerFactory(provider.GetRequiredService<ILoggerFactory>());
                     optionsBuilder.EnableSensitiveDataLogging();
-                }
             })
         .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
         .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
@@ -164,13 +175,13 @@ try
         .AddSingleton<IUisGameApiClient, UisGameApiClient>()
         .AddHttpClient<IUisGameApiClient, UisGameApiClient>();
 
-    services.AddHealthChecks();
+    services
+        .AddHealthChecks()
+        .AddNpgSql(builderConfiguration.GetConnectionString(nameof(WalletDbContext))!, name: nameof(WalletDbContext));
 
     services.AddXmlRpc();
 
     var app = builder.Build();
-
-    Log.Warning("Reconfigured boostrap logger");
 
     app.UseExceptionHandler(
         exceptionAppBuilder =>
@@ -185,9 +196,9 @@ try
     }
 
     app.EnableBufferingAndSaveRawRequest();
-
     app.UseRequestLocalization();
 
+    //TODO remove GG
     app.UseMiddleware<BufferResponseBodyMiddleware>();
     app.UseMiddleware<GamesGlobalMiddleware>();
     app.UseXmlRpc(
@@ -196,6 +207,7 @@ try
             configure.MapService<WalletGamesGlobalService>("wallet/games-global/gaming");
             configure.MapService<WalletGamesGlobalAdminService>("wallet/games-global/admin");
         });
+    //TODO remove GG
 
     var assemblyName = Assembly.GetEntryAssembly()?.FullName!;
     app.MapGet(
@@ -207,9 +219,11 @@ try
             else
                 await context.Response.WriteAsync(assemblyName);
         });
+
     app.MapVersion();
     app.MapConfigname();
-    app.MapHealthz();
+    app.MapConfig();
+    app.MapHealth();
 
     app.MapControllers();
 
@@ -217,13 +231,11 @@ try
 
     await app.RunAsync();
 }
-
 catch (Exception ex)
 {
-    Log.Fatal(ex, "FAILED!!!! on startup");
+    Log.Fatal(ex, "Startup exception");
 }
 finally
 {
-    Log.Fatal("Flushing before closing app");
     Log.CloseAndFlush();
 }

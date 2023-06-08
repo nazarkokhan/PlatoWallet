@@ -31,7 +31,7 @@ public record ReevoGetGameHistoryRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure<object>(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure<object>(ErrorCode.EnvironmentNotFound);
 
             return await _gamesApiClient.GetGameHistoryAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
         }

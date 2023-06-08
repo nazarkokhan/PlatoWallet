@@ -35,7 +35,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 
-public class ActionResultFilterAttribute : ResultFilterAttribute
+public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
@@ -45,7 +45,7 @@ public class ActionResultFilterAttribute : ResultFilterAttribute
 
         var httpContext = context.HttpContext;
         var services = httpContext.RequestServices;
-        var logger = services.GetRequiredService<ILogger<ActionResultFilterAttribute>>();
+        var logger = services.GetRequiredService<ILogger<ResultToResponseResultFilterAttribute>>();
 
         if (context.Result is BaseExternalActionResult baseExternalActionResult)
         {

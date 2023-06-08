@@ -31,7 +31,7 @@ public record ExternalSoftswissCancelFreespinsRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var response = await _gamesApiClient.CancelFreespinsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
 

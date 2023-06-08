@@ -6,7 +6,5 @@ using global::Serilog.Configuration;
 public static class SerilogEnrichersExtensions
 {
     public static LoggerConfiguration WithAppVersion(this LoggerEnrichmentConfiguration enrich)
-    {
-        return enrich.With<AppVersionEnricher>();
-    }
+        => enrich.With<AppVersionEnricher>();
 }

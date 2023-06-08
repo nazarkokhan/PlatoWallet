@@ -31,7 +31,7 @@ public record ExternalSoftswissIssueFreespinsRequest(
                 .Where(e => e.Id == request.Environment)
                 .FirstOrDefaultAsync(cancellationToken);
             if (environment is null)
-                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var apiRequest = request.ApiRequest;
 

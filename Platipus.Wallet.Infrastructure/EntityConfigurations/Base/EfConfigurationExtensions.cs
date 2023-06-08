@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Infrastructure.EntityConfigurations.Base;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence;
 
 public static class EfConfigurationExtensions
 {
@@ -10,6 +11,7 @@ public static class EfConfigurationExtensions
 
     public static PropertyBuilder<DateTime?> HasDefaultValueSqlDateTimeUtcNow(this PropertyBuilder<DateTime?> propertyBuilder)
     {
+        // return propertyBuilder.HasDefaultValue(NpgsqlFunctions.CurrentTimestamp());
         return propertyBuilder.HasDefaultValueSql(SqlUtcNow);
     }
 

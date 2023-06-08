@@ -29,7 +29,7 @@ public record UpdateGameEnvironmentRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure(ErrorCode.EnvironmentAlreadyExists);
+                return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             environment.BaseUrl = request.BaseUrl;
             environment.UisBaseUrl = request.UisBaseUrl;

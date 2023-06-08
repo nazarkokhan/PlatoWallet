@@ -122,7 +122,7 @@ public record LogInRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure<Response>(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure<Response>(ErrorCode.EnvironmentNotFound);
 
             var baseUrl = casino.Provider is CasinoProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
 

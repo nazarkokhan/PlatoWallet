@@ -31,7 +31,7 @@ public record ExternalSoftswissRoundDetailsRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             return await _gamesApiClient.RoundDetailsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
         }

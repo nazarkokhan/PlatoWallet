@@ -31,7 +31,7 @@ public record ReevoRemoveFreeRoundsRequest(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return ResultFactory.Failure<object>(ErrorCode.EnvironmentDoesNotExists);
+                return ResultFactory.Failure<object>(ErrorCode.EnvironmentNotFound);
 
             var apiRequest = request.ApiRequest;
 
