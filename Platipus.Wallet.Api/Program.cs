@@ -122,7 +122,7 @@ try
         .AddOptions(builderConfiguration)
         .AddEndpointsApiExplorer()
         .AddSwaggerWithConfig()
-        .AddMediatR(Assembly.GetExecutingAssembly())
+        .AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly))
         .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
         .AddAllBehaviors()
         .AddLocalization()
