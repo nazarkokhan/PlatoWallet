@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Infrastructure.EntityConfigurations.Base;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Persistence;
 
 public static class EfConfigurationExtensions
 {

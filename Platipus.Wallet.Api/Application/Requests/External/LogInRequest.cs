@@ -27,7 +27,7 @@ public record LogInRequest(
         [property: DefaultValue("openbox")] string CasinoId,
         [property: DefaultValue("extragems")] string Game,
         [property: DefaultValue("test")] string? Environment,
-        [property: DefaultValue("treba_default_a")] string? Lobby,
+        [property: DefaultValue("some_lobby_url")] string? Lobby,
         LaunchMode LaunchMode,
         [property: DefaultValue(null)] int? PswRealityCheck,
         [property: DefaultValue(null)] string? Device)
@@ -91,7 +91,7 @@ public record LogInRequest(
                 IsTemporaryToken = true
             };
 
-            if (casino.Provider is not CasinoProvider.Reevo or CasinoProvider.Softswiss)
+            if (casino.Provider != CasinoProvider.Reevo || casino.Provider != CasinoProvider.Softswiss)
             {
                 _context.Add(session);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -607,7 +607,8 @@ public record LogInRequest(
 
             RuleFor(x => currenciesOptionsValue.Items.Contains(x.Currency));
 
-            RuleFor(p => p.Balance).ScalePrecision(2, 28);
+            RuleFor(p => p.Balance)
+                .PrecisionScale(28, 2, false);
         }
     }
 }

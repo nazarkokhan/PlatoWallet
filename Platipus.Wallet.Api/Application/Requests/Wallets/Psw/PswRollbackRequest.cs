@@ -49,7 +49,7 @@ public record PswRollbackRequest(
         public Validator()
         {
             RuleFor(p => p.Amount)
-                .ScalePrecision(2, 28);
+                .PrecisionScale(28, 2, false);
         }
     }
 }

@@ -1,6 +1,4 @@
 using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Horizon.XmlRpc.AspNetCore.Extensions;
@@ -8,7 +6,6 @@ using Humanizer;
 using JorgeSerrano.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
@@ -19,7 +16,6 @@ using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
-using Platipus.Wallet.Api.Controllers.GamesGlobal;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
@@ -45,29 +41,16 @@ try
         .CreateBootstrapLogger();
 
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog(
-        (context, configuration) => configuration.ReadFrom
-            .Configuration(context.Configuration)
-            .Destructure.AsScalar<JsonNode>() //TODO to config
-            .Destructure.AsScalar<JsonDocument>());
+    builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
-
-    //TODO remove GamesGlobal
-    services.Configure<KestrelServerOptions>(
-        options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
 
     const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO now it is dynamic from config, remove
     services
         .AddScoped<IWalletService, WalletService>()
         .AddTransient<ExceptionHandlerMiddleware>()
         .AddTransient<BufferResponseBodyMiddleware>()
-        .AddTransient<GamesGlobalMiddleware>()
-        .AddTransient<GamesGlobalAuthMiddleware>()
         .AddControllers(
             options =>
             {
@@ -198,16 +181,7 @@ try
     app.EnableBufferingAndSaveRawRequest();
     app.UseRequestLocalization();
 
-    //TODO remove GG
     app.UseMiddleware<BufferResponseBodyMiddleware>();
-    app.UseMiddleware<GamesGlobalMiddleware>();
-    app.UseXmlRpc(
-        configure =>
-        {
-            configure.MapService<WalletGamesGlobalService>("wallet/games-global/gaming");
-            configure.MapService<WalletGamesGlobalAdminService>("wallet/games-global/admin");
-        });
-    //TODO remove GG
 
     var assemblyName = Assembly.GetEntryAssembly()?.FullName!;
     app.MapGet(
@@ -223,7 +197,7 @@ try
     app.MapVersion();
     app.MapConfigname();
     app.MapConfig();
-    app.MapHealth();
+    app.MapHealth("healthz"); // TODO temporary, ask devops to remove z
 
     app.MapControllers();
 

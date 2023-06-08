@@ -30,7 +30,8 @@ public static class DynamicResultFactory
                 exception) as TResponse)!;
         }
 
-        return BaseResultFactory.Failure<TResponse>(default, exception) as TResponse ?? throw new InvalidOperationException();
+        //TODO
+        return BaseResultFactory.Failure<TResponse>(default!, exception) as TResponse ?? throw new InvalidOperationException();
     }
 
     public static TResponse CreateSuccessResult<TResponse>()

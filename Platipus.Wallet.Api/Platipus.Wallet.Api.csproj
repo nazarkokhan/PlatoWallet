@@ -31,7 +31,7 @@
         <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.5" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
         <PackageReference Include="Platipus.Api.Common.Lib" Version="1.0.0-beta.14" />
-        <PackageReference Include="Platipus.Serilog" Version="1.0.0-beta3" />
+        <PackageReference Include="Platipus.Serilog" Version="1.0.0-beta4" />
         <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
         <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />

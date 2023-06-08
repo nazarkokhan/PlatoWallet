@@ -49,7 +49,7 @@ public record ChangeBalanceRequest(
         public Validator()
         {
             RuleFor(p => p.Balance)
-                .ScalePrecision(2, 38);
+                .PrecisionScale(28, 2, false);
         }
     }
 }
