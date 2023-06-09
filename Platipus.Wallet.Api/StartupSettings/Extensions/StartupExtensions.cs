@@ -25,7 +25,9 @@ public static class StartupExtensions
             .AddScoped<BetflagSecurityFilter>()
             .AddSingleton<BetconstructMockedErrorActionFilter>()
             .AddScoped<BetconstructSecurityFilter>()
-            .AddSingleton<OpenboxMockedErrorActionFilter>();
+            .AddSingleton<OpenboxMockedErrorActionFilter>()
+            .AddSingleton<EmaraPlayMockedErrorActionFilter>()
+            .AddScoped<EmaraPlaySecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

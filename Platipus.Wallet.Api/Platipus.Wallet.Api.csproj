@@ -51,11 +51,11 @@
     <ItemGroup>
         <Folder Include="Application\Results\Base\WithData\WithError" />
         <Folder Include="Application\Services\PswGamesApi\DTOs\Requests" />
+        <Folder Include="StartupSettings\Filters\TODO\" />
     </ItemGroup>
 
     <ItemGroup>
       <Compile Remove="Application\Requests\Wallets\BetConstruct\Base\BetConstructBaseResponse.cs" />
-      <Compile Remove="Application\Requests\Wallets\EmaraPlay\Base\EmaraPlayErrorResponse.cs" />
       <Compile Remove="logs\**" />
     </ItemGroup>
 

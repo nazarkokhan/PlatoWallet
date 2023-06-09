@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Requests.Wallets.TODO.EmaraPlay.Base;
+namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 
 public record EmaraPlayErrorResponse(
     string Error,
