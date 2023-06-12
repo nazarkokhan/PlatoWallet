@@ -48,8 +48,8 @@ public sealed record EmaraPlayAuthenticateRequest(
             };
             
             var response = new EmaraPlayBaseResponse(
-                "0",
-                "Unknown",
+                ((int)EmaraPlayErrorCode.Success).ToString(),
+                "Success",
                 result);
 
             return EmaraPlayResultFactory.Success(response);

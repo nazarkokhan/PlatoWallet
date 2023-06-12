@@ -4,6 +4,7 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
@@ -13,7 +14,7 @@ namespace Platipus.Wallet.Api.Controllers;
 
 [Route("wallet/emara-play/")]
 // [ServiceFilter(typeof(EmaraPlayMockedErrorActionFilter), Order = 1)]
-[ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
+//[ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.EmaraPlay))]
 [ProducesResponseType(typeof(EmaraPlayErrorResponse), StatusCodes.Status200OK)]
 public class WalletEmaraPlayController : RestApiController
@@ -31,31 +32,31 @@ public class WalletEmaraPlayController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     
-    // [HttpPost("balance")]
-    // [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Balance(
-    //     EmaraPlayBalanceRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
+    [HttpPost("balance")]
+    [ProducesResponseType(typeof(EmaraPlayBalanceResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Balance(
+        EmaraPlayBalanceRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
     // [HttpPost("bet")]
-    // [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
+    // [ProducesResponseType(typeof(EmaraPlayBetResponse), StatusCodes.Status200OK)]
     // public async Task<IActionResult> Bet(
     //     EmaraPlayBetRequest request,
     //     CancellationToken cancellationToken)
     //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     //
-    // [HttpPost("win")]
-    // [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Result(
-    //     EmaraPlayResultRequest request,
+    // [HttpPost("refund")]
+    // [ProducesResponseType(typeof(EmaraPlayRefundResponse), StatusCodes.Status200OK)]
+    // public async Task<IActionResult> Refund(
+    //     EmaraPlayRefundRequest request,
     //     CancellationToken cancellationToken)
     //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     //
-    // [HttpPost("rollback")]
-    // [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Refund(
-    //     EmaraPlayRefundRequest request,
+    // [HttpPost("result")]
+    // [ProducesResponseType(typeof(EmaraPlayResultResponse), StatusCodes.Status200OK)]
+    // public async Task<IActionResult> Result(
+    //     EmaraPlayResultRequest request,
     //     CancellationToken cancellationToken)
     //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

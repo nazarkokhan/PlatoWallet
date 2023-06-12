@@ -1,3 +1,8 @@
+using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
+using Platipus.Wallet.Api.Application.Results.EmaraPlay;
+using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
+using Result = Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base.Result;
+
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Net.Mime;
@@ -49,9 +54,9 @@ public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
 
         if (context.Result is BaseExternalActionResult baseExternalActionResult)
         {
-            if (baseExternalActionResult.Result is ISwResult swResult)
+            switch (baseExternalActionResult.Result)
             {
-                if (swResult.IsSuccess)
+                case ISwResult { IsSuccess: true } swResult:
                 {
                     if (swResult is not ISwResult<object> objectResult)
                         return;
@@ -59,19 +64,18 @@ public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
+                case ISwResult swResult:
+                {
+                    var errorCode = swResult.Error;
 
-                var errorCode = swResult.Error;
+                    var errorResponse = new SwErrorResponse(errorCode);
 
-                var errorResponse = new SwErrorResponse(errorCode);
+                    context.Result = new BadRequestObjectResult(errorResponse);
 
-                context.Result = new BadRequestObjectResult(errorResponse);
-
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
-            }
-
-            if (baseExternalActionResult.Result is ISoftBetResult softBetResult)
-            {
-                if (softBetResult.IsSuccess)
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+                case ISoftBetResult { IsSuccess: true } softBetResult:
                 {
                     if (softBetResult is not ISoftBetResult<object> objectResult)
                         return;
@@ -79,134 +83,151 @@ public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
-
-                var errorCode = softBetResult.Error;
-
-                var errorResponse = new SoftBetErrorResponse(
-                    errorCode.ToCode(),
-                    errorCode.ToString(),
-                    "action",
-                    true);
-
-                context.Result = new BadRequestObjectResult(errorResponse);
-
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
-            }
-
-            if (baseExternalActionResult.Result is IUisResult<object> uisResult)
-            {
-                if (uisResult.IsSuccess)
+                case ISoftBetResult softBetResult:
                 {
+                    var errorCode = softBetResult.Error;
+
+                    var errorResponse = new SoftBetErrorResponse(
+                        errorCode.ToCode(),
+                        errorCode.ToString(),
+                        "action",
+                        true);
+
+                    context.Result = new BadRequestObjectResult(errorResponse);
+
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+                case IUisResult<object> { IsSuccess: true } uisResult:
                     context.Result = new OkObjectResult(uisResult.Data)
                     {
                         ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
                     };
                     return;
+                case IUisResult<object> uisResult:
+                {
+                    var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
+                    var responseObject = new UisErrorResponse(uisResult.Error);
+
+                    object container = requestObject switch
+                    {
+                        UisAuthenticateRequest uisRequest
+                            => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(uisRequest, responseObject),
+                        UisChangeBalanceRequest uisRequest
+                            => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
+                        UisGetBalanceRequest uisRequest
+                            => new UisResponseContainer<UisGetBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
+                        UisStatusRequest uisRequest
+                            => new UisResponseContainer<UisStatusRequest, UisErrorResponse>(uisRequest, responseObject),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+
+                    context.Result = new OkObjectResult(container)
+                    {
+                        ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                    };
+
+                    context.HttpContext.Items.Add(responseItemsKey, container);
+                    break;
                 }
-
-                var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
-                var responseObject = new UisErrorResponse(uisResult.Error);
-
-                object container = requestObject switch
+                case IBetflagResult<object> betflagResult:
                 {
-                    UisAuthenticateRequest uisRequest
-                        => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(uisRequest, responseObject),
-                    UisChangeBalanceRequest uisRequest
-                        => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
-                    UisGetBalanceRequest uisRequest
-                        => new UisResponseContainer<UisGetBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
-                    UisStatusRequest uisRequest
-                        => new UisResponseContainer<UisStatusRequest, UisErrorResponse>(uisRequest, responseObject),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                    var errorCode = betflagResult.Error;
+                    var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    var secretKey = (string?)httpContext.Items[HttpContextItems.BetflagCasinoSecretKey];
 
-                context.Result = new OkObjectResult(container)
-                {
-                    ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
-                };
+                    if (betflagResult.IsSuccess)
+                    {
+                        var data = (BetflagBaseResponse)betflagResult.Data;
+                        data.Hash = BetflagSecurityHash.Compute(data.Result.ToString(), timestamp, secretKey!);
+                        data.Timestamp = timestamp;
+                        context.Result = new OkObjectResult(data);
+                        return;
+                    }
 
-                context.HttpContext.Items.Add(responseItemsKey, container);
-            }
+                    var hash = secretKey is not null
+                        ? BetflagSecurityHash.Compute(((int)errorCode).ToString(), timestamp, secretKey)
+                        : string.Empty;
 
-            if (baseExternalActionResult.Result is IBetflagResult<object> betflagResult)
-            {
-                var errorCode = betflagResult.Error;
-                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                var secretKey = (string?)httpContext.Items[HttpContextItems.BetflagCasinoSecretKey];
+                    var errorResponse = new BetflagErrorResponse(
+                        errorCode,
+                        timestamp,
+                        hash);
 
-                if (betflagResult.IsSuccess)
-                {
-                    var data = (BetflagBaseResponse)betflagResult.Data;
-                    data.Hash = BetflagSecurityHash.Compute(data.Result.ToString(), timestamp, secretKey!);
-                    data.Timestamp = timestamp;
-                    context.Result = new OkObjectResult(data);
-                    return;
+                    context.Result = new OkObjectResult(errorResponse);
+
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
                 }
-
-                var hash = secretKey is not null
-                    ? BetflagSecurityHash.Compute(((int)errorCode).ToString(), timestamp, secretKey)
-                    : string.Empty;
-
-                var errorResponse = new BetflagErrorResponse(
-                    errorCode,
-                    timestamp,
-                    hash);
-
-                context.Result = new OkObjectResult(errorResponse);
-
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
-            }
-
-            if (baseExternalActionResult.Result is IReevoResult<object> reevoResult)
-            {
-                if (reevoResult.IsSuccess)
-                {
+                case IReevoResult<object> { IsSuccess: true } reevoResult:
                     context.Result = new OkObjectResult(reevoResult.Data);
                     return;
-                }
-
-                var errorCode = reevoResult.Error;
-
-                var errorResponse = new ReevoErrorResponse(errorCode);
-
-                context.Result = new OkObjectResult(errorResponse);
-
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
-            }
-
-            if (baseExternalActionResult.Result is IEverymatrixResult<object> everymatrixResult)
-            {
-                if (everymatrixResult.IsSuccess)
+                case IReevoResult<object> reevoResult:
                 {
+                    var errorCode = reevoResult.Error;
+
+                    var errorResponse = new ReevoErrorResponse(errorCode);
+
+                    context.Result = new OkObjectResult(errorResponse);
+
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+                case IEverymatrixResult<object> { IsSuccess: true } everymatrixResult:
                     context.Result = new OkObjectResult(everymatrixResult.Data);
                     return;
-                }
-
-                var errorCode = everymatrixResult.Error;
-
-                var errorResponse = new EverymatrixErrorResponse(errorCode);
-
-                context.Result = new OkObjectResult(errorResponse);
-
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
-            }
-
-            if (baseExternalActionResult.Result is IBetconstructResult<object> betConstructResult)
-            {
-                if (betConstructResult.IsSuccess)
+                case IEverymatrixResult<object> everymatrixResult:
                 {
+                    var errorCode = everymatrixResult.Error;
+
+                    var errorResponse = new EverymatrixErrorResponse(errorCode);
+
+                    context.Result = new OkObjectResult(errorResponse);
+
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+                case IBetconstructResult<object> { IsSuccess: true } betConstructResult:
                     context.Result = new OkObjectResult(betConstructResult.Data);
+                    return;
+                case IBetconstructResult<object> betConstructResult:
+                {
+                    var errorCode = betConstructResult.Error;
+
+                    var errorResponse = new BetconstructErrorResponse(errorCode);
+
+                    context.Result = new OkObjectResult(errorResponse);
+
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+            }
+        }
+
+        if (context.Result is EmaraPlayExternalActionResult { Result: { } emaraPlayResult })
+        {
+            if (emaraPlayResult.IsSuccess)
+            {
+                if (emaraPlayResult is IEmaraPlayResult<object> objectResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
 
-                var errorCode = betConstructResult.Error;
-
-                var errorResponse = new BetconstructErrorResponse(errorCode);
-
-                context.Result = new OkObjectResult(errorResponse);
-
-                context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                const EmaraPlayErrorCode emaraPlayErrorCode = EmaraPlayErrorCode.Success;
+                var emaraPlayBaseResponse = new EmaraPlayBaseResponse(((int)emaraPlayErrorCode).ToString(), 
+                    emaraPlayErrorCode.ToString(), new Result());
+                context.Result = new OkObjectResult(emaraPlayBaseResponse);
+                return;
             }
+
+            var errorCode = emaraPlayResult.Error;
+
+            var errorResponse = new EmaraPlayErrorResponse(((int)errorCode).ToString(), errorCode.ToString());
+
+            context.Result = new OkObjectResult(errorResponse);
+
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is PswExternalActionResult { Result: { } pswActionResult })
@@ -344,16 +365,12 @@ public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
             context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
-        if (context.Result is ExternalActionResult externalActionResult)
+        if (context.Result is not ExternalActionResult externalActionResult) return;
         {
             if (externalActionResult.Result.IsSuccess)
             {
-                if (externalActionResult.Result is IResult<object> objectResult)
-                {
-                    context.Result = new OkObjectResult(objectResult.Data);
-                    return;
-                }
-
+                if (externalActionResult.Result is not IResult<object> objectResult) return;
+                context.Result = new OkObjectResult(objectResult.Data);
                 return;
             }
 

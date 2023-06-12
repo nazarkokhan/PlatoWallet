@@ -131,7 +131,7 @@ public record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
-                case CasinoProvider.Psw or CasinoProvider.Betflag:
+                case CasinoProvider.Psw or CasinoProvider.Betflag or CasinoProvider.EmaraPlay:
                 {
                     var getGameLinkResult = await _pswAndBetflagGameApiClient.GetLaunchUrlAsync(
                         baseUrl,
@@ -533,6 +533,11 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
+    private static string GetEmaraPlayLaunchUrlAsync()
+    {
+        throw new NotImplementedException();
+    }
+    
     private static string GetBetConstructLaunchUrlAsync(
         Uri baseUrl,
         int gameId,

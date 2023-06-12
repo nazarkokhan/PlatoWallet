@@ -53,143 +53,149 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             ?.Template;
 
         var actionArgumentsValues = context.ActionArguments.Values;
-        if (context.Controller is WalletOpenboxController)
+        switch (context.Controller)
         {
-            var singleRequest = actionArgumentsValues.OfType<OpenboxSingleRequest>().Single();
-
-            if (!httpContext.Items.TryGetValue(HttpContextItems.OpenboxPayloadRequestObj, out var payloadRequestObj)
-             || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
+            case WalletOpenboxController:
             {
-                LogOpenboxMockingFailed(logger, singleRequest);
-                return;
+                var singleRequest = actionArgumentsValues.OfType<OpenboxSingleRequest>().Single();
+
+                if (!httpContext.Items.TryGetValue(HttpContextItems.OpenboxPayloadRequestObj, out var payloadRequestObj)
+                    || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
+                {
+                    LogOpenboxMockingFailed(logger, singleRequest);
+                    return;
+                }
+
+                usernameOrSession = openboxPayloadObj.Token;
+                searchMockBySession = true;
+                currentMethod = singleRequest.Method switch
+                {
+                    OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
+                    OpenboxHelpers.MoneyTransactions => (openboxPayloadObj as OpenboxMoneyTransactionRequest)?.OrderType switch
+                    {
+                        3 => MockedErrorMethod.Bet,
+                        4 => MockedErrorMethod.Win,
+                        _ => null
+                    },
+                    OpenboxHelpers.CancelTransaction => MockedErrorMethod.Rollback,
+                    _ => null
+                };
+                break;
             }
-
-            usernameOrSession = openboxPayloadObj.Token;
-            searchMockBySession = true;
-            currentMethod = singleRequest.Method switch
+            case WalletISoftBetController:
             {
-                OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
-                OpenboxHelpers.MoneyTransactions => (openboxPayloadObj as OpenboxMoneyTransactionRequest)?.OrderType switch
+                var singleRequest = actionArgumentsValues.OfType<SoftBetSingleRequest>().Single();
+
+                usernameOrSession = singleRequest.Username;
+                currentMethod = singleRequest.Action.Command switch
                 {
-                    3 => MockedErrorMethod.Bet,
-                    4 => MockedErrorMethod.Win,
+                    "balance" => MockedErrorMethod.Balance,
+                    "bet" => MockedErrorMethod.Bet,
+                    "win" => MockedErrorMethod.Win,
+                    "cancel" => MockedErrorMethod.Rollback,
                     _ => null
-                },
-                OpenboxHelpers.CancelTransaction => MockedErrorMethod.Rollback,
-                _ => null
-            };
-        }
-        else if (context.Controller is WalletISoftBetController)
-        {
-            var singleRequest = actionArgumentsValues.OfType<SoftBetSingleRequest>().Single();
-
-            usernameOrSession = singleRequest.Username;
-            currentMethod = singleRequest.Action.Command switch
+                };
+                break;
+            }
+            case WalletSwController:
             {
-                "balance" => MockedErrorMethod.Balance,
-                "bet" => MockedErrorMethod.Bet,
-                "win" => MockedErrorMethod.Win,
-                "cancel" => MockedErrorMethod.Rollback,
-                _ => null
-            };
-        }
-        else if (context.Controller is WalletSwController)
-        {
-            var singleRequest = actionArgumentsValues.OfType<ISwBaseRequest>().Single();
+                var singleRequest = actionArgumentsValues.OfType<ISwBaseRequest>().Single();
 
-            usernameOrSession = singleRequest.Token;
-            searchMockBySession = true;
+                usernameOrSession = singleRequest.Token;
+                searchMockBySession = true;
 
-            currentMethod = requestRoute switch
-            {
-                "balance-md5" or "balance-hash" => MockedErrorMethod.Balance,
-                "bet-win" => (singleRequest as SwBetWinRequest)?.TrnType switch
+                currentMethod = requestRoute switch
                 {
-                    "BET" => MockedErrorMethod.Bet,
-                    "WIN" => MockedErrorMethod.Win,
+                    "balance-md5" or "balance-hash" => MockedErrorMethod.Balance,
+                    "bet-win" => (singleRequest as SwBetWinRequest)?.TrnType switch
+                    {
+                        "BET" => MockedErrorMethod.Bet,
+                        "WIN" => MockedErrorMethod.Win,
+                        _ => null
+                    },
+                    "refund" => MockedErrorMethod.Rollback,
+                    "freespin" => MockedErrorMethod.Award,
                     _ => null
-                },
-                "refund" => MockedErrorMethod.Rollback,
-                "freespin" => MockedErrorMethod.Award,
-                _ => null
-            };
-        }
-        else if (context.Controller is WalletReevoController)
-        {
-            var singleRequest = actionArgumentsValues.OfType<ReevoSingleRequest>().Single();
+                };
+                break;
+            }
+            case WalletReevoController:
+            {
+                var singleRequest = actionArgumentsValues.OfType<ReevoSingleRequest>().Single();
 
-            usernameOrSession = singleRequest.Username;
-            currentMethod = singleRequest.Action switch
-            {
-                "balance" => MockedErrorMethod.Balance,
-                "debit" => MockedErrorMethod.Bet,
-                "credit" => MockedErrorMethod.Win,
-                "rollback" => MockedErrorMethod.Rollback,
-                _ => null
-            };
-        }
-        else if (context.Controller is WalletUisController)
-        {
-            if (requestRoute is null)
-            {
+                usernameOrSession = singleRequest.Username;
+                currentMethod = singleRequest.Action switch
+                {
+                    "balance" => MockedErrorMethod.Balance,
+                    "debit" => MockedErrorMethod.Bet,
+                    "credit" => MockedErrorMethod.Win,
+                    "rollback" => MockedErrorMethod.Rollback,
+                    _ => null
+                };
+                break;
+            }
+            case WalletUisController when requestRoute is null:
                 logger.LogCritical("Request route not found");
                 return;
-            }
-
-            var baseRequest = context.ActionArguments.Values.OfType<IUisRequest>().Single();
-            if (baseRequest is not IUisUserIdRequest request)
-                return;
-
-            currentMethod = requestRoute switch
+            case WalletUisController:
             {
-                "get-balance" => MockedErrorMethod.Balance,
-                "change-balance" => (request as UisChangeBalanceRequest)?.TrnType switch
+                var baseRequest = context.ActionArguments.Values.OfType<IUisRequest>().Single();
+                if (baseRequest is not IUisUserIdRequest request)
+                    return;
+
+                currentMethod = requestRoute switch
                 {
-                    "BET" => MockedErrorMethod.Bet,
-                    "WIN" => MockedErrorMethod.Win,
-                    "CANCELBET" => MockedErrorMethod.Rollback,
+                    "get-balance" => MockedErrorMethod.Balance,
+                    "change-balance" => (request as UisChangeBalanceRequest)?.TrnType switch
+                    {
+                        "BET" => MockedErrorMethod.Bet,
+                        "WIN" => MockedErrorMethod.Win,
+                        "CANCELBET" => MockedErrorMethod.Rollback,
+                        _ => null
+                    },
                     _ => null
-                },
-                _ => null
-            };
+                };
 
-            usernameOrSession = request.UserId;
-        }
-        else
-        {
-            if (requestRoute is null)
-            {
-                logger.LogCritical("Request route not found");
-                return;
+                usernameOrSession = request.UserId;
+                break;
             }
-
-            currentMethod = requestRoute switch
+            default:
             {
-                "balance" or "user/balance" or "GetBalance" or "GetPlayerInfo" => MockedErrorMethod.Balance,
-                "bet" or "play" or "transaction/bet" or "debit" or "Bet" or "Withdraw" => MockedErrorMethod.Bet,
-                "win" or "result" or "transaction/win" or "credit" or "Win" or "Deposit" => MockedErrorMethod.Win,
-                "award" or "bonusWin" or "freespins" => MockedErrorMethod.Award,
-                "rollback" or "cancel" or "transaction/rollback" or "Cancel" or "Rollback" => MockedErrorMethod.Rollback,
-                _ => null
-            };
+                if (requestRoute is null)
+                {
+                    logger.LogCritical("Request route not found");
+                    return;
+                }
 
-            var walletRequest = actionArgumentsValues
-                .OfType<IBaseWalletRequest>()
-                .SingleOrDefault();
+                currentMethod = requestRoute switch
+                {
+                    "balance" or "user/balance" or "GetBalance" or "GetPlayerInfo" => MockedErrorMethod.Balance,
+                    "bet" or "play" or "transaction/bet" or "debit" or "Bet" or "Withdraw" => MockedErrorMethod.Bet,
+                    "win" or "result" or "transaction/win" or "credit" or "Win" or "Deposit" => MockedErrorMethod.Win,
+                    "award" or "bonusWin" or "freespins" => MockedErrorMethod.Award,
+                    "rollback" or "cancel" or "transaction/rollback" or "Cancel" or "Rollback" => MockedErrorMethod.Rollback,
+                    _ => null
+                };
 
-            (usernameOrSession, searchMockBySession) = walletRequest switch
-            {
-                IPswBaseRequest r => (r.User, false),
-                IDafabetRequest r => (r.PlayerId, false),
-                IOpenboxBaseRequest r => (r.Token, true),
-                IHub88BaseRequest r => (r.SupplierUser, false),
-                ISoftswissBaseRequest r => (r.UserId, false),
-                IBetflagRequest r => (r.Key, true),
-                IReevoRequest r => (r.Username, false),
-                IEveryMatrixRequest r => (r.Token, true),
-                IBetconstructBoxRequest<IBetconstructRequest> r => (r.Data.Token, true),
-                _ => (null, false)
-            };
+                var walletRequest = actionArgumentsValues
+                    .OfType<IBaseWalletRequest>()
+                    .SingleOrDefault();
+
+                (usernameOrSession, searchMockBySession) = walletRequest switch
+                {
+                    IPswBaseRequest r => (r.User, false),
+                    IDafabetRequest r => (r.PlayerId, false),
+                    IOpenboxBaseRequest r => (r.Token, true),
+                    IHub88BaseRequest r => (r.SupplierUser, false),
+                    ISoftswissBaseRequest r => (r.UserId, false),
+                    IBetflagRequest r => (r.Key, true),
+                    IReevoRequest r => (r.Username, false),
+                    IEveryMatrixRequest r => (r.Token, true),
+                    IBetconstructBoxRequest<IBetconstructRequest> r => (r.Data.Token, true),
+                    _ => (null, false)
+                };
+                break;
+            }
         }
 
         if (currentMethod is null)

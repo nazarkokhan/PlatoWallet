@@ -7,7 +7,4 @@ public record Result(
     string? Balance = null,
     string? Bonus = null,
     string? Country = null,
-    string? Jurisdiction = null,
-    string? Transaction = null,
-    string? Promo = null,
-    string? Txid = null);
+    string? Jurisdiction = null);
