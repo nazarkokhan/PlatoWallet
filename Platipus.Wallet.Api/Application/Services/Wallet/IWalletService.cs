@@ -17,6 +17,7 @@ public interface IWalletService
         string? currency = null,
         bool roundFinished = false,
         bool searchByUsername = false,
+        string? provider = null,
         CancellationToken cancellationToken = default);
 
     Task<IResult<WalletBetWinRollbackResponse>> WinAsync(

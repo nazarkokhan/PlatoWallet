@@ -71,10 +71,11 @@ try
             options =>
             {
                 options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
-                                                             | JsonNumberHandling.AllowReadingFromString;
+                                                               | JsonNumberHandling.AllowReadingFromString;
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             })
         .ConfigureApiBehaviorOptions(
             options =>

@@ -6,7 +6,7 @@ using DTOs;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public class WalletService : IWalletService
+public sealed class WalletService : IWalletService
 {
     private readonly ILogger<WalletService> _logger;
     private readonly WalletDbContext _context;
@@ -63,6 +63,7 @@ public class WalletService : IWalletService
         string? currency = null,
         bool roundFinished = false,
         bool searchByUsername = false,
+        string? provider = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -85,7 +86,6 @@ public class WalletService : IWalletService
                         : u.Sessions.Any(s => s.Id == sessionId))
                 .Include(u => u.Rounds.Where(r => r.Id == roundId))
                 .FirstOrDefaultAsync(cancellationToken);
-
             if (user is null)
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
 
@@ -328,7 +328,7 @@ public class WalletService : IWalletService
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
                 .Include(u => u.Awards.Where(r => r.Id == awardId))
-                .ThenInclude(r => r!.AwardRound)
+                .ThenInclude(r => r.AwardRound)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)

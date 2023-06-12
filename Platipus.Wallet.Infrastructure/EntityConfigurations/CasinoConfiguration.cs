@@ -17,6 +17,6 @@ public class CasinoConfiguration : EntityTypeConfiguration<Casino, string>
         builder.Property(x => x.Params).HasColumnType("jsonb");
         
         builder.Property(e => e.Provider)
-            .HasConversion<int>();
+            .HasConversion<string>();
     }
 }

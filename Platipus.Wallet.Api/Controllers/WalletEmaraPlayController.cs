@@ -6,9 +6,6 @@ using Platipus.Wallet.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
-using Platipus.Wallet.Api.StartupSettings.Filters;
-using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
-using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 namespace Platipus.Wallet.Api.Controllers;
 
@@ -39,20 +36,20 @@ public class WalletEmaraPlayController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    // [HttpPost("bet")]
-    // [ProducesResponseType(typeof(EmaraPlayBetResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Bet(
-    //     EmaraPlayBetRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
-    // [HttpPost("refund")]
-    // [ProducesResponseType(typeof(EmaraPlayRefundResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Refund(
-    //     EmaraPlayRefundRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
+    [HttpPost("bet")]
+    [ProducesResponseType(typeof(EmaraPlayBetResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Bet(
+        EmaraPlayBetRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("refund")]
+    [ProducesResponseType(typeof(EmaraPlayRefundResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Refund(
+        EmaraPlayRefundRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
     // [HttpPost("result")]
     // [ProducesResponseType(typeof(EmaraPlayResultResponse), StatusCodes.Status200OK)]
     // public async Task<IActionResult> Result(

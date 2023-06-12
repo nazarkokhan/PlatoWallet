@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct.Base.Response;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Extensions;
