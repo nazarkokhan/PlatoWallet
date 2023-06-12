@@ -6,12 +6,14 @@ using Platipus.Wallet.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
+using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
+using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 namespace Platipus.Wallet.Api.Controllers;
 
 [Route("wallet/emara-play/")]
-// [ServiceFilter(typeof(EmaraPlayMockedErrorActionFilter), Order = 1)]
-//[ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
+[ServiceFilter(typeof(EmaraPlayMockedErrorActionFilter), Order = 1)]
+[ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.EmaraPlay))]
 [ProducesResponseType(typeof(EmaraPlayErrorResponse), StatusCodes.Status200OK)]
 public class WalletEmaraPlayController : RestApiController
@@ -50,11 +52,11 @@ public class WalletEmaraPlayController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
-    // [HttpPost("result")]
-    // [ProducesResponseType(typeof(EmaraPlayResultResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Result(
-    //     EmaraPlayResultRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    [HttpPost("result")]
+    [ProducesResponseType(typeof(EmaraPlayResultResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Result(
+        EmaraPlayResultRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
 

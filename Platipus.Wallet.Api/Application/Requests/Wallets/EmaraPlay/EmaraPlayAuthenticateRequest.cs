@@ -22,7 +22,8 @@ public sealed record EmaraPlayAuthenticateRequest(
         public async Task<IEmaraPlayResult<EmaraPlayBaseResponse>> Handle(EmaraPlayAuthenticateRequest request, CancellationToken cancellationToken)
         {
             var user = await _context.Set<User>()
-                    .Where(u => u.Sessions.Any(s => s.Id == request.Token) && 
+                .AsNoTracking()
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token) && 
                                 u.Casino.CasinoGames.Any(c => 
                                     c.Game.Name == request.Game) && 
                                 u.Casino.Provider.ToString() == request.Provider)

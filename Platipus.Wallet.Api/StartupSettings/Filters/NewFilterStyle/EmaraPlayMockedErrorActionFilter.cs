@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Platipus.Wallet.Api.Application.Requests.Base;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
+using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle.Other;
 using Platipus.Wallet.Domain.Entities.Enums;
@@ -18,7 +20,14 @@ public sealed class EmaraPlayMockedErrorActionFilter : AbstractMockedErrorAction
     {
         var request = (IEmaraPlayBaseRequest)baseRequest;
 
-        var walletMethod = MockedErrorMethod.Award;
+        var walletMethod = request switch
+        {
+            EmaraPlayBalanceRequest => MockedErrorMethod.Balance,
+            EmaraPlayBetRequest => MockedErrorMethod.Bet,
+            EmaraPlayResultRequest => MockedErrorMethod.Win,
+            EmaraPlayRefundRequest => MockedErrorMethod.Rollback,
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
         return new MockedErrorIdentifiers(walletMethod, request.Token, true);
     }

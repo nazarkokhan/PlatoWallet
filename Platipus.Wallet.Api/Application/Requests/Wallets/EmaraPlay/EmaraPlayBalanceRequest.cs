@@ -32,6 +32,7 @@ public sealed record EmaraPlayBalanceRequest(
             try
             {
                 var user = await _walletDbContext.Set<User>()
+                    .AsNoTracking()
                     .TagWith("GetBalance")
                     .Where(u => u.Username == request.User && 
                                 u.Sessions.Any(s => s.Id == request.Token))
