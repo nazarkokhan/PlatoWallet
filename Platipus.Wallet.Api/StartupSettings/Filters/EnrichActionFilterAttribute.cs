@@ -10,7 +10,7 @@ public class EnrichActionFilterAttribute : ActionFilterAttribute
         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<EnrichActionFilterAttribute>>();
         using (logger.BeginScope("Start logging provider {ScopeProvider}", context.Controller.GetTypeName()))
         {
-            var executedContext = await next();
+            await next();
         }
     }
 }

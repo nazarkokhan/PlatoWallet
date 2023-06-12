@@ -47,6 +47,7 @@ public class LoggingResultFilterAttribute : ResultFilterAttribute
             WalletReevoController => CasinoProvider.Reevo.ToString(),
             WalletEverymatrixController => CasinoProvider.Everymatrix.ToString(),
             WalletBetConstructController => CasinoProvider.BetConstruct.ToString(),
+            WalletEmaraPlayController => CasinoProvider.EmaraPlay.ToString(),
             _ => "Other"
         };
 

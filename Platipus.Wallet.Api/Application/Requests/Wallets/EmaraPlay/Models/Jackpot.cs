@@ -1,3 +1,3 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Models;
 
-public sealed record Jackpot(string Id, string Amount);
+public record struct Jackpot(string Id, string Amount);

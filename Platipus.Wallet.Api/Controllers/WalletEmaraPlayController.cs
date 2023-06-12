@@ -16,7 +16,7 @@ namespace Platipus.Wallet.Api.Controllers;
 [ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.EmaraPlay))]
 [ProducesResponseType(typeof(EmaraPlayErrorResponse), StatusCodes.Status200OK)]
-public class WalletEmaraPlayController : RestApiController
+public sealed class WalletEmaraPlayController : RestApiController
 {
     private readonly IMediator _mediator;
 
@@ -33,6 +33,7 @@ public class WalletEmaraPlayController : RestApiController
     
     [HttpPost("balance")]
     [ProducesResponseType(typeof(EmaraPlayBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(EmaraPlayBalanceResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Balance(
         EmaraPlayBalanceRequest request,
         CancellationToken cancellationToken)

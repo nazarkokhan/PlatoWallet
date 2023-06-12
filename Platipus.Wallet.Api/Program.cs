@@ -165,6 +165,7 @@ try
 
     services.AddXmlRpc();
 
+    services.AddHttpContextAccessor();
     var app = builder.Build();
 
     app.UseExceptionHandler(

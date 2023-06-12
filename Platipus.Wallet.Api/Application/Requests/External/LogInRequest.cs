@@ -42,6 +42,7 @@ public record LogInRequest(
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
         private readonly IReevoGameApiClient _reevoGameApiClient;
         private readonly SoftswissCurrenciesOptions _currencyMultipliers;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public Handler(
             WalletDbContext context,
@@ -50,7 +51,8 @@ public record LogInRequest(
             ISoftswissGamesApiClient softswissGamesApiClient,
             IGamesGlobalGamesApiClient globalGamesApiClient,
             IReevoGameApiClient reevoGameApiClient,
-            IOptions<SoftswissCurrenciesOptions> currencyMultipliers)
+            IOptions<SoftswissCurrenciesOptions> currencyMultipliers, 
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
@@ -58,6 +60,7 @@ public record LogInRequest(
             _softswissGamesApiClient = softswissGamesApiClient;
             _globalGamesApiClient = globalGamesApiClient;
             _reevoGameApiClient = reevoGameApiClient;
+            _httpContextAccessor = httpContextAccessor;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -131,7 +134,22 @@ public record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
-                case CasinoProvider.Psw or CasinoProvider.Betflag or CasinoProvider.EmaraPlay:
+                case CasinoProvider.EmaraPlay:
+                {
+                    var ip = _httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                    if (string.IsNullOrEmpty(ip))
+                    {
+                        ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+                    }
+                    launchUrl = GetEmaraPlayLaunchUrlAsync(
+                        baseUrl, request.Game, session.Id, 
+                        request.LaunchMode, "en", casino.Provider.ToString(), 
+                        request.Device, currency: user.Currency.Id, 
+                        ip: ip, user: request.UserName, lobby: request.Lobby, 
+                        cashier: null, jurisdiction: null);
+                    break;
+                }
+                case CasinoProvider.Psw or CasinoProvider.Betflag:
                 {
                     var getGameLinkResult = await _pswAndBetflagGameApiClient.GetLaunchUrlAsync(
                         baseUrl,
@@ -533,9 +551,44 @@ public record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    private static string GetEmaraPlayLaunchUrlAsync()
+    private static string GetEmaraPlayLaunchUrlAsync(
+        Uri baseUrl, string gameId, string token, LaunchMode launchMode, string lang,
+        string @operator, string? channel, string? jurisdiction, string currency,
+        string? ip, string user, string? lobby = null, string? cashier = null)
     {
-        throw new NotImplementedException();
+        var mode = launchMode is LaunchMode.Real ? "real_play" : "demo";
+
+        var queryParameters = new Dictionary<string, string?>
+        {
+            { nameof(mode), mode },
+            { "gameId", gameId },
+            { "lang", lang },
+            { "operator", @operator },
+            { nameof(channel), channel },
+            { nameof(jurisdiction), jurisdiction },
+            { nameof(ip), ip },
+            { nameof(currency), currency },
+        };
+        if (mode is "real_play")
+        {
+            queryParameters.Add(nameof(token), token);
+            queryParameters.Add(nameof(user), user);
+        }
+
+        if (lobby is not null)
+        {
+            queryParameters.Add(nameof(lobby), lobby);
+        }
+        if (cashier is not null)
+        {
+            queryParameters.Add(nameof(cashier), cashier);
+        }
+        
+        var queryString = QueryString.Create(queryParameters);
+
+        var uri = new Uri(baseUrl, $"emara-play/launch{queryString.ToUriComponent()}");
+
+        return uri.AbsoluteUri;
     }
     
     private static string GetBetConstructLaunchUrlAsync(
