@@ -13,7 +13,7 @@ namespace Platipus.Wallet.Api.Controllers;
 
 [Route("wallet/emara-play/")]
 [ServiceFilter(typeof(EmaraPlayMockedErrorActionFilter), Order = 1)]
-// [ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
+[ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.EmaraPlay))]
 [ProducesResponseType(typeof(EmaraPlayErrorResponse), StatusCodes.Status200OK)]
 public sealed class WalletEmaraPlayController : RestApiController
