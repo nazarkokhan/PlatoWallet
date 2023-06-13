@@ -32,12 +32,16 @@ public sealed record EmaraPlayBalanceRequest(
         {
             try
             {
+                if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
+                {
+                    return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.ProviderNotFound);
+                }
                 var user = await _walletDbContext.Set<User>()
                     .AsNoTracking()
                     .TagWith("GetBalance")
                     .Where(u => u.Username == request.User && 
                                 u.Sessions.Any(s => s.Id == request.Token) && 
-                                u.Casino.Provider == Enum.Parse<CasinoProvider>(request.Provider))
+                                u.Casino.Provider == provider)
                     .Select(u => new
                     {
                         Currency = u.Currency.Id,

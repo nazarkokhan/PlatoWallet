@@ -34,13 +34,17 @@ public sealed record EmaraPlayRefundRequest(
         {
             try
             {
+                if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
+                {
+                    return EmaraPlayResultFactory.Failure<EmaraPlayRefundResponse>(EmaraPlayErrorCode.ProviderNotFound);
+                }
                 var dbTransaction = await _walletDbContext.Database.BeginTransactionAsync(cancellationToken);
 
                 var user = await _walletDbContext.Set<User>()
                     .TagWith("Refund")
                     .Where(u => u.Username == request.User &&
                             u.Sessions.Any(s => s.Id == request.Token) &&
-                            u.Casino.Provider == Enum.Parse<CasinoProvider>(request.Provider))
+                            u.Casino.Provider == provider)
                     .Include(
                         u => u.Rounds.Where(
                             r => r.Id == request.Bet && 

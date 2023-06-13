@@ -23,12 +23,16 @@ public sealed record EmaraPlayAuthenticateRequest(
 
         public async Task<IEmaraPlayResult<EmaraPlayBaseResponse>> Handle(EmaraPlayAuthenticateRequest request, CancellationToken cancellationToken)
         {
+            if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
+            {
+                return EmaraPlayResultFactory.Failure<EmaraPlayBaseResponse>(EmaraPlayErrorCode.ProviderNotFound);
+            }
+
             var user = await _context.Set<User>()
                 .AsNoTracking()
-                .Where(u => u.Sessions.Any(s => s.Id == request.Token) && 
-                                u.Casino.CasinoGames.Any(c => 
-                                    c.Game.Name == request.Game) && 
-                                u.Casino.Provider == Enum.Parse<CasinoProvider>(request.Provider))
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token) &&
+                            u.Casino.CasinoGames.Any(c => c.Game.Name == request.Game) &&
+                            u.Casino.Provider == provider)
                 .Select(
                     u => new
                     {
@@ -38,7 +42,7 @@ public sealed record EmaraPlayAuthenticateRequest(
                         u.Username
                     })
                 .FirstOrDefaultAsync(cancellationToken);
-            
+
             if (user is null)
                 return EmaraPlayResultFactory.Failure<EmaraPlayBaseResponse>(EmaraPlayErrorCode.BadParameters);
 
@@ -49,7 +53,7 @@ public sealed record EmaraPlayAuthenticateRequest(
                 Currency = user.Currency,
                 Balance = user.Balance.ToString(CultureInfo.InvariantCulture)
             };
-            
+
             var response = new EmaraPlayBaseResponse(
                 ((int)EmaraPlayErrorCode.Success).ToString(),
                 "Success",
