@@ -7,5 +7,6 @@ public enum MockedErrorMethod
     Bet,
     Win,
     Award,
-    Rollback
+    Rollback,
+    Authenticate
 }

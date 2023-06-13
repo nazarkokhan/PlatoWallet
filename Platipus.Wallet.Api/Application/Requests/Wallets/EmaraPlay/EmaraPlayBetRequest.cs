@@ -35,7 +35,7 @@ public sealed record EmaraPlayBetRequest(
                 request.Transaction,
                 amount: Convert.ToDecimal(request.Amount),
                 cancellationToken: cancellationToken);
-
+            
             if (walletResult.IsFailure)
                 return EmaraPlayResultFactory.Failure<EmaraPlayBetResponse>(EmaraPlayErrorCode.InternalServerError);
 

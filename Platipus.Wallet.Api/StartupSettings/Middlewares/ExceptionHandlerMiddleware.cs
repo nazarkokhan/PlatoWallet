@@ -32,7 +32,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
             "psw" => GetPswErrorResponse(),
             "everymatrix" => GetEveryMatrixErrorResponse(),
             "parimatch" => GetPariMatchErrorResponse(),
-            "enaraplay" => GetEnaraPlayErrorResponse(),
+            "emaraplay" => GetEmaraPlayErrorResponse(),
             // "betflag" => GetPariBetflagErrorResponse(),
             // "betconstruct" => GetBetConstructErrorResponse(),
             _ => GetCommonErrorResponse(context)
@@ -52,10 +52,10 @@ public class ExceptionHandlerMiddleware : IMiddleware
         return new CommonErrorResponse(errorCode);
     }
 
-    private static object GetEnaraPlayErrorResponse()
+    private static object GetEmaraPlayErrorResponse()
     {
         const EmaraPlayErrorCode errorCode = EmaraPlayErrorCode.InternalServerError;
-        int code = (int)errorCode;
+        const int code = (int)errorCode;
         return new EmaraPlayErrorResponse(
             code.ToString(),
             errorCode.ToString());

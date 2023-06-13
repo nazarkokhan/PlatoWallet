@@ -25,6 +25,7 @@ public sealed class EmaraPlayMockedErrorActionFilter : AbstractMockedErrorAction
             EmaraPlayBetRequest => MockedErrorMethod.Bet,
             EmaraPlayResultRequest => MockedErrorMethod.Win,
             EmaraPlayRefundRequest => MockedErrorMethod.Rollback,
+            EmaraPlayAuthenticateRequest => MockedErrorMethod.Authenticate,
             _ => throw new ArgumentOutOfRangeException()
         };
 

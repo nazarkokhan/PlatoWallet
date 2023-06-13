@@ -6,6 +6,7 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Domain.Entities;
+using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Infrastructure.Persistence;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
@@ -38,7 +39,8 @@ public sealed record EmaraPlayRefundRequest(
                 var user = await _walletDbContext.Set<User>()
                     .TagWith("Refund")
                     .Where(u => u.Username == request.User &&
-                            u.Sessions.Any(s => s.Id == request.Token))
+                            u.Sessions.Any(s => s.Id == request.Token) &&
+                            u.Casino.Provider == Enum.Parse<CasinoProvider>(request.Provider))
                     .Include(
                         u => u.Rounds.Where(
                             r => r.Id == request.Bet && 
@@ -48,17 +50,18 @@ public sealed record EmaraPlayRefundRequest(
                     .ThenInclude(r => r.Transactions.Where(t => t.Id == request.Transaction))
                     .Include(g => g.Casino.CasinoGames)
                     .ThenInclude(cg => cg.Game)
-                    .ToListAsync(cancellationToken);
-                var matchedUser = user.FirstOrDefault(u => 
-                    u.Casino.Provider.ToString() == request.Provider);
-                
-                if (matchedUser is null)
+                    .Where(g => g.Casino.CasinoGames.Any(cg => 
+                        cg.Game.Id.ToString() == request.Game))
+                    .AsSplitQuery()
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (user is null)
                     return EmaraPlayResultFactory.Failure<EmaraPlayRefundResponse>(EmaraPlayErrorCode.PlayerNotFound);
 
-                if (matchedUser.IsDisabled)
+                if (user.IsDisabled)
                     return EmaraPlayResultFactory.Failure<EmaraPlayRefundResponse>(EmaraPlayErrorCode.GameIsNotFoundOrDisabled);
 
-                var round = matchedUser.Rounds.FirstOrDefault();
+                var round = user.Rounds.FirstOrDefault();
                 if (round is null)
                     return EmaraPlayResultFactory.Failure<EmaraPlayRefundResponse>(EmaraPlayErrorCode.RoundNotFound);
 
@@ -72,14 +75,14 @@ public sealed record EmaraPlayRefundRequest(
                 transaction.Cancel();
                 _walletDbContext.Update(transaction);
 
-                matchedUser.Balance += transaction.Amount;
+                user.Balance += transaction.Amount;
                 _walletDbContext.Update(user);
 
                 await _walletDbContext.SaveChangesAsync(cancellationToken);
 
                 await dbTransaction.CommitAsync(cancellationToken);
 
-                var refundResult = new RefundResult(matchedUser.Currency.Id, matchedUser.Balance.ToString(CultureInfo.InvariantCulture), 
+                var refundResult = new RefundResult(user.Currency.Id, user.Balance.ToString(CultureInfo.InvariantCulture), 
                     transaction.Id, transaction.InternalId);
                 var response = new EmaraPlayRefundResponse(((int)EmaraPlayErrorCode.Success).ToString(), 
                     EmaraPlayErrorCode.Success.ToString(), refundResult);

@@ -6,6 +6,7 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Domain.Entities;
+using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Infrastructure.Persistence;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
@@ -35,22 +36,20 @@ public sealed record EmaraPlayBalanceRequest(
                     .AsNoTracking()
                     .TagWith("GetBalance")
                     .Where(u => u.Username == request.User && 
-                                u.Sessions.Any(s => s.Id == request.Token))
+                                u.Sessions.Any(s => s.Id == request.Token) && 
+                                u.Casino.Provider == Enum.Parse<CasinoProvider>(request.Provider))
                     .Select(u => new
                     {
                         Currency = u.Currency.Id,
                         u.Balance,
                         u.Casino.Provider,
                     })
-                    .ToListAsync(cancellationToken);
-                
-                var matchedUser = user.FirstOrDefault(u => 
-                    u.Provider.ToString() == request.Provider);
-                
-                if (matchedUser is null)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (user is null)
                     return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.PlayerNotFound);
 
-                var balanceResult = new BalanceResult(matchedUser.Balance.ToString(CultureInfo.InvariantCulture), matchedUser.Currency);
+                var balanceResult = new BalanceResult(user.Balance.ToString(CultureInfo.InvariantCulture), user.Currency);
                 var response = new EmaraPlayBalanceResponse(
                     ((int)EmaraPlayErrorCode.Success).ToString(),
                     EmaraPlayErrorCode.Success.ToString(),

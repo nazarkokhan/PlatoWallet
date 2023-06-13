@@ -14,7 +14,6 @@ public class GamesGlobalAuthMiddleware : IMiddleware
         if (!context.Request.Path.StartsWithSegments("/wallet/games-global"))
         {
             await next(context);
-            return;
         }
     }
 }

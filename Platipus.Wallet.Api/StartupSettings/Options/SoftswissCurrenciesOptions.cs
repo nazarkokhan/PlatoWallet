@@ -18,7 +18,7 @@ public class SoftswissCurrenciesOptions
         return sum / multiplier;
     }
 
-    public long GetMultiplier(string currency)
+    private long GetMultiplier(string currency)
     {
         var valueFound = CountryIndexes.TryGetValue(currency, out var multiplier);
 

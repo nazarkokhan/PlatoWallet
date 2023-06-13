@@ -4,6 +4,7 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Domain.Entities;
+using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Infrastructure.Persistence;
 using Result = Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base.Result;
 
@@ -13,7 +14,8 @@ public sealed record EmaraPlayAuthenticateRequest(
         string Token, string Provider, string Game, string? Ip = null)
     : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayBaseResponse>>
 {
-    public sealed class Handler : IRequestHandler<EmaraPlayAuthenticateRequest, IEmaraPlayResult<EmaraPlayBaseResponse>>
+    public sealed class Handler 
+        : IRequestHandler<EmaraPlayAuthenticateRequest, IEmaraPlayResult<EmaraPlayBaseResponse>>
     {
         private readonly WalletDbContext _context;
 
@@ -26,7 +28,7 @@ public sealed record EmaraPlayAuthenticateRequest(
                 .Where(u => u.Sessions.Any(s => s.Id == request.Token) && 
                                 u.Casino.CasinoGames.Any(c => 
                                     c.Game.Name == request.Game) && 
-                                u.Casino.Provider.ToString() == request.Provider)
+                                u.Casino.Provider == Enum.Parse<CasinoProvider>(request.Provider))
                 .Select(
                     u => new
                     {
