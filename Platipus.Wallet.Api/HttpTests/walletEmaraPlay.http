@@ -1,0 +1,79 @@
+### Balance
+POST http://localhost:5275/wallet/emara-play/balance
+Content-Type: application/json
+Cache-Control: no-cache
+Authorization: Bearer 352c7e273389c797fb01e4674df72176da8cd93c9c3a6b2bf289fb286837df5e9becf9c6dd4890b3f81694f7992dd5d4f16163d16d78a01601a4fa238d6322b0
+
+{
+  "token": "143470d1-32f2-44c5-838b-99fb9115ea7c",
+  "provider": "EmaraPlay",
+  "user": "emaraplay_test"
+}
+
+
+### Authenticate
+POST http://localhost:5275/wallet/emara-play/authenticate
+Content-Type: application/json
+Cache-Control: no-cache
+Authorization: Bearer 352c7e273389c797fb01e4674df72176da8cd93c9c3a6b2bf289fb286837df5e9becf9c6dd4890b3f81694f7992dd5d4f16163d16d78a01601a4fa238d6322b0
+
+{
+  "token": "143470d1-32f2-44c5-838b-99fb9115ea7c",
+  "provider": "EmaraPlay",
+  "game": "Hallowin"
+}
+
+
+### Refund
+POST http://localhost:5275/wallet/emara-play/refund
+Content-Type: application/json
+Cache-Control: no-cache
+Authorization: Bearer 352c7e273389c797fb01e4674df72176da8cd93c9c3a6b2bf289fb286837df5e9becf9c6dd4890b3f81694f7992dd5d4f16163d16d78a01601a4fa238d6322b0
+
+{
+  "user": "emaraplay_test",
+  "transaction": "some transaction",
+  "original_transaction": "another transaction",
+  "amount": "20.00",
+  "bonus_amount": "string",
+  "provider": "EmaraPlay",
+  "bet": "21",
+  "game": "Hallowin",
+  "token": "143470d1-32f2-44c5-838b-99fb9115ea7c"
+}
+
+
+### Bet
+POST http://localhost:5275/wallet/emara-play/bet
+Content-Type: application/json
+Cache-Control: no-cache
+Authorization: Bearer 352c7e273389c797fb01e4674df72176da8cd93c9c3a6b2bf289fb286837df5e9becf9c6dd4890b3f81694f7992dd5d4f16163d16d78a01601a4fa238d6322b0
+
+{
+  "user": "emaraplay_test",
+  "game": "Hallowin",
+  "bet": "12",
+  "provider": "EmaraPlay",
+  "token": "143470d1-32f2-44c5-838b-99fb9115ea7c",
+  "transaction": "some transaction",
+  "amount": "20.00"
+}
+
+
+### Result (Win)
+POST http://localhost:5275/wallet/emara-play/result
+Content-Type: application/json
+Cache-Control: no-cache
+Authorization: Bearer 352c7e273389c797fb01e4674df72176da8cd93c9c3a6b2bf289fb286837df5e9becf9c6dd4890b3f81694f7992dd5d4f16163d16d78a01601a4fa238d6322b0
+
+{
+  "user": "emaraplay_test",
+  "game": "Hallowin",
+  "bet": "21",
+  "amount": "20.00",
+  "transaction": "some transaction",
+  "provider": "EmaraPlay",
+  "token": "143470d1-32f2-44c5-838b-99fb9115ea7c",
+  "close_round": "12",
+  "bet_bonus_amount": "10.00"
+}
