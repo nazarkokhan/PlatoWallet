@@ -4,7 +4,7 @@ using EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
-public class WalletDbContext : DbContext
+public sealed class WalletDbContext : DbContext
 {
     public WalletDbContext(DbContextOptions<WalletDbContext> options)
         : base(options)

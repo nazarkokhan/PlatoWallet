@@ -43,10 +43,9 @@ public sealed class WalletService : IWalletService
             if (user is null)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserNotFound);
 
-            if (user.IsDisabled)
-                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserIsDisabled);
-
-            return ResultFactory.Success(user);
+            return user.IsDisabled ? 
+                ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserIsDisabled) : 
+                ResultFactory.Success(user);
         }
         catch (Exception e)
         {
