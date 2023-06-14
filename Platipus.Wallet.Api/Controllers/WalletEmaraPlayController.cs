@@ -6,8 +6,6 @@ using Platipus.Wallet.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
-using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
-using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 namespace Platipus.Wallet.Api.Controllers;
 
@@ -70,8 +68,24 @@ public sealed class WalletEmaraPlayController : RestApiController
     /// </returns>
     [HttpPost("launcher-url")]
     [ProducesResponseType(typeof(EmaraPlayGetLauncherUrlResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Launcher(
+    public async Task<IActionResult> GetLauncherUrl(
         [FromBody] EmaraPlayGetLauncherUrlRequest urlRequest,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(urlRequest, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///     Gets round's details.
+    /// </summary>
+    /// <param name="urlRequest"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="EmaraPlayGetRoundDetailsResponse"/>.
+    /// </returns>
+    [HttpPost("round-details")]
+    [ProducesResponseType(typeof(EmaraPlayGetRoundDetailsResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRoundDetails(
+        [FromBody] EmaraPlayGetRoundDetailsRequest urlRequest,
         CancellationToken cancellationToken)
         => (await _mediator.Send(urlRequest, cancellationToken)).ToActionResult();
 }

@@ -4,5 +4,5 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 
 public interface IEmaraPlayBaseRequest : IBaseWalletRequest
 {
-    public string Token { get; }
+    public string? Token { get; }
 }

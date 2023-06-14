@@ -36,28 +36,41 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
     public Task<IResult<IHttpClientResult<EmaraPlayGetLauncherUrlResponse, EmaraPlayGameApiErrorResponse>>> GetLauncherUrlAsync(
         Uri baseUrl, EmaraPlayGetLauncherUrlRequest urlRequest, CancellationToken cancellationToken = default)
     {
-        return PostAsync<EmaraPlayGetLauncherUrlResponse>(
+        return PostAsync<EmaraPlayGetLauncherUrlResponse, EmaraPlayGetLauncherUrlRequest>(
             baseUrl, "launcher", urlRequest, cancellationToken);
     }
 
+    public Task<IResult<IHttpClientResult<EmaraPlayGetRoundDetailsResponse, EmaraPlayGameApiErrorResponse>>> GetRoundDetailsAsync(
+        Uri baseUrl, EmaraPlayGetRoundDetailsRequest urlRequest,
+        CancellationToken cancellationToken = default)
+    {
+        return PostAsync<EmaraPlayGetRoundDetailsResponse, EmaraPlayGetRoundDetailsRequest>(
+            baseUrl, "rounddetails", urlRequest, cancellationToken);
+    }
 
-    private async Task<IResult<IHttpClientResult<TSuccess, EmaraPlayGameApiErrorResponse>>> PostAsync<TSuccess>(
+
+    private async Task<IResult<IHttpClientResult<TSuccess, EmaraPlayGameApiErrorResponse>>> PostAsync<TSuccess, TRequest>(
         Uri baseUrl,
         string method,
-        EmaraPlayGetLauncherUrlRequest request,
+        TRequest request,
         CancellationToken cancellationToken = default)
+    where TRequest : class
     {
         try
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
+        
+            var requestToSend = request;
             
-            var requestToSend = request.Mode != "real_play" 
-                ? request with { Token = null!, User = null }
-                : request;
+            if (request is EmaraPlayGetLauncherUrlRequest launcherRequest && 
+                launcherRequest.Mode != "real_play")
+            {
+                requestToSend = launcherRequest with { Token = null, User = null } as TRequest;
+            }
 
             var requestContent = JsonConvert.SerializeObject(requestToSend, _jsonSettings);
             var content = new StringContent(requestContent, Encoding.UTF8, "application/json");
-            
+        
             var hash = EmaraPlaySecurityHash.Compute(Encoding.UTF8.GetBytes(requestContent), "12345678");
 
             // Add Authorization header
@@ -68,7 +81,7 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
             var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
-
+            
             return ResultFactory.Success(httpResult);
         }
         catch (Exception e)

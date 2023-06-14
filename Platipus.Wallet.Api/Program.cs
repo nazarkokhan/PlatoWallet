@@ -7,7 +7,6 @@ using JorgeSerrano.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Platipus.Api.Common;
 using Platipus.Serilog;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;

@@ -223,7 +223,7 @@ public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
 
             var errorCode = emaraPlayResult.Error;
 
-            var errorResponse = new EmaraPlayErrorResponse(((int)errorCode).ToString(), errorCode.ToString());
+            var errorResponse = new EmaraPlayErrorResponse((int)errorCode, errorCode.ToString());
 
             context.Result = new OkObjectResult(errorResponse);
 
