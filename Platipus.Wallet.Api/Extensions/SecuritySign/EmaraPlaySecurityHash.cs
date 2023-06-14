@@ -17,7 +17,7 @@ public static class EmaraPlaySecurityHash
         return isValid;
     }
 
-    private static string Compute(byte[] data, string privateKey)
+    public static string Compute(byte[] data, string privateKey)
     {
         var privateKeyBytes = Encoding.UTF8.GetBytes(privateKey);
 

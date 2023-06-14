@@ -7,8 +7,10 @@ using JorgeSerrano.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Platipus.Api.Common;
 using Platipus.Serilog;
+using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.PswGamesApi;
@@ -157,7 +159,11 @@ try
             })
         .Services
         .AddSingleton<IUisGameApiClient, UisGameApiClient>()
-        .AddHttpClient<IUisGameApiClient, UisGameApiClient>();
+        .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
+        .Services
+        .AddSingleton<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+        .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services
         .AddHealthChecks()
