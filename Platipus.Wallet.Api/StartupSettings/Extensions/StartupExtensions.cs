@@ -28,7 +28,8 @@ public static class StartupExtensions
             .AddSingleton<OpenboxMockedErrorActionFilter>()
             .AddSingleton<EmaraPlayMockedErrorActionFilter>()
             .AddScoped<EmaraPlaySecurityFilter>()
-            .AddScoped<AtlasPlatformSecurityFilter>();
+            .AddScoped<AtlasPlatformSecurityFilter>()
+            .AddSingleton<AtlasPlatformMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

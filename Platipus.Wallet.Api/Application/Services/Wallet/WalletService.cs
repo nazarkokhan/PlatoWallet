@@ -225,6 +225,8 @@ public sealed class WalletService : IWalletService
         string transactionId,
         string? roundId = null,
         bool searchByUsername = false,
+        int? amount = null,
+        string? clientId = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -266,7 +268,14 @@ public sealed class WalletService : IWalletService
             transaction.Cancel();
             _context.Update(transaction);
 
-            user.Balance += transaction.Amount;
+            if (amount is null)
+            {
+                user.Balance += transaction.Amount;
+            }
+            else
+            {
+                user.Balance += (decimal)amount;
+            }
             _context.Update(user);
 
             await _context.SaveChangesAsync(cancellationToken);

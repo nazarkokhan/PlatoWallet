@@ -85,7 +85,7 @@ public class UisChangeBalanceRequest : IUisUserIdRequest, IRequest<IUisResult<Ui
                     request.TransactionId,
                     request.RoundId,
                     true,
-                    cancellationToken),
+                    cancellationToken: cancellationToken),
                 _ => null
             };
 

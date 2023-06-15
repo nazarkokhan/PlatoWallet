@@ -5,13 +5,13 @@ using Platipus.Wallet.Api.Application.Responses.AtlasPlatform;
 using Platipus.Wallet.Api.Controllers.Abstract;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
-using Platipus.Wallet.Api.StartupSettings.Filters.Security;
+using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 using Platipus.Wallet.Domain.Entities.Enums;
 
 namespace Platipus.Wallet.Api.Controllers;
 
 [Route("wallet/atlas-platform/")]
-//[ServiceFilter(typeof(AtlasPlatformMockedErrorActionFilter), Order = 1)]
+[ServiceFilter(typeof(AtlasPlatformMockedErrorActionFilter), Order = 1)]
 //[ServiceFilter(typeof(AtlasPlatformSecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.AtlasPlatform))]
 [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status200OK)]
@@ -87,6 +87,41 @@ public sealed class WalletAtlasPlatformController : RestApiController
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Win(
         [FromBody] AtlasPlatformWinRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///     This method should be used to refund a bet amount to the client balance. 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="AtlasPlatformCommonResponse"/>.
+    /// </returns>
+    [HttpPost("bet:refund")]
+    [ProducesResponseType(typeof(AtlasPlatformCommonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Refund(
+        [FromBody] AtlasPlatformRefundRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///     Using this method AP is able to get the list of casino games available for the integration.
+    ///     Get games request is sent with Basic authentication.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="AtlasPlatformGetGamesResponse"/>.
+    /// </returns>
+    [HttpPost("games")]
+    [ProducesResponseType(typeof(AtlasPlatformGetGamesResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetGames(
+        [FromBody] AtlasPlatformGetGamesRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

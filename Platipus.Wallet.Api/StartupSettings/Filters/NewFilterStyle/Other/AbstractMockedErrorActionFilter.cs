@@ -12,11 +12,11 @@ using Platipus.Wallet.Infrastructure.Persistence;
 
 public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 {
-    private readonly ILogger<AbstractMockedErrorActionFilter> _logger;
+    protected readonly ILogger<AbstractMockedErrorActionFilter> Logger;
 
     protected AbstractMockedErrorActionFilter(ILogger<AbstractMockedErrorActionFilter> logger)
     {
-        _logger = logger;
+        Logger = logger;
     }
 
     protected abstract MockedErrorIdentifiers? GetMockedErrorIdentifiers(
@@ -25,7 +25,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        _logger.LogDebug("Handling request with possible mocked error");
+        Logger.LogDebug("Handling request with possible mocked error");
 
         var executedContext = await next();
 
@@ -37,7 +37,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 
         if (mockedErrorIdentifiers is null)
         {
-            _logger.LogInformation("ErrorMockMethod not found");
+            Logger.LogInformation("ErrorMockMethod not found");
             return;
         }
 
@@ -63,7 +63,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
         }
         catch (Exception e)
         {
-            _logger.LogCritical(e, "Mocking error failed");
+            Logger.LogCritical(e, "Mocking error failed");
         }
         finally
         {
@@ -95,11 +95,11 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 
         if (mockedError is null)
         {
-            _logger.LogDebug("Mocked error not found");
+            Logger.LogDebug("Mocked error not found");
             return;
         }
 
-        _logger.LogInformation(
+        Logger.LogInformation(
             "Executing mocked error {@MockedError}",
             new
             {
@@ -134,7 +134,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
                 }
                 catch (Exception e)
                 {
-                    _logger.LogWarning(e, "Error deserializing mocked error body");
+                    Logger.LogWarning(e, "Error deserializing mocked error body");
                     httpContext.Items.Add(responseItem, mockedError.Body);
                 }
 
@@ -165,6 +165,6 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
             : await updMockQuery.ExecuteDeleteAsync();
 
         if (updMockRows is not 1)
-            _logger.LogCritical("Error mock executed but {AffectedRows} rows affected on upd/del", updMockRows);
+            Logger.LogCritical("Error mock executed but {AffectedRows} rows affected on upd/del", updMockRows);
     }
 }

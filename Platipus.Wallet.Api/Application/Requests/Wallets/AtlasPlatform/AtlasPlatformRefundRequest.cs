@@ -7,14 +7,14 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform;
 
-public sealed record AtlasPlatformBetRequest(
-    string Token, [MaxLength(150)] string RoundId, int Amount,
-    [MaxLength(150)] string TransactionId, string Currency,
-    string? BonusInstanceId = null) : 
-        IRequest<IAtlasPlatformResult<AtlasPlatformCommonResponse>>, IAtlasPlatformRequest
+public sealed record AtlasPlatformRefundRequest(
+    string Token, string ClientId, [MaxLength(150)]string RoundId,
+    int Amount, [MaxLength(150)]string TransactionId, 
+    [MaxLength(150)]string RefundTransactionId) : 
+    IAtlasPlatformRequest, IRequest<IAtlasPlatformResult<AtlasPlatformCommonResponse>>
 {
     public sealed class Handler :
-        IRequestHandler<AtlasPlatformBetRequest, IAtlasPlatformResult<AtlasPlatformCommonResponse>>
+        IRequestHandler<AtlasPlatformRefundRequest, IAtlasPlatformResult<AtlasPlatformCommonResponse>>
     {
         private readonly IWalletService _walletService;
 
@@ -22,20 +22,23 @@ public sealed record AtlasPlatformBetRequest(
             _walletService = walletService;
 
         public async Task<IAtlasPlatformResult<AtlasPlatformCommonResponse>> Handle(
-            AtlasPlatformBetRequest request, CancellationToken cancellationToken)
+            AtlasPlatformRefundRequest request, CancellationToken cancellationToken)
         {
-            var walletResult = await _walletService.BetAsync(
+            var walletResult = await _walletService.RollbackAsync(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
                 amount: request.Amount,
-                currency: request.Currency,
+                clientId: request.ClientId,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
             {
                 switch (walletResult.Error)
                 {
+                    case ErrorCode.TransactionNotFound:
+                        return AtlasPlatformResultFactory.Failure<AtlasPlatformCommonResponse>(
+                            AtlasPlatformErrorCode.BetTransactionNotFound);
                     case ErrorCode.UnknownBetException:
                         return AtlasPlatformResultFactory.Failure<AtlasPlatformCommonResponse>(
                             AtlasPlatformErrorCode.InternalError);

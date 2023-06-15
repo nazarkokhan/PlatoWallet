@@ -35,6 +35,8 @@ public interface IWalletService
         string transactionId,
         string? roundId = null,
         bool searchByUsername = false,
+        int? amount = null,
+        string? clientId = null,
         CancellationToken cancellationToken = default);
 
     Task<IResult<WalletGetBalanceResponse>> AwardAsync(
