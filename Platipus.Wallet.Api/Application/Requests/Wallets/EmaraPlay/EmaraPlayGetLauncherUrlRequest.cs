@@ -1,11 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
+﻿using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
-using Platipus.Wallet.Domain.Entities;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 

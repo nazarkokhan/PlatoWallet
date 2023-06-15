@@ -16,5 +16,6 @@ public enum CasinoProvider
     Everymatrix,
     BetConstruct,
     PariMatch,
-    EmaraPlay
+    EmaraPlay,
+    AtlasPlatform
 }

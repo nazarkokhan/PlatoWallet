@@ -1,3 +1,4 @@
+using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 
 namespace Platipus.Wallet.Api.Extensions;
@@ -23,5 +24,9 @@ public static class ActionResultExtensions
 
     public static IActionResult ToActionResult(this ISoftswissResult result) => new SoftswissExternalActionResult(result);
     
-    public static IActionResult ToActionResult(this IEmaraPlayResult result) => new EmaraPlayExternalActionResult(result);
+    public static IActionResult ToActionResult(this IEmaraPlayResult result) => 
+        new EmaraPlayExternalActionResult(result);
+
+    public static IActionResult ToActionResult(this IAtlasPlatformResult result) => 
+        new AtlasPlatformExternalActionResult(result);
 }

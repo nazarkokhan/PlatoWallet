@@ -6,7 +6,6 @@ using Platipus.Wallet.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
-using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 namespace Platipus.Wallet.Api.Controllers;
