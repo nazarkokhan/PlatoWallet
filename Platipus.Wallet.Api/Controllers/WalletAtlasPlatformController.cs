@@ -12,7 +12,7 @@ namespace Platipus.Wallet.Api.Controllers;
 
 [Route("wallet/atlas-platform/")]
 //[ServiceFilter(typeof(AtlasPlatformMockedErrorActionFilter), Order = 1)]
-[ServiceFilter(typeof(AtlasPlatformSecurityFilter), Order = 2)]
+//[ServiceFilter(typeof(AtlasPlatformSecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.AtlasPlatform))]
 [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status200OK)]
 public sealed class WalletAtlasPlatformController : RestApiController
@@ -31,10 +31,10 @@ public sealed class WalletAtlasPlatformController : RestApiController
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>
-    ///     <see cref="AtlasPlatformGetClientBalanceResponse"/>.
+    ///     <see cref="AtlasPlatformCommonResponse"/>.
     /// </returns>
     [HttpPost("client/balance")]
-    [ProducesResponseType(typeof(AtlasPlatformGetClientBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AtlasPlatformCommonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetClientBalance(
         [FromBody] AtlasPlatformGetClientBalanceRequest request,
@@ -43,7 +43,7 @@ public sealed class WalletAtlasPlatformController : RestApiController
     
     
     /// <summary>
-    ///     
+    ///     This method authorizes a client.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
@@ -53,6 +53,23 @@ public sealed class WalletAtlasPlatformController : RestApiController
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Authorize(
         [FromBody] AtlasPlatformAuthorizationRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///     This method withdraws the amount from the player’s wallet.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="AtlasPlatformCommonResponse"/>.
+    /// </returns>
+    [HttpPost("bet")]
+    [ProducesResponseType(typeof(AtlasPlatformCommonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Bet(
+        [FromBody] AtlasPlatformBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
