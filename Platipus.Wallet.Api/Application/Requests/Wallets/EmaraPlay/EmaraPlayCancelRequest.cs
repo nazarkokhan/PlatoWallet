@@ -9,41 +9,41 @@ using Platipus.Wallet.Infrastructure.Persistence;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
-public sealed record EmaraPlayGetRoundDetailsRequest(
-    string? Environment, string Bet, 
-    string? User = null, string? Game = null,
-    string? Operator = null, string? Currency = null,
-    string? Token = null) : 
-        IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayGetRoundDetailsResponse>>
+public sealed record EmaraPlayCancelRequest(
+    string? Environment, string Ref, 
+    string? Operator = null, string? Token = null) : 
+    IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayCancelResponse>>
 {
     public sealed class Handler :
-        IRequestHandler<EmaraPlayGetRoundDetailsRequest, IEmaraPlayResult<EmaraPlayGetRoundDetailsResponse>>
+        IRequestHandler<EmaraPlayCancelRequest, IEmaraPlayResult<EmaraPlayCancelResponse>>
     {
-        private readonly IEmaraPlayGameApiClient _apiClient;
         private readonly WalletDbContext _walletDbContext;
+        private readonly IEmaraPlayGameApiClient _apiClient;
 
-        public Handler(IEmaraPlayGameApiClient apiClient, WalletDbContext walletDbContext)
+        public Handler(
+            WalletDbContext walletDbContext, 
+            IEmaraPlayGameApiClient apiClient)
         {
-            _apiClient = apiClient;
             _walletDbContext = walletDbContext;
+            _apiClient = apiClient;
         }
 
-        public async Task<IEmaraPlayResult<EmaraPlayGetRoundDetailsResponse>> Handle(
-            EmaraPlayGetRoundDetailsRequest request, CancellationToken cancellationToken)
+        public async Task<IEmaraPlayResult<EmaraPlayCancelResponse>> Handle(
+            EmaraPlayCancelRequest request, CancellationToken cancellationToken)
         {
             var environment = await _walletDbContext.Set<GameEnvironment>()
                 .Where(e => e.Id == request.Environment)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
-                return EmaraPlayResultFactory.Failure<EmaraPlayGetRoundDetailsResponse>(
+                return EmaraPlayResultFactory.Failure<EmaraPlayCancelResponse>(
                     EmaraPlayErrorCode.InternalServerError);
             
-            var clientResponse = await _apiClient.GetRoundDetailsAsync(
+            await _apiClient.CancelAsync(
                 environment.BaseUrl, request, cancellationToken);
             
-            var response = new EmaraPlayGetRoundDetailsResponse(
-                0, "Success", clientResponse.Data.Data.Result);
+            var response = new EmaraPlayCancelResponse(
+                0, "Success");
             return EmaraPlayResultFactory.Success(response);
         }
     }

@@ -23,8 +23,6 @@ public static class HttpClientRequestMappers
 
         var responseMsgContent = responseMsg.Content;
         var responseBody = await responseMsgContent.ReadAsStringAsync(cancellationToken);
-        // if (string.IsNullOrWhiteSpace(responseBody))
-        //     responseBody = null;
 
         var responseDto = new HttpClientResponseData(
             responseMsg.StatusCode,

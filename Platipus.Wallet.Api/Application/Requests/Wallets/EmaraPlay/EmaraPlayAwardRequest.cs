@@ -10,7 +10,7 @@ using Platipus.Wallet.Infrastructure.Persistence;
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 public sealed record EmaraPlayAwardRequest(
-    string Environment, string User, string Count, string EndDate, 
+    string? Environment, string User, string Count, string EndDate, 
     string Currency, List<string>? Games = null, string? Code = null,
     string? MinBet = "0", string? MaxBet = null, string? StartDate = null, 
     string? Operator = null, string? Token = null) : 

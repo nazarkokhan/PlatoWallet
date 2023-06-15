@@ -11,7 +11,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 public sealed record EmaraPlayGetLauncherUrlRequest(
     string Environment,
-    string Operator, string Token, string Game, 
+    string Operator, string? Token, string Game, 
     string Mode, string Lang, string Channel,
     string Jurisdiction, string Currency, string Ip,
     string? User, string? Lobby = null, 

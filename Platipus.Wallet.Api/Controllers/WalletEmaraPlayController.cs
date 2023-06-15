@@ -103,5 +103,22 @@ public sealed class WalletEmaraPlayController : RestApiController
         [FromBody] EmaraPlayAwardRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///     Cancel endpoint will allow the operator to cancel an awarded free spin campaign to a
+    ///     user.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="EmaraPlayCancelResponse"/>.
+    /// </returns>
+    [HttpPost("cancel")]
+    [ProducesResponseType(typeof(EmaraPlayCancelResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Cancel(
+        [FromBody] EmaraPlayCancelRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
 

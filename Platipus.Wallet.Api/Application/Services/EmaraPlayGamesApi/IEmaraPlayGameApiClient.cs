@@ -21,4 +21,9 @@ public interface IEmaraPlayGameApiClient
         Uri baseUrl,
         EmaraPlayAwardRequest urlRequest,
         CancellationToken cancellationToken = default);
+    
+    Task<IResult<IHttpClientResult<EmaraPlayCancelResponse, EmaraPlayGameApiErrorResponse>>> CancelAsync(
+        Uri baseUrl,
+        EmaraPlayCancelRequest urlRequest,
+        CancellationToken cancellationToken = default);
 }

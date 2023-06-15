@@ -54,6 +54,12 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
             baseUrl, "award", urlRequest, cancellationToken);
     }
 
+    public Task<IResult<IHttpClientResult<EmaraPlayCancelResponse, EmaraPlayGameApiErrorResponse>>> CancelAsync(Uri baseUrl, EmaraPlayCancelRequest urlRequest, CancellationToken cancellationToken = default)
+    {
+        return PostAsync<EmaraPlayCancelResponse, EmaraPlayCancelRequest>(
+            baseUrl, "cancel", urlRequest, cancellationToken);
+    }
+
 
     private async Task<IResult<IHttpClientResult<TSuccess, EmaraPlayGameApiErrorResponse>>> PostAsync<TSuccess, TRequest>(
         Uri baseUrl,
@@ -65,14 +71,19 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
         try
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
-        
-            var requestToSend = request;
-            
-            if (request is EmaraPlayGetLauncherUrlRequest launcherRequest && 
-                launcherRequest.Mode != "real_play")
+
+            var requestToSend = request switch
             {
-                requestToSend = launcherRequest with { Token = null, User = null } as TRequest;
-            }
+                EmaraPlayGetLauncherUrlRequest launcherRequest when launcherRequest.Mode != "real_play" =>
+                    launcherRequest with { Token = null, User = null } as TRequest,
+                EmaraPlayCancelRequest cancelRequest =>
+                    cancelRequest with { Environment = null, Token = null } as TRequest,
+                EmaraPlayAwardRequest awardRequest =>
+                    awardRequest with { Environment = null, Token = null } as TRequest,
+                EmaraPlayGetRoundDetailsRequest roundDetailsRequest =>
+                    roundDetailsRequest with { Environment = null, Token = null } as TRequest,
+                _ => request
+            };
 
             var requestContent = JsonConvert.SerializeObject(requestToSend, _jsonSettings);
             var content = new StringContent(requestContent, Encoding.UTF8, "application/json");
