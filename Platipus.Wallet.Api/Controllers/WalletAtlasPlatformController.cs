@@ -51,7 +51,7 @@ public sealed class WalletAtlasPlatformController : RestApiController
     [HttpPost("client/auth")]
     [ProducesResponseType(typeof(AtlasPlatformAuthorizationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Authorize(
+    public async ValueTask<IActionResult> Authorize(
         [FromBody] AtlasPlatformAuthorizationRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -65,11 +65,28 @@ public sealed class WalletAtlasPlatformController : RestApiController
     /// <returns>
     ///     <see cref="AtlasPlatformCommonResponse"/>.
     /// </returns>
-    [HttpPost("bet")]
+    [HttpPost("bet:place")]
     [ProducesResponseType(typeof(AtlasPlatformCommonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Bet(
         [FromBody] AtlasPlatformBetRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///     This method deposits the amount to the player’s wallet.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="AtlasPlatformCommonResponse"/>.
+    /// </returns>
+    [HttpPost("bet:win")]
+    [ProducesResponseType(typeof(AtlasPlatformCommonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Win(
+        [FromBody] AtlasPlatformWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

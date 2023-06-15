@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
 using Platipus.Wallet.Api.Application.Responses.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Results.AtlasPlatform.WithData;
@@ -6,14 +7,14 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform;
 
-public sealed record AtlasPlatformBetRequest(
-    string Token, [MaxLength(150)] string RoundId, int Amount,
-    [MaxLength(150)] string TransactionId, string Currency,
-    string? BonusInstanceId = null) : 
-        IRequest<IAtlasPlatformResult<AtlasPlatformCommonResponse>>
+public sealed record AtlasPlatformWinRequest(
+    string Token, string ClientId,
+    [MaxLength(150)] string RoundId, int Amount,
+    [MaxLength(150)] string TransactionId) : 
+        IRequest<IAtlasPlatformResult<AtlasPlatformCommonResponse>>, IAtlasPlatformRequest
 {
-    public sealed class Handler :
-        IRequestHandler<AtlasPlatformBetRequest, IAtlasPlatformResult<AtlasPlatformCommonResponse>>
+    public sealed class Handler : 
+        IRequestHandler<AtlasPlatformWinRequest, IAtlasPlatformResult<AtlasPlatformCommonResponse>>
     {
         private readonly IWalletService _walletService;
 
@@ -21,21 +22,20 @@ public sealed record AtlasPlatformBetRequest(
             _walletService = walletService;
 
         public async Task<IAtlasPlatformResult<AtlasPlatformCommonResponse>> Handle(
-            AtlasPlatformBetRequest request, CancellationToken cancellationToken)
+            AtlasPlatformWinRequest request, CancellationToken cancellationToken)
         {
-            var walletResult = await _walletService.BetAsync(
+            var walletResult = await _walletService.WinAsync(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
-                amount: request.Amount,
-                currency: request.Currency,
+                request.Amount, 
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
             {
                 switch (walletResult.Error)
                 {
-                    case ErrorCode.UnknownBetException:
+                    case ErrorCode.UnknownWinException:
                         return AtlasPlatformResultFactory.Failure<AtlasPlatformCommonResponse>(
                             AtlasPlatformErrorCode.InternalError);
                     case ErrorCode.InvalidCurrency:
@@ -59,8 +59,8 @@ public sealed record AtlasPlatformBetRequest(
 
             var response = new AtlasPlatformCommonResponse(
                 walletResult.Data.Currency, (int)walletResult.Data.Balance, 
-                walletResult.Data.UserId.ToString());
-
+                walletResult.Data.UserId.ToString()
+                );
             return AtlasPlatformResultFactory.Success(response);
         }
     }

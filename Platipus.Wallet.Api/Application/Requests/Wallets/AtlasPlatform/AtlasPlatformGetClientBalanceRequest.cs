@@ -27,9 +27,20 @@ public sealed record AtlasPlatformGetClientBalanceRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return AtlasPlatformResultFactory.Failure<AtlasPlatformCommonResponse>(
-                    AtlasPlatformErrorCode.SessionValidationFailed);
-
+            {
+                switch (walletResult.Error)
+                {
+                    case ErrorCode.UserIsDisabled:
+                    case ErrorCode.UserNotFound:
+                        return AtlasPlatformResultFactory.Failure<AtlasPlatformCommonResponse>(
+                            AtlasPlatformErrorCode.SessionValidationFailed);
+                    case ErrorCode.UnknownGetBalanceException:
+                        return AtlasPlatformResultFactory.Failure<AtlasPlatformCommonResponse>(
+                            AtlasPlatformErrorCode.InternalError);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
             var response = new AtlasPlatformCommonResponse(
                 walletResult.Data.Currency, 
                 Convert.ToInt32(walletResult.Data.Balance), 
