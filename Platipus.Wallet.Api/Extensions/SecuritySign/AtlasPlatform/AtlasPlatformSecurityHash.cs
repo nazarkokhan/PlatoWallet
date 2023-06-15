@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace Platipus.Wallet.Api.Extensions.SecuritySign;
+namespace Platipus.Wallet.Api.Extensions.SecuritySign.AtlasPlatform;
 
 public static class AtlasPlatformSecurityHash
 {

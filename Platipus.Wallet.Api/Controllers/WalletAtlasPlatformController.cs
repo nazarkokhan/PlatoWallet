@@ -6,13 +6,14 @@ using Platipus.Wallet.Api.Controllers.Abstract;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
+using Platipus.Wallet.Api.StartupSettings.Filters.Security.AtlasPlatform;
 using Platipus.Wallet.Domain.Entities.Enums;
 
 namespace Platipus.Wallet.Api.Controllers;
 
 [Route("wallet/atlas-platform/")]
 [ServiceFilter(typeof(AtlasPlatformMockedErrorActionFilter), Order = 1)]
-//[ServiceFilter(typeof(AtlasPlatformSecurityFilter), Order = 2)]
+[ServiceFilter(typeof(AtlasPlatformSecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.AtlasPlatform))]
 [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status200OK)]
 public sealed class WalletAtlasPlatformController : RestApiController
@@ -118,6 +119,7 @@ public sealed class WalletAtlasPlatformController : RestApiController
     ///     <see cref="AtlasPlatformGetGamesResponse"/>.
     /// </returns>
     [HttpPost("games")]
+    [ServiceFilter(typeof(AtlasPlatformBasicSecurityFilter), Order = 2)]
     [ProducesResponseType(typeof(AtlasPlatformGetGamesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetGames(

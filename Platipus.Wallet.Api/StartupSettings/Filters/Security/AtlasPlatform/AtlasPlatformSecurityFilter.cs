@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc.Controllers;
+﻿using Bogus.DataSets;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
 using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
 using Platipus.Wallet.Api.Controllers;
 using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.Extensions.SecuritySign;
+using Platipus.Wallet.Api.Extensions.SecuritySign.AtlasPlatform;
 using Platipus.Wallet.Domain.Entities;
 using Platipus.Wallet.Infrastructure.Persistence;
 
-namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
+namespace Platipus.Wallet.Api.StartupSettings.Filters.Security.AtlasPlatform;
 
 public sealed class AtlasPlatformSecurityFilter : IAsyncActionFilter
 {
@@ -19,7 +20,9 @@ public sealed class AtlasPlatformSecurityFilter : IAsyncActionFilter
         if (context.ActionDescriptor is ControllerActionDescriptor
             {
                 ActionName: nameof(WalletAtlasPlatformController.Authorize)
-            })
+            } or ControllerActionDescriptor
+            {
+                ActionName: nameof(WalletAtlasPlatformController.GetGames)})
         {
             await next();
             return;
@@ -40,6 +43,8 @@ public sealed class AtlasPlatformSecurityFilter : IAsyncActionFilter
                 {
                     s.ExpirationDate,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
+                    UsedId = s.User.Id,
+                    UserPassword = s.User.Password
                 })
             .FirstOrDefaultAsync();
 
@@ -51,9 +56,8 @@ public sealed class AtlasPlatformSecurityFilter : IAsyncActionFilter
             return;
         }
 
-        string authHeader = context.HttpContext.Request.Headers["Hash"]!;
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
-
+        string authHeader = context.HttpContext.Request.Headers["Hash"]!;
         var result = AtlasPlatformSecurityHash.IsValid(
             authHeader, requestBytesToValidate, session.CasinoSignatureKey);
 

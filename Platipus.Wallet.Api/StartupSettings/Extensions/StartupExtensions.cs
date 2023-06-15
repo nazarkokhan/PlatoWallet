@@ -1,3 +1,5 @@
+using Platipus.Wallet.Api.StartupSettings.Filters.Security.AtlasPlatform;
+
 namespace Platipus.Wallet.Api.StartupSettings.Extensions;
 
 using System.Text.Json;
@@ -28,8 +30,9 @@ public static class StartupExtensions
             .AddSingleton<OpenboxMockedErrorActionFilter>()
             .AddSingleton<EmaraPlayMockedErrorActionFilter>()
             .AddScoped<EmaraPlaySecurityFilter>()
+            .AddSingleton<AtlasPlatformMockedErrorActionFilter>()
             .AddScoped<AtlasPlatformSecurityFilter>()
-            .AddSingleton<AtlasPlatformMockedErrorActionFilter>();
+            .AddScoped<AtlasPlatformBasicSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
