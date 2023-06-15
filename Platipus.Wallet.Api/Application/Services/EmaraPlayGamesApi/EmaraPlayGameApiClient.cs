@@ -19,8 +19,7 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
-    private readonly JsonSerializerSettings _jsonSettings;
-    
+
     private const string ApiBasePath = "emaraplay/";
 
     public EmaraPlayGameApiClient(
@@ -30,7 +29,6 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
         _httpClient = httpClient;
         _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.EmaraPlay))
             .JsonSerializerOptions;
-        _jsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
     }
 
     public Task<IResult<IHttpClientResult<EmaraPlayGetLauncherUrlResponse, EmaraPlayGameApiErrorResponse>>> GetLauncherUrlAsync(
@@ -85,7 +83,7 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
                 _ => request
             };
 
-            var requestContent = JsonConvert.SerializeObject(requestToSend, _jsonSettings);
+            var requestContent = JsonConvert.SerializeObject(requestToSend);
             var content = new StringContent(requestContent, Encoding.UTF8, "application/json");
         
             var hash = EmaraPlaySecurityHash.Compute(Encoding.UTF8.GetBytes(requestContent), "12345678");

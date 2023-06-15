@@ -1,4 +1,7 @@
+using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
+using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
+using Platipus.Wallet.Api.Application.Results.AtlasPlatform.WithData;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Result = Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base.Result;
@@ -40,7 +43,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 
-public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
+public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
@@ -202,6 +205,25 @@ public class ResultToResponseResultFilterAttribute : ResultFilterAttribute
                     break;
                 }
             }
+        }
+        
+        if (context.Result is AtlasPlatformExternalActionResult { Result: { } atlasPlatformResult })
+        {
+            if (atlasPlatformResult.IsSuccess)
+            {
+                if (atlasPlatformResult is IAtlasPlatformResult<object> objectResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+                context.Result = new OkObjectResult(atlasPlatformResult);
+                return;
+            }
+
+            var errorCode = atlasPlatformResult.Error;
+            var errorResponse = new AtlasPlatformErrorResponse(errorCode.ToString(), (int)errorCode);
+            context.Result = new OkObjectResult(errorResponse);
+            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is EmaraPlayExternalActionResult { Result: { } emaraPlayResult })

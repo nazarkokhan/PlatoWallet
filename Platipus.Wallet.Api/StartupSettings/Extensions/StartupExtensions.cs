@@ -27,7 +27,8 @@ public static class StartupExtensions
             .AddScoped<BetconstructSecurityFilter>()
             .AddSingleton<OpenboxMockedErrorActionFilter>()
             .AddSingleton<EmaraPlayMockedErrorActionFilter>()
-            .AddScoped<EmaraPlaySecurityFilter>();
+            .AddScoped<EmaraPlaySecurityFilter>()
+            .AddScoped<AtlasPlatformSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -106,6 +107,18 @@ public static class StartupExtensions
                 nameof(CasinoProvider.BetConstruct),
                 options =>
                 {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                })
+            .AddJsonOptions(nameof(CasinoProvider.EmaraPlay),
+                options =>
+                {
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                })
+            .AddJsonOptions(nameof(CasinoProvider.AtlasPlatform),
+                options =>
+                {
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
 

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
 using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
+using Platipus.Wallet.Api.Controllers;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
 using Platipus.Wallet.Domain.Entities;
@@ -14,10 +16,18 @@ public sealed class AtlasPlatformSecurityFilter : IAsyncActionFilter
     public async Task OnActionExecutionAsync(
         ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        if (context.ActionDescriptor is ControllerActionDescriptor
+            {
+                ActionName: nameof(WalletAtlasPlatformController.Authorize)
+            })
+        {
+            await next();
+            return;
+        }
         var request = context.ActionArguments.Values
             .OfType<IAtlasPlatformRequest>()
             .Single();
-
+        
         var httpContext = context.HttpContext;
 
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
