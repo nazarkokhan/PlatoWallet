@@ -65,4 +65,7 @@ public enum ErrorCode
     UnknownHttpClientError,
     EmptyExternalResponse,
     InvalidExternalResponse,
+    
+    
+    UnknownEnvironmentException
 }

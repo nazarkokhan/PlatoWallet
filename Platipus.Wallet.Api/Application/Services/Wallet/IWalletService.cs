@@ -46,4 +46,8 @@ public interface IWalletService
         string? currency = null,
         bool searchByUsername = false,
         CancellationToken cancellationToken = default);
+
+    Task<IResult<WalletGetEnvironmentResponse>> GetEnvironmentAsync(
+        string? environment,
+        CancellationToken cancellationToken = default);
 }

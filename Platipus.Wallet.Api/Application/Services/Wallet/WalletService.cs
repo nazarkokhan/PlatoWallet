@@ -381,4 +381,30 @@ public sealed class WalletService : IWalletService
             return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UnknownAwardException, e);
         }
     }
+
+    public async Task<IResult<WalletGetEnvironmentResponse>> GetEnvironmentAsync(
+        string? environment, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(environment);
+            
+            var contextResponse = await _context.Set<GameEnvironment>()
+                .Where(e => e.Id == environment)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (contextResponse is null)
+                return ResultFactory.Failure<WalletGetEnvironmentResponse>(
+                    ErrorCode.EnvironmentNotFound);
+            
+            var finalResponse = new WalletGetEnvironmentResponse(contextResponse.BaseUrl);
+
+            return ResultFactory.Success(finalResponse);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Common wallet service Environment unknown exception");
+            return ResultFactory.Failure<WalletGetEnvironmentResponse>(ErrorCode.UnknownEnvironmentException);
+        }
+    }
 }

@@ -4,6 +4,7 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Domain.Entities;
 using Platipus.Wallet.Infrastructure.Persistence;
 
@@ -17,34 +18,29 @@ public sealed record EmaraPlayCancelRequest(
     public sealed class Handler :
         IRequestHandler<EmaraPlayCancelRequest, IEmaraPlayResult<EmaraPlayCancelResponse>>
     {
-        private readonly WalletDbContext _walletDbContext;
+        private readonly IWalletService _walletService;
         private readonly IEmaraPlayGameApiClient _apiClient;
 
         public Handler(
-            WalletDbContext walletDbContext, 
-            IEmaraPlayGameApiClient apiClient)
+            IEmaraPlayGameApiClient apiClient, 
+            IWalletService walletService)
         {
-            _walletDbContext = walletDbContext;
             _apiClient = apiClient;
+            _walletService = walletService;
         }
 
         public async Task<IEmaraPlayResult<EmaraPlayCancelResponse>> Handle(
             EmaraPlayCancelRequest request, CancellationToken cancellationToken)
         {
-            var environment = await _walletDbContext.Set<GameEnvironment>()
-                .Where(e => e.Id == request.Environment)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (environment is null)
-                return EmaraPlayResultFactory.Failure<EmaraPlayCancelResponse>(
-                    EmaraPlayErrorCode.InternalServerError);
+            var walletResponse = await _walletService.GetEnvironmentAsync(
+                request.Environment, cancellationToken);
             
             await _apiClient.CancelAsync(
-                environment.BaseUrl, request, cancellationToken);
+                walletResponse.Data.BaseUrl, request, cancellationToken);
             
-            var response = new EmaraPlayCancelResponse(
+            var finalResponse = new EmaraPlayCancelResponse(
                 0, "Success");
-            return EmaraPlayResultFactory.Success(response);
+            return EmaraPlayResultFactory.Success(finalResponse);
         }
     }
 }

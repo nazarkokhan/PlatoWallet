@@ -4,8 +4,8 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
@@ -21,26 +21,22 @@ public sealed record EmaraPlayGetLauncherUrlRequest(
         IRequestHandler<EmaraPlayGetLauncherUrlRequest, IEmaraPlayResult<EmaraPlayGetLauncherUrlResponse>>
     {
         private readonly IEmaraPlayGameApiClient _gameApiClient;
-        private readonly WalletDbContext _walletDbContext;
+        private readonly IWalletService _walletService;
 
-        public Handler(IEmaraPlayGameApiClient gameApiClient, WalletDbContext walletDbContext)
+        public Handler(
+            IEmaraPlayGameApiClient gameApiClient, IWalletService walletService)
         {
             _gameApiClient = gameApiClient;
-            _walletDbContext = walletDbContext;
+            _walletService = walletService;
         }
 
         public async Task<IEmaraPlayResult<EmaraPlayGetLauncherUrlResponse>> Handle(
             EmaraPlayGetLauncherUrlRequest urlRequest, CancellationToken cancellationToken)
         {
-            var environment = await _walletDbContext.Set<GameEnvironment>()
-                .Where(e => e.Id == urlRequest.Environment)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (environment is null)
-                return EmaraPlayResultFactory.Failure<EmaraPlayGetLauncherUrlResponse>(
-                    EmaraPlayErrorCode.InternalServerError);
+            var walletResponse = await _walletService.GetEnvironmentAsync(
+                urlRequest.Environment, cancellationToken);
             var clientResponse = await _gameApiClient.GetLauncherUrlAsync(
-                environment.BaseUrl, urlRequest, cancellationToken);
+                walletResponse.Data.BaseUrl, urlRequest, cancellationToken);
             
             var response = new EmaraPlayGetLauncherUrlResponse(
                 0, "Success", clientResponse.Data.Data.Result);
