@@ -48,6 +48,12 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
             baseUrl, "rounddetails", urlRequest, cancellationToken);
     }
 
+    public Task<IResult<IHttpClientResult<EmaraPlayAwardResponse, EmaraPlayGameApiErrorResponse>>> GetAwardAsync(Uri baseUrl, EmaraPlayAwardRequest urlRequest, CancellationToken cancellationToken = default)
+    {
+        return PostAsync<EmaraPlayAwardResponse, EmaraPlayAwardRequest>(
+            baseUrl, "award", urlRequest, cancellationToken);
+    }
+
 
     private async Task<IResult<IHttpClientResult<TSuccess, EmaraPlayGameApiErrorResponse>>> PostAsync<TSuccess, TRequest>(
         Uri baseUrl,

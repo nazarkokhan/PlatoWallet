@@ -61,7 +61,7 @@ public sealed class WalletEmaraPlayController : RestApiController
     /// <summary>
     ///     Creates a launcher URL. 
     /// </summary>
-    /// <param name="urlRequest"></param>
+    /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>
     ///     <see cref="EmaraPlayGetLauncherUrlResponse"/>.
@@ -69,15 +69,15 @@ public sealed class WalletEmaraPlayController : RestApiController
     [HttpPost("launcher-url")]
     [ProducesResponseType(typeof(EmaraPlayGetLauncherUrlResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLauncherUrl(
-        [FromBody] EmaraPlayGetLauncherUrlRequest urlRequest,
+        [FromBody] EmaraPlayGetLauncherUrlRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(urlRequest, cancellationToken)).ToActionResult();
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     
     /// <summary>
     ///     Gets round's details.
     /// </summary>
-    /// <param name="urlRequest"></param>
+    /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>
     ///     <see cref="EmaraPlayGetRoundDetailsResponse"/>.
@@ -85,8 +85,23 @@ public sealed class WalletEmaraPlayController : RestApiController
     [HttpPost("round-details")]
     [ProducesResponseType(typeof(EmaraPlayGetRoundDetailsResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetRoundDetails(
-        [FromBody] EmaraPlayGetRoundDetailsRequest urlRequest,
+        [FromBody] EmaraPlayGetRoundDetailsRequest request,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(urlRequest, cancellationToken)).ToActionResult();
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    
+    /// <summary>
+    ///  Award endpoint will allow the operator to grant some free spins to a user with some
+    ///  feature such as game list, min bet, etc.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost("award")]
+    [ProducesResponseType(typeof(EmaraPlayAwardResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Award(
+        [FromBody] EmaraPlayAwardRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
 
