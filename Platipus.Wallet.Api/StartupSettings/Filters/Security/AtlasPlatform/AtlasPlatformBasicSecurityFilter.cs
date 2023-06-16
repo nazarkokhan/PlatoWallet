@@ -14,9 +14,15 @@ public sealed class AtlasPlatformBasicSecurityFilter : IAsyncActionFilter
     public async Task OnActionExecutionAsync(
         ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        byte[] bytes;
         string authHeader = context.HttpContext.Request.Headers["Authorization"]!;
         var encryptedClientData = authHeader.Replace("Basic", "");
-        byte[] bytes;
+        if (string.IsNullOrWhiteSpace(encryptedClientData))
+        {
+            context.Result = AtlasPlatformResultFactory.Failure<AtlasPlatformErrorResponse>(
+                AtlasPlatformErrorCode.RequiredHeaderHashNotPresent).ToActionResult();
+            return;
+        }
         try
         {
             bytes = Convert.FromBase64String(encryptedClientData);

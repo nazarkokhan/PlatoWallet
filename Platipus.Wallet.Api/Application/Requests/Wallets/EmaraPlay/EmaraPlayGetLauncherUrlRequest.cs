@@ -35,6 +35,9 @@ public sealed record EmaraPlayGetLauncherUrlRequest(
                 urlRequest.Environment, cancellationToken);
             var clientResponse = await _gameApiClient.GetLauncherUrlAsync(
                 walletResponse.Data.BaseUrl, urlRequest, cancellationToken);
+            if (clientResponse.IsFailure)
+                return EmaraPlayResultFactory.Failure<EmaraPlayGetLauncherUrlResponse>(
+                    EmaraPlayErrorCode.InternalServerError);
             
             var response = new EmaraPlayGetLauncherUrlResponse(
                 0, "Success", clientResponse.Data.Data.Result);
