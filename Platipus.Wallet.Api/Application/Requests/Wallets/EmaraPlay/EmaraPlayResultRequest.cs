@@ -39,6 +39,7 @@ public sealed record EmaraPlayResultRequest(
             if (walletResult.IsFailure)
                 return EmaraPlayResultFactory.Failure<EmaraPlayResultResponse>(EmaraPlayErrorCode.BadParameters);
 
+            //TODO dont repeat this code, just put wrapping in ResultFilter
             var response = new EmaraPlayResultResponse(((int)EmaraPlayErrorCode.Success).ToString(),
                 EmaraPlayErrorCode.Success.ToString(), 
                 new WinResult(walletResult.Data.Currency, walletResult.Data.Balance.ToString(CultureInfo.InvariantCulture), 

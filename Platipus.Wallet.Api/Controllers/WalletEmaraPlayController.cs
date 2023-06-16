@@ -9,31 +9,29 @@ using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
 using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
-namespace Platipus.Wallet.Api.Controllers;
+namespace Platipus.Wallet.Api.Controllers; //TODO namespace as 1 line of code everywhere
 
-[Route("wallet/emara-play/")]
+[Route("wallet/emara-play")]
 [ServiceFilter(typeof(EmaraPlayMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.EmaraPlay))]
-[ProducesResponseType(typeof(EmaraPlayErrorResponse), StatusCodes.Status200OK)]
+[ProducesResponseType(typeof(EmaraPlayErrorResponse), StatusCodes.Status200OK)] //TODO check this docs
 public sealed class WalletEmaraPlayController : RestApiController
 {
     private readonly IMediator _mediator;
 
     public WalletEmaraPlayController(IMediator mediator) => _mediator = mediator;
 
-    
     [HttpPost("authenticate")]
     [ProducesResponseType(typeof(EmaraPlayBaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Authenticate(
         [FromBody] EmaraPlayAuthenticateRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
+
     [HttpPost("balance")]
     [ProducesResponseType(typeof(EmaraPlayBalanceResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(EmaraPlayBalanceResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(EmaraPlayBalanceResponse), StatusCodes.Status401Unauthorized)] //TODO does it really responds with that?
     public async Task<IActionResult> Balance(
         [FromBody] EmaraPlayBalanceRequest request,
         CancellationToken cancellationToken)
@@ -45,21 +43,22 @@ public sealed class WalletEmaraPlayController : RestApiController
         [FromBody] EmaraPlayBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpPost("refund")]
     [ProducesResponseType(typeof(EmaraPlayRefundResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Refund(
         [FromBody] EmaraPlayRefundRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpPost("result")]
     [ProducesResponseType(typeof(EmaraPlayResultResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Result(
         [FromBody] EmaraPlayResultRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
+    // TODO Those are external controller endpoints, check other integrations, they have separate controller
     /// <summary>
     ///     Creates a launcher URL. 
     /// </summary>
@@ -74,8 +73,8 @@ public sealed class WalletEmaraPlayController : RestApiController
         [FromBody] EmaraPlayGetLauncherUrlRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
+
+
     /// <summary>
     ///     Gets round's details.
     /// </summary>
@@ -90,8 +89,8 @@ public sealed class WalletEmaraPlayController : RestApiController
         [FromBody] EmaraPlayGetRoundDetailsRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
+
+
     /// <summary>
     ///  Award endpoint will allow the operator to grant some free spins to a user with some
     ///  feature such as game list, min bet, etc.
@@ -105,8 +104,8 @@ public sealed class WalletEmaraPlayController : RestApiController
         [FromBody] EmaraPlayAwardRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
+
+
     /// <summary>
     ///     Cancel endpoint will allow the operator to cancel an awarded free spin campaign to a
     ///     user.
@@ -116,6 +115,7 @@ public sealed class WalletEmaraPlayController : RestApiController
     /// <returns>
     ///     <see cref="EmaraPlayCancelResponse"/>.
     /// </returns>
+    //TODO  summary is enough, use ProducesResponseType to describe response contract
     [HttpPost("cancel")]
     [ProducesResponseType(typeof(EmaraPlayCancelResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Cancel(
@@ -123,4 +123,3 @@ public sealed class WalletEmaraPlayController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
-

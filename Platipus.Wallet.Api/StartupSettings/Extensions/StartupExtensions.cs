@@ -116,8 +116,8 @@ public static class StartupExtensions
             .AddJsonOptions(nameof(CasinoProvider.EmaraPlay),
                 options =>
                 {
-                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; //TODO avoid it.
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; //TODO it is default policy anyway
                 })
             .AddJsonOptions(nameof(CasinoProvider.AtlasPlatform),
                 options =>

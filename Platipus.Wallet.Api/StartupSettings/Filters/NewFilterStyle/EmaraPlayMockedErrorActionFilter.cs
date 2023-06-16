@@ -19,18 +19,22 @@ public sealed class EmaraPlayMockedErrorActionFilter : AbstractMockedErrorAction
     {
         var request = (IEmaraPlayBaseRequest)baseRequest;
 
-        MockedErrorMethod? walletMethod = request switch
+
+        var walletMethod = request switch
         {
             EmaraPlayBalanceRequest => MockedErrorMethod.Balance,
             EmaraPlayBetRequest => MockedErrorMethod.Bet,
             EmaraPlayResultRequest => MockedErrorMethod.Win,
             EmaraPlayRefundRequest => MockedErrorMethod.Rollback,
-            _ => null
+            _ => throw new ArgumentOutOfRangeException(nameof(request))
         };
-        if (walletMethod is not null) 
-            return new MockedErrorIdentifiers(walletMethod!.Value, request.Token!, true);
-        
-        Logger.LogInformation("Unexpected request type encountered: {RequestType}", request.GetType().Name);
-        return null;
+        // TODO walletMethod is never null
+        // if (walletMethod is null)
+        // {
+        //     Logger.LogInformation("Unexpected request type encountered: {RequestType}", request.GetType().Name);
+        //     return null;
+        // }
+
+        return new MockedErrorIdentifiers(walletMethod, request.Token!, true);
     }
 }

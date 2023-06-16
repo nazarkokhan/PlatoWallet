@@ -55,8 +55,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
         {
             await semaphoreSlim.WaitAsync();
 
-
-            await Method(
+            await TryReplaceResponseWithMockedError(
                 executedContext,
                 mockedErrorIdentifiers.Value,
                 concurrencyKey);
@@ -71,7 +70,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
         }
     }
 
-    private async Task Method(
+    private async Task TryReplaceResponseWithMockedError(
         ActionExecutedContext executedContext,
         MockedErrorIdentifiers mockedErrorIdentifiers,
         string concurrencyKey)
@@ -144,7 +143,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
                 };
                 break;
             }
-            case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html or _:
+            default:
             {
                 httpContext.Items.Add(responseItem, mockedError.Body);
                 executedContext.Result = new ContentResult

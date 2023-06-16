@@ -396,6 +396,7 @@ public sealed class WalletService : IWalletService
     {
         try
         {
+            //TODO why accept nullable and then throw exception
             ArgumentNullException.ThrowIfNull(environment);
             
             var contextResponse = await _context.Set<GameEnvironment>()

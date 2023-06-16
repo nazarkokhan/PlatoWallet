@@ -12,11 +12,11 @@ using Platipus.Wallet.Infrastructure.Persistence;
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 public sealed record EmaraPlayBalanceRequest(
-        string Provider, string Token, string User) 
-        : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayBalanceResponse>>
+    string Provider,
+    string Token,
+    string User) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayBalanceResponse>>
 {
-    public sealed class Handler : 
-        IRequestHandler<EmaraPlayBalanceRequest, IEmaraPlayResult<EmaraPlayBalanceResponse>>
+    public sealed class Handler : IRequestHandler<EmaraPlayBalanceRequest, IEmaraPlayResult<EmaraPlayBalanceResponse>>
     {
         private readonly WalletDbContext _walletDbContext;
         private readonly ILogger<Handler> _logger;
@@ -28,31 +28,39 @@ public sealed record EmaraPlayBalanceRequest(
         }
 
         public async Task<IEmaraPlayResult<EmaraPlayBalanceResponse>> Handle(
-            EmaraPlayBalanceRequest request, CancellationToken cancellationToken)
+            EmaraPlayBalanceRequest request,
+            CancellationToken cancellationToken)
         {
-            try
+            try //TODO we will need to fix exception behaviour
             {
+                //TODO it
                 if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
                 {
                     return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.ProviderNotFound);
                 }
+
+                //just use
+                // var walletResult = await _walletService.GetBalanceAsync(request.Token)
                 var user = await _walletDbContext.Set<User>()
                     .AsNoTracking()
                     .TagWith("GetBalance")
-                    .Where(u => u.Username == request.User && 
-                                u.Sessions.Any(s => s.Id == request.Token) && 
-                                u.Casino.Provider == provider)
-                    .Select(u => new
-                    {
-                        Currency = u.Currency.Id,
-                        u.Balance,
-                        u.Casino.Provider,
-                    })
+                    .Where(
+                        u => u.Username == request.User
+                          && u.Sessions.Any(s => s.Id == request.Token)
+                          && u.Casino.Provider == provider)
+                    .Select(
+                        u => new
+                        {
+                            Currency = u.Currency.Id,
+                            u.Balance,
+                            u.Casino.Provider,
+                        })
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (user is null)
                     return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.PlayerNotFound);
 
+                // TODO if your contract with numbers is as strings just put it inside json settings to not repeat yourself
                 var balanceResult = new BalanceResult(user.Balance.ToString(CultureInfo.InvariantCulture), user.Currency);
                 var response = new EmaraPlayBalanceResponse(
                     ((int)EmaraPlayErrorCode.Success).ToString(),

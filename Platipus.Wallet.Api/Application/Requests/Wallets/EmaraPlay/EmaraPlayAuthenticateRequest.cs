@@ -23,6 +23,7 @@ public sealed record EmaraPlayAuthenticateRequest(
 
         public async Task<IEmaraPlayResult<EmaraPlayBaseResponse>> Handle(EmaraPlayAuthenticateRequest request, CancellationToken cancellationToken)
         {
+            //TODO it should not match this enum, just check it in security filter to match casino custom properties
             if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
             {
                 return EmaraPlayResultFactory.Failure<EmaraPlayBaseResponse>(EmaraPlayErrorCode.ProviderNotFound);
@@ -54,6 +55,8 @@ public sealed record EmaraPlayAuthenticateRequest(
                 Balance = user.Balance.ToString(CultureInfo.InvariantCulture)
             };
 
+            //TODO better put common logic inside dto, dont use magic strings
+            //TODO as i see in documentation, all wallet responses follow the same wrapper logic with generic Result property
             var response = new EmaraPlayBaseResponse(
                 ((int)EmaraPlayErrorCode.Success).ToString(),
                 "Success",

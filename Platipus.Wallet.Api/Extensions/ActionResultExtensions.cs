@@ -10,6 +10,7 @@ using StartupSettings.ActionResults;
 
 public static class ActionResultExtensions
 {
+    //TODO use this method, other methods are obsolete
     public static IActionResult ToActionResult(this IBaseResult result) => new BaseExternalActionResult(result);
 
     public static IActionResult ToActionResult(this IResult result) => new ExternalActionResult(result);
@@ -23,10 +24,10 @@ public static class ActionResultExtensions
     public static IActionResult ToActionResult(this IHub88Result result) => new Hub88ExternalActionResult(result);
 
     public static IActionResult ToActionResult(this ISoftswissResult result) => new SoftswissExternalActionResult(result);
-    
-    public static IActionResult ToActionResult(this IEmaraPlayResult result) => 
-        new EmaraPlayExternalActionResult(result);
 
-    public static IActionResult ToActionResult(this IAtlasPlatformResult result) => 
-        new AtlasPlatformExternalActionResult(result);
+    [Obsolete] //TODO remove, use BaseExternalActionResult
+    public static IActionResult ToActionResult(this IEmaraPlayResult result) => new EmaraPlayExternalActionResult(result);
+
+    [Obsolete]
+    public static IActionResult ToActionResult(this IAtlasPlatformResult result) => new AtlasPlatformExternalActionResult(result);
 }

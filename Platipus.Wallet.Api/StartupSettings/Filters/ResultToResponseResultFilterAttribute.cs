@@ -206,7 +206,8 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 }
             }
         }
-        
+
+        // TODO Old way of checking result, use BaseExternalActionResult
         if (context.Result is AtlasPlatformExternalActionResult { Result: { } atlasPlatformResult })
         {
             if (atlasPlatformResult.IsSuccess)
@@ -226,6 +227,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
             context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
+        // TODO Old way of checking result, use BaseExternalActionResult
         if (context.Result is EmaraPlayExternalActionResult { Result: { } emaraPlayResult })
         {
             if (emaraPlayResult.IsSuccess)

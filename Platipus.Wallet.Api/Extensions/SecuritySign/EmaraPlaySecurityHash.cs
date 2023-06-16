@@ -7,12 +7,12 @@ public static class EmaraPlaySecurityHash
 {
     public static bool IsValid(
         string externalHash,
-        byte[] data,
+        byte[] requestBodyBytes,
         string privateKey)
     {
-        var hmacHash = Compute(data, privateKey);
+        var correctHash = Compute(requestBodyBytes, privateKey);
 
-        var isValid = externalHash.Equals(hmacHash, StringComparison.InvariantCultureIgnoreCase);
+        var isValid = externalHash.Equals(correctHash, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }
@@ -21,11 +21,11 @@ public static class EmaraPlaySecurityHash
     {
         var privateKeyBytes = Encoding.UTF8.GetBytes(privateKey);
 
-        var hmacHashData = HMACSHA512.HashData(privateKeyBytes, data);
+        var resultHmacHashData = HMACSHA512.HashData(privateKeyBytes, data);
 
-        var hmacString = Convert.ToHexString(hmacHashData);
+        var result = Convert.ToHexString(resultHmacHashData);
 
-        return hmacString;
+        return result;
     }
 
 }

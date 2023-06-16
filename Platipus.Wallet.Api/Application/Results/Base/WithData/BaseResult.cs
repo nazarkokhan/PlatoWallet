@@ -2,9 +2,11 @@ namespace Platipus.Wallet.Api.Application.Results.Base.WithData;
 
 public record BaseResult<TError, TData> : BaseResult<TError>, IBaseResult<TError, TData>
 {
+    private readonly TData _data;
+
     public BaseResult(TData data)
     {
-        Data = data;
+        _data = data;
     }
 
     public BaseResult(
@@ -12,8 +14,8 @@ public record BaseResult<TError, TData> : BaseResult<TError>, IBaseResult<TError
         Exception? exception)
         : base(errorCode, exception)
     {
-        Data = default!;
+        _data = default!;
     }
 
-    public TData Data { get; }
+    public TData Data => IsSuccess ? _data : throw new Exception("Data is empty because result is failed");
 }

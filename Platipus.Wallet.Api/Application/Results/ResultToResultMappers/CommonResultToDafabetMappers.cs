@@ -19,7 +19,6 @@ public static class CommonResultToDafabetMappers
     {
         return source switch
         {
-            // ErrorCode.Success=> DafabetErrorCode.Success,
             ErrorCode.SecurityParameterIsInvalid or ErrorCode.SecurityParameterIsEmpty => DafabetErrorCode.InvalidHash,
             ErrorCode.BadParametersInTheRequest => DafabetErrorCode.MissingRequiredParameters,
             ErrorCode.SessionExpired or ErrorCode.SessionNotFound => DafabetErrorCode.InvalidToken,
@@ -28,6 +27,7 @@ public static class CommonResultToDafabetMappers
             ErrorCode.RoundNotFound => DafabetErrorCode.RoundNotFound,
             ErrorCode.TransactionNotFound => DafabetErrorCode.TransactionNotFound,
             ErrorCode.InsufficientFunds => DafabetErrorCode.InsufficientFunds,
+            // ReSharper disable once PatternIsRedundant
             ErrorCode.Unknown or _ => DafabetErrorCode.SystemError
         };
     }

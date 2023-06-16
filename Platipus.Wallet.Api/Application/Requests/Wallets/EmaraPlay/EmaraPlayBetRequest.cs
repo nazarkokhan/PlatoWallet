@@ -9,15 +9,33 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+//TODO fix spacing for request records everywhere for emara play
+// public sealed record EmaraPlayBetRequest(
+//     string User,
+//     string Game,
+//     string Bet,
+//     string Provider,
+//     string Token,
+//     string Transaction,
+//     string Amount,
+//     string? BonusCode,
+//     string? BonusAmount,
+//     List<Jackpot>? Jackpots, //TODO null assigning is redundant, it is deserialized anyway
+//     string? Ip) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayBetResponse>>
 public sealed record EmaraPlayBetRequest(
-    string User, string Game, string Bet, 
-    string Provider, string Token, string Transaction,
-    string Amount, string? BonusCode = null, string? BonusAmount = null, 
-    List<Jackpot>? Jackpots = null, 
+    string User,
+    string Game,
+    string Bet,
+    string Provider,
+    string Token,
+    string Transaction,
+    string Amount,
+    string? BonusCode = null,
+    string? BonusAmount = null,
+    List<Jackpot>? Jackpots = null,
     string? Ip = null) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayBetResponse>>
 {
-    public sealed class Handler :
-        IRequestHandler<EmaraPlayBetRequest, IEmaraPlayResult<EmaraPlayBetResponse>>
+    public sealed class Handler : IRequestHandler<EmaraPlayBetRequest, IEmaraPlayResult<EmaraPlayBetResponse>>
     {
         private readonly IWalletService _walletService;
 
@@ -27,23 +45,32 @@ public sealed record EmaraPlayBetRequest(
         }
 
         public async Task<IEmaraPlayResult<EmaraPlayBetResponse>> Handle(
-            EmaraPlayBetRequest request, CancellationToken cancellationToken)
+            EmaraPlayBetRequest request,
+            CancellationToken cancellationToken)
         {
             var walletResult = await _walletService.BetAsync(
                 request.Token,
                 request.Bet,
                 request.Transaction,
-                amount: Convert.ToDecimal(request.Amount),
+                Convert.ToDecimal(request.Amount), //TODO just accept decimal in contract
                 cancellationToken: cancellationToken);
-            
+
             if (walletResult.IsFailure)
+                //TODO write CommonResultToEmaraPlayMappers class because you just return 1 error for all any error from walletResult
+                // return walletResult.ToEmaraPlay<EmaraPlayBetResponse>();
                 return EmaraPlayResultFactory.Failure<EmaraPlayBetResponse>(EmaraPlayErrorCode.InternalServerError);
+            var data = walletResult.Data; //TODO just use variable to shorten code
 
             var betResult = new BetResult(
-                walletResult.Data.Currency, walletResult.Data.Balance.ToString(CultureInfo.InvariantCulture), 
-                walletResult.Data.Transaction.InternalId, walletResult.Data.Transaction.Id);
-            var response = new EmaraPlayBetResponse(((int)EmaraPlayErrorCode.Success).ToString(), 
-                EmaraPlayErrorCode.Success.ToString(), betResult);
+                data.Currency,
+                data.Balance.ToString(CultureInfo.InvariantCulture),
+                data.Transaction.InternalId,
+                data.Transaction.Id);
+
+            var response = new EmaraPlayBetResponse(
+                ((int)EmaraPlayErrorCode.Success).ToString(),
+                EmaraPlayErrorCode.Success.ToString(),
+                betResult);
 
             return EmaraPlayResultFactory.Success(response);
         }
