@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Models;
 using Platipus.Wallet.Api.Application.Responses.AtlasPlatform;
@@ -11,8 +12,7 @@ using Platipus.Wallet.Infrastructure.Persistence;
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform;
 
 public sealed record AtlasPlatformGetGamesRequest(
-    string? Token = null, 
-    string? CasinoId = null) : 
+    string? Token = null, string? CasinoId = "") : 
         IAtlasPlatformRequest, IRequest<IAtlasPlatformResult<AtlasPlatformGetGamesResponse>>
 {
     public sealed class Handler : 
@@ -34,7 +34,7 @@ public sealed record AtlasPlatformGetGamesRequest(
 
             IQueryable<CasinoGames> filteredCasinoGamesQuery;
 
-            if (casinoId is null)
+            if (string.IsNullOrWhiteSpace(casinoId))
             {
                 filteredCasinoGamesQuery = casinoGamesQuery
                     .Where(cg => cg.Casino.Provider == CasinoProvider.AtlasPlatform);

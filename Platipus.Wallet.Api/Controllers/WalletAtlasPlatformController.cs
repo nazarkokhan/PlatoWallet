@@ -107,14 +107,15 @@ public sealed class WalletAtlasPlatformController : RestApiController
         [FromBody] AtlasPlatformRefundRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
+
+
     /// <summary>
     ///     Using this method AP is able to get the list of casino games available for the integration.
     ///     Get games request is sent with Basic authentication.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
+    /// <param name="casinoId">Id of the Casino.</param>
     /// <returns>
     ///     <see cref="AtlasPlatformGetGamesResponse"/>.
     /// </returns>
@@ -124,6 +125,28 @@ public sealed class WalletAtlasPlatformController : RestApiController
     [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetGames(
         [FromBody] AtlasPlatformGetGamesRequest request,
+        CancellationToken cancellationToken, 
+        string? casinoId = "")
+    {
+        var requestToSend = request with { CasinoId = casinoId };
+        return (await _mediator.Send(requestToSend, cancellationToken)).ToActionResult();
+    }
+
+
+    /// <summary>
+    ///     Using this method AP is able to get the link for launching the game.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>
+    ///     <see cref="AtlasPlatformLaunchGameResponse"/>.
+    /// </returns>
+    [HttpPost("gameLaunch")]
+    [ServiceFilter(typeof(AtlasPlatformBasicSecurityFilter), Order = 2)]
+    [ProducesResponseType(typeof(AtlasPlatformLaunchGameResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> LaunchGame(
+        [FromBody] AtlasPlatformLaunchGameRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
