@@ -35,6 +35,9 @@ public sealed record EmaraPlayAwardRequest(
             
             var clientResponse = await _apiClient.GetAwardAsync(
                 walletResponse.Data.BaseUrl, request, cancellationToken);
+            if (clientResponse.IsFailure)
+                return EmaraPlayResultFactory.Failure<EmaraPlayAwardResponse>(
+                    EmaraPlayErrorCode.InternalServerError);
             
             var response = new EmaraPlayAwardResponse(
                 0, "Success", clientResponse.Data.Data.Result);
