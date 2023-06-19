@@ -1,13 +1,12 @@
-using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
-using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
-using Platipus.Wallet.Api.Application.Results.AtlasPlatform.WithData;
-using Platipus.Wallet.Api.Application.Results.EmaraPlay;
-using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
-using Result = Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base.Result;
+using Humanizer;
 
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+
+using Application.Requests.Wallets.AtlasPlatform.Base;
+using Application.Requests.Wallets.EmaraPlay.Base;
+using Platipus.Wallet.Api.Application.Results.AtlasPlatform.WithData;
+using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using System.Net.Mime;
 using System.Text.Json;
 using ActionResults;
@@ -204,54 +203,33 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
-            }
-        }
-
-        // TODO Old way of checking result, use BaseExternalActionResult
-        if (context.Result is AtlasPlatformExternalActionResult { Result: { } atlasPlatformResult })
-        {
-            if (atlasPlatformResult.IsSuccess)
-            {
-                if (atlasPlatformResult is IAtlasPlatformResult<object> objectResult)
-                {
-                    context.Result = new OkObjectResult(objectResult.Data);
+                case IEmaraPlayResult<object> { IsSuccess: true } emaraPlayResult:
+                    context.Result = new OkObjectResult(emaraPlayResult.Data);
                     return;
-                }
-                context.Result = new OkObjectResult(atlasPlatformResult);
-                return;
-            }
-
-            var errorCode = atlasPlatformResult.Error;
-            var errorResponse = new AtlasPlatformErrorResponse(errorCode.ToString(), (int)errorCode);
-            context.Result = new OkObjectResult(errorResponse);
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
-        }
-
-        // TODO Old way of checking result, use BaseExternalActionResult
-        if (context.Result is EmaraPlayExternalActionResult { Result: { } emaraPlayResult })
-        {
-            if (emaraPlayResult.IsSuccess)
-            {
-                if (emaraPlayResult is IEmaraPlayResult<object> objectResult)
+                case IEmaraPlayResult<object> emaraPlayResult:
                 {
-                    context.Result = new OkObjectResult(objectResult.Data);
-                    return;
+                    var errorCode = emaraPlayResult.Error;
+
+                    var errorResponse = new EmaraPlayErrorResponse(errorCode);
+
+                    context.Result = new OkObjectResult(errorResponse);
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
                 }
+                case IAtlasPlatformResult<object> { IsSuccess: true } atlasPlatformResult:
+                    context.Result = new OkObjectResult(atlasPlatformResult.Data);
+                    return;
+                case IAtlasPlatformResult<object> atlasPlatformResult:
+                {
+                    var errorCode = atlasPlatformResult.Error;
 
-                const EmaraPlayErrorCode emaraPlayErrorCode = EmaraPlayErrorCode.Success;
-                var emaraPlayBaseResponse = new EmaraPlayBaseResponse(((int)emaraPlayErrorCode).ToString(), 
-                    emaraPlayErrorCode.ToString(), new Result());
-                context.Result = new OkObjectResult(emaraPlayBaseResponse);
-                return;
+                    var errorResponse = new AtlasPlatformErrorResponse(errorCode.Humanize(), (int)errorCode);
+
+                    context.Result = new OkObjectResult(errorResponse);
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
             }
-
-            var errorCode = emaraPlayResult.Error;
-
-            var errorResponse = new EmaraPlayErrorResponse((int)errorCode, errorCode.ToString());
-
-            context.Result = new OkObjectResult(errorResponse);
-
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
         if (context.Result is PswExternalActionResult { Result: { } pswActionResult })

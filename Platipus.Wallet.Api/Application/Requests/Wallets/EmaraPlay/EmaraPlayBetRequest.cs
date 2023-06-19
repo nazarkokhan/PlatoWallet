@@ -5,6 +5,7 @@ using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
+using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
@@ -29,7 +30,7 @@ public sealed record EmaraPlayBetRequest(
     string Provider,
     string Token,
     string Transaction,
-    string Amount,
+    decimal Amount,
     string? BonusCode = null,
     string? BonusAmount = null,
     List<Jackpot>? Jackpots = null,
@@ -52,12 +53,11 @@ public sealed record EmaraPlayBetRequest(
                 request.Token,
                 request.Bet,
                 request.Transaction,
-                Convert.ToDecimal(request.Amount), //TODO just accept decimal in contract
+                request.Amount, //TODO just accept decimal in contract
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
                 //TODO write CommonResultToEmaraPlayMappers class because you just return 1 error for all any error from walletResult
-                // return walletResult.ToEmaraPlay<EmaraPlayBetResponse>();
                 return EmaraPlayResultFactory.Failure<EmaraPlayBetResponse>(EmaraPlayErrorCode.InternalServerError);
             var data = walletResult.Data; //TODO just use variable to shorten code
 

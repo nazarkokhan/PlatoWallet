@@ -11,7 +11,7 @@ public sealed record EmaraPlayAwardRequest(
     string? Environment, string User, string Count, string EndDate, 
     string Currency, List<string>? Games = null, string? Code = null,
     string? MinBet = "0", string? MaxBet = null, string? StartDate = null, 
-    string? Operator = null, string? Token = null) : 
+    string? Operator = null, string? Token = null, string? Provider = null) : 
     IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayAwardResponse>>
 {
     public sealed class Handler :
@@ -41,4 +41,5 @@ public sealed record EmaraPlayAwardRequest(
             return EmaraPlayResultFactory.Success(response);
         }
     }
+    
 }

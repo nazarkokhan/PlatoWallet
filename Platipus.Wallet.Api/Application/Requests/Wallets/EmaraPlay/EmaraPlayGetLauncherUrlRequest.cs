@@ -1,14 +1,12 @@
 ﻿using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
+using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 
-//TODO put using statements under namespace. namespace should be 1 line of code. You can change it in Rider settings
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
-//TODO Put external endpoints inside Requests/External/EmaraPlay
 public sealed record EmaraPlayGetLauncherUrlRequest(
     string Environment,
     string Operator,
@@ -22,10 +20,12 @@ public sealed record EmaraPlayGetLauncherUrlRequest(
     string Ip,
     string? User,
     string? Lobby = null,
-    string? Cashier = null) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayGetLauncherUrlResponse>>
+    string? Cashier = null) : IEmaraPlayBaseRequest, 
+        IRequest<IEmaraPlayResult<EmaraPlayCommonBoxResponse<EmaraplayGetLauncherResult>>>
 {
     public sealed class Handler
-        : IRequestHandler<EmaraPlayGetLauncherUrlRequest, IEmaraPlayResult<EmaraPlayGetLauncherUrlResponse>>
+        : IRequestHandler<EmaraPlayGetLauncherUrlRequest, 
+            IEmaraPlayResult<EmaraPlayCommonBoxResponse<EmaraplayGetLauncherResult>>>
     {
         private readonly IEmaraPlayGameApiClient _gameApiClient;
         private readonly IWalletService _walletService;
@@ -38,21 +38,27 @@ public sealed record EmaraPlayGetLauncherUrlRequest(
             _walletService = walletService;
         }
 
-        public async Task<IEmaraPlayResult<EmaraPlayGetLauncherUrlResponse>> Handle(
+        public async Task<IEmaraPlayResult<EmaraPlayCommonBoxResponse<EmaraplayGetLauncherResult>>> Handle(
             EmaraPlayGetLauncherUrlRequest urlRequest,
             CancellationToken cancellationToken)
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(urlRequest.Environment, cancellationToken);
-
-            //TODO so you get walletResponse.Data.BaseUrl and what is going to happen when result is failed? Add IsFailed check
+            
             var clientResponse = await _gameApiClient.GetLauncherUrlAsync(
                 walletResponse.Data.BaseUrl,
                 urlRequest,
                 cancellationToken);
+            
+            if (clientResponse.IsFailure)
+                return EmaraPlayResultFactory.Failure<EmaraPlayCommonBoxResponse<EmaraplayGetLauncherResult>>(
+                    EmaraPlayErrorCode.InternalServerError);
 
-            // TODO again magic strings and numbers. Anyway this is external call and there is no need to follow wallet methods contract
-            var response = new EmaraPlayGetLauncherUrlResponse(0, "Success", clientResponse.Data.Data.Result);
+            var response = new EmaraPlayCommonBoxResponse<EmaraplayGetLauncherResult>(
+                new EmaraplayGetLauncherResult(clientResponse.Data.Data.Result.Url)
+                );
             return EmaraPlayResultFactory.Success(response);
         }
     }
+
+    public string? Provider { get; }
 }

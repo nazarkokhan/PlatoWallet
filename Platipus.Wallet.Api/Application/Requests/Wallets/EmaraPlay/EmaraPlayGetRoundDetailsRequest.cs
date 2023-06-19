@@ -37,9 +37,15 @@ public sealed record EmaraPlayGetRoundDetailsRequest(
             var clientResponse = await _apiClient.GetRoundDetailsAsync(
                 walletResponse.Data.BaseUrl, request, cancellationToken);
             
+            if(clientResponse.IsFailure)
+                return EmaraPlayResultFactory.Failure<EmaraPlayGetRoundDetailsResponse>(
+                    EmaraPlayErrorCode.InternalServerError);
+            
             var response = new EmaraPlayGetRoundDetailsResponse(
                 0, "Success", clientResponse.Data.Data.Result);
             return EmaraPlayResultFactory.Success(response);
         }
     }
+
+    public string? Provider { get; }
 }

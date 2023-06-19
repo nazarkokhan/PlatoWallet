@@ -11,20 +11,23 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
 {
-    public async Task OnActionExecutionAsync( //TODO fix spacing
-        ActionExecutingContext context,
+    private readonly WalletDbContext _dbContext;
+
+    public EmaraPlaySecurityFilter(WalletDbContext walletDbContext)
+    {
+        _dbContext = walletDbContext;
+    }
+
+    public async Task OnActionExecutionAsync(
+        ActionExecutingContext context, 
         ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
             .OfType<IEmaraPlayBaseRequest>()
             .Single();
+        
 
-        var httpContext = context.HttpContext;
-
-        //TODO check if can be resolved from constructor, using service locator is not good
-        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
-
-        var session = await dbContext
+        var session = await _dbContext
             .Set<Session>()
             .Where(s => s.Id == request.Token)
             .Select(
@@ -32,7 +35,7 @@ public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
                 {
                     s.ExpirationDate,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
-                    // CasinoProvider = s.User.Casino.Params.EmaraPlayProvider,//TODO
+                    CasinoProvider = s.User.Casino.Params.EmaraPlayProvider
                 })
             .FirstOrDefaultAsync();
 

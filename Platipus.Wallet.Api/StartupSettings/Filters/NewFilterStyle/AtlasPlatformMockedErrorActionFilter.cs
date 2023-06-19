@@ -2,7 +2,6 @@
 using Platipus.Wallet.Api.Application.Requests.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle.Other;
 using Platipus.Wallet.Domain.Entities.Enums;
 

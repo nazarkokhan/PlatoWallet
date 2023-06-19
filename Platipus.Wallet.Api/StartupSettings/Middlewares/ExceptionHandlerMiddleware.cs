@@ -56,9 +56,7 @@ public class ExceptionHandlerMiddleware : IMiddleware
     {
         const EmaraPlayErrorCode errorCode = EmaraPlayErrorCode.InternalServerError;
         const int code = (int)errorCode;
-        return new EmaraPlayErrorResponse(
-            code,
-            errorCode.ToString());
+        return new EmaraPlayErrorResponse(errorCode);
     }
 
     private static object GetPswErrorResponse()

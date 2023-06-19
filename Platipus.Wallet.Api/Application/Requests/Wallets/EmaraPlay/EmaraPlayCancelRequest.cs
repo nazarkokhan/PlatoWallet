@@ -7,7 +7,6 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
-//TODO separate out controller contract from contract that is accepted by game server.
 public sealed record EmaraPlayCancelRequest(
     string? Environment, //TODO cant be null
     string Ref, //TODO the rest of parameters in separate record, this record should exactly replicate game server contract
@@ -39,4 +38,6 @@ public sealed record EmaraPlayCancelRequest(
             return EmaraPlayResultFactory.Success(finalResponse);
         }
     }
+
+    public string? Provider { get; }
 }

@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform;
-using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
-using Platipus.Wallet.Api.Application.Responses.AtlasPlatform;
-using Platipus.Wallet.Api.Controllers.Abstract;
-using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.StartupSettings.ControllerSpecificJsonOptions;
-using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
-using Platipus.Wallet.Api.StartupSettings.Filters.Security.AtlasPlatform;
-using Platipus.Wallet.Domain.Entities.Enums;
+﻿namespace Platipus.Wallet.Api.Controllers;
 
-namespace Platipus.Wallet.Api.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Application.Requests.Wallets.AtlasPlatform;
+using Application.Requests.Wallets.AtlasPlatform.Base;
+using Application.Responses.AtlasPlatform;
+using Abstract;
+using Extensions;
+using StartupSettings.ControllerSpecificJsonOptions;
+using StartupSettings.Filters.NewFilterStyle;
+using StartupSettings.Filters.Security.AtlasPlatform;
+using Domain.Entities.Enums;
 
 [Route("wallet/atlas-platform/")]
 [ServiceFilter(typeof(AtlasPlatformMockedErrorActionFilter), Order = 1)]

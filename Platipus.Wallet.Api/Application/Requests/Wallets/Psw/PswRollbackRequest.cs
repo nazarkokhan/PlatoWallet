@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Psw;
 
 using Base;
@@ -44,6 +46,7 @@ public record PswRollbackRequest(
         }
     }
 
+    [UsedImplicitly]
     public class Validator : AbstractValidator<PswRollbackRequest>
     {
         public Validator()

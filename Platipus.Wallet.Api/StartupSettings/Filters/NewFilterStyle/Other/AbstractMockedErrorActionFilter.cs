@@ -6,9 +6,9 @@ using LazyCache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Requests.Base;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Application.Requests.Base;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 {
@@ -69,7 +69,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
             semaphoreSlim.Release();
         }
     }
-
+    
     private async Task TryReplaceResponseWithMockedError(
         ActionExecutedContext executedContext,
         MockedErrorIdentifiers mockedErrorIdentifiers,

@@ -36,7 +36,8 @@ public sealed record EmaraPlayBalanceRequest(
                 //TODO it
                 if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
                 {
-                    return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.ProviderNotFound);
+                    return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode
+                        .ProviderNotFound);
                 }
 
                 //just use
@@ -46,8 +47,8 @@ public sealed record EmaraPlayBalanceRequest(
                     .TagWith("GetBalance")
                     .Where(
                         u => u.Username == request.User
-                          && u.Sessions.Any(s => s.Id == request.Token)
-                          && u.Casino.Provider == provider)
+                             && u.Sessions.Any(s => s.Id == request.Token)
+                             && u.Casino.Provider == provider)
                     .Select(
                         u => new
                         {
@@ -61,7 +62,8 @@ public sealed record EmaraPlayBalanceRequest(
                     return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.PlayerNotFound);
 
                 // TODO if your contract with numbers is as strings just put it inside json settings to not repeat yourself
-                var balanceResult = new BalanceResult(user.Balance.ToString(CultureInfo.InvariantCulture), user.Currency);
+                var balanceResult =
+                    new BalanceResult(user.Balance.ToString(CultureInfo.InvariantCulture), user.Currency);
                 var response = new EmaraPlayBalanceResponse(
                     ((int)EmaraPlayErrorCode.Success).ToString(),
                     EmaraPlayErrorCode.Success.ToString(),
@@ -72,7 +74,8 @@ public sealed record EmaraPlayBalanceRequest(
             catch (Exception e)
             {
                 _logger.LogError(e, "Common wallet service GetBalance unknown exception");
-                return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.InternalServerError, e);
+                return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.InternalServerError,
+                    e);
             }
         }
     }

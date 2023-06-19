@@ -9,10 +9,8 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 
 public sealed class EmaraPlayMockedErrorActionFilter : AbstractMockedErrorActionFilter
 {
-    public EmaraPlayMockedErrorActionFilter(ILogger<EmaraPlayMockedErrorActionFilter> logger) 
-        : base(logger)
-    {
-    }
+    public EmaraPlayMockedErrorActionFilter(
+        ILogger<EmaraPlayMockedErrorActionFilter> logger) : base(logger) { }
 
     protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(
         IBaseWalletRequest baseRequest, ActionExecutedContext actionExecutedContext)
@@ -26,15 +24,10 @@ public sealed class EmaraPlayMockedErrorActionFilter : AbstractMockedErrorAction
             EmaraPlayBetRequest => MockedErrorMethod.Bet,
             EmaraPlayResultRequest => MockedErrorMethod.Win,
             EmaraPlayRefundRequest => MockedErrorMethod.Rollback,
+            EmaraPlayAuthenticateRequest => MockedErrorMethod.Authenticate,
             _ => throw new ArgumentOutOfRangeException(nameof(request))
         };
-        // TODO walletMethod is never null
-        // if (walletMethod is null)
-        // {
-        //     Logger.LogInformation("Unexpected request type encountered: {RequestType}", request.GetType().Name);
-        //     return null;
-        // }
-
+        
         return new MockedErrorIdentifiers(walletMethod, request.Token!, true);
     }
 }
