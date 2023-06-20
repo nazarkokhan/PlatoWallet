@@ -7,20 +7,13 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using System.ComponentModel;
+using Services.EmaraPlayGamesApi.Requests;
+
 public sealed record EmaraPlayGetLauncherUrlRequest(
-    string Environment,
-    string Operator,
-    string? Token,
-    string Game,
-    string Mode,
-    string Lang,
-    string Channel,
-    string Jurisdiction,
-    string Currency,
-    string Ip,
-    string? User,
-    string? Lobby = null,
-    string? Cashier = null) : IEmaraPlayBaseRequest, 
+    [property: DefaultValue("local")]string Environment,
+    EmaraplayGetLauncherUrlGameApiRequest ApiRequest,
+    string? Token) : IEmaraPlayBaseRequest, 
         IRequest<IEmaraPlayResult<EmaraPlayCommonBoxResponse<EmaraplayGetLauncherResult>>>
 {
     public sealed class Handler
@@ -46,7 +39,7 @@ public sealed record EmaraPlayGetLauncherUrlRequest(
             
             var clientResponse = await _gameApiClient.GetLauncherUrlAsync(
                 walletResponse.Data.BaseUrl,
-                urlRequest,
+                urlRequest.ApiRequest,
                 cancellationToken);
             
             if (clientResponse.IsFailure)
@@ -59,6 +52,4 @@ public sealed record EmaraPlayGetLauncherUrlRequest(
             return EmaraPlayResultFactory.Success(response);
         }
     }
-
-    public string? Provider { get; }
 }

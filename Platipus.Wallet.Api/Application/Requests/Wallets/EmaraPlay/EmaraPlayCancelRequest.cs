@@ -1,16 +1,16 @@
-﻿using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
+
+using Base;
+using Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
-using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
+using Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
-
-namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
+using Services.EmaraPlayGamesApi.Requests;
 
 public sealed record EmaraPlayCancelRequest(
-    string? Environment, //TODO cant be null
-    string Ref, //TODO the rest of parameters in separate record, this record should exactly replicate game server contract
-    string? Operator = null, //TODO there is no point to use optional parameters as it is deserialized from json
+    string Environment,
+    EmaraplayCancelGameApiRequest ApiRequest,
     string? Token = null) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayCancelResponse>>
 {
     public sealed class Handler : IRequestHandler<EmaraPlayCancelRequest, IEmaraPlayResult<EmaraPlayCancelResponse>>
@@ -32,12 +32,10 @@ public sealed record EmaraPlayCancelRequest(
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(request.Environment, cancellationToken);
 
-            await _apiClient.CancelAsync(walletResponse.Data.BaseUrl, request, cancellationToken);
+            await _apiClient.CancelAsync(walletResponse.Data.BaseUrl, request.ApiRequest, cancellationToken);
 
-            var finalResponse = new EmaraPlayCancelResponse(0, "Success");
+            var finalResponse = new EmaraPlayCancelResponse(EmaraPlayErrorCode.Success);
             return EmaraPlayResultFactory.Success(finalResponse);
         }
     }
-
-    public string? Provider { get; }
 }

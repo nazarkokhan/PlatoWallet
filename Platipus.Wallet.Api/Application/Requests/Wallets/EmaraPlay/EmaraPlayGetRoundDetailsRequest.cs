@@ -7,10 +7,12 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using Application.Results.ResultToResultMappers;
+using Services.EmaraPlayGamesApi.Requests;
+
 public sealed record EmaraPlayGetRoundDetailsRequest(
-    string? Environment, string Bet, 
-    string? User = null, string? Game = null,
-    string? Operator = null, string? Currency = null,
+    string Environment, 
+    EmaraplayGetRoundDetailsGameApiRequest ApiRequest,
     string? Token = null) : 
         IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayGetRoundDetailsResponse>>
 {
@@ -35,17 +37,13 @@ public sealed record EmaraPlayGetRoundDetailsRequest(
                 request.Environment, cancellationToken);
             
             var clientResponse = await _apiClient.GetRoundDetailsAsync(
-                walletResponse.Data.BaseUrl, request, cancellationToken);
+                walletResponse.Data.BaseUrl, request.ApiRequest, cancellationToken);
             
-            if(clientResponse.IsFailure)
-                return EmaraPlayResultFactory.Failure<EmaraPlayGetRoundDetailsResponse>(
-                    EmaraPlayErrorCode.InternalServerError);
+            if (clientResponse.IsFailure)
+                return clientResponse.ToEmaraPlayResult<EmaraPlayGetRoundDetailsResponse>();
             
-            var response = new EmaraPlayGetRoundDetailsResponse(
-                0, "Success", clientResponse.Data.Data.Result);
+            var response = new EmaraPlayGetRoundDetailsResponse(clientResponse.Data.Data.Result);
             return EmaraPlayResultFactory.Success(response);
         }
     }
-
-    public string? Provider { get; }
 }

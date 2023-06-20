@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
+﻿using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Models;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;

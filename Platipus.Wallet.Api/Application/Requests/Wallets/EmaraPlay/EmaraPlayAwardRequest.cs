@@ -8,12 +8,12 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using Services.EmaraPlayGamesApi.Requests;
+
 public sealed record EmaraPlayAwardRequest(
-    string? Environment, string User, string Count, string EndDate, 
-    string Currency, List<string>? Games = null, string? Code = null,
-    string? MinBet = "0", string? MaxBet = null, string? StartDate = null, 
-    string? Operator = null, string? Token = null, string? Provider = null) : 
-    IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayAwardResponse>>
+    string Environment, 
+    EmaraplayAwardGameApiRequest ApiRequest, 
+    string? Token = null) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayAwardResponse>>
 {
     public sealed class Handler :
         IRequestHandler<EmaraPlayAwardRequest, IEmaraPlayResult<EmaraPlayAwardResponse>>
@@ -35,7 +35,7 @@ public sealed record EmaraPlayAwardRequest(
                 request.Environment, cancellationToken);
             
             var clientResponse = await _apiClient.GetAwardAsync(
-                walletResponse.Data.BaseUrl, request, cancellationToken);
+                walletResponse.Data.BaseUrl, request.ApiRequest, cancellationToken);
 
             if (clientResponse.IsFailure)
                 return EmaraPlayResultFactory.Failure<EmaraPlayAwardResponse>(
@@ -47,5 +47,4 @@ public sealed record EmaraPlayAwardRequest(
             return EmaraPlayResultFactory.Success(response);
         }
     }
-    
 }

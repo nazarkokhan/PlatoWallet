@@ -21,6 +21,8 @@ public static class CommonResultToEmaraPlayMappers
         return source switch
         {
             ErrorCode.UserIsDisabled => EmaraPlayErrorCode.GameIsNotFoundOrDisabled,
+            ErrorCode.CasinoNotFound => EmaraPlayErrorCode.ProviderNotFound,
+            
             ErrorCode.Unknown or _ => EmaraPlayErrorCode.Success
         };
     }

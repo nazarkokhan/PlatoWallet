@@ -6,5 +6,4 @@ public interface IEmaraPlayBaseRequest : IBaseWalletRequest
 {
     public string? Token { get; }
     
-    public string? Provider { get; }
 }
