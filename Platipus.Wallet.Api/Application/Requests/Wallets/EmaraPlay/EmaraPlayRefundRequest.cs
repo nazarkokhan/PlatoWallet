@@ -1,15 +1,13 @@
-﻿using System.Globalization;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
+
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
-using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
+using Base;
+using Responses;
+using Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Domain.Entities.Enums;
-using Platipus.Wallet.Infrastructure.Persistence;
-
-namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public sealed record EmaraPlayRefundRequest(
     string User, string Transaction, 
@@ -34,17 +32,12 @@ public sealed record EmaraPlayRefundRequest(
         {
             try
             {
-                if (!Enum.TryParse(request.Provider, out CasinoProvider provider))
-                {
-                    return EmaraPlayResultFactory.Failure<EmaraPlayRefundResponse>(EmaraPlayErrorCode.ProviderNotFound);
-                }
                 var dbTransaction = await _walletDbContext.Database.BeginTransactionAsync(cancellationToken);
 
                 var user = await _walletDbContext.Set<User>()
                     .TagWith("Refund")
                     .Where(u => u.Username == request.User &&
-                            u.Sessions.Any(s => s.Id == request.Token) &&
-                            u.Casino.Provider == provider)
+                            u.Sessions.Any(s => s.Id == request.Token))
                     .Include(
                         u => u.Rounds.Where(
                             r => r.Id == request.Bet && 
@@ -86,10 +79,8 @@ public sealed record EmaraPlayRefundRequest(
 
                 await dbTransaction.CommitAsync(cancellationToken);
 
-                var refundResult = new RefundResult(user.Currency.Id, user.Balance.ToString(CultureInfo.InvariantCulture), 
-                    transaction.Id, transaction.InternalId);
-                var response = new EmaraPlayRefundResponse(((int)EmaraPlayErrorCode.Success).ToString(), 
-                    EmaraPlayErrorCode.Success.ToString(), refundResult);
+                var refundResult = new RefundResult(user.Currency.Id, user.Balance, transaction.Id, transaction.InternalId);
+                var response = new EmaraPlayRefundResponse(refundResult);
 
                 return EmaraPlayResultFactory.Success(response);
             }

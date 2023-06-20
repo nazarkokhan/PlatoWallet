@@ -1,6 +1,3 @@
-using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
-using Platipus.Wallet.Api.Application.Results.EmaraPlay;
-
 namespace Platipus.Wallet.Api.Extensions;
 
 using Application.Results.Base;

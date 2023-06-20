@@ -2,5 +2,7 @@
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 
-public sealed record EmaraPlayResultResponse(
-    string Error, string Description, WinResult Result);
+using Base;
+
+public sealed record EmaraPlayResultResponse(EmaraplayWinResult Result) 
+    : EmaraPlayCommonBoxResponse<EmaraplayWinResult>(Result);

@@ -1,5 +1,6 @@
 ﻿using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
+using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
@@ -35,9 +36,14 @@ public sealed record EmaraPlayAwardRequest(
             
             var clientResponse = await _apiClient.GetAwardAsync(
                 walletResponse.Data.BaseUrl, request, cancellationToken);
+
+            if (clientResponse.IsFailure)
+                return EmaraPlayResultFactory.Failure<EmaraPlayAwardResponse>(
+                    EmaraPlayErrorCode.InternalServerError);
             
+            var data = clientResponse.Data.Data.Result;
             var response = new EmaraPlayAwardResponse(
-                0, "Success", clientResponse.Data.Data.Result);
+                new EmaraplayAwardResult(data.Ref));
             return EmaraPlayResultFactory.Success(response);
         }
     }

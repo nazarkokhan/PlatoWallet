@@ -9,9 +9,11 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using Application.Results.ResultToResultMappers;
+
 public sealed record EmaraPlayResultRequest(
         string User, string Game, string Bet, 
-        string Amount, string Transaction, string Provider, 
+        decimal Amount, string Transaction, string Provider, 
         string Token, string CloseRound, string BetBonusAmount, 
         List<Jackpot>? Jackpots = null, string? BonusCode = null, 
         string? BonusAmount = null, List<Detail>? Details = null, string? Spins = null) 
@@ -34,17 +36,17 @@ public sealed record EmaraPlayResultRequest(
                 request.Token,
                 request.Bet,
                 request.Transaction,
-                decimal.Parse(request.Amount), cancellationToken: cancellationToken);
+                request.Amount, cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return EmaraPlayResultFactory.Failure<EmaraPlayResultResponse>(EmaraPlayErrorCode.BadParameters);
+                return walletResult.ToEmaraPlayResult<EmaraPlayResultResponse>();
 
-            //TODO dont repeat this code, just put wrapping in ResultFilter
-            var response = new EmaraPlayResultResponse(((int)EmaraPlayErrorCode.Success).ToString(),
-                EmaraPlayErrorCode.Success.ToString(), 
-                new WinResult(walletResult.Data.Currency, walletResult.Data.Balance.ToString(CultureInfo.InvariantCulture), 
-                    walletResult.Data.Transaction.Id, walletResult.Data.Transaction.InternalId));
+            var walletData = walletResult.Data;
+            var winResult = new EmaraplayWinResult(walletData.Currency,
+                walletData.Balance,
+                walletData.Transaction.Id, walletData.Transaction.InternalId);
 
+            var response = new EmaraPlayResultResponse(winResult);
             return EmaraPlayResultFactory.Success(response);
 
         }

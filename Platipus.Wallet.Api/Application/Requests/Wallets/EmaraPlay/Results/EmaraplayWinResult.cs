@@ -2,6 +2,6 @@
 
 using Base;
 
-public sealed record RefundResult(
+public sealed record EmaraplayWinResult(
     string Currency, decimal Balance, string Transaction, 
     string TxId, string? Bonus = null, string? Promo = null) : IEmaraPlayBaseResponse;

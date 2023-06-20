@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Base;
 using Platipus.Wallet.Api.Application.Requests.Wallets.AtlasPlatform.Models;
 using Platipus.Wallet.Api.Application.Responses.AtlasPlatform;

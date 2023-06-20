@@ -5,6 +5,7 @@ using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
 using Platipus.Wallet.Domain.Entities;
+using Platipus.Wallet.Domain.Entities.Enums;
 using Platipus.Wallet.Infrastructure.Persistence;
 
 namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
@@ -38,7 +39,7 @@ public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
                     CasinoProvider = s.User.Casino.Params.EmaraPlayProvider
                 })
             .FirstOrDefaultAsync();
-
+        
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = EmaraPlayResultFactory
@@ -47,8 +48,23 @@ public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
             return;
         }
 
-        string authHeader = context.HttpContext.Request.Headers.Authorization!;
+        const int emaraplayProviderId = (int)CasinoProvider.EmaraPlay; 
+        if (!session.CasinoProvider.Equals(emaraplayProviderId.ToString()))
+        {
+            context.Result = EmaraPlayResultFactory
+                .Failure<EmaraPlayErrorResponse>(EmaraPlayErrorCode.PlayerAuthenticationFailed)
+                .ToActionResult();
+            return;
+        }
 
+        string authHeader = context.HttpContext.Request.Headers.Authorization!;
+        if (string.IsNullOrWhiteSpace(authHeader))
+        {
+            context.Result = EmaraPlayResultFactory.Failure<EmaraPlayErrorResponse>(
+                EmaraPlayErrorCode.PlayerAuthenticationFailed).ToActionResult();
+            return;
+        }
+        
         authHeader = authHeader.Replace("Bearer ", "");
 
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
@@ -57,7 +73,8 @@ public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
 
         if (!result)
         {
-            context.Result = EmaraPlayResultFactory.Failure(EmaraPlayErrorCode.InvalidHashCode).ToActionResult();
+            context.Result = EmaraPlayResultFactory.Failure<EmaraPlayErrorResponse>(
+                EmaraPlayErrorCode.InvalidHashCode).ToActionResult();
             return;
         }
 
