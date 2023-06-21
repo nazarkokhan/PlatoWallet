@@ -36,7 +36,7 @@ public sealed record AtlasPlatformGetGamesRequest(
             if (string.IsNullOrWhiteSpace(casinoId))
             {
                 filteredCasinoGamesQuery = casinoGamesQuery
-                    .Where(cg => cg.Casino.Provider == CasinoProvider.AtlasPlatform);
+                    .Where(cg => cg.Casino.Provider == CasinoProvider.Atlas);
             }
             else
             {

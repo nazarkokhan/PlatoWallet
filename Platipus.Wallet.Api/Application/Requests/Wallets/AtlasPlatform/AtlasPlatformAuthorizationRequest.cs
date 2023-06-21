@@ -35,7 +35,7 @@ public sealed record AtlasPlatformAuthorizationRequest(
                 })
                 .Where(u => u.Username == request.Username &&
                             u.Password == request.Password && 
-                            u.CasinoProvider == CasinoProvider.AtlasPlatform)
+                            u.CasinoProvider == CasinoProvider.Atlas)
                 .FirstOrDefaultAsync(cancellationToken: cancellationToken);
             
             if (user is null)

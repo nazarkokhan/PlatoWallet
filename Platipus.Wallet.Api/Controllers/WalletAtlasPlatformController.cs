@@ -14,7 +14,7 @@ using Domain.Entities.Enums;
 [Route("wallet/atlas-platform/")]
 [ServiceFilter(typeof(AtlasPlatformMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(AtlasPlatformSecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.AtlasPlatform))]
+[JsonSettingsName(nameof(CasinoProvider.Atlas))]
 [ProducesResponseType(typeof(AtlasPlatformErrorResponse), StatusCodes.Status200OK)]
 public sealed class WalletAtlasPlatformController : RestApiController
 {

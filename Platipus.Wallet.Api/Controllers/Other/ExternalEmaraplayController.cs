@@ -7,7 +7,7 @@ using Abstract;
 using Extensions;
 
 
-[Route("external/emara-play")]
+[Route("wallet/emara-play")]
 public sealed class ExternalEmaraplayController : RestApiController
 {
     private readonly IMediator _mediator;
