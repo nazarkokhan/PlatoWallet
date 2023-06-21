@@ -9,6 +9,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Services.EmaraPlayGamesApi;
 using Services.GamesGlobalGamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
@@ -20,7 +21,6 @@ using Services.SoftswissGamesApi;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
 
-//TODO launchmode for oponbox, uis, psw
 public record LogInRequest(
         [property: DefaultValue("openbox")] string UserName,
         [property: DefaultValue("password")] string Password,
@@ -40,6 +40,7 @@ public record LogInRequest(
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
+        private readonly IEmaraPlayGameApiClient _emaraPlayGameApiClient;
         private readonly IReevoGameApiClient _reevoGameApiClient;
         private readonly SoftswissCurrenciesOptions _currencyMultipliers;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -52,7 +53,8 @@ public record LogInRequest(
             IGamesGlobalGamesApiClient globalGamesApiClient,
             IReevoGameApiClient reevoGameApiClient,
             IOptions<SoftswissCurrenciesOptions> currencyMultipliers, 
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor, 
+            IEmaraPlayGameApiClient emaraPlayGameApiClient)
         {
             _context = context;
             _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
@@ -61,10 +63,12 @@ public record LogInRequest(
             _globalGamesApiClient = globalGamesApiClient;
             _reevoGameApiClient = reevoGameApiClient;
             _httpContextAccessor = httpContextAccessor;
+            _emaraPlayGameApiClient = emaraPlayGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
-        public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
+        public async Task<IResult<Response>> Handle(
+            LogInRequest request, CancellationToken cancellationToken)
         {
             var casino = await _context.Set<Casino>()
                 .Where(c => c.Id == request.CasinoId)
