@@ -9,7 +9,9 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Results.EmaraPlay;
 using Services.EmaraPlayGamesApi;
+using Services.EmaraPlayGamesApi.Requests;
 using Services.GamesGlobalGamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
@@ -19,6 +21,7 @@ using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
 using StartupSettings.Options;
+using Wallets.EmaraPlay.Base;
 using Wallets.Psw.Base.Response;
 
 public record LogInRequest(
@@ -30,7 +33,8 @@ public record LogInRequest(
         [property: DefaultValue("some_lobby_url")] string? Lobby,
         LaunchMode LaunchMode,
         [property: DefaultValue(null)] int? PswRealityCheck,
-        [property: DefaultValue(null)] string? Device)
+        [property: DefaultValue(null)] string? Device,
+        [property: DefaultValue("en")] string? Language)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
@@ -145,12 +149,18 @@ public record LogInRequest(
                     {
                         ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
                     }
-                    launchUrl = GetEmaraPlayLaunchUrlAsync(
-                        baseUrl, request.Game, session.Id, 
-                        request.LaunchMode, "en", casino.Provider.ToString(), 
-                        request.Device, currency: user.Currency.Id, 
-                        ip: ip, user: request.UserName, lobby: request.Lobby, 
-                        cashier: null, jurisdiction: null);
+
+                    var apiRequest = new EmaraplayGetLauncherUrlGameApiRequest(
+                        request.CasinoId, request.Game, 
+                        request.LaunchMode.ToString(), request.Language!, 
+                        "someChannel", "someJurisdiction",
+                        user.Currency.Id, ip!, User: request.UserName, Lobby: request.Lobby, 
+                        Cashier: "someCashier", Token: session.Id);
+                    var apiResponse = await _emaraPlayGameApiClient.GetLauncherUrlAsync(
+                        baseUrl, apiRequest, cancellationToken: cancellationToken);
+                    if (apiResponse.IsFailure)
+                        EmaraPlayResultFactory.Failure<EmaraPlayErrorResponse>(EmaraPlayErrorCode.InternalServerError);
+                    launchUrl = apiResponse.Data.Data.Result.Url.ToString()!;
                     break;
                 }
                 case CasinoProvider.Psw or CasinoProvider.Betflag:

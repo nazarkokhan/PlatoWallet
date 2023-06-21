@@ -14,22 +14,6 @@ public sealed class ExternalEmaraplayController : RestApiController
 
     public ExternalEmaraplayController(IMediator mediator) => 
         _mediator = mediator;
-    
-    /// <summary>
-    ///     Creates a launcher URL. 
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>
-    ///     <see cref="EmaraPlayGetLauncherUrlResponse"/>.
-    /// </returns>
-    [HttpPost("launcher-url")]
-    [ProducesResponseType(typeof(EmaraPlayGetLauncherUrlResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetLauncherUrl(
-        [FromBody] EmaraPlayGetLauncherUrlRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
 
     /// <summary>
     ///     Gets round's details.

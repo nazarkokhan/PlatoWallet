@@ -26,9 +26,8 @@ public sealed record EmaraPlayAuthenticateRequest(
 
             var user = await _context.Set<User>()
                 .AsNoTracking()
-                .Include(c => c.Casino)
-                .ThenInclude(cg => cg.CasinoGames)
-                .Where(u => u.Sessions.Any(s => s.Id == request.Token))
+                .Where(u => u.Sessions.Any(s => s.Id == request.Token) && 
+                            u.Casino.CasinoGames.Any(cg => cg.Game.LaunchName == request.Game))
                     .Select(
                     u => new
                     {

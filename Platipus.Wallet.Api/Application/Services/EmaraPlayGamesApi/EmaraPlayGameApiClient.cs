@@ -74,7 +74,7 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
 
             var requestToSend = request switch
             {
-                EmaraplayGetLauncherUrlGameApiRequest launcherRequest when launcherRequest.Mode != "real_play" =>
+                EmaraplayGetLauncherUrlGameApiRequest launcherRequest when launcherRequest.Mode != "Real" =>
                     launcherRequest with { Token = null, User = null } as TRequest,
                 _ => request
             };
