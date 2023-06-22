@@ -48,7 +48,7 @@ public sealed record EmaraPlayBetRequest(
             
             var data = walletResult.Data;
             var response = new EmaraPlayBetResponse(
-                new BetResult(data.Currency, data.Balance, data.Transaction.InternalId, data.Transaction.Id));
+                new BetResult(data.Currency, data.Balance, data.Transaction.Id, data.Transaction.InternalId));
 
             return EmaraPlayResultFactory.Success(response);
         }
