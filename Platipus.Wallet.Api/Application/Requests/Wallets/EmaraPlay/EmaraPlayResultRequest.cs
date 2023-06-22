@@ -35,7 +35,9 @@ public sealed record EmaraPlayResultRequest(
                 request.Token,
                 request.Bet,
                 request.Transaction,
-                request.Amount, cancellationToken: cancellationToken);
+                request.Amount, 
+                bool.Parse(request.CloseRound),
+                cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
                 return walletResult.ToEmaraPlayResult<EmaraPlayResultResponse>();
