@@ -5,4 +5,4 @@ using Base;
 public sealed record RoundDetailsResult(
     string Type, 
     string Details, 
-    string Complete) : IEmaraPlayBaseResponse;
+    bool Completed) : IEmaraPlayBaseResponse;

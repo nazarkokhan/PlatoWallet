@@ -8,6 +8,7 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using System.Globalization;
 using Services.EmaraPlayGamesApi.Requests;
 
 public sealed record EmaraPlayAwardRequest(
