@@ -8,14 +8,24 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using System.Text.Json.Serialization;
 using Application.Results.ResultToResultMappers;
 
 public sealed record EmaraPlayResultRequest(
-        string User, string Game, string Bet, 
-        decimal Amount, string Transaction, string Provider, 
-        string Token, string CloseRound, string BetBonusAmount, 
-        List<Jackpot>? Jackpots = null, string? BonusCode = null, 
-        string? BonusAmount = null, List<Detail>? Details = null, string? Spins = null) 
+        string User, 
+        string Game, 
+        string Bet, 
+        decimal Amount, 
+        string Transaction,
+        string Provider, 
+        string Token, 
+        [property: JsonPropertyName("closeRound")]bool CloseRound, 
+        [property: JsonPropertyName("betBonusAmount")]string? BetBonusAmount = null, 
+        List<Jackpot>? Jackpots = null, 
+        [property: JsonPropertyName("bonusCode")]string? BonusCode = null, 
+        [property: JsonPropertyName("bonusAmount")]string? BonusAmount = null, 
+        List<Detail>? Details = null, 
+        string? Spins = null) 
     : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayResultResponse>>
 {
     public sealed class Handler 
@@ -36,7 +46,7 @@ public sealed record EmaraPlayResultRequest(
                 request.Bet,
                 request.Transaction,
                 request.Amount, 
-                bool.Parse(request.CloseRound),
+                request.CloseRound,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

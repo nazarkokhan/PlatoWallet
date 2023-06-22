@@ -116,7 +116,7 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; //TODO it is default policy anyway
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
             .AddJsonOptions(nameof(CasinoProvider.Atlas),
                 options =>

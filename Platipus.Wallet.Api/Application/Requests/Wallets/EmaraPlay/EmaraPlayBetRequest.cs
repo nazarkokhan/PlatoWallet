@@ -1,5 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using System.Text.Json.Serialization;
+using Application.Results.ResultToResultMappers;
 using Base;
 using Models;
 using Responses;
@@ -16,8 +18,8 @@ public sealed record EmaraPlayBetRequest(
     string Token,
     string Transaction,
     decimal Amount,
-    string? BonusCode = null,
-    string? BonusAmount = null,
+    [property: JsonPropertyName("bonusCode")]string? BonusCode = null,
+    [property: JsonPropertyName("bonusAmount")]string? BonusAmount = null,
     List<Jackpot?>? Jackpots = null,
     string? Ip = null) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayBetResponse>>
 {
@@ -37,12 +39,12 @@ public sealed record EmaraPlayBetRequest(
             var walletResult = await _walletService.BetAsync(
                 request.Token,
                 request.Bet,
-                request.Transaction,
+                transactionId: request.Transaction,
                 request.Amount,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return EmaraPlayResultFactory.Failure<EmaraPlayBetResponse>(EmaraPlayErrorCode.InternalServerError);
+                return walletResult.ToEmaraPlayResult<EmaraPlayBetResponse>();
             
             var data = walletResult.Data;
             var response = new EmaraPlayBetResponse(

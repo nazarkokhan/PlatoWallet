@@ -20,9 +20,13 @@ public static class CommonResultToEmaraPlayMappers
     {
         return source switch
         {
-            ErrorCode.UserIsDisabled => EmaraPlayErrorCode.GameIsNotFoundOrDisabled,
             ErrorCode.CasinoNotFound => EmaraPlayErrorCode.ProviderNotFound,
-            
+            ErrorCode.TransactionAlreadyExists => EmaraPlayErrorCode.DuplicatedTransaction,
+            ErrorCode.UserNotFound => EmaraPlayErrorCode.PlayerNotFound,
+            ErrorCode.UserIsDisabled => EmaraPlayErrorCode.PlayerIsFrozen,
+            ErrorCode.RoundAlreadyExists => EmaraPlayErrorCode.BetRoundAlreadyStarted,
+            ErrorCode.RoundAlreadyFinished => EmaraPlayErrorCode.BetRoundAlreadyClosed,
+            ErrorCode.InvalidCurrency => EmaraPlayErrorCode.InvalidUserCurrency,
             ErrorCode.Unknown or _ => EmaraPlayErrorCode.Success
         };
     }

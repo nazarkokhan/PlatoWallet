@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Base;
 using Responses;
@@ -10,10 +11,15 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 
 public sealed record EmaraPlayRefundRequest(
-    string User, string Transaction, 
-    string OriginalTransaction, string Amount,
-    string BonusAmount, string Provider, string Bet, 
-    string Game, string Token) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayRefundResponse>>
+    string User, 
+    string Transaction, 
+    [property: JsonPropertyName("originalTransaction")]string OriginalTransaction, 
+    decimal Amount, 
+    [property: JsonPropertyName("bonusAmount")]string BonusAmount, 
+    string Provider, 
+    string Bet, 
+    string Game, 
+    string Token) : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraPlayRefundResponse>>
 {
     public sealed class Handler : 
         IRequestHandler<EmaraPlayRefundRequest, IEmaraPlayResult<EmaraPlayRefundResponse>>
