@@ -9,6 +9,8 @@ using Platipus.Wallet.Infrastructure.Persistence;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
+using FluentValidation;
+
 public sealed record EmaraPlayAuthenticateRequest(
         string Token, string Provider, string Game, string? Ip = null)
     : IEmaraPlayBaseRequest, IRequest<IEmaraPlayResult<EmaraplayAuthenticateResponse>>
@@ -46,6 +48,36 @@ public sealed record EmaraPlayAuthenticateRequest(
                 user.Id.ToString(), user.Currency, user.Username, user.Balance);
             var response = new EmaraplayAuthenticateResponse(authenticateResult);
             return EmaraPlayResultFactory.Success(response);
+        }
+    }
+    
+    internal sealed class EmaraPlayAuthenticateRequestValidator : AbstractValidator<EmaraPlayAuthenticateRequest>
+    {
+        public EmaraPlayAuthenticateRequestValidator()
+        {
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token is required.");
+
+            RuleFor(x => x.Provider)
+                .NotEmpty()
+                .WithMessage("Provider is required.");
+
+            RuleFor(x => x.Game)
+                .NotEmpty()
+                .WithMessage("Game is required.");
+
+            When(x => !string.IsNullOrEmpty(x.Ip), () =>
+            {
+                RuleFor(x => x.Ip)
+                    .Must(IsValidIp)
+                    .WithMessage("IP is not in correct format.");
+            });
+        }
+
+        private bool IsValidIp(string? ip)
+        {
+            return System.Net.IPAddress.TryParse(ip, out _);
         }
     }
 }

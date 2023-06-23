@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 using Base;
+using FluentValidation;
 using Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
@@ -36,6 +37,31 @@ public sealed record EmaraPlayCancelRequest(
 
             var finalResponse = new EmaraPlayCancelResponse(EmaraPlayErrorCode.Success);
             return EmaraPlayResultFactory.Success(finalResponse);
+        }
+    }
+    
+    internal sealed class EmaraPlayCancelRequestValidator : AbstractValidator<EmaraPlayCancelRequest>
+    {
+        public EmaraPlayCancelRequestValidator()
+        {
+            RuleFor(x => x.Environment)
+                .NotEmpty()
+                .WithMessage("Environment is required.");
+
+            RuleFor(x => x.ApiRequest)
+                .SetValidator(new EmaraplayCancelGameApiRequestValidator());
+        }
+    }
+
+    private sealed class EmaraplayCancelGameApiRequestValidator : AbstractValidator<EmaraplayCancelGameApiRequest>
+    {
+        public EmaraplayCancelGameApiRequestValidator()
+        {
+            RuleFor(x => x.Ref)
+                .NotEmpty()
+                .WithMessage("Ref is required.");
+
+            // The remaining field (Operator) is optional so we don't validate it
         }
     }
 }

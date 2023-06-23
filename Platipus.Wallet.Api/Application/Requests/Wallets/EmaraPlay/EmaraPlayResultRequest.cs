@@ -10,6 +10,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 using System.Text.Json.Serialization;
 using Application.Results.ResultToResultMappers;
+using FluentValidation;
 
 public sealed record EmaraPlayResultRequest(
         string User, 
@@ -60,6 +61,85 @@ public sealed record EmaraPlayResultRequest(
             var response = new EmaraPlayResultResponse(winResult);
             return EmaraPlayResultFactory.Success(response);
 
+        }
+    }
+    
+
+    public class EmaraPlayResultRequestValidator : AbstractValidator<EmaraPlayResultRequest>
+    {
+        public EmaraPlayResultRequestValidator()
+        {
+            RuleFor(x => x.User)
+                .NotEmpty()
+                .WithMessage("User is required.");
+
+            RuleFor(x => x.Game)
+                .NotEmpty()
+                .WithMessage("Game is required.");
+
+            RuleFor(x => x.Bet)
+                .NotEmpty()
+                .WithMessage("Bet is required.");
+
+            RuleFor(x => x.Amount)
+                .NotEmpty()
+                .WithMessage("Amount is required.")
+                .GreaterThan(0)
+                .WithMessage("Amount must be greater than 0.");
+
+            RuleFor(x => x.Transaction)
+                .NotEmpty()
+                .WithMessage("Transaction is required.");
+
+            RuleFor(x => x.Provider)
+                .NotEmpty()
+                .WithMessage("Provider is required.");
+
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token is required.");
+
+            RuleFor(x => x.CloseRound)
+                .NotNull()
+                .WithMessage("CloseRound is required.");
+
+            RuleFor(x => x.Jackpots)
+                .SetValidator(new InlineValidator<List<Jackpot>>
+                {
+                    v => v.RuleFor(x => x)
+                        .Must(list => list is null || list.All(i => !string.IsNullOrEmpty(i.Id) && i.Amount > 0))
+                        .WithMessage("All Jackpots must have a non-empty Id and Amount greater than 0.")
+                }!);
+
+            RuleFor(x => x.Details)
+                .SetValidator(new InlineValidator<List<Detail>>
+                {
+                    v => v.RuleFor(x => x)
+                        .Must(list => list is null || list.All(i => !string.IsNullOrEmpty(i.Type) && 
+                                                                    !string.IsNullOrEmpty(i.Value)))
+                        .WithMessage("All Details must have a non-empty Type and Value.")
+                }!);
+
+            When(x => !string.IsNullOrEmpty(x.BetBonusAmount), () =>
+            {
+                RuleFor(x => x.BetBonusAmount)
+                    .Must(x => decimal.TryParse(x, out _))
+                    .WithMessage("BetBonusAmount must be a valid decimal.");
+            });
+
+            When(x => !string.IsNullOrEmpty(x.BonusAmount), () =>
+            {
+                RuleFor(x => x.BonusAmount)
+                    .Must(x => decimal.TryParse(x, out _))
+                    .WithMessage("BonusAmount must be a valid decimal.");
+            });
+
+            When(x => !string.IsNullOrEmpty(x.Spins), () =>
+            {
+                RuleFor(x => x.Spins)
+                    .Must(x => int.TryParse(x, out _))
+                    .WithMessage("Spins must be a valid integer.");
+            });
         }
     }
 }

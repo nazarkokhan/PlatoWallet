@@ -8,6 +8,7 @@ using Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
 
 public sealed record EmaraPlayRefundRequest(
@@ -15,7 +16,7 @@ public sealed record EmaraPlayRefundRequest(
     string Transaction, 
     [property: JsonPropertyName("originalTransaction")]string OriginalTransaction, 
     decimal Amount, 
-    [property: JsonPropertyName("bonusAmount")]string BonusAmount, 
+    [property: JsonPropertyName("bonusAmount")]decimal BonusAmount, 
     string Provider, 
     string Bet, 
     string Game, 
@@ -95,6 +96,48 @@ public sealed record EmaraPlayRefundRequest(
                 _logger.LogError(e, "Exception during refund operation has occurred");
                 return EmaraPlayResultFactory.Failure<EmaraPlayRefundResponse>(EmaraPlayErrorCode.InternalServerError, e);
             }
+        }
+    }
+    
+    internal sealed class EmaraPlayRefundRequestValidator : AbstractValidator<EmaraPlayRefundRequest>
+    {
+        public EmaraPlayRefundRequestValidator()
+        {
+            RuleFor(x => x.User)
+                .NotEmpty()
+                .WithMessage("User is required.");
+
+            RuleFor(x => x.Transaction)
+                .NotEmpty()
+                .WithMessage("Transaction is required.");
+
+            RuleFor(x => x.OriginalTransaction)
+                .NotEmpty()
+                .WithMessage("Original Transaction is required.");
+
+            RuleFor(x => x.Amount)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Amount should be equal or greater than 0.");
+
+            RuleFor(x => x.BonusAmount)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Bonus Amount should be equal or greater than 0.");
+
+            RuleFor(x => x.Provider)
+                .NotEmpty()
+                .WithMessage("Provider is required.");
+
+            RuleFor(x => x.Bet)
+                .NotEmpty()
+                .WithMessage("Bet is required.");
+
+            RuleFor(x => x.Game)
+                .NotEmpty()
+                .WithMessage("Game is required.");
+
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token is required.");
         }
     }
 }

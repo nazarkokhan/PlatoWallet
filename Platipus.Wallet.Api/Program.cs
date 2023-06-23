@@ -169,7 +169,6 @@ try
         .AddNpgSql(builderConfiguration.GetConnectionString(nameof(WalletDbContext))!, name: nameof(WalletDbContext));
 
     services.AddXmlRpc();
-
     services.AddHttpContextAccessor();
     var app = builder.Build();
 

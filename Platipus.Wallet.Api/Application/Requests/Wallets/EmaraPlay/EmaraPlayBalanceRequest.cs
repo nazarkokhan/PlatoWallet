@@ -2,6 +2,7 @@
 
 using Application.Results.ResultToResultMappers;
 using Base;
+using FluentValidation;
 using Responses;
 using Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
@@ -50,6 +51,24 @@ public sealed record EmaraPlayBalanceRequest(
                 return EmaraPlayResultFactory.Failure<EmaraPlayBalanceResponse>(EmaraPlayErrorCode.InternalServerError,
                     e);
             }
+        }
+    }
+    
+    internal sealed class EmaraPlayBalanceRequestValidator : AbstractValidator<EmaraPlayBalanceRequest>
+    {
+        public EmaraPlayBalanceRequestValidator()
+        {
+            RuleFor(x => x.Provider)
+                .NotEmpty()
+                .WithMessage("Provider is required.");
+
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token is required.");
+
+            RuleFor(x => x.User)
+                .NotEmpty()
+                .WithMessage("User is required.");
         }
     }
 }

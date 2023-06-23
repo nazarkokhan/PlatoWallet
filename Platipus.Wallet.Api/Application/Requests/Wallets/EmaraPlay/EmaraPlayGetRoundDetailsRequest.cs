@@ -8,6 +8,7 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 using Application.Results.ResultToResultMappers;
+using FluentValidation;
 using Services.EmaraPlayGamesApi.Requests;
 
 public sealed record EmaraPlayGetRoundDetailsRequest(
@@ -47,5 +48,26 @@ public sealed record EmaraPlayGetRoundDetailsRequest(
         }
     }
     
-    
+    internal sealed class EmaraPlayGetRoundDetailsRequestValidator : AbstractValidator<EmaraPlayGetRoundDetailsRequest>
+    {
+        public EmaraPlayGetRoundDetailsRequestValidator()
+        {
+            RuleFor(x => x.Environment)
+                .NotEmpty()
+                .WithMessage("Environment is required.");
+
+            RuleFor(x => x.ApiRequest)
+                .SetValidator(new EmaraplayGetRoundDetailsGameApiRequestValidator());
+        }
+    }
+
+    private sealed class EmaraplayGetRoundDetailsGameApiRequestValidator : AbstractValidator<EmaraplayGetRoundDetailsGameApiRequest>
+    {
+        public EmaraplayGetRoundDetailsGameApiRequestValidator()
+        {
+            RuleFor(x => x.Bet)
+                .NotEmpty()
+                .WithMessage("Bet is required.");
+        }
+    }
 }
