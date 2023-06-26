@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using System.ComponentModel;
+using System.Text;
 using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -10,6 +11,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Results.EmaraPlay;
+using Results.ResultToResultMappers;
+using Services.AtlasGamesApi;
+using Services.AtlasGamesApi.Requests;
 using Services.EmaraPlayGamesApi;
 using Services.EmaraPlayGamesApi.Requests;
 using Services.GamesGlobalGamesApi;
@@ -21,10 +25,11 @@ using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
 using StartupSettings.Options;
+using Wallets.Atlas.Base;
 using Wallets.EmaraPlay.Base;
 using Wallets.Psw.Base.Response;
 
-public record LogInRequest(
+public sealed record LogInRequest(
         [property: DefaultValue("openbox")] string UserName,
         [property: DefaultValue("password")] string Password,
         [property: DefaultValue("openbox")] string CasinoId,
@@ -34,7 +39,9 @@ public record LogInRequest(
         LaunchMode LaunchMode,
         [property: DefaultValue(null)] int? PswRealityCheck,
         [property: DefaultValue(null)] string? Device,
-        [property: DefaultValue("en")] string? Language)
+        [property: DefaultValue("en")] string Language,
+        [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier,
+        [property: DefaultValue("test-pGKay18t7ZSSc1HvX8UtPaeYovbaDRrB")] string? Token)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
@@ -48,6 +55,7 @@ public record LogInRequest(
         private readonly IReevoGameApiClient _reevoGameApiClient;
         private readonly SoftswissCurrenciesOptions _currencyMultipliers;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAtlasGameApiClient _atlasGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -58,7 +66,8 @@ public record LogInRequest(
             IReevoGameApiClient reevoGameApiClient,
             IOptions<SoftswissCurrenciesOptions> currencyMultipliers, 
             IHttpContextAccessor httpContextAccessor, 
-            IEmaraPlayGameApiClient emaraPlayGameApiClient)
+            IEmaraPlayGameApiClient emaraPlayGameApiClient, 
+            IAtlasGameApiClient atlasGameApiClient)
         {
             _context = context;
             _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
@@ -68,6 +77,7 @@ public record LogInRequest(
             _reevoGameApiClient = reevoGameApiClient;
             _httpContextAccessor = httpContextAccessor;
             _emaraPlayGameApiClient = emaraPlayGameApiClient;
+            _atlasGameApiClient = atlasGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -142,6 +152,22 @@ public record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case CasinoProvider.Atlas:
+                {
+                    var stringToEncode = $"{request.UserName}:{request.Password}";
+                    var stringToEncodeAsBytes = Encoding.UTF8.GetBytes(stringToEncode);
+                    var token = Convert.ToBase64String(stringToEncodeAsBytes);
+                    var isDemo = request.LaunchMode is LaunchMode.Demo;
+                    var apiRequest = new AtlasGameLaunchGameApiRequest(
+                        request.Game, isDemo, false, request.Token!, 
+                        request.CasinoId, request.Language!, request.Cashier!, request.Lobby!);
+                    var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
+                        baseUrl, apiRequest, token, cancellationToken: cancellationToken);
+                    if (apiResponse.IsFailure)
+                        apiResponse.ToAtlasResult<AtlasErrorResponse>();
+                    launchUrl = apiResponse.Data.Data.Url.ToString();
+                    break;
+                }
                 case CasinoProvider.EmaraPlay:
                 {
                     var ip = _httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();

@@ -5,7 +5,6 @@ using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi.Responses;
 namespace Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 
 using Requests;
-using Results.EmaraPlay.WithData;
 
 public interface IEmaraPlayGameApiClient
 {

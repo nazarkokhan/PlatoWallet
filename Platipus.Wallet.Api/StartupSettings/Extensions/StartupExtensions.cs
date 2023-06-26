@@ -30,9 +30,9 @@ public static class StartupExtensions
             .AddSingleton<OpenboxMockedErrorActionFilter>()
             .AddSingleton<EmaraPlayMockedErrorActionFilter>()
             .AddScoped<EmaraPlaySecurityFilter>()
-            .AddSingleton<AtlasPlatformMockedErrorActionFilter>()
-            .AddScoped<AtlasPlatformSecurityFilter>()
-            .AddScoped<AtlasPlatformBasicSecurityFilter>();
+            .AddSingleton<AtlasMockedErrorActionFilter>()
+            .AddScoped<AtlasSecurityFilter>()
+            .AddScoped<AtlasExternalSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
