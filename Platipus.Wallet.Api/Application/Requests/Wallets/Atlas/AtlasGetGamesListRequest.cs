@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Atlas;
 
 using Base;
+using FluentValidation;
 using Responses.AtlasPlatform;
 using Results.Atlas;
 using Results.Atlas.WithData;
@@ -12,7 +13,7 @@ using Services.Wallet;
 public sealed record AtlasGetGamesListRequest(
     string Environment,
     AtlasGetGamesListGameApiRequest ApiRequest,
-    string? Token) : 
+    string? Token = null) : 
         IAtlasRequest, IRequest<IAtlasResult<AtlasGetGamesListResponse>>
 {
     public sealed class Handler : 
@@ -36,7 +37,7 @@ public sealed record AtlasGetGamesListRequest(
                 request.Environment, cancellationToken);
             
             var clientResponse = await _atlasGameApiClient.GetGamesListAsync(
-                walletResponse.Data.BaseUrl, request.ApiRequest, request.Token,
+                walletResponse.Data.BaseUrl, request.ApiRequest, request.Token!,
                 cancellationToken);
             
             if (clientResponse.IsFailure)
@@ -44,6 +45,15 @@ public sealed record AtlasGetGamesListRequest(
             
             var response = new AtlasGetGamesListResponse(clientResponse.Data.Data.GameList);
             return AtlasResultFactory.Success(response);
+        }
+    }
+
+    public sealed class AtlasGetGamesListRequestValidator 
+        : AbstractValidator<AtlasGetGamesListRequest>
+    {
+        public AtlasGetGamesListRequestValidator()
+        {
+            RuleFor(x => x.Environment).NotEmpty();
         }
     }
 }

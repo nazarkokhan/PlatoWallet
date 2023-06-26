@@ -3,6 +3,7 @@
 using Application.Requests.Wallets.Atlas.Base;
 using Requests;
 using Responses.AtlasPlatform;
+using Results.Atlas;
 using Results.HttpClient.WithData;
 
 public interface IAtlasGameApiClient
@@ -16,6 +17,18 @@ public interface IAtlasGameApiClient
     Task<IResult<IHttpClientResult<AtlasGetGamesListResponse, AtlasErrorResponse>>> GetGamesListAsync(
         Uri baseUrl,
         AtlasGetGamesListGameApiRequest apiRequest,
+        string token,
+        CancellationToken cancellationToken = default);
+    
+    Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
+        Uri baseUrl,
+        AtlasRegisterFreeSpinBonusGameApiRequest apiRequest,
+        string token,
+        CancellationToken cancellationToken = default);
+    
+    Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
+        Uri baseUrl,
+        AtlasAssignFreeSpinBonusGameApiRequest apiRequest,
         string token,
         CancellationToken cancellationToken = default);
 }

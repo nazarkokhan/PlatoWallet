@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Requests;
 using Responses.AtlasPlatform;
+using Results.Atlas;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
@@ -53,7 +54,27 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         return GetAsync<AtlasGetGamesListResponse>(
             baseUrl, "getgames", request, token, cancellationToken);
     }
-    
+
+    public Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
+        Uri baseUrl, 
+        AtlasRegisterFreeSpinBonusGameApiRequest apiRequest, 
+        string token,
+        CancellationToken cancellationToken = default)
+    {
+        return PostAsync<IAtlasResult, AtlasRegisterFreeSpinBonusGameApiRequest>(
+            baseUrl, "registerBonus", apiRequest, token, cancellationToken);
+    }
+
+    public Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
+        Uri baseUrl, 
+        AtlasAssignFreeSpinBonusGameApiRequest apiRequest, 
+        string token,
+        CancellationToken cancellationToken = default)
+    {
+        return PostAsync<IAtlasResult, AtlasAssignFreeSpinBonusGameApiRequest>(
+            baseUrl, "assignBonus", apiRequest, token, cancellationToken);
+    }
+
     private async Task<IResult<IHttpClientResult<TSuccess, AtlasErrorResponse>>> PostAsync<TSuccess, TRequest>(
         Uri baseUrl,
         string method,
