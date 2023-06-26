@@ -139,28 +139,11 @@ public class WalletOpenboxPrivateController : RestApiController
     }
 
     [HttpGet("decrypt-payload")]
-    public async Task<IActionResult> OpenboxDecryptPayload(
-        string vendorUid,
-        string requestPayload,
-        [FromServices] WalletDbContext dbContext,
-        CancellationToken cancellationToken)
+    public IActionResult OpenboxDecryptPayload(
+        string signatureKey,
+        string requestPayload)
     {
-        var casino = await dbContext.Set<Casino>()
-            .Where(
-                c => c.Provider == CasinoProvider.Openbox
-                  && c.Params.OpenboxVendorUid == vendorUid)
-            .Select(
-                c => new
-                {
-                    c.Id,
-                    c.SignatureKey
-                })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (casino is null)
-            return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
-
-        var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, casino.SignatureKey);
+        var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, signatureKey);
 
         return Ok(decryptedPayload);
     }
