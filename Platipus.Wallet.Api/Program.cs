@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
+using Platipus.Wallet.Api.Application.Services.AtlasGamesApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
@@ -73,7 +74,7 @@ try
             {
                 options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
                                                                | JsonNumberHandling.AllowReadingFromString;
-                options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                //options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -162,7 +163,10 @@ try
         .Services
         .AddSingleton<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
         .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
-            .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddSingleton<IAtlasGameApiClient, AtlasGameApiClient>()
+        .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>();
 
     services
         .AddHealthChecks()

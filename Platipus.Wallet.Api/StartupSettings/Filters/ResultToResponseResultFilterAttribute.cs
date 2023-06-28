@@ -2,16 +2,14 @@ using Humanizer;
 
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
-
-using Application.Requests.Wallets.AtlasPlatform.Base;
 using Application.Requests.Wallets.EmaraPlay.Base;
-using Platipus.Wallet.Api.Application.Results.AtlasPlatform.WithData;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using System.Net.Mime;
 using System.Text.Json;
 using ActionResults;
 using Api.Extensions.SecuritySign;
 using Application.Requests.Base.Common;
+using Application.Requests.Wallets.Atlas.Base;
 using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base.Response;
@@ -25,6 +23,7 @@ using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base.Response;
+using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Everymatrix.WithData;
@@ -216,14 +215,14 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
-                case IAtlasPlatformResult<object> { IsSuccess: true } atlasPlatformResult:
+                case IAtlasResult<object> { IsSuccess: true } atlasPlatformResult:
                     context.Result = new OkObjectResult(atlasPlatformResult.Data);
                     return;
-                case IAtlasPlatformResult<object> atlasPlatformResult:
+                case IAtlasResult<object> atlasPlatformResult:
                 {
                     var errorCode = atlasPlatformResult.Error;
 
-                    var errorResponse = new AtlasPlatformErrorResponse(errorCode.Humanize(), (int)errorCode);
+                    var errorResponse = new AtlasErrorResponse(errorCode.Humanize(), (int)errorCode);
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
