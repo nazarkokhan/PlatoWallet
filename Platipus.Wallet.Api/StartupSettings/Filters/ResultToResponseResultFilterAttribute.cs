@@ -14,6 +14,7 @@ using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
+using Application.Requests.Wallets.Evoplay.Base;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
@@ -27,6 +28,7 @@ using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Everymatrix.WithData;
+using Application.Results.Evoplay.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
@@ -223,6 +225,20 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     var errorCode = atlasPlatformResult.Error;
 
                     var errorResponse = new AtlasErrorResponse(errorCode.Humanize(), (int)errorCode);
+
+                    context.Result = new OkObjectResult(errorResponse);
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+                case IEvoplayResult<object> { IsSuccess: true } evoplayResult:
+                    context.Result = new OkObjectResult(evoplayResult.Data);
+                    return;
+                case IEvoplayResult<object> evoplayResult:
+                {
+                    var errorCode = evoplayResult.Error;
+
+                    var errorResponse = new EvoplayCommonErrorResponse(
+                        errorCode.Humanize(), ((int)errorCode).ToString(), string.Empty);
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);

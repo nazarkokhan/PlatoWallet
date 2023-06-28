@@ -2,7 +2,8 @@
 
 using Base.WithData;
 
-public record EmaraPlayResult<TData> : BaseResult<EmaraPlayErrorCode, TData>, IEmaraPlayResult<TData>
+public record EmaraPlayResult<TData> 
+    : BaseResult<EmaraPlayErrorCode, TData>, IEmaraPlayResult<TData>
 {
     public EmaraPlayResult(TData data)
         : base(data)

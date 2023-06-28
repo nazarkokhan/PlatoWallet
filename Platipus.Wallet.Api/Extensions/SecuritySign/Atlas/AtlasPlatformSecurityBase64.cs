@@ -1,6 +1,6 @@
-﻿using System.Text;
+﻿namespace Platipus.Wallet.Api.Extensions.SecuritySign.Atlas;
 
-namespace Platipus.Wallet.Api.Extensions.SecuritySign.AtlasPlatform;
+using System.Text;
 
 public static class AtlasPlatformSecurityBase64
 {

@@ -7,4 +7,5 @@ using Microsoft.AspNetCore.Mvc;
 [Consumes(MediaTypeNames.Application.Json)]
 public abstract class RestApiController : ApiController
 {
+    
 }

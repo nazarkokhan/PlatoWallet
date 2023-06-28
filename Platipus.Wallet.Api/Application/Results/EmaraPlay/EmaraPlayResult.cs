@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Results.EmaraPlay;
 
 using Base;
 
-public record EmaraPlayResult : BaseResult<EmaraPlayErrorCode>, IEmaraPlayResult
+public sealed record EmaraPlayResult : BaseResult<EmaraPlayErrorCode>, IEmaraPlayResult
 {
     public EmaraPlayResult()
     {

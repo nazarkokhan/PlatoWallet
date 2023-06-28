@@ -1,6 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Results.Atlas;
 
-using Platipus.Wallet.Api.Application.Results.Base;
+using Base;
 
 public sealed record AtlasResult :  BaseResult<AtlasErrorCode>, IAtlasResult
 {

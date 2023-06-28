@@ -1,7 +1,7 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿namespace Platipus.Wallet.Api.Extensions.SecuritySign.Atlas;
 
-namespace Platipus.Wallet.Api.Extensions.SecuritySign.AtlasPlatform;
+using System.Security.Cryptography;
+using System.Text;
 
 public static class AtlasSecurityHash
 {
@@ -17,7 +17,7 @@ public static class AtlasSecurityHash
         return isValid;
     }
 
-    public static string Compute(byte[] data, string privateKey)
+    private static string Compute(byte[] data, string privateKey)
     {
         var privateKeyBytes = Encoding.UTF8.GetBytes(privateKey);
 

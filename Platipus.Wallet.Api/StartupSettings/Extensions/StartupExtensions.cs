@@ -123,6 +123,11 @@ public static class StartupExtensions
                 {
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                })
+            .AddJsonOptions(nameof(CasinoProvider.Evoplay),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
 
         return builder.Services;
