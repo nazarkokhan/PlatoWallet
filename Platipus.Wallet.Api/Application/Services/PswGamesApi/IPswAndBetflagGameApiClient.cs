@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
 using DTOs.Responses;
 using Domain.Entities.Enums;
+using Hub88GamesApi.DTOs.Requests;
 
 public interface IPswAndBetflagGameApiClient
 {
@@ -32,5 +33,9 @@ public interface IPswAndBetflagGameApiClient
         string[] games,
         DateTime validUntil,
         int count,
+        CancellationToken cancellationToken = default);
+
+    Task<IPswResult<PswGameBuyGamesApiResponseDto>> GameBuyAsync(
+        PswGameBuyGamesApiRequest request,
         CancellationToken cancellationToken = default);
 }

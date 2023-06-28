@@ -51,7 +51,6 @@
 
     <ItemGroup>
         <Folder Include="Application\Results\Base\WithData\WithError" />
-        <Folder Include="Application\Services\PswGamesApi\DTOs\Requests" />
     </ItemGroup>
 
     <ItemGroup>

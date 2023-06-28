@@ -50,7 +50,7 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
         CancellationToken cancellationToken = default)
     {
         var launchModePath = launchModeType is LaunchMode.Real ? "session" : "demo";
-        var response = await PostSignedRequestAsync<GetLaunchUrlResponseDto, PswGetGameLinkGamesApiRequest>(
+        var response = await PostSignedRequestAsync<PswGetGameLinkGamesApiRequest, GetLaunchUrlResponseDto>(
             new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/{launchModePath}").AbsoluteUri,
             new PswGetGameLinkGamesApiRequest(
                 casinoId,
@@ -71,7 +71,7 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
         string casinoId,
         CancellationToken cancellationToken = default)
     {
-        var response = await PostSignedRequestAsync<PswGetCasinoGamesListGamesApiResponseDto, PswGetCasinoGamesGamesApiRequest>(
+        var response = await PostSignedRequestAsync<PswGetCasinoGamesGamesApiRequest, PswGetCasinoGamesListGamesApiResponseDto>(
             "game/list",
             new PswGetCasinoGamesGamesApiRequest(casinoId),
             cancellationToken);
@@ -89,7 +89,7 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
         int count,
         CancellationToken cancellationToken = default)
     {
-        var response = await PostSignedRequestAsync<CreateFreebetAwardResponseDto, PswCreateFreebetAwardGamesApiRequest>(
+        var response = await PostSignedRequestAsync<PswCreateFreebetAwardGamesApiRequest, CreateFreebetAwardResponseDto>(
             "freebet/award",
             new PswCreateFreebetAwardGamesApiRequest(
                 casinoId,
@@ -104,7 +104,19 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
         return response;
     }
 
-    private async Task<IPswResult<TResponse>> PostSignedRequestAsync<TResponse, TRequest>(
+    public async Task<IPswResult<PswGameBuyGamesApiResponseDto>> GameBuyAsync(
+        PswGameBuyGamesApiRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await PostSignedRequestAsync<PswGameBuyGamesApiRequest, PswGameBuyGamesApiResponseDto>(
+            "game/buy",
+            request,
+            cancellationToken);
+
+        return response;
+    }
+
+    private async Task<IPswResult<TResponse>> PostSignedRequestAsync<TRequest, TResponse>(
         string requestUri,
         TRequest request,
         CancellationToken cancellationToken)

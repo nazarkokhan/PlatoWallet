@@ -11,15 +11,19 @@ public class ExternalPswController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public ExternalPswController(IMediator mediator)
-        => _mediator = mediator;
+    public ExternalPswController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("award")]
+    [HttpPost("freebet/award")]
     public async Task<IActionResult> CreateAward(PswCreateAwardRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpGet("gamelist")]
+    [HttpGet("game/list")]
     [ProducesResponseType(typeof(PswGetCasinoGamesListGamesApiResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> PswGames([FromQuery] GetPswCasinoGamesRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("game/buy")]
+    [ProducesResponseType(typeof(PswGameBuyGamesApiResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GameBuy([FromBody] PswGameBuyRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

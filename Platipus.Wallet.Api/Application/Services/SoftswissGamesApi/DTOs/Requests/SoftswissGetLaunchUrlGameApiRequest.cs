@@ -11,5 +11,4 @@ public record SoftswissGetLaunchUrlGameApiRequest(
     long? Balance,
     string ClientType,
     SoftswissGamesApiUrls Urls,
-    // string Jurisdiction,
     SoftswissGamesApiUser User) : IPswGamesApiBaseRequest;

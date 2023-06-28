@@ -28,6 +28,5 @@ public enum PswErrorCode
     Duplication = 1001,
 
     //remve
-    ReevoGameServerError = 10052,
-    MaxTimeout3Min = 100122
+    EnvironmentNotFound = 9999999
 }
