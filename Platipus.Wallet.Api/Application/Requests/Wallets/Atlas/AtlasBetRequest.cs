@@ -6,10 +6,14 @@ using Responses.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Results.Atlas;
 using Results.Atlas.WithData;
+using Results.ResultToResultMappers;
 
 public sealed record AtlasBetRequest(
-    string Token, [MaxLength(150)] string RoundId, int Amount,
-    [MaxLength(150)] string TransactionId, string Currency,
+    string Token, 
+    string RoundId, 
+    int Amount,
+    string TransactionId, 
+    string Currency,
     string? BonusInstanceId = null) : 
         IRequest<IAtlasResult<AtlasCommonResponse>>, IAtlasRequest
 {
@@ -24,40 +28,18 @@ public sealed record AtlasBetRequest(
         public async Task<IAtlasResult<AtlasCommonResponse>> Handle(
             AtlasBetRequest request, CancellationToken cancellationToken)
         {
+            var validAmount = request.Amount / 100;
             var walletResult = await _walletService.BetAsync(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
-                amount: request.Amount,
+                amount: validAmount,
                 currency: request.Currency,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-            {
-                switch (walletResult.Error)
-                {
-                    case ErrorCode.UnknownBetException:
-                        return AtlasResultFactory.Failure<AtlasCommonResponse>(
-                            AtlasErrorCode.InternalError);
-                    case ErrorCode.InvalidCurrency:
-                        return AtlasResultFactory.Failure<AtlasCommonResponse>(
-                            AtlasErrorCode.CurrencyMismatchException); 
-                    case ErrorCode.RoundAlreadyFinished:
-                    case ErrorCode.RoundAlreadyExists:
-                        return AtlasResultFactory.Failure<AtlasCommonResponse>(
-                            AtlasErrorCode.GameRoundNotPreviouslyCreated);
-                    case ErrorCode.UserIsDisabled:
-                    case ErrorCode.UserNotFound:
-                        return AtlasResultFactory.Failure<AtlasCommonResponse>(
-                            AtlasErrorCode.SessionValidationFailed);
-                    case ErrorCode.TransactionAlreadyExists:
-                        return AtlasResultFactory.Failure<AtlasCommonResponse>(
-                            AtlasErrorCode.TransactionAlreadyProcessed);
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(request), "Unknown error has occurred");
-                }
-            }
-
+                return walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
+            
             var response = new AtlasCommonResponse(
                 walletResult.Data.Currency, (int)walletResult.Data.Balance, 
                 walletResult.Data.UserId.ToString());

@@ -41,7 +41,7 @@ public sealed record AtlasGetGamesListRequest(
                 cancellationToken);
             
             if (clientResponse.IsFailure)
-                return clientResponse.ToAtlasResult<AtlasGetGamesListResponse>();
+                return clientResponse.ToAtlasFailureResult<AtlasGetGamesListResponse>();
             
             var response = new AtlasGetGamesListResponse(clientResponse.Data.Data.GameList);
             return AtlasResultFactory.Success(response);

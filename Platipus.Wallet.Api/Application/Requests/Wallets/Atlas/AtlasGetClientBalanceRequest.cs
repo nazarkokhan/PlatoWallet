@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Atlas;
 
 using Base;
+using FluentValidation;
 using Responses.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Results.Atlas;
@@ -29,7 +30,7 @@ public sealed record AtlasGetClientBalanceRequest(
 
             if (walletResult.IsFailure)
             {
-                walletResult.ToAtlasResult<AtlasCommonResponse>();
+                walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
             }
 
             var data = walletResult.Data;
@@ -39,6 +40,16 @@ public sealed record AtlasGetClientBalanceRequest(
                 data.UserId.ToString()
                 );
             return AtlasResultFactory.Success(response);
+        }
+    }
+
+    public sealed class AtlasGetClientBalanceRequestValidator : AbstractValidator<AtlasGetClientBalanceRequest>
+    {
+        public AtlasGetClientBalanceRequestValidator()
+        {
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token is required");
         }
     }
 }

@@ -54,13 +54,19 @@ public sealed class AtlasSecurityFilter : IAsyncActionFilter
         }
 
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
-        string authHeader = context.HttpContext.Request.Headers["Hash"]!;
+        string? authHeaderValue = context.HttpContext.Request.Headers["Hash"];
+        if (authHeaderValue is null)
+        {
+            context.Result = AtlasResultFactory.Failure<AtlasErrorResponse>(
+                AtlasErrorCode.RequiredHeaderHashNotPresent).ToActionResult();
+            return;
+        }
         var result = AtlasSecurityHash.IsValid(
-            authHeader, requestBytesToValidate, session.CasinoSignatureKey);
+            authHeaderValue, requestBytesToValidate, session.CasinoSignatureKey);
 
         if (!result)
         {
-            context.Result = AtlasResultFactory.Failure(
+            context.Result = AtlasResultFactory.Failure<AtlasErrorResponse>(
                 AtlasErrorCode.HashValidationFailed).ToActionResult();
             return;
         }

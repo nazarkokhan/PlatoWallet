@@ -154,17 +154,17 @@ public sealed record LogInRequest(
             {
                 case CasinoProvider.Atlas:
                 {
+                    var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
                     var stringToEncode = $"{request.UserName}:{request.Password}";
                     var stringToEncodeAsBytes = Encoding.UTF8.GetBytes(stringToEncode);
                     var token = Convert.ToBase64String(stringToEncodeAsBytes);
-                    var isDemo = request.LaunchMode is LaunchMode.Demo;
                     var apiRequest = new AtlasGameLaunchGameApiRequest(
-                        request.Game, isDemo, false, request.Token!, 
+                        request.Game, isDemoLaunchMode, false, request.Token!, 
                         request.CasinoId, request.Language!, request.Cashier!, request.Lobby!);
                     var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
                         baseUrl, apiRequest, token, cancellationToken: cancellationToken);
                     if (apiResponse.IsFailure)
-                        apiResponse.ToAtlasResult<AtlasErrorResponse>();
+                        apiResponse.ToAtlasFailureResult<AtlasErrorResponse>();
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
                 }
