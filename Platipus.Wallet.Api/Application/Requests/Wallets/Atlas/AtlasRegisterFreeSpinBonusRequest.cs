@@ -2,7 +2,6 @@
 
 using Base;
 using FluentValidation;
-using Models;
 using Results.Atlas;
 using Results.ResultToResultMappers;
 using Services.AtlasGamesApi;
@@ -65,8 +64,8 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
 
             RuleFor(x => x.SpinsCount).GreaterThan(0);
 
-            RuleForEach(x => x.BetValues).SetValidator(
-                new AtlasBetValueModelValidator());
+            RuleForEach(x => x.BetValues).Must(HaveValidBetValues)
+                .WithMessage("Invalid BetValues format");
 
             RuleFor(x => x.StartDate).NotEmpty()
                 .Must(BeAValidDate).WithMessage("Invalid date format");
@@ -86,15 +85,19 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
             return true;
 
         }
-    }
-
-    private sealed class AtlasBetValueModelValidator : AbstractValidator<AtlasBetValueModel>
-    {
-        public AtlasBetValueModelValidator()
+        private static bool HaveValidBetValues(Dictionary<string, int> betValues)
         {
-            RuleFor(x => x.Currency).NotEmpty().Must(x => 
-                x.Length is 3);
-            RuleFor(x => x.Value).GreaterThan(0);
+            // Check that the dictionary has exactly one entry.
+            if (betValues.Count is not 1) return false;
+
+            // Get the key-value pair.
+            var kvp = betValues.First();
+
+            // Check that the key is a 3-character string.
+            if (kvp.Key.Length != 3) return false;
+
+            // Check that the value is a positive integer.
+            return kvp.Value > 0;
         }
     }
 }
