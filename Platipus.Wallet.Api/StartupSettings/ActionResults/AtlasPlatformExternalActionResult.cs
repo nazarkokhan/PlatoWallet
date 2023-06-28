@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Platipus.Wallet.Api.Application.Results.AtlasPlatform;
 
 namespace Platipus.Wallet.Api.StartupSettings.ActionResults;
 
+using Application.Results.Atlas;
+
 public sealed class AtlasPlatformExternalActionResult : ActionResult
 {
-    public AtlasPlatformExternalActionResult(IAtlasPlatformResult result) => 
+    public AtlasPlatformExternalActionResult(IAtlasResult result) => 
         Result = result;
 
-    public IAtlasPlatformResult Result { get; }
+    public IAtlasResult Result { get; }
 }
