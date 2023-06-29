@@ -163,8 +163,8 @@ public sealed record LogInRequest(
                         request.CasinoId, request.Language!, request.Cashier!, request.Lobby!);
                     var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
                         baseUrl, apiRequest, token, cancellationToken: cancellationToken);
-                    if (apiResponse.IsFailure)
-                        apiResponse.ToAtlasFailureResult<AtlasErrorResponse>();
+                    if (apiResponse.IsFailure || apiResponse.Data.Data.Url is null)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
                 }
@@ -184,8 +184,8 @@ public sealed record LogInRequest(
                         Cashier: "someCashier", Token: session.Id);
                     var apiResponse = await _emaraPlayGameApiClient.GetLauncherUrlAsync(
                         baseUrl, apiRequest, cancellationToken: cancellationToken);
-                    if (apiResponse.IsFailure)
-                        EmaraPlayResultFactory.Failure<EmaraPlayErrorResponse>(EmaraPlayErrorCode.InternalServerError);
+                    if (apiResponse.IsFailure || apiResponse.Data.Data.Result.Url is null)
+                        ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
                     launchUrl = apiResponse.Data.Data.Result.Url.ToString()!;
                     break;
                 }
@@ -697,6 +697,14 @@ public sealed record LogInRequest(
         string? HttpRequestMessage,
         string? HttpResponseMessage) : PswBalanceResponse(Balance);
 
+    public class LoginRequestValidator : AbstractValidator<LogInRequest>
+    {
+        public LoginRequestValidator()
+        {
+            
+        }
+    }
+    
     public class Validator : AbstractValidator<SignUpRequest>
     {
         public Validator(IOptions<SupportedCurrenciesOptions> currenciesOptions)

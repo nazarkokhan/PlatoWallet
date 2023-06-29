@@ -10,21 +10,27 @@ public static class AtlasSecurityHash
         byte[] data,
         string privateKey)
     {
-        var hmacHash = Compute(data, privateKey);
+        var md5Hash = Compute(data, privateKey);
 
-        var isValid = externalHash.Equals(hmacHash, StringComparison.InvariantCultureIgnoreCase);
+        var isValid = externalHash.Equals(md5Hash, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }
 
     private static string Compute(byte[] data, string privateKey)
     {
-        var privateKeyBytes = Encoding.UTF8.GetBytes(privateKey);
+        // Convert the private key to bytes
+        var keyBytes = Encoding.UTF8.GetBytes(privateKey);
+        using var hmacMd5 = new HMACMD5(keyBytes);
 
-        var hmacHashData = HMACSHA512.HashData(privateKeyBytes, data);
+        // Compute the HMAC-MD5 hash of the data
+        var hashData = hmacMd5.ComputeHash(data);
 
-        var hmacString = Convert.ToHexString(hmacHashData);
+        // Convert the hash data to a hexadecimal string
+        var hashString = BitConverter.ToString(hashData)
+            .Replace("-", "")
+            .ToLowerInvariant();
 
-        return hmacString;
+        return hashString;
     }
 }
