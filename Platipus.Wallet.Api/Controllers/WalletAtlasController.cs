@@ -41,23 +41,8 @@ public sealed class WalletAtlasController : RestApiController
         [FromBody] AtlasGetClientBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
-    /// <summary>
-    ///     This method authorizes a client.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    [HttpPost("client/auth")]
-    [ProducesResponseType(typeof(AtlasPlatformAuthorizationResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(AtlasErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async ValueTask<IActionResult> Authorize(
-        [FromBody] AtlasAuthorizationRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    
+
+
     /// <summary>
     ///     This method withdraws the amount from the player’s wallet.
     /// </summary>
