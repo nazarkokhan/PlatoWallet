@@ -186,7 +186,7 @@ public sealed record LogInRequest(
                         baseUrl, apiRequest, cancellationToken: cancellationToken);
                     if (apiResponse.IsFailure || apiResponse.Data.Data.Result.Url is null)
                         ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
-                    launchUrl = apiResponse.Data.Data.Result.Url.ToString()!;
+                    launchUrl = apiResponse.Data.Data.Result.Url?.ToString()!;
                     break;
                 }
                 case CasinoProvider.Psw or CasinoProvider.Betflag:
