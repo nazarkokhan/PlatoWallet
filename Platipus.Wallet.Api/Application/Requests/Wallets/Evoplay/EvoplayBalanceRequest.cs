@@ -4,5 +4,5 @@ using Base;
 using Results.Evoplay;
 
 public sealed record EvoplayBalanceRequest(
-        string Token, 
+        string SessionToken, 
         string PlayerId) : IEvoplayRequest, IRequest<IEvoplayResult>;

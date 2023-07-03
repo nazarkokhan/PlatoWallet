@@ -17,14 +17,6 @@ public sealed class AtlasSecurityFilter : IAsyncActionFilter
         ActionExecutingContext context, 
         ActionExecutionDelegate next)
     {
-        if (context.ActionDescriptor is ControllerActionDescriptor
-            {
-                ActionName: nameof(WalletAtlasController.Authorize)
-            })
-        {
-            await next();
-            return;
-        }
         var request = context.ActionArguments.Values
             .OfType<IAtlasRequest>()
             .Single();

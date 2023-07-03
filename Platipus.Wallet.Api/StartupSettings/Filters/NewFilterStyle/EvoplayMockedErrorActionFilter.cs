@@ -25,7 +25,7 @@ public sealed class EvoplayMockedErrorActionFilter : AbstractMockedErrorActionFi
             _ => throw new ArgumentOutOfRangeException(nameof(baseRequest), "There is no such method in controller.")
         };
 
-        return new MockedErrorIdentifiers(walletMethod, request.Token!, true);
+        return new MockedErrorIdentifiers(walletMethod, request.SessionToken!, true);
 
     }
 }

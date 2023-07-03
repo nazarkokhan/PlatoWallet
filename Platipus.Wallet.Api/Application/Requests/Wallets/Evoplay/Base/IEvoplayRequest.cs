@@ -4,6 +4,6 @@ using Requests.Base;
 
 public interface IEvoplayRequest : IBaseWalletRequest
 {
-    public string? Token { get; }
+    public string? SessionToken { get; }
     public string PlayerId { get; }
 }

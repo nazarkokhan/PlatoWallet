@@ -23,8 +23,8 @@ public sealed class EvoplaySecurityFilter : IAsyncActionFilter
 
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
         IQueryable<Session> query = dbContext.Set<Session>();
-        query = !string.IsNullOrEmpty(request.Token) 
-            ? query.Where(s => s.Id == request.Token) 
+        query = !string.IsNullOrEmpty(request.SessionToken) 
+            ? query.Where(s => s.Id == request.SessionToken) 
             : query.Where(s => s.UserId.ToString() == request.PlayerId);
 
         var session = await query
