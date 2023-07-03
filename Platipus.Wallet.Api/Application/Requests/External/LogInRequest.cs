@@ -163,7 +163,7 @@ public sealed record LogInRequest(
                         request.CasinoId, request.Language!, request.Cashier!, request.Lobby!);
                     var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
                         baseUrl, apiRequest, token, cancellationToken: cancellationToken);
-                    if (apiResponse.IsFailure || apiResponse.Data.Data.Url is null)
+                    if (apiResponse.IsFailure || apiResponse.Data?.Data?.Url is null)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;

@@ -141,7 +141,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         try
         {
             var responseBody = httpResponse.ResponseData.Body;
-            if (responseBody is null)
+            if (string.IsNullOrEmpty(responseBody))
                 return httpResponse.Failure<TSuccess, AtlasErrorResponse>();
 
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
