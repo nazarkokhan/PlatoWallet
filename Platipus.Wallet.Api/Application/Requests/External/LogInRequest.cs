@@ -36,9 +36,8 @@ public sealed record LogInRequest(
         [property: DefaultValue(null)] int? PswRealityCheck,
         [property: DefaultValue(null)] string? Device,
         [property: DefaultValue("en")] string Language,
-        [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier,
-        [property: DefaultValue("test-pGKay18t7ZSSc1HvX8UtPaeYovbaDRrB")] string? Token)
-    : IRequest<IResult<LogInRequest.Response>>
+        [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier)
+        : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
@@ -151,11 +150,11 @@ public sealed record LogInRequest(
                 case CasinoProvider.Atlas:
                 {
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
-                    var stringToEncode = $"{request.UserName}:{request.Password}";
+                    const string stringToEncode = "atlas:password123";
                     var stringToEncodeAsBytes = Encoding.UTF8.GetBytes(stringToEncode);
                     var token = Convert.ToBase64String(stringToEncodeAsBytes);
                     var apiRequest = new AtlasGameLaunchGameApiRequest(
-                        request.Game, isDemoLaunchMode, false, request.Token!, 
+                        request.Game, isDemoLaunchMode, false, session.Id, 
                         request.CasinoId, request.Language!, request.Cashier!, request.Lobby!);
                     var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
                         baseUrl, apiRequest, token, cancellationToken: cancellationToken);

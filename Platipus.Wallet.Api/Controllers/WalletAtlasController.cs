@@ -34,7 +34,7 @@ public sealed class WalletAtlasController : RestApiController
     /// <returns>
     ///     <see cref="AtlasCommonResponse"/>.
     /// </returns>
-    [HttpPost("client/balance")]
+    [HttpPost("wallet")]
     [ProducesResponseType(typeof(AtlasCommonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(AtlasErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetClientBalance(
