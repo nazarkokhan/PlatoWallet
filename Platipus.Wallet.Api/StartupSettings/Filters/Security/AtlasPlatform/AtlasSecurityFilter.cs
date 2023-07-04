@@ -63,6 +63,7 @@ public sealed class AtlasSecurityFilter : IAsyncActionFilter
                 AtlasErrorCode.RequiredHeaderHashNotPresent).ToActionResult();
             return;
         }
+        
         var result = AtlasSecurityHash.IsValid(
             authHeaderValue, requestBytesToValidate, session.CasinoSignatureKey);
 
