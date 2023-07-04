@@ -4,5 +4,5 @@ using Requests.Wallets.Atlas.Base;
 
 public sealed record AtlasCommonResponse(
     string Currency, 
-    int Balance, 
+    decimal Balance, 
     string ClientId) : IAtlasCommonResponse;

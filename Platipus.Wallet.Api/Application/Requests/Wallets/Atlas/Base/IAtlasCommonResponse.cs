@@ -4,7 +4,7 @@ public interface IAtlasCommonResponse
 {
     public string Currency { get; }
     
-    public int Balance { get; }
+    public decimal Balance { get; }
     
     public string ClientId { get; }
 }

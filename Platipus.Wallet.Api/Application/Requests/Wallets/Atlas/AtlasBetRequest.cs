@@ -10,7 +10,7 @@ using Results.ResultToResultMappers;
 public sealed record AtlasBetRequest(
     string Token, 
     string RoundId, 
-    int Amount,
+    decimal Amount,
     string TransactionId, 
     string Currency,
     string? BonusInstanceId = null) : 
@@ -40,7 +40,7 @@ public sealed record AtlasBetRequest(
                 return walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
             
             var response = new AtlasCommonResponse(
-                walletResult.Data.Currency, (int)walletResult.Data.Balance, 
+                walletResult.Data?.Currency!, walletResult.Data!.Balance * 100, 
                 walletResult.Data.UserId.ToString());
 
             return AtlasResultFactory.Success(response);

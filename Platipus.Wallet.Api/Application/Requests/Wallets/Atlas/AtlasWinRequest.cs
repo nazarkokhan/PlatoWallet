@@ -12,7 +12,7 @@ public sealed record AtlasWinRequest(
     string Token, 
     string ClientId,
     string RoundId, 
-    int Amount,
+    decimal Amount,
     string TransactionId) : 
         IRequest<IAtlasResult<AtlasCommonResponse>>, IAtlasRequest
 {
@@ -39,7 +39,7 @@ public sealed record AtlasWinRequest(
                 return walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
 
             var response = new AtlasCommonResponse(
-                walletResult.Data.Currency, (int)walletResult.Data.Balance, 
+                walletResult.Data.Currency, walletResult.Data.Balance * 100, 
                 walletResult.Data.UserId.ToString()
                 );
             return AtlasResultFactory.Success(response);

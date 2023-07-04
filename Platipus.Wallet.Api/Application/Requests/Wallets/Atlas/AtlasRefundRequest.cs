@@ -12,7 +12,7 @@ public sealed record AtlasRefundRequest(
     string Token, 
     string ClientId, 
     string RoundId,
-    int Amount, 
+    decimal Amount, 
     string TransactionId, 
     string RefundTransactionId) : 
     IAtlasRequest, IRequest<IAtlasResult<AtlasCommonResponse>>
@@ -33,7 +33,7 @@ public sealed record AtlasRefundRequest(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
-                amount: validAmount,
+                amount: (int)validAmount,
                 clientId: request.ClientId,
                 cancellationToken: cancellationToken);
 
@@ -41,7 +41,7 @@ public sealed record AtlasRefundRequest(
                 return walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
 
             var response = new AtlasCommonResponse(
-                walletResult.Data.Currency, (int)walletResult.Data.Balance, 
+                walletResult.Data.Currency, walletResult.Data.Balance * 100, 
                 walletResult.Data.UserId.ToString());
 
             return AtlasResultFactory.Success(response);
