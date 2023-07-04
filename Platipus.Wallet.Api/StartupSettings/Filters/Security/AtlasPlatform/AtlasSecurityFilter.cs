@@ -8,8 +8,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Application.Requests.Wallets.Atlas.Base;
 using Application.Results.Atlas;
-using Controllers;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Domain.Entities.Enums;
 
 public sealed class AtlasSecurityFilter : IAsyncActionFilter
 {
@@ -34,7 +33,8 @@ public sealed class AtlasSecurityFilter : IAsyncActionFilter
                     s.ExpirationDate,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
                     UsedId = s.User.Id,
-                    UserPassword = s.User.Password
+                    UserPassword = s.User.Password,
+                    CasinoProvider = s.User.Casino.Params.AtlasProvider
                 })
             .FirstOrDefaultAsync();
 
@@ -42,6 +42,15 @@ public sealed class AtlasSecurityFilter : IAsyncActionFilter
         {
             context.Result = AtlasResultFactory
                 .Failure<AtlasErrorResponse>(AtlasErrorCode.SessionValidationFailed)
+                .ToActionResult();
+            return;
+        }
+        
+        const int atlasProviderId = (int)CasinoProvider.Atlas; 
+        if (!session.CasinoProvider.Equals(atlasProviderId.ToString()))
+        {
+            context.Result = AtlasResultFactory
+                .Failure<AtlasErrorResponse>(AtlasErrorCode.ProviderNotConfigured)
                 .ToActionResult();
             return;
         }

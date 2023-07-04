@@ -237,8 +237,12 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 {
                     var errorCode = evoplayResult.Error;
 
-                    var errorResponse = new EvoplayCommonErrorResponse(
-                        errorCode.Humanize(), ((int)errorCode).ToString(), string.Empty);
+                    var errorResponse = new EvoplayFailureResponse(
+                        new EvoplayCommonErrorResponse(
+                        errorCode.Humanize(), 
+                        errorCode.ToString(),
+                        Array.Empty<object>())
+                        );
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);

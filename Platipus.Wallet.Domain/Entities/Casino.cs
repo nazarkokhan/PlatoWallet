@@ -57,5 +57,7 @@ public class Casino : Entity<string>
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
         string? EmaraPlayProvider = null!,
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
-        string? AtlasProvider = null!);
+        string? AtlasProvider = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? EvoplayProvider = null!);
 }

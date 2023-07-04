@@ -1,7 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 
 using Application.Requests.Base;
-using Application.Requests.Wallets.Atlas;
 using Application.Requests.Wallets.Evoplay;
 using Application.Requests.Wallets.Evoplay.Base;
 using Domain.Entities.Enums;

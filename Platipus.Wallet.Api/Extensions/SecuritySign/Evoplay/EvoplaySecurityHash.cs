@@ -2,6 +2,7 @@
 
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 public static class EvoplaySecurityHash
 {
@@ -19,9 +20,19 @@ public static class EvoplaySecurityHash
 
     private static string Compute(byte[] data, string privateKey)
     {
-        var privateKeyBytes = Encoding.UTF8.GetBytes(privateKey);
+        var keyBytes = Encoding.UTF8.GetBytes(privateKey);
 
-        return MD5.HashData(privateKeyBytes, data)
-            .ToString();
+        using var hmacMd5 = new HMACMD5(keyBytes);
+
+        // Compute the HMAC-MD5 hash of the data
+        var hashData = hmacMd5.ComputeHash(data);
+
+        // Convert the hash data to a hexadecimal string
+        var hashString = BitConverter.ToString(hashData)
+            .Replace("-", "")
+            .ToLowerInvariant();
+
+        return hashString;
     }
+    
 }

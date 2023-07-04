@@ -5,6 +5,7 @@ using Api.Extensions.SecuritySign.Evoplay;
 using Application.Requests.Wallets.Evoplay.Base;
 using Application.Results.Evoplay;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -34,14 +35,24 @@ public sealed class EvoplaySecurityFilter : IAsyncActionFilter
                     s.ExpirationDate,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
                     UsedId = s.User.Id,
-                    UserPassword = s.User.Password
+                    UserPassword = s.User.Password,
+                    CasinoProvider = s.User.Casino.Params.EvoplayProvider
                 })
             .FirstOrDefaultAsync();
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = EvoplayResultFactory
-                .Failure<EvoplayCommonErrorResponse>(EvoplayErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
+                .Failure<EvoplayFailureResponse>(EvoplayErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
+                .ToActionResult();
+            return;
+        }
+        
+        const int evoplayProviderId = (int)CasinoProvider.Evoplay; 
+        if (!session.CasinoProvider.Equals(evoplayProviderId.ToString()))
+        {
+            context.Result = EvoplayResultFactory
+                .Failure<EvoplayFailureResponse>(EvoplayErrorCode.E_PROVIDER_NOT_FOUND)
                 .ToActionResult();
             return;
         }
@@ -50,7 +61,7 @@ public sealed class EvoplaySecurityFilter : IAsyncActionFilter
         string? authHeaderValue = context.HttpContext.Request.Headers["X-Signature"];
         if (authHeaderValue is null)
         {
-            context.Result = EvoplayResultFactory.Failure<EvoplayCommonErrorResponse>(
+            context.Result = EvoplayResultFactory.Failure<EvoplayFailureResponse>(
                 EvoplayErrorCode.E_PLAYER_SESSION_NOT_FOUND).ToActionResult();
             return;
         }
@@ -59,7 +70,7 @@ public sealed class EvoplaySecurityFilter : IAsyncActionFilter
 
         if (!result)
         {
-            context.Result = EvoplayResultFactory.Failure<EvoplayCommonErrorResponse>(
+            context.Result = EvoplayResultFactory.Failure<EvoplayFailureResponse>(
                 EvoplayErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED).ToActionResult();
             return;
         }

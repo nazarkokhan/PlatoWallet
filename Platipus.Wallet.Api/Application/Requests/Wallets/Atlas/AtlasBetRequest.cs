@@ -1,6 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Atlas;
 
-using System.ComponentModel.DataAnnotations;
 using Base;
 using Responses.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Services.Wallet;

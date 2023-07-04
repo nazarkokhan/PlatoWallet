@@ -12,7 +12,7 @@ using StartupSettings.Filters.Security.Evoplay;
 [ServiceFilter(typeof(EvoplayMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(EvoplaySecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Evoplay))]
-[ProducesResponseType(typeof(EvoplayCommonErrorResponse), StatusCodes.Status200OK)]
+[ProducesResponseType(typeof(EvoplayFailureResponse), StatusCodes.Status200OK)]
 public sealed class WalletEvoplayController : RestApiController
 {
     private readonly IMediator _mediator;

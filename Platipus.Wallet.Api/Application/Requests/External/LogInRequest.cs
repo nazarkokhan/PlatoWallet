@@ -10,8 +10,6 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Results.EmaraPlay;
-using Results.ResultToResultMappers;
 using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
 using Services.EmaraPlayGamesApi;
@@ -25,8 +23,6 @@ using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
 using StartupSettings.Options;
-using Wallets.Atlas.Base;
-using Wallets.EmaraPlay.Base;
 using Wallets.Psw.Base.Response;
 
 public sealed record LogInRequest(

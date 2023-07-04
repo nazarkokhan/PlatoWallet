@@ -2,7 +2,6 @@
 
 using Atlas;
 using Atlas.WithData;
-using Requests.Wallets.Atlas.Base;
 
 public static class CommonResultToAtlasMappers
 {
