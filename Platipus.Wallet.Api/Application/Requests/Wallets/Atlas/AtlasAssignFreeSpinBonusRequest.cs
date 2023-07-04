@@ -34,7 +34,7 @@ public sealed record AtlasAssignFreeSpinBonusRequest(
                 request.Environment, cancellationToken);
             
             var clientResponse = await _atlasGameApiClient.AssignFreeSpinBonusAsync(
-                walletResponse.Data.BaseUrl, request.ApiRequest, request.Token!,
+                walletResponse.Data?.BaseUrl!, request.ApiRequest, request.Token!,
                 cancellationToken);
 
             return clientResponse.ToAtlasResult();

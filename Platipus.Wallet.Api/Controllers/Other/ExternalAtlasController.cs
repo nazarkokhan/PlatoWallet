@@ -47,7 +47,7 @@ public sealed class ExternalAtlasController : RestApiController
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     [HttpPost("assignBonus")]
-    [ProducesResponseType(typeof(Task), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<IActionResult> AssignFreeSpinBonus(
        [FromBody]AtlasAssignFreeSpinBonusRequest request,
         CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ public sealed class ExternalAtlasController : RestApiController
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     [HttpPost("registerBonus")]
-    [ProducesResponseType(typeof(Task), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterFreeSpinBonus(
         [FromBody]AtlasRegisterFreeSpinBonusRequest request,
         CancellationToken cancellationToken)
