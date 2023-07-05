@@ -10,6 +10,7 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using Filters.NewFilterStyle;
 using Filters.Security;
+using Filters.Security.Evoplay;
 using Infrastructure.Persistence;
 using JorgeSerrano.Json;
 using JsonConverters;
@@ -32,7 +33,9 @@ public static class StartupExtensions
             .AddScoped<EmaraPlaySecurityFilter>()
             .AddSingleton<AtlasMockedErrorActionFilter>()
             .AddScoped<AtlasSecurityFilter>()
-            .AddScoped<AtlasExternalSecurityFilter>();
+            .AddScoped<AtlasExternalSecurityFilter>()
+            .AddSingleton<EvoplayMockedErrorActionFilter>()
+            .AddScoped<EvoplaySecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

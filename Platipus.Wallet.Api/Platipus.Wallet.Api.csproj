@@ -50,7 +50,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Application\Requests\Wallets\Evoplay\Data\" />
         <Folder Include="Application\Results\Base\WithData\WithError" />
     </ItemGroup>
 

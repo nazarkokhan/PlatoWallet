@@ -10,8 +10,8 @@ public static class EvoplayResultFactory
 
     public static EvoplayResult Failure(
         EvoplayErrorCode errorCode, 
-        string balance, 
-        string currency, 
+        string? balance, 
+        string? currency, 
         Exception? exception = null)
         => new(errorCode, balance, currency, exception);
 

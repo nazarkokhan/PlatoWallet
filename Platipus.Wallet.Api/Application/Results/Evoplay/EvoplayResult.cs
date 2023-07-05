@@ -26,7 +26,7 @@ public sealed record EvoplayResult : BaseResult<EvoplayErrorCode>, IEvoplayResul
     
     public string ErrorDescription { get; set; }
 
-    public string Balance { get; }
+    public string? Balance { get; }
     
-    public string Currency { get; }
+    public string? Currency { get; }
 }
