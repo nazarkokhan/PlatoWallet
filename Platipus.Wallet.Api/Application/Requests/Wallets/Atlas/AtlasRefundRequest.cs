@@ -33,7 +33,7 @@ public sealed record AtlasRefundRequest(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
-                amount: (int)validAmount,
+                amount: validAmount,
                 clientId: request.ClientId,
                 cancellationToken: cancellationToken);
 
