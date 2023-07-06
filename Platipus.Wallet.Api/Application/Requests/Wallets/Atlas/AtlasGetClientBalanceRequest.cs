@@ -36,7 +36,7 @@ public sealed record AtlasGetClientBalanceRequest(
             var data = walletResult.Data;
             var response = new AtlasCommonResponse(
                 data?.Currency!, 
-                walletResult.Data!.Balance * 100, 
+                (long)walletResult.Data!.Balance * 100, 
                 data?.UserId.ToString()!
                 );
             return AtlasResultFactory.Success(response);
