@@ -29,6 +29,7 @@ public static class CommonResultToAtlasMappers
         {
             ErrorCode.CasinoNotFound => AtlasErrorCode.ProviderNotConfigured,
             ErrorCode.TransactionAlreadyExists => AtlasErrorCode.TransactionAlreadyProcessed,
+            ErrorCode.TransactionNotFound => AtlasErrorCode.BetTransactionNotFound,
             ErrorCode.UserNotFound => AtlasErrorCode.SessionValidationFailed,
             ErrorCode.UserIsDisabled => AtlasErrorCode.SessionValidationFailed,
             ErrorCode.RoundAlreadyExists => AtlasErrorCode.GameRoundNotPreviouslyCreated,

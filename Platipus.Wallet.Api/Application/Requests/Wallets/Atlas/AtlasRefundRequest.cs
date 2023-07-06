@@ -31,8 +31,8 @@ public sealed record AtlasRefundRequest(
             var validAmount = request.Amount / 100;
             var walletResult = await _walletService.RollbackAsync(
                 request.Token,
-                request.RoundId,
                 request.TransactionId,
+                request.RoundId,
                 amount: validAmount,
                 clientId: request.ClientId,
                 cancellationToken: cancellationToken);
@@ -42,7 +42,7 @@ public sealed record AtlasRefundRequest(
 
             var response = new AtlasCommonResponse(
                 walletResult.Data?.Currency!, 
-                (long)walletResult.Data!.Balance * 100, 
+                (long)(walletResult.Data!.Balance * 100), 
                 walletResult.Data.UserId.ToString());
 
             return AtlasResultFactory.Success(response);

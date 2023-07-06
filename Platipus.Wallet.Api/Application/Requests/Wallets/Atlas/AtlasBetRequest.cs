@@ -41,7 +41,7 @@ public sealed record AtlasBetRequest(
             
             var response = new AtlasCommonResponse(
                 walletResult.Data?.Currency!, 
-                (long)walletResult.Data!.Balance * 100, 
+                (long)(walletResult.Data!.Balance * 100), 
                 walletResult.Data.UserId.ToString());
 
             return AtlasResultFactory.Success(response);
