@@ -2,6 +2,7 @@
 
 using Base;
 using FluentValidation;
+using Responses.AtlasPlatform;
 using Results.Atlas;
 using Results.ResultToResultMappers;
 using Services.AtlasGamesApi;
@@ -28,10 +29,15 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
         }
 
         public async Task<IAtlasResult> Handle(
-            AtlasRegisterFreeSpinBonusRequest request, CancellationToken cancellationToken)
+            AtlasRegisterFreeSpinBonusRequest request, 
+            CancellationToken cancellationToken)
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(
                 request.Environment, cancellationToken);
+            if (walletResponse.IsFailure)
+            {
+                return walletResponse.ToAtlasFailureResult<AtlasCommonResponse>();
+            }
             
             var clientResponse = await _atlasGameApiClient.RegisterFreeSpinBonusAsync(
                 walletResponse.Data?.BaseUrl!, request.ApiRequest, request.Token!,

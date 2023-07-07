@@ -35,9 +35,11 @@ public static class CommonResultToAtlasMappers
             ErrorCode.RoundAlreadyExists => AtlasErrorCode.GameRoundNotPreviouslyCreated,
             ErrorCode.RoundAlreadyFinished => AtlasErrorCode.GameRoundIdNotUnique,
             ErrorCode.InvalidCurrency => AtlasErrorCode.CurrencyMismatchException,
+            ErrorCode.GameServerApiError => AtlasErrorCode.GameLaunchError,
             ErrorCode.RoundNotFound => AtlasErrorCode.GameRoundNotPreviouslyCreated,
+            ErrorCode.InsufficientFunds => AtlasErrorCode.InsufficientFunds,
             ErrorCode.UnknownHttpClientError => AtlasErrorCode.InternalError,
-            _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
+            _ => AtlasErrorCode.InternalError
         };
     }
 }

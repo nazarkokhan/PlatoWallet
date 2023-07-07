@@ -39,7 +39,7 @@ public sealed record AtlasGetClientBalanceRequest(
                 (long)(walletResult.Data!.Balance * 100), 
                 data?.UserId.ToString()!
                 );
-            return AtlasResultFactory.Success(response);
+            return walletResult.ToAtlasResult(response);
         }
     }
 

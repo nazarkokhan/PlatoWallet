@@ -50,6 +50,6 @@ public interface IWalletService
         CancellationToken cancellationToken = default);
 
     Task<IResult<WalletGetEnvironmentResponse>> GetEnvironmentAsync(
-        string? environment,
+        string environment,
         CancellationToken cancellationToken = default);
 }

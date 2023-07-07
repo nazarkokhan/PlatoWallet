@@ -38,12 +38,13 @@ public sealed record AtlasWinRequest(
             if (walletResult.IsFailure)
                 return walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
 
+            var data = walletResult.Data;
             var response = new AtlasCommonResponse(
-                walletResult.Data?.Currency!, 
-                (long)(walletResult.Data!.Balance * 100), 
-                walletResult.Data.UserId.ToString()
-                );
-            return AtlasResultFactory.Success(response);
+                data?.Currency!, 
+                (long)(data!.Balance * 100), 
+                data.UserId.ToString()
+            );
+            return walletResult.ToAtlasResult(response);
         }
     }
     

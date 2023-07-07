@@ -40,12 +40,13 @@ public sealed record AtlasRefundRequest(
             if (walletResult.IsFailure)
                 return walletResult.ToAtlasFailureResult<AtlasCommonResponse>();
 
+            var data = walletResult.Data;
             var response = new AtlasCommonResponse(
-                walletResult.Data?.Currency!, 
-                (long)(walletResult.Data!.Balance * 100), 
-                walletResult.Data.UserId.ToString());
+                data?.Currency!, 
+                (long)(data!.Balance * 100), 
+                data.UserId.ToString());
 
-            return AtlasResultFactory.Success(response);
+            return walletResult.ToAtlasResult(response);
         }
     }
 

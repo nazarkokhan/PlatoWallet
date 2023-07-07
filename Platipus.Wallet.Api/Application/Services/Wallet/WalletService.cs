@@ -392,13 +392,10 @@ public sealed class WalletService : IWalletService
     }
 
     public async Task<IResult<WalletGetEnvironmentResponse>> GetEnvironmentAsync(
-        string? environment, CancellationToken cancellationToken = default)
+        string environment, CancellationToken cancellationToken = default)
     {
         try
         {
-            //TODO why accept nullable and then throw exception
-            ArgumentNullException.ThrowIfNull(environment);
-            
             var contextResponse = await _context.Set<GameEnvironment>()
                 .Where(e => e.Id == environment)
                 .FirstOrDefaultAsync(cancellationToken);
