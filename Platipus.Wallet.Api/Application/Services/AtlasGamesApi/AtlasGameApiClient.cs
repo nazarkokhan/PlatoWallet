@@ -98,7 +98,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
             var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
-            
+
             return ResultFactory.Success(httpResult);
         }
         catch (Exception e)
@@ -107,7 +107,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
                 ErrorCode.UnknownHttpClientError, e);
         }
     }
-    
+
     private async Task<IResult<IHttpClientResult<TSuccess, AtlasErrorResponse>>> GetAsync<TSuccess>(
         Uri baseUrl,
         string method,

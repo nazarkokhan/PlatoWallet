@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 public record CreateErrorMockRequest(
     [property: DefaultValue("reevo_nazar")] string Username,
-    MockedErrorMethod Method,
+    [property: DefaultValue(MockedErrorMethod.Bet)]MockedErrorMethod Method,
     List<CreateErrorMockRequest.CreateErrorMockItem> Items) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<CreateErrorMockRequest, IResult>
@@ -45,6 +45,10 @@ public record CreateErrorMockRequest(
             for (var i = 0; i < request.Items.Count; i++)
             {
                 var item = request.Items[i];
+                if(!Enum.IsDefined(typeof(HttpStatusCode), item.HttpStatusCode))
+                {
+                    return ResultFactory.Failure(ErrorCode.InvalidHttpStatusCode);
+                }
                 var contentType = item.ContentType switch
                 {
                     "text" => MediaTypeNames.Text.Plain,

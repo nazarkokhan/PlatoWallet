@@ -3,7 +3,6 @@
 using System.Text.Json.Serialization;
 using Base;
 using FluentValidation;
-using Responses.AtlasPlatform;
 using Results.Atlas;
 using Results.ResultToResultMappers;
 using Services.AtlasGamesApi;
@@ -11,10 +10,12 @@ using Services.AtlasGamesApi.Requests;
 using Services.Wallet;
 
 public sealed record AtlasRegisterFreeSpinBonusRequest(
-    [property: JsonPropertyName("environment")]string Environment,
-    [property: JsonPropertyName("apiRequest")]AtlasRegisterFreeSpinBonusGameApiRequest ApiRequest,
-    [property: JsonPropertyName("token")]string? Token = null) 
-        : IAtlasRequest, IRequest<IAtlasResult>
+        [property: JsonPropertyName("environment")] 
+        string Environment,
+        [property: JsonPropertyName("apiRequest")]
+        AtlasRegisterFreeSpinBonusGameApiRequest ApiRequest,
+        [property: JsonPropertyName("token")] string? Token = null)
+    : IAtlasRequest, IRequest<IAtlasResult>
 {
     public sealed class Handler : 
         IRequestHandler<AtlasRegisterFreeSpinBonusRequest, IAtlasResult>
@@ -38,7 +39,7 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
                 request.Environment, cancellationToken);
             if (walletResponse.IsFailure)
             {
-                return walletResponse.ToAtlasFailureResult<AtlasCommonResponse>();
+                return walletResponse.ToAtlasFailureResult<AtlasErrorResponse>();
             }
             
             var clientResponse = await _atlasGameApiClient.RegisterFreeSpinBonusAsync(
@@ -68,17 +69,20 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
 
             RuleFor(x => x.BonusId).NotEmpty();
 
-            RuleFor(x => x.CasinoId).NotEmpty();
-
             RuleFor(x => x.SpinsCount).GreaterThan(0);
 
-            RuleForEach(x => x.BetValues).Must(HaveValidBetValues)
+            RuleForEach(x => x.BetValues)
+                .NotEmpty() 
+                .Must(HaveValidBetValues)
                 .WithMessage("Invalid BetValues format");
 
             RuleFor(x => x.StartDate).NotEmpty()
-                .Must(BeAValidDate).WithMessage("Invalid date format");
+                .Must(BeAValidDate)
+                .WithMessage("Invalid date format");
 
-            RuleFor(x => x.ExpirationDate).NotEmpty()
+            RuleFor(x => x.ExpirationDate)
+                .NotEmpty()
+                .GreaterThan(x => x.StartDate)
                 .Must(BeAValidDate).WithMessage("Invalid date format");
         }
 

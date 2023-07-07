@@ -39,7 +39,7 @@ public sealed record AtlasAssignFreeSpinBonusRequest(
             
             if (walletResponse.IsFailure)
             {
-                return walletResponse.ToAtlasFailureResult<AtlasCommonResponse>();
+                return walletResponse.ToAtlasFailureResult<AtlasErrorResponse>();
             }
             
             var clientResponse = await _atlasGameApiClient.AssignFreeSpinBonusAsync(
@@ -71,13 +71,12 @@ public sealed record AtlasAssignFreeSpinBonusRequest(
                 .NotEmpty();
 
             RuleFor(x => x.BonusInstanceId).NotEmpty();
-
-            RuleFor(x => x.CasinoId).NotEmpty();
-
+            
             RuleFor(x => x.ClientId).NotEmpty();
 
             RuleFor(x => x.Currency).NotEmpty()
-                .Must(BeAValidCurrency).WithMessage("Invalid currency format");
+                .Must(BeAValidCurrency)
+                .WithMessage("Invalid currency format");
         }
 
         private static bool BeAValidCurrency(string currency)
