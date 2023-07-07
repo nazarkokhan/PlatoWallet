@@ -4,7 +4,6 @@ using Base;
 using FluentValidation;
 using Responses.AtlasPlatform;
 using Platipus.Wallet.Api.Application.Services.Wallet;
-using Results.Atlas;
 using Results.Atlas.WithData;
 using Results.ResultToResultMappers;
 
@@ -31,7 +30,7 @@ public sealed record AtlasRefundRequest(
             var validAmount = request.Amount / 100;
             var walletResult = await _walletService.RollbackAsync(
                 request.Token,
-                request.TransactionId,
+                request.RefundTransactionId,
                 request.RoundId,
                 amount: validAmount,
                 clientId: request.ClientId,
