@@ -46,7 +46,9 @@ public sealed record AtlasAssignFreeSpinBonusRequest(
                 walletResponse.Data?.BaseUrl!, request.ApiRequest, request.Token!,
                 cancellationToken);
 
-            return clientResponse.ToAtlasResult();
+            return clientResponse.IsFailure 
+                ? clientResponse.ToAtlasFailureResult<AtlasErrorResponse>() 
+                : clientResponse.ToAtlasResult();
         }
     }
     
@@ -69,6 +71,11 @@ public sealed record AtlasAssignFreeSpinBonusRequest(
         {
             RuleFor(x => x.BonusId)
                 .NotEmpty();
+            
+            When(x => x.CasinoId is not null, () =>
+            {
+                RuleFor(x => x.CasinoId).NotEmpty();
+            });
 
             RuleFor(x => x.BonusInstanceId).NotEmpty();
             

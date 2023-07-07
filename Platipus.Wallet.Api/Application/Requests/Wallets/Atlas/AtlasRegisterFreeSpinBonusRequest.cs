@@ -46,7 +46,9 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
                 walletResponse.Data?.BaseUrl!, request.ApiRequest, request.Token!,
                 cancellationToken);
 
-            return clientResponse.ToAtlasResult();
+            return clientResponse.IsFailure 
+                ? clientResponse.ToAtlasFailureResult<AtlasErrorResponse>() 
+                : clientResponse.ToAtlasResult();
         }
     }
 
@@ -68,6 +70,10 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
             RuleFor(x => x.GameId).NotEmpty();
 
             RuleFor(x => x.BonusId).NotEmpty();
+            
+            RuleFor(x => x.CasinoId)
+                .NotEmpty()
+                .When(x => x.CasinoId is not null);
 
             RuleFor(x => x.SpinsCount).GreaterThan(0);
 
@@ -76,40 +82,48 @@ public sealed record AtlasRegisterFreeSpinBonusRequest(
                 .Must(HaveValidBetValues)
                 .WithMessage("Invalid BetValues format");
 
-            RuleFor(x => x.StartDate).NotEmpty()
-                .Must(BeAValidDate)
-                .WithMessage("Invalid date format");
+            RuleFor(x => x.StartDate)
+            .NotEmpty()
+            .Must(BeAValidDate)
+            .WithMessage("Invalid date format");
 
-            RuleFor(x => x.ExpirationDate)
-                .NotEmpty()
-                .GreaterThan(x => x.StartDate)
-                .Must(BeAValidDate).WithMessage("Invalid date format");
+        RuleFor(x => x.ExpirationDate)
+            .NotEmpty()
+            .Must(BeAValidDate)
+            .WithMessage("Invalid date format")
+            .Must((request, expirationDate) => BeLaterThanStartDate(expirationDate, request.StartDate))
+            .WithMessage("ExpirationDate must be later than StartDate")
+            .Must(BeInTheFuture)
+            .WithMessage("ExpirationDate must be in the future");
         }
 
         private static bool BeAValidDate(string date)
         {
-            // Assuming the date string is a long in seconds, we need to try and parse it.
             if (!long.TryParse(date, out var dateLong)) return false;
-            
-            // Check if the date is a valid Unix timestamp
             DateTimeOffset.FromUnixTimeSeconds(dateLong);
-            // Add your own validation logic here, if needed.
             return true;
 
         }
         private static bool HaveValidBetValues(Dictionary<string, int> betValues)
         {
-            // Check that the dictionary has exactly one entry.
             if (betValues.Count is not 1) return false;
-
-            // Get the key-value pair.
             var kvp = betValues.First();
-
-            // Check that the key is a 3-character string.
-            if (kvp.Key.Length != 3) return false;
-
-            // Check that the value is a positive integer.
+            if (kvp.Key.Length is not 3) return false;
             return kvp.Value > 0;
+        }
+        
+        private static bool BeLaterThanStartDate(string expirationDate, string startDate)
+        {
+            if (!long.TryParse(startDate, out var startUnixTime)) return false;
+            if (!long.TryParse(expirationDate, out var expirationUnixTime)) return false;
+            return expirationUnixTime > startUnixTime;
+        }
+
+        private static bool BeInTheFuture(string expirationDate)
+        {
+            if (!long.TryParse(expirationDate, out var expirationUnixTime)) return false;
+            var currentUnixTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+            return expirationUnixTime > currentUnixTime;
         }
     }
 }

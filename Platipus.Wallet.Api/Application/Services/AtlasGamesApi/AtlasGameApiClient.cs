@@ -98,6 +98,11 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
             var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            if (httpResult.IsFailure)
+            {
+                return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(
+                    ErrorCode.Unknown);
+            }
 
             return ResultFactory.Success(httpResult);
         }
@@ -145,8 +150,17 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
                 return httpResponse.Failure<TSuccess, AtlasErrorResponse>();
 
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
+            
+            if (responseJson.TryGetProperty("error", out _) 
+                && responseJson.TryGetProperty("errorCode", out _))
+            {
+                var errorResponse = responseJson.Deserialize<AtlasErrorResponse>(_jsonSerializerOptions);
+                if (errorResponse is not null) 
+                    return httpResponse.Failure<TSuccess, AtlasErrorResponse>(errorResponse);
+            }
 
             var success = responseJson.Deserialize<TSuccess>(_jsonSerializerOptions);
+            
             return success is null ? 
                 httpResponse.Failure<TSuccess, AtlasErrorResponse>() : 
                 httpResponse.Success<TSuccess, AtlasErrorResponse>(success);

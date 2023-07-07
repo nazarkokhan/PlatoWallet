@@ -124,6 +124,7 @@ public static class StartupExtensions
             .AddJsonOptions(nameof(CasinoProvider.Atlas),
                 options =>
                 {
+                    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
