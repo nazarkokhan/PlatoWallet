@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Atlas;
 
+using System.Text.Json.Serialization;
 using Base;
 using FluentValidation;
 using Responses.AtlasPlatform;
@@ -10,9 +11,10 @@ using Services.AtlasGamesApi.Requests;
 using Services.Wallet;
 
 public sealed record AtlasRegisterFreeSpinBonusRequest(
-    string Environment,
-    AtlasRegisterFreeSpinBonusGameApiRequest ApiRequest,
-    string? Token = null) : IAtlasRequest, IRequest<IAtlasResult>
+    [property: JsonPropertyName("environment")]string Environment,
+    [property: JsonPropertyName("apiRequest")]AtlasRegisterFreeSpinBonusGameApiRequest ApiRequest,
+    [property: JsonPropertyName("token")]string? Token = null) 
+        : IAtlasRequest, IRequest<IAtlasResult>
 {
     public sealed class Handler : 
         IRequestHandler<AtlasRegisterFreeSpinBonusRequest, IAtlasResult>
