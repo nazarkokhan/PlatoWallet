@@ -6,6 +6,6 @@ public sealed record AtlasGameModel(
     string GameTypeId, 
     bool DemoGameAvailable, 
     bool JackpotAvailable, 
-    bool IsFreeSpinAvailable,
+    bool FreeSpinAvailable,
     bool IsDesktop, 
     bool IsMobile);
