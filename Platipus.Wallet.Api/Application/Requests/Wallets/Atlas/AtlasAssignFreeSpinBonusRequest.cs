@@ -67,7 +67,8 @@ public sealed record AtlasAssignFreeSpinBonusRequest(
     {
         public AtlasAssignFreeSpinBonusGameApiRequestValidator()
         {
-            RuleFor(x => x.BonusId).NotEmpty();
+            RuleFor(x => x.BonusId)
+                .NotEmpty();
 
             RuleFor(x => x.BonusInstanceId).NotEmpty();
 

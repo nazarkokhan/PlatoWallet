@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Horizon.XmlRpc.AspNetCore.Extensions;
 using Humanizer;
 using JorgeSerrano.Json;
@@ -107,6 +108,7 @@ try
         .AddSecurityAndErrorMockFilters()
         .AddOptions(builderConfiguration)
         .AddEndpointsApiExplorer()
+        .AddFluentValidationAutoValidation()
         .AddSwaggerWithConfig()
         .AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly))
         .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
