@@ -55,23 +55,23 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
             baseUrl, "getgames", request, token, cancellationToken);
     }
 
-    public Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
+    public Task<IResult<IHttpClientResult<object, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
         Uri baseUrl, 
         AtlasRegisterFreeSpinBonusGameApiRequest apiRequest, 
         string token,
         CancellationToken cancellationToken = default)
     {
-        return PostAsync<IAtlasResult, AtlasRegisterFreeSpinBonusGameApiRequest>(
+        return PostAsync<object, AtlasRegisterFreeSpinBonusGameApiRequest>(
             baseUrl, "registerBonus", apiRequest, token, cancellationToken);
     }
 
-    public Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
+    public Task<IResult<IHttpClientResult<object, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
         Uri baseUrl, 
         AtlasAssignFreeSpinBonusGameApiRequest apiRequest, 
         string token,
         CancellationToken cancellationToken = default)
     {
-        return PostAsync<IAtlasResult, AtlasAssignFreeSpinBonusGameApiRequest>(
+        return PostAsync<object, AtlasAssignFreeSpinBonusGameApiRequest>(
             baseUrl, "assignBonus", apiRequest, token, cancellationToken);
     }
 
@@ -97,7 +97,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
             if (httpResult.IsFailure)
             {
                 return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(
@@ -129,7 +129,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
 
             return ResultFactory.Success(httpResult);
         }
@@ -141,15 +141,22 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
     }
 
     private IHttpClientResult<TSuccess, AtlasErrorResponse> GetHttpResultAsync<TSuccess>(
-        HttpClientRequest httpResponse)
+        HttpClientRequest httpResponse, string method)
     {
         try
         {
             var responseBody = httpResponse.ResponseData.Body;
-            if (string.IsNullOrEmpty(responseBody))
-                return httpResponse.Failure<TSuccess, AtlasErrorResponse>();
 
-            var responseJson = JsonDocument.Parse(responseBody).RootElement;
+            if (method is "registerBonus" or "assignBonus" && responseBody is "")
+            {
+                return httpResponse.Success<TSuccess, AtlasErrorResponse>(Activator.CreateInstance<TSuccess>());
+            }
+            
+            if (string.IsNullOrEmpty(responseBody))
+            {
+                return httpResponse.Failure<TSuccess, AtlasErrorResponse>();
+            }
+            var responseJson = JsonDocument.Parse(responseBody!).RootElement;
             
             if (responseJson.TryGetProperty("error", out _) 
                 && responseJson.TryGetProperty("errorCode", out _))

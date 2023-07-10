@@ -20,13 +20,13 @@ public interface IAtlasGameApiClient
         string token,
         CancellationToken cancellationToken = default);
     
-    Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
+    Task<IResult<IHttpClientResult<object, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
         Uri baseUrl,
         AtlasRegisterFreeSpinBonusGameApiRequest apiRequest,
         string token,
         CancellationToken cancellationToken = default);
     
-    Task<IResult<IHttpClientResult<IAtlasResult, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
+    Task<IResult<IHttpClientResult<object, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
         Uri baseUrl,
         AtlasAssignFreeSpinBonusGameApiRequest apiRequest,
         string token,

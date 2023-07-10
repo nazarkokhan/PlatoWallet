@@ -5,6 +5,7 @@ using Base;
 using FluentValidation;
 using Responses.AtlasPlatform;
 using Results.Atlas;
+using Results.Atlas.WithData;
 using Results.ResultToResultMappers;
 using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
