@@ -66,7 +66,7 @@ public sealed record AtlasWinRequest(
                 .WithMessage("RoundId cannot exceed 150 characters.");
 
             RuleFor(x => x.Amount)
-                .NotEmpty()
+                .GreaterThanOrEqualTo(0)
                 .WithMessage("Amount property is required");
 
             RuleFor(x => x.TransactionId)
