@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using ControllerSpecificJsonOptions;
 using Domain.Entities;
 using Domain.Entities.Enums;
+using Factories;
 using Filters.NewFilterStyle;
 using Filters.Security;
 using Filters.Security.Evoplay;
@@ -24,30 +25,30 @@ public static class StartupExtensions
     public static IServiceCollection AddSecurityAndErrorMockFilters(this IServiceCollection services)
     {
         return services
-            .AddSingleton<BetflagMockedErrorActionFilter>()
-            .AddScoped<BetflagSecurityFilter>()
-            .AddSingleton<BetconstructMockedErrorActionFilter>()
-            .AddScoped<BetconstructSecurityFilter>()
-            .AddSingleton<OpenboxMockedErrorActionFilter>()
-            .AddSingleton<EmaraPlayMockedErrorActionFilter>()
-            .AddScoped<EmaraPlaySecurityFilter>()
-            .AddSingleton<AtlasMockedErrorActionFilter>()
-            .AddScoped<AtlasSecurityFilter>()
-            .AddScoped<AtlasExternalSecurityFilter>()
-            .AddSingleton<EvoplayMockedErrorActionFilter>()
-            .AddScoped<EvoplaySecurityFilter>();
+           .AddSingleton<BetflagMockedErrorActionFilter>()
+           .AddScoped<BetflagSecurityFilter>()
+           .AddSingleton<BetconstructMockedErrorActionFilter>()
+           .AddScoped<BetconstructSecurityFilter>()
+           .AddSingleton<OpenboxMockedErrorActionFilter>()
+           .AddSingleton<EmaraPlayMockedErrorActionFilter>()
+           .AddScoped<EmaraPlaySecurityFilter>()
+           .AddSingleton<AtlasMockedErrorActionFilter>()
+           .AddScoped<AtlasSecurityFilter>()
+           .AddScoped<AtlasExternalSecurityFilter>()
+           .AddSingleton<EvoplayMockedErrorActionFilter>()
+           .AddScoped<EvoplaySecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
     {
         builder
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Dafabet),
                 options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Openbox),
                 options =>
                 {
@@ -55,21 +56,21 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Hub88),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Softswiss),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Sw),
                 options =>
                 {
@@ -77,58 +78,61 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.SoftBet),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonLowerCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Betflag),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Uis),
                 options =>
                 {
                     // options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Reevo),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.Everymatrix),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                 })
-            .AddJsonOptions(
+           .AddJsonOptions(
                 nameof(CasinoProvider.BetConstruct),
                 _ =>
                 {
                 })
-            .AddJsonOptions(nameof(CasinoProvider.EmaraPlay),
+           .AddJsonOptions(
+                nameof(CasinoProvider.EmaraPlay),
                 options =>
                 {
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
-            .AddJsonOptions(nameof(CasinoProvider.Atlas),
+           .AddJsonOptions(
+                nameof(CasinoProvider.Atlas),
                 options =>
                 {
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
-            .AddJsonOptions(nameof(CasinoProvider.Evoplay),
+           .AddJsonOptions(
+                nameof(CasinoProvider.Evoplay),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -140,26 +144,15 @@ public static class StartupExtensions
     public static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddOptions<SupportedCurrenciesOptions>()
-            .Configure<WalletDbContext>(
-                (options, context) =>
-                {
-                    var currencies = context.Set<Currency>()
-                        .Select(c => c.Id)
-                        .ToList();
-
-                    options.Items = new HashSet<string>(currencies);
-                })
-            .Services
-            .AddOptions<SoftswissCurrenciesOptions>()
-            .Configure(
+           .AddOptions<SoftswissCurrenciesOptions>()
+           .Configure(
                 options =>
                 {
                     var fullJson = File.ReadAllText("StaticFiles/softswiss_currency_mappers.json");
                     var jsonNode = JsonNode.Parse(fullJson)!;
 
                     var optionsValue = jsonNode.AsObject()
-                        .ToDictionary(
+                       .ToDictionary(
                             x => x.Value!["iso_code"]!.GetValue<string>(),
                             x => x.Value!["subunit_to_unit"]!.GetValue<long>());
 
@@ -188,6 +181,7 @@ public static class StartupExtensions
                         Type = "string",
                         Example = new OpenApiString(TimeSpan.Zero.ToString())
                     });
+
                 options.SupportNonNullableReferenceTypes();
                 options.MapType<DateOnly>(
                     () => new OpenApiSchema
@@ -195,6 +189,7 @@ public static class StartupExtensions
                         Type = "string",
                         Format = "date"
                     });
+
                 options.MapType<TimeOnly>(
                     () => new OpenApiSchema
                     {

@@ -22,6 +22,7 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
+using Platipus.Wallet.Api.StartupSettings.Factories;
 using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Logging;
@@ -35,13 +36,13 @@ try
 {
     SelfLogHelper.EnableConsoleAndFile();
     Log.Logger = new LoggerConfiguration()
-        .Enrich.FromLogContext()
-        .Enrich.WithMachineName()
-        .Enrich.WithEnvironmentName()
-        .Enrich.WithEnvironmentUserName()
-        .Enrich.WithAppVersion()
-        .WriteTo.File("./logs/static-logger.txt")
-        .CreateBootstrapLogger();
+       .Enrich.FromLogContext()
+       .Enrich.WithMachineName()
+       .Enrich.WithEnvironmentName()
+       .Enrich.WithEnvironmentUserName()
+       .Enrich.WithAppVersion()
+       .WriteTo.File("./logs/static-logger.txt")
+       .CreateBootstrapLogger();
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
@@ -51,10 +52,10 @@ try
 
     const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO now it is dynamic from config, remove
     services
-        .AddScoped<IWalletService, WalletService>()
-        .AddTransient<ExceptionHandlerMiddleware>()
-        .AddTransient<BufferResponseBodyMiddleware>()
-        .AddControllers(
+       .AddScoped<IWalletService, WalletService>()
+       .AddTransient<ExceptionHandlerMiddleware>()
+       .AddTransient<BufferResponseBodyMiddleware>()
+       .AddControllers(
             options =>
             {
                 var xmlFormatter = options.OutputFormatters.OfType<XmlSerializerOutputFormatter>().FirstOrDefault();
@@ -70,109 +71,112 @@ try
                 options.Filters.Add<ResultToResponseResultFilterAttribute>(1);
                 options.Filters.Add<LoggingResultFilterAttribute>(2);
             })
-        .AddJsonOptions(
+       .AddJsonOptions(
             options =>
             {
                 options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.WriteAsString
-                                                               | JsonNumberHandling.AllowReadingFromString;
+                                                             | JsonNumberHandling.AllowReadingFromString;
+
                 options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             })
-        .ConfigureApiBehaviorOptions(
+       .ConfigureApiBehaviorOptions(
             options =>
             {
                 options.InvalidModelStateResponseFactory = context =>
-                {
-                    //TODO suppress and move to ResultToResponseResultFilterAttribute
-                    var errors = context.ModelState
-                        .Where(x => x.Value?.Errors.Count > 0)
-                        .SelectMany(kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));
+                                                           {
+                                                               //TODO suppress and move to ResultToResponseResultFilterAttribute
+                                                               var errors = context.ModelState
+                                                                  .Where(x => x.Value?.Errors.Count > 0)
+                                                                  .SelectMany(
+                                                                       kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));
 
-                    const ErrorCode code = ErrorCode.ValidationError;
-                    var description = string.Join(". ", errors);
+                                                               const ErrorCode code = ErrorCode.ValidationError;
+                                                               var description = string.Join(". ", errors);
 
-                    var errorResponse = new
-                    {
-                        Code = (int)code,
-                        Description = !string.IsNullOrWhiteSpace(description)
-                            ? description
-                            : code.Humanize()
-                    };
+                                                               var errorResponse = new
+                                                               {
+                                                                   Code = (int)code,
+                                                                   Description = !string.IsNullOrWhiteSpace(description)
+                                                                       ? description
+                                                                       : code.Humanize()
+                                                               };
 
-                    return new BadRequestObjectResult(errorResponse);
-                };
+                                                               return new BadRequestObjectResult(errorResponse);
+                                                           };
             })
-        .AddJsonOptionsForProviders()
-        .AddSecurityAndErrorMockFilters()
-        .AddOptions(builderConfiguration)
-        .AddEndpointsApiExplorer()
-        .AddFluentValidationAutoValidation()
-        .AddSwaggerWithConfig()
-        .AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly))
-        .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
-        .AddAllBehaviors()
-        .AddLocalization()
-        .AddLazyCache()
-        .AddDbContext<WalletDbContext>(
+       .AddJsonOptionsForProviders()
+       .AddSecurityAndErrorMockFilters()
+       .AddOptions(builderConfiguration)
+       .AddEndpointsApiExplorer()
+       .AddFluentValidationAutoValidation()
+       .AddSwaggerWithConfig()
+       .AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly))
+       .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+       .AddAllBehaviors()
+       .AddLocalization()
+       .AddLazyCache()
+       .AddDbContext<WalletDbContext>(
             (optionsBuilder) =>
             {
                 optionsBuilder
-                    .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
-                    .UseSnakeCaseNamingConvention();
+                   .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
+                   .UseSnakeCaseNamingConvention();
 
                 if (builder.Environment.IsDevelopment() || builder.Environment.IsDebug())
                     optionsBuilder.EnableSensitiveDataLogging();
             })
-        .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
-        .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
+       .AddTransient<SupportedCurrenciesFactory>()
+       .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
+       .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
             })
-        .Services
-        .AddSingleton<IHub88GamesApiClient, Hub88GamesApiClient>()
-        .AddHttpClient<IHub88GamesApiClient, Hub88GamesApiClient>(
+       .Services
+       .AddSingleton<IHub88GamesApiClient, Hub88GamesApiClient>()
+       .AddHttpClient<IHub88GamesApiClient, Hub88GamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}hub88/");
             })
-        .Services
-        .AddSingleton<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
-        .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
+       .Services
+       .AddSingleton<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
+       .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
-        .Services
-        .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
-        .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
+       .Services
+       .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
+       .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
             })
-        .Services
-        .AddSingleton<IReevoGameApiClient, ReevoGameApiClient>()
-        .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
+       .Services
+       .AddSingleton<IReevoGameApiClient, ReevoGameApiClient>()
+       .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
             })
-        .Services
-        .AddSingleton<IUisGameApiClient, UisGameApiClient>()
-        .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
-        .Services
-        .AddSingleton<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
-        .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
-        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-        .Services
-        .AddSingleton<IAtlasGameApiClient, AtlasGameApiClient>()
-        .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>();
+       .Services
+       .AddSingleton<IUisGameApiClient, UisGameApiClient>()
+       .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
+       .Services
+       .AddSingleton<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+       .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddSingleton<IAtlasGameApiClient, AtlasGameApiClient>()
+       .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>();
 
     services
-        .AddHealthChecks()
-        .AddNpgSql(builderConfiguration.GetConnectionString(nameof(WalletDbContext))!, name: nameof(WalletDbContext));
+       .AddHealthChecks()
+       .AddNpgSql(builderConfiguration.GetConnectionString(nameof(WalletDbContext))!, name: nameof(WalletDbContext));
 
     services.AddXmlRpc();
     services.AddHttpContextAccessor();

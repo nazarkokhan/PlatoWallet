@@ -7,6 +7,7 @@ using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using StartupSettings.Factories;
 using StartupSettings.Options;
 
 public record SignUpRequest(
@@ -78,11 +79,11 @@ public record SignUpRequest(
 
     public class Validator : AbstractValidator<SignUpRequest>
     {
-        public Validator(IOptions<SupportedCurrenciesOptions> currenciesOptions)
+        public Validator(SupportedCurrenciesFactory currenciesFactory)
         {
-            var currenciesOptionsValue = currenciesOptions.Value;
+            var currenciesOptions = currenciesFactory.Create();
 
-            RuleFor(x => currenciesOptionsValue.Items.Contains(x.Currency));
+            RuleFor(x => currenciesOptions.Items.Contains(x.Currency));
 
             RuleFor(p => p.Password)
                 .MinimumLength(6)

@@ -22,6 +22,7 @@ using Services.PswGamesApi;
 using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
+using StartupSettings.Factories;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
 
@@ -702,11 +703,11 @@ public sealed record LogInRequest(
     
     public class Validator : AbstractValidator<SignUpRequest>
     {
-        public Validator(IOptions<SupportedCurrenciesOptions> currenciesOptions)
+        public Validator(SupportedCurrenciesFactory supportedCurrenciesFactory)
         {
-            var currenciesOptionsValue = currenciesOptions.Value;
+            var currenciesOptions = supportedCurrenciesFactory.Create();
 
-            RuleFor(x => currenciesOptionsValue.Items.Contains(x.Currency));
+            RuleFor(x => currenciesOptions.Items.Contains(x.Currency));
 
             RuleFor(p => p.Balance)
                 .PrecisionScale(28, 2, false);
