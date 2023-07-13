@@ -85,27 +85,27 @@ try
        .ConfigureApiBehaviorOptions(
             options =>
             {
-                options.InvalidModelStateResponseFactory = context =>
-                                                           {
-                                                               //TODO suppress and move to ResultToResponseResultFilterAttribute
-                                                               var errors = context.ModelState
-                                                                  .Where(x => x.Value?.Errors.Count > 0)
-                                                                  .SelectMany(
-                                                                       kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));
+                options.InvalidModelStateResponseFactory =
+                    context =>
+                    {
+                        //TODO suppress and move to ResultToResponseResultFilterAttribute
+                        var errors = context.ModelState
+                           .Where(x => x.Value?.Errors.Count > 0)
+                           .SelectMany(kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));
 
-                                                               const ErrorCode code = ErrorCode.ValidationError;
-                                                               var description = string.Join(". ", errors);
+                        const ErrorCode code = ErrorCode.ValidationError;
+                        var description = string.Join(". ", errors);
 
-                                                               var errorResponse = new
-                                                               {
-                                                                   Code = (int)code,
-                                                                   Description = !string.IsNullOrWhiteSpace(description)
-                                                                       ? description
-                                                                       : code.Humanize()
-                                                               };
+                        var errorResponse = new
+                        {
+                            Code = (int)code,
+                            Description = !string.IsNullOrWhiteSpace(description)
+                                ? description
+                                : code.Humanize()
+                        };
 
-                                                               return new BadRequestObjectResult(errorResponse);
-                                                           };
+                        return new BadRequestObjectResult(errorResponse);
+                    };
             })
        .AddJsonOptionsForProviders()
        .AddSecurityAndErrorMockFilters()

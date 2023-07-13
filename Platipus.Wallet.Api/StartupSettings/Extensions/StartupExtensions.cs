@@ -6,13 +6,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using ControllerSpecificJsonOptions;
-using Domain.Entities;
 using Domain.Entities.Enums;
-using Factories;
 using Filters.NewFilterStyle;
 using Filters.Security;
 using Filters.Security.Evoplay;
-using Infrastructure.Persistence;
 using JorgeSerrano.Json;
 using JsonConverters;
 using Microsoft.OpenApi.Any;
@@ -25,6 +22,7 @@ public static class StartupExtensions
     public static IServiceCollection AddSecurityAndErrorMockFilters(this IServiceCollection services)
     {
         return services
+           .AddSingleton<SoftswissMockedErrorActionFilter>()
            .AddSingleton<BetflagMockedErrorActionFilter>()
            .AddScoped<BetflagSecurityFilter>()
            .AddSingleton<BetconstructMockedErrorActionFilter>()

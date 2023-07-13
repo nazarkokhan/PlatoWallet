@@ -69,7 +69,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
             semaphoreSlim.Release();
         }
     }
-    
+
     private async Task TryReplaceResponseWithMockedError(
         ActionExecutedContext executedContext,
         MockedErrorIdentifiers mockedErrorIdentifiers,

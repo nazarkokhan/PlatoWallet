@@ -14,11 +14,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StartupSettings;
 using StartupSettings.ControllerSpecificJsonOptions;
-using StartupSettings.Filters;
+using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security;
 
 [Route("wallet/softswiss")]
-[MockedErrorActionFilter(Order = 1)]
+[ServiceFilter(typeof(SoftswissMockedErrorActionFilter), Order = 1)]
 [SoftswissSecurityFilter(Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Softswiss))]
 [ProducesResponseType(typeof(SoftswissErrorResponse), StatusCodes.Status400BadRequest)]
