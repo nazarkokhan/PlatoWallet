@@ -34,7 +34,8 @@ public static class StartupExtensions
            .AddScoped<AtlasSecurityFilter>()
            .AddScoped<AtlasExternalSecurityFilter>()
            .AddSingleton<UranusMockedErrorActionFilter>()
-           .AddScoped<UranusSecurityFilter>();
+           .AddScoped<UranusSecurityFilter>()
+           .AddScoped<UranusExternalSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -135,7 +136,6 @@ public static class StartupExtensions
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
-                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
                 });
 
         return builder.Services;

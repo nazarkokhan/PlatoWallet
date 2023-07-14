@@ -1,16 +1,15 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.Security.Uranus;
 
 using System.Text;
-using System.Text.RegularExpressions;
 using Application.Requests.Wallets.Uranus.Base;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Results.Uranus;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign.Evoplay;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Domain.Entities.Enums;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Domain.Entities;
+using Domain.Entities.Enums;
+using Infrastructure.Persistence;
 
 public sealed class UranusSecurityFilter : IAsyncActionFilter
 {

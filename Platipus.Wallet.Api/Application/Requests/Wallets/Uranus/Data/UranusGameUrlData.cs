@@ -1,5 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus.Data;
 
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
-public sealed record UranusGameUrlData([property: JsonPropertyName("url")] Uri Url);
+public sealed record UranusGameUrlData([property: JsonProperty("url")] Uri Url);

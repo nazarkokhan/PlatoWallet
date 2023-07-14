@@ -18,6 +18,7 @@ using Platipus.Wallet.Api.Application.Services.PswGamesApi;
 using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
+using Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Obsolete;
@@ -172,7 +173,10 @@ try
        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddSingleton<IAtlasGameApiClient, AtlasGameApiClient>()
-       .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>();
+       .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>()
+       .Services
+       .AddSingleton<IUranusGameApiClient, UranusGameApiClient>()
+       .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>();
 
     services
        .AddHealthChecks()

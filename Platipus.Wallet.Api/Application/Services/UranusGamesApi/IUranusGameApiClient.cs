@@ -7,7 +7,7 @@ using Requests;
 
 public interface IUranusGameApiClient
 {
-    Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetLaunchUrlAsync(
+    Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetGameLaunchUrlAsync(
         Uri baseUrl,
         UranusGetLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default);

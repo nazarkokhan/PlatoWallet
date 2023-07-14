@@ -35,7 +35,7 @@ public static class CommonResultToUranusMappers
             ErrorCode.RoundAlreadyFinished => UranusErrorCode.E_UNEXPECTED_LOGIC,
             ErrorCode.InvalidCurrency => UranusErrorCode.E_UNEXPECTED_LOGIC,
             ErrorCode.RoundNotFound => UranusErrorCode.E_UNEXPECTED_LOGIC,
-            _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
+            _ => UranusErrorCode.E_INTERNAL
         };
     }
 }

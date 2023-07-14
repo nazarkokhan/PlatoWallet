@@ -32,12 +32,13 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
            .JsonSerializerOptions;
     }
 
-    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetLaunchUrlAsync(
+    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetGameLaunchUrlAsync(
         Uri baseUrl,
         UranusGetLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetLaunchUrlGameApiRequest>(
+            baseUrl, "game/launch", apiRequest, cancellationToken);
     }
 
     public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusAvailableGamesData>, UranusFailureResponse>>> GetAvailableGamesAsync(
@@ -45,7 +46,8 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
         UranusGetAvailableGamesGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return PostAsync<UranusSuccessResponse<UranusAvailableGamesData>, UranusGetAvailableGamesGameApiRequest>(
+            baseUrl, "game/list", apiRequest, cancellationToken);
     }
 
     public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetDemoLaunchUrlAsync(
@@ -53,7 +55,8 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
         UranusGetDemoLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetDemoLaunchUrlGameApiRequest>(
+            baseUrl, "game/demo", apiRequest, cancellationToken);
     }
 
     private async Task<IResult<IHttpClientResult<TSuccess, UranusFailureResponse>>> PostAsync<TSuccess, TRequest>(
@@ -68,12 +71,12 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
             var requestContent = JsonConvert.SerializeObject(request);
-            var content = new StringContent(requestContent, Encoding.UTF8, "application/json");
+            var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
-            var validHash = UranusSecurityHash.Compute(requestContent, SecretKey);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(validHash);
+            var xSignature = UranusSecurityHash.Compute(requestContent, SecretKey);
+            jsonContent.Headers.Add("X-Signature", xSignature);
 
-            var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, content, cancellationToken);
+            var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
