@@ -2,9 +2,9 @@
 
 using System.Text;
 using System.Text.RegularExpressions;
+using Application.Requests.Wallets.Uranus.Base;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay.Base;
 using Platipus.Wallet.Api.Application.Results.Uranus;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign.Evoplay;
@@ -15,23 +15,23 @@ using Platipus.Wallet.Infrastructure.Persistence;
 public sealed class UranusSecurityFilter : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(
-        ActionExecutingContext context, 
+        ActionExecutingContext context,
         ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
-            .OfType<IUranusRequest>()
-            .Single();
-        
+           .OfType<IUranusRequest>()
+           .Single();
+
         var httpContext = context.HttpContext;
 
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
         IQueryable<Session> query = dbContext.Set<Session>();
-        query = !string.IsNullOrEmpty(request.SessionToken) 
-            ? query.Where(s => s.Id == request.SessionToken) 
+        query = !string.IsNullOrEmpty(request.SessionToken)
+            ? query.Where(s => s.Id == request.SessionToken)
             : query.Where(s => s.UserId.ToString() == request.PlayerId);
 
         var session = await query
-            .Select(
+           .Select(
                 s => new
                 {
                     s.ExpirationDate,
@@ -40,42 +40,47 @@ public sealed class UranusSecurityFilter : IAsyncActionFilter
                     UserPassword = s.User.Password,
                     CasinoProvider = s.User.Casino.Params.UranusProvider
                 })
-            .FirstOrDefaultAsync();
+           .FirstOrDefaultAsync();
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = UranusResultFactory
-                .Failure<UranusFailureResponse>(UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
-                .ToActionResult();
+               .Failure<UranusFailureResponse>(UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
+               .ToActionResult();
+
             return;
         }
-        
-        const int uranusProviderId = (int)CasinoProvider.Uranus; 
+
+        const int uranusProviderId = (int)CasinoProvider.Uranus;
         if (!session.CasinoProvider.Equals(uranusProviderId.ToString()))
         {
             context.Result = UranusResultFactory
-                .Failure<UranusFailureResponse>(UranusErrorCode.E_PROVIDER_NOT_FOUND)
-                .ToActionResult();
+               .Failure<UranusFailureResponse>(UranusErrorCode.E_PROVIDER_NOT_FOUND)
+               .ToActionResult();
+
             return;
         }
 
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
         var jsonString = Encoding.UTF8.GetString(requestBytesToValidate);
-        //jsonString = Regex.Replace(jsonString, @"\s", "");
+
         string? authHeaderValue = context.HttpContext.Request.Headers["X-Signature"];
         if (authHeaderValue is null)
         {
-            context.Result = UranusResultFactory.Failure<UranusFailureResponse>(
-                UranusErrorCode.E_PLAYER_SESSION_NOT_FOUND).ToActionResult();
+            context.Result = UranusResultFactory.Failure<UranusFailureResponse>(UranusErrorCode.E_PLAYER_SESSION_NOT_FOUND)
+               .ToActionResult();
+
             return;
         }
-        var result = UranusSecurityHash.IsValid(
-            authHeaderValue, jsonString, session.CasinoSignatureKey);
+
+        var result = UranusSecurityHash.IsValid(authHeaderValue, jsonString, session.CasinoSignatureKey);
 
         if (!result)
         {
             context.Result = UranusResultFactory.Failure<UranusFailureResponse>(
-                UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED).ToActionResult();
+                    UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
+               .ToActionResult();
+
             return;
         }
 

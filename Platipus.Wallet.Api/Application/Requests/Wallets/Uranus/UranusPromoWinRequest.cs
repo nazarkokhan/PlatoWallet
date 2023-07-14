@@ -1,11 +1,11 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus;
 
 using Base;
 using Data;
-using Results.ResultToResultMappers;
-using Results.Uranus;
-using Results.Uranus.WithData;
-using Services.Wallet;
+using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
+using Platipus.Wallet.Api.Application.Results.Uranus;
+using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 
 public sealed record UranusPromoWinRequest(
         string PlayerId,

@@ -1,17 +1,17 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay.Base;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus.Base;
 
 using Newtonsoft.Json;
 
-public record EvoplayCommonBoxResponse<TData> : IEvoplayBoxResponse<TData>
+public record UranusCommonBoxResponse<TData> : IUranusBoxResponse<TData>
 {
-    protected EvoplayCommonBoxResponse()
+    protected UranusCommonBoxResponse()
     {
     }
 
-    public EvoplayCommonBoxResponse(
+    public UranusCommonBoxResponse(
         bool success,
         TData data,
-        EvoplayCommonErrorResponse error)
+        UranusCommonErrorResponse error)
     {
         Success = success;
         Data = data;
@@ -25,5 +25,5 @@ public record EvoplayCommonBoxResponse<TData> : IEvoplayBoxResponse<TData>
     public TData Data { get; set; } = default!;
 
     [JsonProperty("error")]
-    public EvoplayCommonErrorResponse Error { get; set; } = null!;
+    public UranusCommonErrorResponse Error { get; set; } = null!;
 }

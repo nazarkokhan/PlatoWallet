@@ -1,8 +1,8 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 
 using Application.Requests.Base;
-using Application.Requests.Wallets.Evoplay;
-using Application.Requests.Wallets.Evoplay.Base;
+using Application.Requests.Wallets.Uranus;
+using Application.Requests.Wallets.Uranus.Base;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Other;

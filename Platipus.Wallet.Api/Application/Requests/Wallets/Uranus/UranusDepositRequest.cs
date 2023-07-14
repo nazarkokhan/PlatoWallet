@@ -1,26 +1,27 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus;
 
 using Base;
 using Data;
 using FluentValidation;
-using Results.ResultToResultMappers;
-using Results.Uranus;
-using Results.Uranus.WithData;
-using Services.Wallet;
+using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
+using Platipus.Wallet.Api.Application.Results.Uranus;
+using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 
-public sealed record UranusRollbackRequest(
-    string SessionToken, 
-    string PlayerId, 
-    string GameId,
-    string RollbackTransactionId,
-    string RoundId,
-    string TransactionId, 
-    string Amount, 
-    string Currency, 
-    string? Payload) : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
+public sealed record UranusDepositRequest(
+        string SessionToken,
+        string PlayerId,
+        string GameId,
+        string TransactionId,
+        string Amount,
+        string Currency,
+        string RoundId,
+        bool RoundEnd,
+        string? Payload)
+    : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
 {
-    public sealed class Handler 
-        : IRequestHandler<UranusRollbackRequest, IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
+    public sealed class Handler : IRequestHandler<UranusDepositRequest,
+        IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
     {
         private readonly IWalletService _walletService;
 
@@ -28,31 +29,33 @@ public sealed record UranusRollbackRequest(
             _walletService = walletService;
 
         public async Task<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>> Handle(
-            UranusRollbackRequest request, 
-            CancellationToken cancellationToken)
+            UranusDepositRequest request, CancellationToken cancellationToken)
         {
-            var walletResult = await _walletService.RollbackAsync(
+            var walletResult = await _walletService.WinAsync(
                 request.SessionToken,
                 request.RoundId,
                 request.TransactionId,
-                amount: int.Parse(request.Amount),
+                decimal.Parse(request.Amount), 
+                currency: request.Currency,
+                roundFinished: request.RoundEnd,
                 cancellationToken: cancellationToken);
 
-            if (walletResult.IsFailure || walletResult.Data is null)
+            if (walletResult.IsFailure)
                 return walletResult.ToUranusFailureResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>();
+
             var response = new UranusSuccessResponse<UranusCommonDataWithTransaction>(
-             new UranusCommonDataWithTransaction(
-                 walletResult.Data?.Currency, 
-                 walletResult.Data!.Balance,
-                 walletResult.Data.Transaction.Id
-                 ));
+                new UranusCommonDataWithTransaction(
+                    walletResult.Data?.Currency, 
+                    walletResult.Data!.Balance, 
+                    walletResult.Data.Transaction.Id)
+            );
             return UranusResultFactory.Success(response);
         }
     }
-    
-    public sealed class EvoplayRollbackRequestValidator : AbstractValidator<UranusRollbackRequest>
+
+    public sealed class EvoplayDepositRequestValidator : AbstractValidator<UranusDepositRequest>
     {
-        public EvoplayRollbackRequestValidator()
+        public EvoplayDepositRequestValidator()
         {
             RuleFor(x => x.SessionToken)
                 .NotEmpty()
@@ -70,12 +73,7 @@ public sealed record UranusRollbackRequest(
                 .NotEmpty()
                 .Length(1, 255);
 
-            RuleFor(x => x.RollbackTransactionId)
-                .NotEmpty()
-                .Length(1, 255);
-
             RuleFor(x => x.Amount)
-                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
                 .MinimumLength(1)
                 .Matches(@"^\d+(\.\d{1,10})?$")
@@ -88,6 +86,9 @@ public sealed record UranusRollbackRequest(
             RuleFor(x => x.RoundId)
                 .NotEmpty()
                 .MaximumLength(255);
+
+            RuleFor(x => x.RoundEnd)
+                .NotNull();
         }
     }
 }

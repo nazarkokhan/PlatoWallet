@@ -1,16 +1,16 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus;
 
 using System.ComponentModel;
 using Base;
 using Data;
 using FluentValidation;
-using Results.ResultToResultMappers;
-using Results.Uranus;
-using Results.Uranus.WithData;
-using Services.Wallet;
+using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
+using Platipus.Wallet.Api.Application.Results.Uranus;
+using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 
 public sealed record UranusBalanceRequest(
-        [property: DefaultValue("your session token")] string SessionToken, 
+        [property: DefaultValue("your session token")] string SessionToken,
         [property: DefaultValue("some player id")] string PlayerId)
     : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusBalanceData>>>
 {
@@ -34,10 +34,9 @@ public sealed record UranusBalanceRequest(
             {
                 walletResult.ToUranusFailureResult<UranusFailureResponse>();
             }
-            
+
             var data = walletResult.Data;
-            var response = new UranusSuccessResponse<UranusBalanceData>(
-                new UranusBalanceData(data?.Currency, data!.Balance));
+            var response = new UranusSuccessResponse<UranusBalanceData>(new UranusBalanceData(data?.Currency, data!.Balance));
             return UranusResultFactory.Success(response);
         }
     }
@@ -47,11 +46,12 @@ public sealed record UranusBalanceRequest(
         public EvoplayBalanceRequestValidator()
         {
             RuleFor(x => x.SessionToken)
-                .NotEmpty()
-                .WithMessage("Session Token is required");
+               .NotEmpty()
+               .WithMessage("Session Token is required");
+
             RuleFor(x => x.PlayerId)
-                .NotEmpty()
-                .WithMessage("PlayerId is required");
+               .NotEmpty()
+               .WithMessage("PlayerId is required");
         }
     }
 }

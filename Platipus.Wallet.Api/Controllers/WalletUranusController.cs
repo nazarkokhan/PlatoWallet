@@ -1,9 +1,9 @@
 ﻿namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Wallets.Evoplay;
-using Application.Requests.Wallets.Evoplay.Base;
-using Application.Requests.Wallets.Evoplay.Data;
+using Application.Requests.Wallets.Uranus;
+using Application.Requests.Wallets.Uranus.Base;
+using Application.Requests.Wallets.Uranus.Data;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;

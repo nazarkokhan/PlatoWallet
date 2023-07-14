@@ -1,4 +1,4 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay.Base;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus.Base;
 
 using System.Text.Json.Serialization;
 

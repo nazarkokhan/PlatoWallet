@@ -14,7 +14,6 @@ using Application.Requests.Wallets.BetConstruct.Base.Response;
 using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
-using Application.Requests.Wallets.Evoplay.Base;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
@@ -24,6 +23,7 @@ using Application.Requests.Wallets.Softswiss.Base;
 using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base.Response;
+using Application.Requests.Wallets.Uranus.Base;
 using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
@@ -238,7 +238,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     var errorCode = evoplayResult.Error;
 
                     var errorResponse = new UranusFailureResponse(
-                        new EvoplayCommonErrorResponse(
+                        new UranusCommonErrorResponse(
                         errorCode.Humanize(), 
                         errorCode.ToString(),
                         Array.Empty<object>())

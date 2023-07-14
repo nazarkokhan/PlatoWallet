@@ -1,9 +1,9 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay.Base;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus.Base;
 
 using System.Text.Json.Serialization;
 
 public sealed record UranusFailureResponse(
-    [property: JsonPropertyName("error"), JsonPropertyOrder(2)] EvoplayCommonErrorResponse Error)
+    [property: JsonPropertyName("error"), JsonPropertyOrder(2)] UranusCommonErrorResponse Error)
 {
     [JsonPropertyName("success")]
     public bool Success { get; init; } = false;

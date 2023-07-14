@@ -17,7 +17,7 @@ public static class UranusSecurityHash
         return isValid;
     }
 
-    private static string Compute(string requestJson, string privateKey)
+    public static string Compute(string requestJson, string privateKey)
     {
         using var md5 = MD5.Create();
         var input = $"{requestJson}{privateKey}";

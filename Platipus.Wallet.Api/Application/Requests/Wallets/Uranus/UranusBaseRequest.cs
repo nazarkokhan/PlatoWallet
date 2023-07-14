@@ -1,8 +1,8 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus;
 
 using Base;
 using Data;
-using Results.Uranus.WithData;
+using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
 
 public abstract record UranusBaseRequest(
         string SessionToken,

@@ -1,27 +1,25 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Uranus;
 
 using Base;
 using Data;
 using FluentValidation;
-using Results.ResultToResultMappers;
-using Results.Uranus;
-using Results.Uranus.WithData;
-using Services.Wallet;
+using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
+using Platipus.Wallet.Api.Application.Results.Uranus;
+using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
+using Platipus.Wallet.Api.Application.Services.Wallet;
 
-public sealed record UranusDepositRequest(
-        string SessionToken,
-        string PlayerId,
-        string GameId,
-        string TransactionId,
-        string Amount,
-        string Currency,
-        string RoundId,
-        bool RoundEnd,
-        string? Payload)
-    : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
+public sealed record UranusWithdrawRequest(
+    string SessionToken,
+    string PlayerId,
+    string GameId,
+    string TransactionId,
+    string Amount,
+    string Currency,
+    string RoundId,
+    string? Payload) : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
 {
-    public sealed class Handler : IRequestHandler<UranusDepositRequest,
-        IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
+    public sealed class Handler
+        : IRequestHandler<UranusWithdrawRequest, IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
     {
         private readonly IWalletService _walletService;
 
@@ -29,15 +27,15 @@ public sealed record UranusDepositRequest(
             _walletService = walletService;
 
         public async Task<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>> Handle(
-            UranusDepositRequest request, CancellationToken cancellationToken)
+            UranusWithdrawRequest request,
+            CancellationToken cancellationToken)
         {
-            var walletResult = await _walletService.WinAsync(
+            var walletResult = await _walletService.BetAsync(
                 request.SessionToken,
                 request.RoundId,
                 request.TransactionId,
-                decimal.Parse(request.Amount), 
+                amount: decimal.Parse(request.Amount),
                 currency: request.Currency,
-                roundFinished: request.RoundEnd,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
@@ -45,17 +43,17 @@ public sealed record UranusDepositRequest(
 
             var response = new UranusSuccessResponse<UranusCommonDataWithTransaction>(
                 new UranusCommonDataWithTransaction(
-                    walletResult.Data?.Currency, 
-                    walletResult.Data!.Balance, 
-                    walletResult.Data.Transaction.Id)
-            );
+                    walletResult.Data?.Currency,
+                     walletResult.Data!.Balance, 
+                    walletResult.Data.Transaction.Id));
+
             return UranusResultFactory.Success(response);
         }
     }
-
-    public sealed class EvoplayDepositRequestValidator : AbstractValidator<UranusDepositRequest>
+    
+    public sealed class EvoplayWithdrawRequestValidator : AbstractValidator<UranusWithdrawRequest>
     {
-        public EvoplayDepositRequestValidator()
+        public EvoplayWithdrawRequestValidator()
         {
             RuleFor(x => x.SessionToken)
                 .NotEmpty()
@@ -86,9 +84,6 @@ public sealed record UranusDepositRequest(
             RuleFor(x => x.RoundId)
                 .NotEmpty()
                 .MaximumLength(255);
-
-            RuleFor(x => x.RoundEnd)
-                .NotNull();
         }
     }
 }
