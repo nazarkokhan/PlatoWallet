@@ -8,11 +8,11 @@ using DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Platipus.Wallet.Api.Application.Services.Hub88GamesApi.DTOs.Requests;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
+using DTOs.Requests;
 using Infrastructure.Persistence;
 
 public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient

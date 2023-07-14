@@ -3,7 +3,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-public static class EvoplaySecurityHash
+public static class UranusSecurityHash
 {
     public static bool IsValid(
         string externalHash,

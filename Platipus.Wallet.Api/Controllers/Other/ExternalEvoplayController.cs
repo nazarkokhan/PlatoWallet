@@ -8,9 +8,9 @@ using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.Security.Evoplay;
 
 [Route("external/evoplay/")]
-[ServiceFilter(typeof(EvoplaySecurityFilter), Order = 1)]
-[JsonSettingsName(nameof(CasinoProvider.Evoplay))]
-[ProducesResponseType(typeof(EvoplayFailureResponse), StatusCodes.Status200OK)]
+[ServiceFilter(typeof(UranusSecurityFilter), Order = 1)]
+[JsonSettingsName(nameof(CasinoProvider.Uranus))]
+[ProducesResponseType(typeof(UranusFailureResponse), StatusCodes.Status200OK)]
 public sealed class ExternalEvoplayController : RestApiController
 {
     private readonly IMediator _mediator;

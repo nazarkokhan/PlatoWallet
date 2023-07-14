@@ -6,9 +6,7 @@ using DTO;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using StartupSettings.Factories;
-using StartupSettings.Options;
 
 public record SignUpRequest(
     [property: DefaultValue("psw_nazar_123")] string Username,

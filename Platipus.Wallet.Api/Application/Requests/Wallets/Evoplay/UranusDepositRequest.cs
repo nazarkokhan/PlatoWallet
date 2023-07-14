@@ -3,12 +3,12 @@
 using Base;
 using Data;
 using FluentValidation;
-using Results.Evoplay;
-using Results.Evoplay.WithData;
 using Results.ResultToResultMappers;
+using Results.Uranus;
+using Results.Uranus.WithData;
 using Services.Wallet;
 
-public sealed record EvoplayDepositRequest(
+public sealed record UranusDepositRequest(
         string SessionToken,
         string PlayerId,
         string GameId,
@@ -18,18 +18,18 @@ public sealed record EvoplayDepositRequest(
         string RoundId,
         bool RoundEnd,
         string? Payload)
-    : IEvoplayRequest, IRequest<IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>>
+    : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
 {
-    public sealed class Handler : IRequestHandler<EvoplayDepositRequest,
-        IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>>
+    public sealed class Handler : IRequestHandler<UranusDepositRequest,
+        IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
     {
         private readonly IWalletService _walletService;
 
         public Handler(IWalletService walletService) => 
             _walletService = walletService;
 
-        public async Task<IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>> Handle(
-            EvoplayDepositRequest request, CancellationToken cancellationToken)
+        public async Task<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>> Handle(
+            UranusDepositRequest request, CancellationToken cancellationToken)
         {
             var walletResult = await _walletService.WinAsync(
                 request.SessionToken,
@@ -41,19 +41,19 @@ public sealed record EvoplayDepositRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToEvoplayFailureResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>();
+                return walletResult.ToUranusFailureResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>();
 
-            var response = new EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>(
-                new EvoplayCommonDataWithTransaction(
+            var response = new UranusSuccessResponse<UranusCommonDataWithTransaction>(
+                new UranusCommonDataWithTransaction(
                     walletResult.Data?.Currency, 
                     walletResult.Data!.Balance, 
                     walletResult.Data.Transaction.Id)
             );
-            return EvoplayResultFactory.Success(response);
+            return UranusResultFactory.Success(response);
         }
     }
 
-    public sealed class EvoplayDepositRequestValidator : AbstractValidator<EvoplayDepositRequest>
+    public sealed class EvoplayDepositRequestValidator : AbstractValidator<UranusDepositRequest>
     {
         public EvoplayDepositRequestValidator()
         {

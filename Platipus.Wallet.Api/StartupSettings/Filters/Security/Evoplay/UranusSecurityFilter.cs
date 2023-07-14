@@ -3,21 +3,21 @@
 using Api.Extensions;
 using Api.Extensions.SecuritySign.Evoplay;
 using Application.Requests.Wallets.Evoplay.Base;
-using Application.Results.Evoplay;
+using Application.Results.Uranus;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class EvoplaySecurityFilter : IAsyncActionFilter
+public sealed class UranusSecurityFilter : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(
         ActionExecutingContext context, 
         ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
-            .OfType<IEvoplayRequest>()
+            .OfType<IUranusRequest>()
             .Single();
         
         var httpContext = context.HttpContext;
@@ -36,23 +36,23 @@ public sealed class EvoplaySecurityFilter : IAsyncActionFilter
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
                     UsedId = s.User.Id,
                     UserPassword = s.User.Password,
-                    CasinoProvider = s.User.Casino.Params.EvoplayProvider
+                    CasinoProvider = s.User.Casino.Params.UranusProvider
                 })
             .FirstOrDefaultAsync();
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
-            context.Result = EvoplayResultFactory
-                .Failure<EvoplayFailureResponse>(EvoplayErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
+            context.Result = UranusResultFactory
+                .Failure<UranusFailureResponse>(UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)
                 .ToActionResult();
             return;
         }
         
-        const int evoplayProviderId = (int)CasinoProvider.Evoplay; 
-        if (!session.CasinoProvider.Equals(evoplayProviderId.ToString()))
+        const int uranusProviderId = (int)CasinoProvider.Uranus; 
+        if (!session.CasinoProvider.Equals(uranusProviderId.ToString()))
         {
-            context.Result = EvoplayResultFactory
-                .Failure<EvoplayFailureResponse>(EvoplayErrorCode.E_PROVIDER_NOT_FOUND)
+            context.Result = UranusResultFactory
+                .Failure<UranusFailureResponse>(UranusErrorCode.E_PROVIDER_NOT_FOUND)
                 .ToActionResult();
             return;
         }
@@ -61,17 +61,17 @@ public sealed class EvoplaySecurityFilter : IAsyncActionFilter
         string? authHeaderValue = context.HttpContext.Request.Headers["X-Signature"];
         if (authHeaderValue is null)
         {
-            context.Result = EvoplayResultFactory.Failure<EvoplayFailureResponse>(
-                EvoplayErrorCode.E_PLAYER_SESSION_NOT_FOUND).ToActionResult();
+            context.Result = UranusResultFactory.Failure<UranusFailureResponse>(
+                UranusErrorCode.E_PLAYER_SESSION_NOT_FOUND).ToActionResult();
             return;
         }
-        var result = EvoplaySecurityHash.IsValid(
+        var result = UranusSecurityHash.IsValid(
             authHeaderValue, requestBytesToValidate, session.CasinoSignatureKey);
 
         if (!result)
         {
-            context.Result = EvoplayResultFactory.Failure<EvoplayFailureResponse>(
-                EvoplayErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED).ToActionResult();
+            context.Result = UranusResultFactory.Failure<UranusFailureResponse>(
+                UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED).ToActionResult();
             return;
         }
 

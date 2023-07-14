@@ -9,11 +9,11 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using DTOs.Requests;
 using DTOs.Responses;
-using Hub88GamesApi.DTOs.Requests;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using PswGamesApi.DTOs.Requests;
 using StartupSettings.Options;
 
 public class SoftswissGamesApiClient : ISoftswissGamesApiClient

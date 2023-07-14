@@ -50,6 +50,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Application\Responses\Uranus\" />
         <Folder Include="Application\Results\Base\WithData\WithError" />
     </ItemGroup>
 

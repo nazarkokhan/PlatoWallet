@@ -1,7 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Services.SoftswissGamesApi.DTOs.Requests;
 
 using System.ComponentModel;
-using Hub88GamesApi.DTOs.Requests;
+using PswGamesApi.DTOs.Requests;
 
 public record SoftswissIssueFreespinsGameApiRequest(
     [property: DefaultValue("softswiss")] string CasinoId,

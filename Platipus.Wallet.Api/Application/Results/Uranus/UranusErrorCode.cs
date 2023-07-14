@@ -1,6 +1,6 @@
-﻿namespace Platipus.Wallet.Api.Application.Results.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Results.Uranus;
 
-public enum EvoplayErrorCode
+public enum UranusErrorCode
 {
     E_INTERNAL = 1, 
     E_BAD_REQUEST, 

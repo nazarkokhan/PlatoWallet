@@ -11,50 +11,50 @@ using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security.Evoplay;
 
-[Route("wallet/evoplay/")]
-[ServiceFilter(typeof(EvoplayMockedErrorActionFilter), Order = 1)]
-[ServiceFilter(typeof(EvoplaySecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Evoplay))]
-[ProducesResponseType(typeof(EvoplayFailureResponse), StatusCodes.Status200OK)]
-public sealed class WalletEvoplayController : RestApiController
+[Route("wallet/uranus/")]
+[ServiceFilter(typeof(UranusMockedErrorActionFilter), Order = 1)]
+[ServiceFilter(typeof(UranusSecurityFilter), Order = 2)]
+[JsonSettingsName(nameof(CasinoProvider.Uranus))]
+[ProducesResponseType(typeof(UranusFailureResponse), StatusCodes.Status200OK)]
+public sealed class WalletUranusController : RestApiController
 {
     private readonly IMediator _mediator;
 
-    public WalletEvoplayController(IMediator mediator) => 
+    public WalletUranusController(IMediator mediator) => 
         _mediator = mediator;
     
     [HttpPost("balance")]
-    [ProducesResponseType(typeof(EvoplaySuccessResponse<EvoplayBalanceData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UranusSuccessResponse<UranusBalanceData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
-        [FromBody] EvoplayBalanceRequest request,
+        [FromBody] UranusBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("deposit")]
-    [ProducesResponseType(typeof(EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UranusSuccessResponse<UranusCommonDataWithTransaction>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Deposit(
-        [FromBody] EvoplayDepositRequest request,
+        [FromBody] UranusDepositRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("withdrawal")]
-    [ProducesResponseType(typeof(EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UranusSuccessResponse<UranusCommonDataWithTransaction>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Withdraw(
-        [FromBody] EvoplayWithdrawRequest request,
+        [FromBody] UranusWithdrawRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("rollback")]
-    [ProducesResponseType(typeof(EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UranusSuccessResponse<UranusCommonDataWithTransaction>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
-        [FromBody] EvoplayRollbackRequest request,
+        [FromBody] UranusRollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
     [HttpPost("promoWin")]
-    [ProducesResponseType(typeof(EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Award(
-        [FromBody] EvoplayAwardRequest request,
+    [ProducesResponseType(typeof(UranusSuccessResponse<UranusCommonDataWithTransaction>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PromoWin(
+        [FromBody] UranusPromoWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     

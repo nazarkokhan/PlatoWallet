@@ -2,13 +2,13 @@
 
 using Base;
 using Data;
-using Results.Evoplay.WithData;
+using Results.Uranus.WithData;
 
-public abstract record EvoplayBaseRequest(
+public abstract record UranusBaseRequest(
         string SessionToken,
         string PlayerId,
         string TransactionId,
         string Amount,
         string Currency,
         string? Payload)
-    : IEvoplayRequest, IRequest<IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>>;
+    : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>;

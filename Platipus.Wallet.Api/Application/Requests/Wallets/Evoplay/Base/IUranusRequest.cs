@@ -2,7 +2,7 @@
 
 using Requests.Base;
 
-public interface IEvoplayRequest : IBaseWalletRequest
+public interface IUranusRequest : IBaseWalletRequest
 {
     public string? SessionToken { get; }
     public string PlayerId { get; }

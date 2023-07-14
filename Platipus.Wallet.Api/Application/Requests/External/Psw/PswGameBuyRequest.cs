@@ -2,11 +2,11 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Psw;
 
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Services.Hub88GamesApi.DTOs.Requests;
 using Services.PswGamesApi;
 using Platipus.Wallet.Api.Application.Services.PswGamesApi.DTOs.Responses;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Services.PswGamesApi.DTOs.Requests;
 
 public record PswGameBuyRequest(
     [property: DefaultValue("test")] string Environment,

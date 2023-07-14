@@ -33,8 +33,8 @@ public static class StartupExtensions
            .AddSingleton<AtlasMockedErrorActionFilter>()
            .AddScoped<AtlasSecurityFilter>()
            .AddScoped<AtlasExternalSecurityFilter>()
-           .AddSingleton<EvoplayMockedErrorActionFilter>()
-           .AddScoped<EvoplaySecurityFilter>();
+           .AddSingleton<UranusMockedErrorActionFilter>()
+           .AddScoped<UranusSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -130,7 +130,7 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Evoplay),
+                nameof(CasinoProvider.Uranus),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

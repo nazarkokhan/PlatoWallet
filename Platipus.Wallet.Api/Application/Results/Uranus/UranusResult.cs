@@ -1,18 +1,18 @@
-﻿namespace Platipus.Wallet.Api.Application.Results.Evoplay;
+﻿namespace Platipus.Wallet.Api.Application.Results.Uranus;
 
-using Base;
+using Platipus.Wallet.Api.Application.Results.Base;
 
-public sealed record EvoplayResult : BaseResult<EvoplayErrorCode>, IEvoplayResult
+public sealed record UranusResult : BaseResult<UranusErrorCode>, IUranusResult
 {
-    public EvoplayResult()
+    public UranusResult()
     {
         Balance = "0";
         ErrorDescription = string.Empty;
         Currency = "USD";
     }
     
-    public EvoplayResult(
-        EvoplayErrorCode errorCode, 
+    public UranusResult(
+        UranusErrorCode errorCode, 
         string balance,
         string currency,
         Exception? exception = null,

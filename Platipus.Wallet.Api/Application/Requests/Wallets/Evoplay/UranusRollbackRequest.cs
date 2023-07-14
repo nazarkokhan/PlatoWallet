@@ -3,12 +3,12 @@
 using Base;
 using Data;
 using FluentValidation;
-using Results.Evoplay;
-using Results.Evoplay.WithData;
 using Results.ResultToResultMappers;
+using Results.Uranus;
+using Results.Uranus.WithData;
 using Services.Wallet;
 
-public sealed record EvoplayRollbackRequest(
+public sealed record UranusRollbackRequest(
     string SessionToken, 
     string PlayerId, 
     string GameId,
@@ -17,18 +17,18 @@ public sealed record EvoplayRollbackRequest(
     string TransactionId, 
     string Amount, 
     string Currency, 
-    string? Payload) : IEvoplayRequest, IRequest<IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>>
+    string? Payload) : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
 {
     public sealed class Handler 
-        : IRequestHandler<EvoplayRollbackRequest, IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>>
+        : IRequestHandler<UranusRollbackRequest, IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>>
     {
         private readonly IWalletService _walletService;
 
         public Handler(IWalletService walletService) => 
             _walletService = walletService;
 
-        public async Task<IEvoplayResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>> Handle(
-            EvoplayRollbackRequest request, 
+        public async Task<IUranusResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>> Handle(
+            UranusRollbackRequest request, 
             CancellationToken cancellationToken)
         {
             var walletResult = await _walletService.RollbackAsync(
@@ -39,18 +39,18 @@ public sealed record EvoplayRollbackRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure || walletResult.Data is null)
-                return walletResult.ToEvoplayFailureResult<EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>>();
-            var response = new EvoplaySuccessResponse<EvoplayCommonDataWithTransaction>(
-             new EvoplayCommonDataWithTransaction(
+                return walletResult.ToUranusFailureResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>();
+            var response = new UranusSuccessResponse<UranusCommonDataWithTransaction>(
+             new UranusCommonDataWithTransaction(
                  walletResult.Data?.Currency, 
                  walletResult.Data!.Balance,
                  walletResult.Data.Transaction.Id
                  ));
-            return EvoplayResultFactory.Success(response);
+            return UranusResultFactory.Success(response);
         }
     }
     
-    public sealed class EvoplayRollbackRequestValidator : AbstractValidator<EvoplayRollbackRequest>
+    public sealed class EvoplayRollbackRequestValidator : AbstractValidator<UranusRollbackRequest>
     {
         public EvoplayRollbackRequestValidator()
         {

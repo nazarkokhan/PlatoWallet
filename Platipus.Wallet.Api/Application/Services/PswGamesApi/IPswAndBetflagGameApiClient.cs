@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
 using DTOs.Responses;
 using Domain.Entities.Enums;
-using Hub88GamesApi.DTOs.Requests;
+using DTOs.Requests;
 
 public interface IPswAndBetflagGameApiClient
 {

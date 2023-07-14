@@ -28,7 +28,6 @@ using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Everymatrix.WithData;
-using Application.Results.Evoplay.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
@@ -37,6 +36,7 @@ using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
 using Application.Results.Uis.WithData;
+using Application.Results.Uranus.WithData;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -230,14 +230,14 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
-                case IEvoplayResult<object> { IsSuccess: true } evoplayResult:
+                case IUranusResult<object> { IsSuccess: true } evoplayResult:
                     context.Result = new OkObjectResult(evoplayResult.Data);
                     return;
-                case IEvoplayResult<object> evoplayResult:
+                case IUranusResult<object> evoplayResult:
                 {
                     var errorCode = evoplayResult.Error;
 
-                    var errorResponse = new EvoplayFailureResponse(
+                    var errorResponse = new UranusFailureResponse(
                         new EvoplayCommonErrorResponse(
                         errorCode.Humanize(), 
                         errorCode.ToString(),

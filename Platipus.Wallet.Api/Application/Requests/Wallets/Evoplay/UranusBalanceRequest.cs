@@ -4,26 +4,26 @@ using System.ComponentModel;
 using Base;
 using Data;
 using FluentValidation;
-using Results.Evoplay;
-using Results.Evoplay.WithData;
 using Results.ResultToResultMappers;
+using Results.Uranus;
+using Results.Uranus.WithData;
 using Services.Wallet;
 
-public sealed record EvoplayBalanceRequest(
+public sealed record UranusBalanceRequest(
         [property: DefaultValue("your session token")] string SessionToken, 
         [property: DefaultValue("some player id")] string PlayerId)
-    : IEvoplayRequest, IRequest<IEvoplayResult<EvoplaySuccessResponse<EvoplayBalanceData>>>
+    : IUranusRequest, IRequest<IUranusResult<UranusSuccessResponse<UranusBalanceData>>>
 {
     public sealed class Handler
-        : IRequestHandler<EvoplayBalanceRequest, IEvoplayResult<EvoplaySuccessResponse<EvoplayBalanceData>>>
+        : IRequestHandler<UranusBalanceRequest, IUranusResult<UranusSuccessResponse<UranusBalanceData>>>
     {
         private readonly IWalletService _walletService;
 
         public Handler(IWalletService walletService) =>
             _walletService = walletService;
 
-        public async Task<IEvoplayResult<EvoplaySuccessResponse<EvoplayBalanceData>>> Handle(
-            EvoplayBalanceRequest request,
+        public async Task<IUranusResult<UranusSuccessResponse<UranusBalanceData>>> Handle(
+            UranusBalanceRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _walletService.GetBalanceAsync(
@@ -32,17 +32,17 @@ public sealed record EvoplayBalanceRequest(
 
             if (walletResult.IsFailure)
             {
-                walletResult.ToEvoplayFailureResult<EvoplayFailureResponse>();
+                walletResult.ToUranusFailureResult<UranusFailureResponse>();
             }
             
             var data = walletResult.Data;
-            var response = new EvoplaySuccessResponse<EvoplayBalanceData>(
-                new EvoplayBalanceData(data?.Currency, data!.Balance));
-            return EvoplayResultFactory.Success(response);
+            var response = new UranusSuccessResponse<UranusBalanceData>(
+                new UranusBalanceData(data?.Currency, data!.Balance));
+            return UranusResultFactory.Success(response);
         }
     }
 
-    public sealed class EvoplayBalanceRequestValidator : AbstractValidator<EvoplayBalanceRequest>
+    public sealed class EvoplayBalanceRequestValidator : AbstractValidator<UranusBalanceRequest>
     {
         public EvoplayBalanceRequestValidator()
         {
