@@ -9,7 +9,7 @@ using ControllerSpecificJsonOptions;
 using Domain.Entities.Enums;
 using Filters.NewFilterStyle;
 using Filters.Security;
-using Filters.Security.Evoplay;
+using Filters.Security.Uranus;
 using JorgeSerrano.Json;
 using JsonConverters;
 using Microsoft.OpenApi.Any;
@@ -134,6 +134,8 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
                 });
 
         return builder.Services;

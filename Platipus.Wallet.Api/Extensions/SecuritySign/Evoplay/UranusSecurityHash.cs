@@ -7,31 +7,22 @@ public static class UranusSecurityHash
 {
     public static bool IsValid(
         string externalHash,
-        byte[] data,
+        string requestJson,
         string privateKey)
     {
-        var hmacHash = Compute(data, privateKey);
+        var hmacHash = Compute(requestJson, privateKey);
 
         var isValid = externalHash.Equals(hmacHash, StringComparison.InvariantCultureIgnoreCase);
 
         return isValid;
     }
 
-    private static string Compute(byte[] data, string privateKey)
+    private static string Compute(string requestJson, string privateKey)
     {
-        var keyBytes = Encoding.UTF8.GetBytes(privateKey);
+        using var md5 = MD5.Create();
+        var input = $"{requestJson}{privateKey}";
+        var data = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
 
-        using var hmacMd5 = new HMACMD5(keyBytes);
-
-        // Compute the HMAC-MD5 hash of the data
-        var hashData = hmacMd5.ComputeHash(data);
-
-        // Convert the hash data to a hexadecimal string
-        var hashString = BitConverter.ToString(hashData)
-            .Replace("-", "")
-            .ToLowerInvariant();
-
-        return hashString;
+        return string.Concat(data.Select(x => x.ToString("x2")));
     }
-    
 }

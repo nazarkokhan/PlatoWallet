@@ -1,14 +1,16 @@
-﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.Security.Evoplay;
+﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.Security.Uranus;
 
-using Api.Extensions;
-using Api.Extensions.SecuritySign.Evoplay;
-using Application.Requests.Wallets.Evoplay.Base;
-using Application.Results.Uranus;
-using Domain.Entities;
-using Domain.Entities.Enums;
-using Infrastructure.Persistence;
+using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Evoplay.Base;
+using Platipus.Wallet.Api.Application.Results.Uranus;
+using Platipus.Wallet.Api.Extensions;
+using Platipus.Wallet.Api.Extensions.SecuritySign.Evoplay;
+using Platipus.Wallet.Domain.Entities;
+using Platipus.Wallet.Domain.Entities.Enums;
+using Platipus.Wallet.Infrastructure.Persistence;
 
 public sealed class UranusSecurityFilter : IAsyncActionFilter
 {
@@ -58,6 +60,8 @@ public sealed class UranusSecurityFilter : IAsyncActionFilter
         }
 
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
+        var jsonString = Encoding.UTF8.GetString(requestBytesToValidate);
+        //jsonString = Regex.Replace(jsonString, @"\s", "");
         string? authHeaderValue = context.HttpContext.Request.Headers["X-Signature"];
         if (authHeaderValue is null)
         {
@@ -66,7 +70,7 @@ public sealed class UranusSecurityFilter : IAsyncActionFilter
             return;
         }
         var result = UranusSecurityHash.IsValid(
-            authHeaderValue, requestBytesToValidate, session.CasinoSignatureKey);
+            authHeaderValue, jsonString, session.CasinoSignatureKey);
 
         if (!result)
         {

@@ -9,7 +9,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.NewFilterStyle;
-using StartupSettings.Filters.Security.Evoplay;
+using StartupSettings.Filters.Security.Uranus;
 
 [Route("wallet/uranus/")]
 [ServiceFilter(typeof(UranusMockedErrorActionFilter), Order = 1)]
