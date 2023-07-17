@@ -31,7 +31,7 @@ public static class CommonResultToUranusMappers
             ErrorCode.TransactionAlreadyExists => UranusErrorCode.E_INVALID_TRANSACTION_ID,
             ErrorCode.TransactionNotFound => UranusErrorCode.E_INVALID_TRANSACTION_ID,
             ErrorCode.UserNotFound => UranusErrorCode.E_INVALID_USER_ID,
-            ErrorCode.UserIsDisabled => UranusErrorCode.E_INVALID_USER_ID,
+            ErrorCode.UserIsDisabled => UranusErrorCode.E_PLAYER_IS_LOCKED,
             ErrorCode.RoundAlreadyExists => UranusErrorCode.E_UNEXPECTED_LOGIC,
             ErrorCode.GameServerApiError => UranusErrorCode.E_REQUEST_TRANSPORT_FAILED,
             ErrorCode.RoundNotFound => UranusErrorCode.E_PROVIDER_GAME_NOT_FOUND,
