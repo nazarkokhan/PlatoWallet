@@ -35,7 +35,7 @@ public sealed record UranusRollbackRequest(
                 request.SessionToken,
                 request.RoundId,
                 request.RollbackTransactionId,
-                amount: int.Parse(request.Amount),
+                amount: (int)double.Parse(request.Amount),
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure || walletResult.Data is null)
