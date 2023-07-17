@@ -34,7 +34,7 @@ public sealed record UranusRollbackRequest(
             var walletResult = await _walletService.RollbackAsync(
                 request.SessionToken,
                 request.RoundId,
-                request.TransactionId,
+                request.RollbackTransactionId,
                 amount: int.Parse(request.Amount),
                 cancellationToken: cancellationToken);
 
