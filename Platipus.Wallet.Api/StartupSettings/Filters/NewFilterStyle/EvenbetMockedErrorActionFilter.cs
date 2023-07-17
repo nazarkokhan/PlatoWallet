@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 
 using Application.Requests.Base;
+using Application.Requests.Wallets.Evenbet;
 using Application.Requests.Wallets.Evenbet.Base;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -19,12 +20,12 @@ public sealed class EvenbetMockedErrorActionFilter : AbstractMockedErrorActionFi
     {
         var request = (IEvenbetRequest)baseRequest;
 
-        // var walletMethod = request switch
-        // {
-        //     EvenbetGetBalanceRequest => MockedErrorMethod.Balance,
-        //     _ => throw new ArgumentOutOfRangeException(nameof(baseRequest), "There is no such method in controller.")
-        // };
+        var walletMethod = request switch
+        {
+            EvenbetGetBalanceRequest => MockedErrorMethod.Balance,
+            _ => throw new ArgumentOutOfRangeException(nameof(baseRequest), "There is no such method in controller.")
+        };
 
-        return new MockedErrorIdentifiers(MockedErrorMethod.Balance, request.Token, true);
+        return new MockedErrorIdentifiers(walletMethod, request.Token, true);
     }
 }

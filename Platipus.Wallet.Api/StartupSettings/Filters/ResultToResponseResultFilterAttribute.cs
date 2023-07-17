@@ -24,9 +24,11 @@ using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Requests.Wallets.Uranus.Base;
+using Application.Responses.Evenbet.Base;
 using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
+using Application.Results.Evenbet.WithData;
 using Application.Results.Everymatrix.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
@@ -243,6 +245,23 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         errorCode.ToString(),
                         Array.Empty<object>())
                         );
+
+                    context.Result = new OkObjectResult(errorResponse);
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+                case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
+                    context.Result = new OkObjectResult(evenbetResult.Data);
+                    return;
+                case IEvenbetResult<object> evenbetResult:
+                {
+                    var errorCode = evenbetResult.Error;
+
+                    var errorResponse = new EvenbetFailureResponse(
+                        new EvenbetErrorResponse(
+                            (int)errorCode, 
+                            errorCode.Humanize())
+                    );
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
