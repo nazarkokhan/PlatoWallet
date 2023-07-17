@@ -35,10 +35,10 @@ public sealed class ExternalUranusController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
-    // [HttpPost("demo")]
-    // [ProducesResponseType(typeof(UranusSuccessResponse<UranusGameUrlData>), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> GetDemoLaunchGameUrl(
-    //     [FromBody] UranusGetDemoLaunchGameUrlRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    [HttpPost("demo")]
+    [ProducesResponseType(typeof(UranusSuccessResponse<UranusGameUrlData>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDemoLaunchGameUrl(
+        [FromBody] UranusGetDemoLaunchGameUrlRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

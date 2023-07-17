@@ -22,6 +22,8 @@ using Services.PswGamesApi;
 using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
+using Services.UranusGamesApi;
+using Services.UranusGamesApi.Requests;
 using StartupSettings.Factories;
 using StartupSettings.Options;
 using Wallets.Psw.Base.Response;
@@ -38,7 +40,7 @@ public sealed record LogInRequest(
         [property: DefaultValue(null)] string? Device,
         [property: DefaultValue("en")] string Language,
         [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier)
-        : IRequest<IResult<LogInRequest.Response>>
+    : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
@@ -52,6 +54,7 @@ public sealed record LogInRequest(
         private readonly SoftswissCurrenciesOptions _currencyMultipliers;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAtlasGameApiClient _atlasGameApiClient;
+        private readonly IUranusGameApiClient _uranusGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -60,10 +63,11 @@ public sealed record LogInRequest(
             ISoftswissGamesApiClient softswissGamesApiClient,
             IGamesGlobalGamesApiClient globalGamesApiClient,
             IReevoGameApiClient reevoGameApiClient,
-            IOptions<SoftswissCurrenciesOptions> currencyMultipliers, 
-            IHttpContextAccessor httpContextAccessor, 
-            IEmaraPlayGameApiClient emaraPlayGameApiClient, 
-            IAtlasGameApiClient atlasGameApiClient)
+            IOptions<SoftswissCurrenciesOptions> currencyMultipliers,
+            IHttpContextAccessor httpContextAccessor,
+            IEmaraPlayGameApiClient emaraPlayGameApiClient,
+            IAtlasGameApiClient atlasGameApiClient,
+            IUranusGameApiClient uranusGameApiClient)
         {
             _context = context;
             _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
@@ -74,24 +78,24 @@ public sealed record LogInRequest(
             _httpContextAccessor = httpContextAccessor;
             _emaraPlayGameApiClient = emaraPlayGameApiClient;
             _atlasGameApiClient = atlasGameApiClient;
+            _uranusGameApiClient = uranusGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
-        public async Task<IResult<Response>> Handle(
-            LogInRequest request, CancellationToken cancellationToken)
+        public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
         {
             var casino = await _context.Set<Casino>()
-                .Where(c => c.Id == request.CasinoId)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(c => c.Id == request.CasinoId)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
                 return ResultFactory.Failure<Response>(ErrorCode.CasinoNotFound);
 
             var user = await _context.Set<User>()
-                .Where(u => u.Username == request.UserName && u.CasinoId == request.CasinoId)
-                .Include(u => u.Casino)
-                .Include(u => u.Currency)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(u => u.Username == request.UserName && u.CasinoId == request.CasinoId)
+               .Include(u => u.Casino)
+               .Include(u => u.Currency)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure<Response>(ErrorCode.UserNotFound);
@@ -115,28 +119,28 @@ public sealed record LogInRequest(
             }
 
             var game = await _context.Set<Game>()
-                .Where(g => g.LaunchName == request.Game)
-                .Select(
+               .Where(g => g.LaunchName == request.Game)
+               .Select(
                     g => new
                     {
                         GameServerId = g.GameServiceId,
                         g.LaunchName
                     })
-                .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (game is null)
                 return ResultFactory.Failure<Response>(ErrorCode.GameNotFound);
 
             var environmentName = request.Environment ?? "test";
             var environment = await _context.Set<GameEnvironment>()
-                .Where(e => e.Id == environmentName)
-                .Select(
+               .Where(e => e.Id == environmentName)
+               .Select(
                     e => new
                     {
                         e.BaseUrl,
                         e.UisBaseUrl,
                     })
-                .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
                 return ResultFactory.Failure<Response>(ErrorCode.EnvironmentNotFound);
@@ -148,6 +152,45 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case CasinoProvider.Uranus:
+                {
+                    var playerIp = GetPlayerIp();
+                    var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
+
+                    var apiRequest = isDemoLaunchMode
+                        ? new UranusGetDemoLaunchUrlGameApiRequest(
+                            request.Game,
+                            request.Language,
+                            request.Device!,
+                            PlayerIp: playerIp,
+                            LobbyUrl: request.Lobby!) as dynamic
+                        : new UranusGetLaunchUrlGameApiRequest(
+                            request.Game,
+                            session.Id,
+                            request.Language,
+                            user.Currency.Id,
+                            user.Id.ToString(),
+                            request.CasinoId,
+                            PlayerIp: playerIp);
+
+                    var apiResponse = isDemoLaunchMode
+                        ? await _uranusGameApiClient.GetDemoLaunchUrlAsync(
+                            baseUrl,
+                            apiRequest,
+                            cancellationToken: cancellationToken)
+                        : await _uranusGameApiClient.GetGameLaunchUrlAsync(
+                            baseUrl,
+                            apiRequest,
+                            cancellationToken: cancellationToken);
+
+                    if (CheckUranusApiResponse(apiResponse))
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = apiResponse.Data.Data.Data.Url.ToString();
+
+                    break;
+                }
+
                 case CasinoProvider.Atlas:
                 {
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
@@ -155,36 +198,58 @@ public sealed record LogInRequest(
                     var stringToEncodeAsBytes = Encoding.UTF8.GetBytes(stringToEncode);
                     var token = Convert.ToBase64String(stringToEncodeAsBytes);
                     var apiRequest = new AtlasGameLaunchGameApiRequest(
-                        request.Game, isDemoLaunchMode, false, session.Id, 
-                        request.CasinoId, request.Language!, request.Cashier!, request.Lobby!);
+                        request.Game,
+                        isDemoLaunchMode,
+                        false,
+                        session.Id,
+                        request.CasinoId,
+                        request.Language!,
+                        request.Cashier!,
+                        request.Lobby!);
+
                     var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
-                        baseUrl, apiRequest, token, cancellationToken: cancellationToken);
+                        baseUrl,
+                        apiRequest,
+                        token,
+                        cancellationToken: cancellationToken);
+
                     if (apiResponse.IsFailure || apiResponse.Data?.Data?.Url is null)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
                 }
+
                 case CasinoProvider.EmaraPlay:
                 {
-                    var ip = _httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-                    if (string.IsNullOrEmpty(ip))
-                    {
-                        ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
-                    }
+                    var ip = GetPlayerIp();
 
                     var apiRequest = new EmaraplayGetLauncherUrlGameApiRequest(
-                        request.CasinoId, request.Game, 
-                        request.LaunchMode.ToString(), request.Language!, 
-                        "someChannel", "someJurisdiction",
-                        user.Currency.Id, ip!, User: request.UserName, Lobby: request.Lobby, 
-                        Cashier: "someCashier", Token: session.Id);
+                        request.CasinoId,
+                        request.Game,
+                        request.LaunchMode.ToString(),
+                        request.Language!,
+                        "someChannel",
+                        "someJurisdiction",
+                        user.Currency.Id,
+                        ip!,
+                        User: request.UserName,
+                        Lobby: request.Lobby,
+                        Cashier: "someCashier",
+                        Token: session.Id);
+
                     var apiResponse = await _emaraPlayGameApiClient.GetLauncherUrlAsync(
-                        baseUrl, apiRequest, cancellationToken: cancellationToken);
+                        baseUrl,
+                        apiRequest,
+                        cancellationToken: cancellationToken);
+
                     if (apiResponse.IsFailure || apiResponse.Data.Data.Result.Url is null)
                         ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
                     launchUrl = apiResponse.Data.Data.Result.Url?.ToString()!;
                     break;
                 }
+
                 case CasinoProvider.Psw or CasinoProvider.Betflag:
                 {
                     var getGameLinkResult = await _pswAndBetflagGameApiClient.GetLaunchUrlAsync(
@@ -202,6 +267,7 @@ public sealed record LogInRequest(
                     launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
                     break;
                 }
+
                 case CasinoProvider.Openbox:
                     launchUrl = GetOpenboxLaunchUrl(
                         baseUrl,
@@ -211,7 +277,9 @@ public sealed record LogInRequest(
                         user.Username,
                         request.Game,
                         user.CurrencyId);
+
                     break;
+
                 case CasinoProvider.Dafabet:
                     launchUrl = GetDafabetLaunchUrlAsync(
                         baseUrl,
@@ -225,7 +293,9 @@ public sealed record LogInRequest(
                             "launch",
                             $"{request.Game}{user.Username}{session.Id}{user.Currency.Id}",
                             casino.SignatureKey));
+
                     break;
+
                 case CasinoProvider.Hub88:
                 {
                     var getHub88GameLinkRequestDto = new Hub88GetGameLinkGamesApiRequestDto(
@@ -252,6 +322,7 @@ public sealed record LogInRequest(
                     launchUrl = getGameLinkResult.Data?.Url ?? "";
                     break;
                 }
+
                 case CasinoProvider.Softswiss:
                 {
                     var getGameLinkResult = await _softswissGamesApiClient.GetLaunchUrlAsync(
@@ -266,6 +337,7 @@ public sealed record LogInRequest(
 
                     if (getGameLinkResult.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
                     var data = getGameLinkResult.Data;
 
                     httpRequestMessage = data.HttpRequest;
@@ -273,8 +345,8 @@ public sealed record LogInRequest(
 
                     var content = data.Content!;
                     var existingSession = await _context.Set<Session>()
-                        .Where(s => s.Id == content.SessionId)
-                        .FirstOrDefaultAsync(cancellationToken);
+                       .Where(s => s.Id == content.SessionId)
+                       .FirstOrDefaultAsync(cancellationToken);
 
                     if (existingSession is not null)
                     {
@@ -293,6 +365,7 @@ public sealed record LogInRequest(
                     launchUrl = content.LaunchOptions.GameUrl;
                     break;
                 }
+
                 case CasinoProvider.Sw:
                     launchUrl = GetSwLaunchUrl(
                         baseUrl,
@@ -300,7 +373,9 @@ public sealed record LogInRequest(
                         $"{casino.Id}-{user.Currency.Id}",
                         user.Id.ToString(),
                         request.Game);
+
                     break;
+
                 case CasinoProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
                         baseUrl,
@@ -309,22 +384,28 @@ public sealed record LogInRequest(
                         user.Username,
                         user.Currency.Id,
                         casino.InternalId);
+
                     break;
+
                 case CasinoProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
                         baseUrl,
                         session.Id,
                         game.LaunchName,
                         cancellationToken);
+
                     launchUrl = getLaunchUrlResult.Data ?? "";
                     break;
+
                 case CasinoProvider.Uis:
                     launchUrl = GetUisLaunchUrl(
                         environment.UisBaseUrl,
                         session.Id,
                         casino.InternalId,
                         request.LaunchMode);
+
                     break;
+
                 case CasinoProvider.Reevo:
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
                         baseUrl,
@@ -353,6 +434,7 @@ public sealed record LogInRequest(
 
                     launchUrl = dataSuccess.Response;
                     break;
+
                 case CasinoProvider.Everymatrix:
                     launchUrl = GetEveryMatrixLaunchUrlAsync(
                         baseUrl,
@@ -364,7 +446,9 @@ public sealed record LogInRequest(
                         "dev",
                         session.Id,
                         user.Currency.Id);
+
                     break;
+
                 case CasinoProvider.BetConstruct:
                     launchUrl = GetBetConstructLaunchUrlAsync(
                         baseUrl,
@@ -373,7 +457,9 @@ public sealed record LogInRequest(
                         request.LaunchMode,
                         session.Id,
                         casino.Id);
+
                     break;
+
                 default:
                     launchUrl = "";
                     break;
@@ -399,6 +485,19 @@ public sealed record LogInRequest(
                 httpResponseMessage);
 
             return ResultFactory.Success(result);
+        }
+
+        private string GetPlayerIp()
+        {
+            var playerIp = _httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            return (!string.IsNullOrEmpty(playerIp)
+                ? playerIp
+                : _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString())!;
+        }
+
+        private static bool CheckUranusApiResponse(dynamic apiResponse)
+        {
+            return apiResponse.IsFailure || apiResponse.Data?.Data?.Data.Url is null;
         }
     }
 
@@ -588,9 +687,19 @@ public sealed record LogInRequest(
     }
 
     private static string GetEmaraPlayLaunchUrlAsync(
-        Uri baseUrl, string gameId, string token, LaunchMode launchMode, string lang,
-        string @operator, string? channel, string? jurisdiction, string currency,
-        string? ip, string user, string? lobby = null, string? cashier = null)
+        Uri baseUrl,
+        string gameId,
+        string token,
+        LaunchMode launchMode,
+        string lang,
+        string @operator,
+        string? channel,
+        string? jurisdiction,
+        string currency,
+        string? ip,
+        string user,
+        string? lobby = null,
+        string? cashier = null)
     {
         var mode = launchMode is LaunchMode.Real ? "real_play" : "demo";
 
@@ -605,6 +714,7 @@ public sealed record LogInRequest(
             { nameof(ip), ip },
             { nameof(currency), currency },
         };
+
         if (mode is "real_play")
         {
             queryParameters.Add(nameof(token), token);
@@ -615,18 +725,19 @@ public sealed record LogInRequest(
         {
             queryParameters.Add(nameof(lobby), lobby);
         }
+
         if (cashier is not null)
         {
             queryParameters.Add(nameof(cashier), cashier);
         }
-        
+
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(baseUrl, $"emara-play/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
-    
+
     private static string GetBetConstructLaunchUrlAsync(
         Uri baseUrl,
         int gameId,
@@ -697,10 +808,9 @@ public sealed record LogInRequest(
     {
         public LoginRequestValidator()
         {
-            
         }
     }
-    
+
     public class Validator : AbstractValidator<SignUpRequest>
     {
         public Validator(SupportedCurrenciesFactory supportedCurrenciesFactory)
@@ -710,7 +820,7 @@ public sealed record LogInRequest(
             RuleFor(x => currenciesOptions.Items.Contains(x.Currency));
 
             RuleFor(p => p.Balance)
-                .PrecisionScale(28, 2, false);
+               .PrecisionScale(28, 2, false);
         }
     }
 }
