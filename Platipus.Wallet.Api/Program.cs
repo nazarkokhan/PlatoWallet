@@ -12,6 +12,7 @@ using Platipus.Api.Common;
 using Platipus.Serilog;
 using Platipus.Wallet.Api.Application.Services.AtlasGamesApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
+using Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.PswGamesApi;
@@ -176,7 +177,10 @@ try
        .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>()
        .Services
        .AddSingleton<IUranusGameApiClient, UranusGameApiClient>()
-       .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>();
+       .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>()
+       .Services
+       .AddSingleton<IEvenbetGameApiClient, EvenbetGameApiClient>()
+       .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>();
 
     services
        .AddHealthChecks()

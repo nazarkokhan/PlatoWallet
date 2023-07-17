@@ -9,8 +9,10 @@ using Other;
 
 public sealed class UranusMockedErrorActionFilter : AbstractMockedErrorActionFilter
 {
-    public UranusMockedErrorActionFilter(
-        ILogger<UranusMockedErrorActionFilter> logger) : base(logger) { }
+    public UranusMockedErrorActionFilter(ILogger<UranusMockedErrorActionFilter> logger)
+        : base(logger)
+    {
+    }
 
     protected override MockedErrorIdentifiers? GetMockedErrorIdentifiers(
         IBaseWalletRequest baseRequest,
@@ -29,6 +31,5 @@ public sealed class UranusMockedErrorActionFilter : AbstractMockedErrorActionFil
         };
 
         return new MockedErrorIdentifiers(walletMethod, request.SessionToken!, true);
-
     }
 }

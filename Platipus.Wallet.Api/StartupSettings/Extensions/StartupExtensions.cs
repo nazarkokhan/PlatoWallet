@@ -9,6 +9,7 @@ using ControllerSpecificJsonOptions;
 using Domain.Entities.Enums;
 using Filters.NewFilterStyle;
 using Filters.Security;
+using Filters.Security.Evenbet;
 using Filters.Security.Uranus;
 using JorgeSerrano.Json;
 using JsonConverters;
@@ -35,7 +36,9 @@ public static class StartupExtensions
            .AddScoped<AtlasExternalSecurityFilter>()
            .AddSingleton<UranusMockedErrorActionFilter>()
            .AddScoped<UranusSecurityFilter>()
-           .AddScoped<UranusExternalSecurityFilter>();
+           .AddScoped<UranusExternalSecurityFilter>()
+           .AddSingleton<EvenbetMockedErrorActionFilter>()
+           .AddScoped<EvenbetSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -132,6 +135,13 @@ public static class StartupExtensions
                 })
            .AddJsonOptions(
                 nameof(CasinoProvider.Uranus),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+                })
+           .AddJsonOptions(
+                nameof(CasinoProvider.Evenbet),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

@@ -1,4 +1,4 @@
-﻿namespace Platipus.Wallet.Api.Extensions.SecuritySign.Evoplay;
+﻿namespace Platipus.Wallet.Api.Extensions.SecuritySign.Uranus;
 
 using System.Security.Cryptography;
 using System.Text;

@@ -18,5 +18,6 @@ public enum CasinoProvider
     PariMatch,
     EmaraPlay, 
     Atlas,
-    Uranus
+    Uranus,
+    Evenbet
 }

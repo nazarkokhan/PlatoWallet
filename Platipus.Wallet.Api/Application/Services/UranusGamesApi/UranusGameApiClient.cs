@@ -1,9 +1,8 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Api.Extensions.SecuritySign.Evoplay;
+using Api.Extensions.SecuritySign.Uranus;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
 using Domain.Entities.Enums;

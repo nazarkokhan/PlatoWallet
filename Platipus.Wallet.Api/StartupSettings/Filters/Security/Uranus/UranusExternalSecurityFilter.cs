@@ -2,7 +2,7 @@
 
 using System.Text;
 using Api.Extensions;
-using Api.Extensions.SecuritySign.Evoplay;
+using Api.Extensions.SecuritySign.Uranus;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Results.Uranus;
 using Microsoft.AspNetCore.Mvc.Filters;

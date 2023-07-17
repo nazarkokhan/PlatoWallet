@@ -50,8 +50,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Application\Requests\Wallets\Evenbet\Models\" />
+        <Folder Include="Application\Responses\Evenbet\" />
         <Folder Include="Application\Responses\Uranus\" />
         <Folder Include="Application\Results\Base\WithData\WithError" />
+        <Folder Include="Application\Services\EvenbetGamesApi\External\" />
+        <Folder Include="Application\Services\EvenbetGamesApi\Requests\" />
     </ItemGroup>
 
     <ItemGroup>

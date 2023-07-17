@@ -1,12 +1,12 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.Security.Uranus;
 
 using System.Text;
+using Api.Extensions.SecuritySign.Uranus;
 using Application.Requests.Wallets.Uranus.Base;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Results.Uranus;
 using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.Extensions.SecuritySign.Evoplay;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Infrastructure.Persistence;

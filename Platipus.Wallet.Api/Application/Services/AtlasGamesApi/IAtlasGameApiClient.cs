@@ -3,7 +3,6 @@
 using Application.Requests.Wallets.Atlas.Base;
 using Requests;
 using Responses.AtlasPlatform;
-using Results.Atlas;
 using Results.HttpClient.WithData;
 
 public interface IAtlasGameApiClient

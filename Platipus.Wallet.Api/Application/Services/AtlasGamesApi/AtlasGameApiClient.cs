@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Requests;
 using Responses.AtlasPlatform;
-using Results.Atlas;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
