@@ -29,12 +29,14 @@ public static class CommonResultToUranusMappers
         {
             ErrorCode.CasinoNotFound => UranusErrorCode.E_PROVIDER_NOT_FOUND,
             ErrorCode.TransactionAlreadyExists => UranusErrorCode.E_INVALID_TRANSACTION_ID,
+            ErrorCode.TransactionNotFound => UranusErrorCode.E_INVALID_TRANSACTION_ID,
             ErrorCode.UserNotFound => UranusErrorCode.E_INVALID_USER_ID,
-            ErrorCode.UserIsDisabled => UranusErrorCode.E_PLAYER_IS_LOCKED,
+            ErrorCode.UserIsDisabled => UranusErrorCode.E_INVALID_USER_ID,
             ErrorCode.RoundAlreadyExists => UranusErrorCode.E_UNEXPECTED_LOGIC,
-            ErrorCode.RoundAlreadyFinished => UranusErrorCode.E_UNEXPECTED_LOGIC,
-            ErrorCode.InvalidCurrency => UranusErrorCode.E_UNEXPECTED_LOGIC,
-            ErrorCode.RoundNotFound => UranusErrorCode.E_UNEXPECTED_LOGIC,
+            ErrorCode.GameServerApiError => UranusErrorCode.E_REQUEST_TRANSPORT_FAILED,
+            ErrorCode.RoundNotFound => UranusErrorCode.E_PROVIDER_GAME_NOT_FOUND,
+            ErrorCode.InsufficientFunds => UranusErrorCode.E_INSUFFICIENT_BALANCE,
+            ErrorCode.UnknownHttpClientError => UranusErrorCode.E_UNEXPECTED_LOGIC,
             _ => UranusErrorCode.E_INTERNAL
         };
     }
