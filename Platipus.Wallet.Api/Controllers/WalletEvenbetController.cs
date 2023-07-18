@@ -4,6 +4,7 @@ using Abstract;
 using Application.Requests.Wallets.Evenbet;
 using Application.Responses.Evenbet;
 using Application.Responses.Evenbet.Base;
+using Application.Services.EvenbetGamesApi.External;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -50,6 +51,13 @@ public sealed class WalletEvenbetController : RestApiController
     [ProducesResponseType(typeof(EvenbetRollbackResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
         [FromBody] EvenbetRollbackRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("login")]
+    [ProducesResponseType(typeof(EvenbetLoginResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Login(
+        [FromBody] EvenbetLoginRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

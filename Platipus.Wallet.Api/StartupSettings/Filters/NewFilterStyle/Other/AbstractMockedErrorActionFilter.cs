@@ -29,9 +29,16 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 
         var executedContext = await next();
 
+        var actionName = context.ActionDescriptor.RouteValues["action"];
+        if (actionName is not null && actionName.Equals("Login", StringComparison.OrdinalIgnoreCase))
+        {
+            await next();
+            return;
+        }
+
         var walletRequest = context.ActionArguments.Values
-            .OfType<IBaseWalletRequest>()
-            .Single();
+           .OfType<IBaseWalletRequest>()
+           .Single();
 
         var mockedErrorIdentifiers = GetMockedErrorIdentifiers(walletRequest, executedContext);
 
@@ -82,15 +89,15 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
         var (walletMethod, usernameOrSession, callerIdentifiedBySession) = mockedErrorIdentifiers;
 
         var mockedErrorQuery = dbContext.Set<MockedError>()
-            .Where(e => e.Method == walletMethod)
-            .Where(
+           .Where(e => e.Method == walletMethod)
+           .Where(
                 e => callerIdentifiedBySession
                     ? e.User.Sessions.Any(s => s.Id == usernameOrSession)
                     : e.User.Username == usernameOrSession);
 
         var mockedError = await mockedErrorQuery
-            .OrderBy(e => e.ExecutionOrder)
-            .FirstOrDefaultAsync();
+           .OrderBy(e => e.ExecutionOrder)
+           .FirstOrDefaultAsync();
 
         if (mockedError is null)
         {
@@ -141,8 +148,10 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
                 {
                     StatusCode = (int?)mockedError.HttpStatusCode
                 };
+
                 break;
             }
+
             default:
             {
                 httpContext.Items.Add(responseItem, mockedError.Body);
@@ -152,12 +161,13 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
                     StatusCode = (int?)mockedError.HttpStatusCode,
                     ContentType = mockedError.ContentType
                 };
+
                 break;
             }
         }
 
         var updMockQuery = dbContext.Set<MockedError>()
-            .Where(e => e.Id == mockedError.Id);
+           .Where(e => e.Id == mockedError.Id);
 
         var updMockRows = mockedError.Count > 1
             ? await updMockQuery.ExecuteUpdateAsync(e => e.SetProperty(p => p.Count, p => p.Count - 1))

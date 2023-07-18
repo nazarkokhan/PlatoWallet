@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.Security.Evenbet;
 
-[Route("external/evenbet/game")]
+[Route("external/evenbet/")]
 [ServiceFilter(typeof(EvenbetSecurityFilter), Order = 1)]
 [JsonSettingsName(nameof(CasinoProvider.Evenbet))]
 [ProducesResponseType(typeof(EvenbetFailureResponse), StatusCodes.Status200OK)]
@@ -21,18 +21,18 @@ public sealed class ExternalEvenbetController : RestApiController
     {
         _mediator = mediator;
     }
-    
-    [HttpPost("list")]
+
+    [HttpPost("game/list")]
     [ProducesResponseType(typeof(EvenbetGetGamesResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetGames(
         [FromBody] EvenbetGetGamesRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
-    // [HttpPost("launch")]
-    // [ProducesResponseType(typeof(EvenbetGetLaunchGameUrlResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> GetLaunchGameUrl(
-    //     [FromBody] EvenbetGetLaunchGameUrlRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("game/launch")]
+    [ProducesResponseType(typeof(EvenbetGetLaunchGameUrlResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetLaunchGameUrl(
+        [FromBody] EvenbetGetLaunchGameUrlRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

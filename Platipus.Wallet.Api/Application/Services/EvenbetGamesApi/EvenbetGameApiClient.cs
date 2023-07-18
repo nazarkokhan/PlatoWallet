@@ -9,13 +9,11 @@ using External;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Requests;
 using Responses.Evenbet.Base;
-using Results.Evenbet;
-using Results.Evenbet.WithData;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
-using Results.ResultToResultMappers;
 
 internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
 {
@@ -46,6 +44,18 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
             cancellationToken);
     }
 
+    public Task<IResult<IHttpClientResult<EvenbetGetLaunchGameUrlResponse, EvenbetFailureResponse>>> GetGameLaunchUrlAsync(
+        Uri baseUrl,
+        EvenbetGetLaunchGameUrlGameApiRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return PostAsync<EvenbetGetLaunchGameUrlResponse, EvenbetGetLaunchGameUrlGameApiRequest>(
+            baseUrl,
+            "game/launch",
+            request,
+            cancellationToken);
+    }
+
     private async Task<IResult<IHttpClientResult<TSuccess, EvenbetFailureResponse>>> PostAsync<TSuccess, TRequest>(
         Uri baseUrl,
         string method,
@@ -62,7 +72,7 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
             var hashToken = EvenbetSecurityHash.Compute(requestContent, secretKey);
-            _httpClient.DefaultRequestHeaders.Add("Authorization", hashToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(hashToken);
 
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 

@@ -146,6 +146,7 @@ public static class StartupExtensions
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 });
 
         return builder.Services;

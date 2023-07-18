@@ -52,7 +52,6 @@
     <ItemGroup>
         <Folder Include="Application\Responses\Uranus\" />
         <Folder Include="Application\Results\Base\WithData\WithError" />
-        <Folder Include="Application\Services\EvenbetGamesApi\Requests\" />
     </ItemGroup>
 
     <ItemGroup>
