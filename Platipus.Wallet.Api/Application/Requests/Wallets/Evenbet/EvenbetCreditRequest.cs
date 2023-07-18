@@ -15,7 +15,7 @@ public sealed record EvenbetCreditRequest(
         [property: JsonProperty("endRound")] bool EndRound,
         [property: JsonProperty("roundId")] string RoundId,
         [property: JsonProperty("transactionId")] string TransactionId,
-        [property: JsonProperty("amount")] int Amount)
+        [property: JsonProperty("amount")] decimal Amount)
     : IEvenbetRequest, IRequest<IEvenbetResult<EvenbetCreditResponse>>
 {
     public sealed class Handler : IRequestHandler<EvenbetCreditRequest, IEvenbetResult<EvenbetCreditResponse>>
@@ -43,7 +43,7 @@ public sealed record EvenbetCreditRequest(
             {
                 walletResult.ToEvenbetFailureResult<EvenbetFailureResponse>();
             }
-
+            
             var data = walletResult.Data;
 
             var response = new EvenbetCreditResponse(
@@ -80,9 +80,7 @@ public sealed record EvenbetCreditRequest(
                .WithMessage("TransactionId is required.");
 
             RuleFor(x => x.Amount)
-               .NotEmpty()
-               .WithMessage("Amount is required.")
-               .GreaterThanOrEqualTo(0)
+               .GreaterThanOrEqualTo(0.0M)
                .WithMessage("Amount must be greater than or equal 0.");
         }
     }

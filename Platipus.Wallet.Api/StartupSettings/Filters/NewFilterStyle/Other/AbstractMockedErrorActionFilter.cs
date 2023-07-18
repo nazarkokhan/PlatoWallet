@@ -27,14 +27,14 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
     {
         Logger.LogDebug("Handling request with possible mocked error");
 
-        var executedContext = await next();
-
         var actionName = context.ActionDescriptor.RouteValues["action"];
         if (actionName is not null && actionName.Equals("Login", StringComparison.OrdinalIgnoreCase))
         {
             await next();
             return;
         }
+        
+        var executedContext = await next();
 
         var walletRequest = context.ActionArguments.Values
            .OfType<IBaseWalletRequest>()
