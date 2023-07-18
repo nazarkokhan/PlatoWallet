@@ -19,7 +19,7 @@ public static class CommonResultToEvenbetMappers
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 exception: result.Exception);
 
-    public static IEvenbetResult ToEvenbetResult<TData>(this IResult result, TData response)
+    public static IEvenbetResult<TData> ToEvenbetResult<TData>(this IResult result, TData response)
         => result.IsSuccess
             ? EvenbetResultFactory.Success(response)
             : EvenbetResultFactory.Failure<TData>(

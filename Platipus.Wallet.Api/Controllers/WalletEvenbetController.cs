@@ -24,11 +24,32 @@ public sealed class WalletEvenbetController : RestApiController
     {
         _mediator = mediator;
     }
-    
+
     [HttpPost("balance")]
     [ProducesResponseType(typeof(EvenbetGetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
         [FromBody] EvenbetGetBalanceRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("debit")]
+    [ProducesResponseType(typeof(EvenbetDebitResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Debit(
+        [FromBody] EvenbetDebitRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("credit")]
+    [ProducesResponseType(typeof(EvenbetCreditResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Credit(
+        [FromBody] EvenbetCreditRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("rollback")]
+    [ProducesResponseType(typeof(EvenbetRollbackResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Rollback(
+        [FromBody] EvenbetRollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

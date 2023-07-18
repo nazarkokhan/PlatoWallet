@@ -23,6 +23,9 @@ public sealed class EvenbetMockedErrorActionFilter : AbstractMockedErrorActionFi
         var walletMethod = request switch
         {
             EvenbetGetBalanceRequest => MockedErrorMethod.Balance,
+            EvenbetDebitRequest => MockedErrorMethod.Bet,
+            EvenbetCreditRequest => MockedErrorMethod.Win,
+            EvenbetRollbackRequest => MockedErrorMethod.Rollback,
             _ => throw new ArgumentOutOfRangeException(nameof(baseRequest), "There is no such method in controller.")
         };
 

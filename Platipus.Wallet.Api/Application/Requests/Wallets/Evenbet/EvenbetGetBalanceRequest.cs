@@ -1,9 +1,12 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evenbet;
 
 using Base;
+using FluentValidation;
 using Newtonsoft.Json;
 using Responses.Evenbet;
+using Responses.Evenbet.Base;
 using Results.Evenbet.WithData;
+using Results.ResultToResultMappers;
 using Services.Wallet;
 
 public sealed record EvenbetGetBalanceRequest([property: JsonProperty("token")] string Token)
@@ -22,7 +25,32 @@ public sealed record EvenbetGetBalanceRequest([property: JsonProperty("token")] 
             EvenbetGetBalanceRequest request,
             CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var walletResult = await _walletService.GetBalanceAsync(
+                request.Token,
+                cancellationToken: cancellationToken);
+
+            if (walletResult.IsFailure || walletResult.Data is null)
+            {
+                walletResult.ToEvenbetFailureResult<EvenbetFailureResponse>();
+            }
+
+            var data = walletResult.Data;
+
+            var response = new EvenbetGetBalanceResponse(
+                (int)data!.Balance,
+                DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
+
+            return walletResult.ToEvenbetResult(response);
+        }
+    }
+
+    public sealed class EvenbetGetBalanceRequestValidator : AbstractValidator<EvenbetGetBalanceRequest>
+    {
+        public EvenbetGetBalanceRequestValidator()
+        {
+            RuleFor(x => x.Token)
+               .NotEmpty()
+               .WithMessage("Token is required!");
         }
     }
 }

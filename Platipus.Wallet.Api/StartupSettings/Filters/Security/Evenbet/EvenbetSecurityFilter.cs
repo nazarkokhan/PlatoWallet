@@ -36,14 +36,14 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
                     UsedId = s.User.Id,
                     UserPassword = s.User.Password,
-                    CasinoProvider = s.User.Casino.Params.UranusProvider
+                    CasinoProvider = s.User.Casino.Params.EvenbetProvider
                 })
            .FirstOrDefaultAsync();
 
         if (session is null || session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = EvenbetResultFactory
-               .Failure<EvenbetFailureResponse>(EvenbetErrorCode.AUTHORIZATION_FAILED)
+               .Failure<EvenbetFailureResponse>(EvenbetErrorCode.INVALID_TOKEN)
                .ToActionResult();
 
             return;
@@ -53,7 +53,7 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
         if (!session.CasinoProvider.Equals(evenbetProviderId.ToString()))
         {
             context.Result = EvenbetResultFactory
-               .Failure<EvenbetFailureResponse>(EvenbetErrorCode.INVALID_PARAMETER)
+               .Failure<EvenbetFailureResponse>(EvenbetErrorCode.AUTHORIZATION_FAILED)
                .ToActionResult();
 
             return;
@@ -65,7 +65,7 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
         string? authHeaderValue = context.HttpContext.Request.Headers["Authorization"];
         if (authHeaderValue is null)
         {
-            context.Result = EvenbetResultFactory.Failure<EvenbetFailureResponse>(EvenbetErrorCode.INVALID_TOKEN)
+            context.Result = EvenbetResultFactory.Failure<EvenbetFailureResponse>(EvenbetErrorCode.AUTHORIZATION_FAILED)
                .ToActionResult();
 
             return;
