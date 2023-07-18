@@ -17,7 +17,7 @@ public static class EvenbetSecurityHash
         return isValid;
     }
 
-    private static string Compute(string requestJson, string privateKey)
+    public static string Compute(string requestJson, string privateKey)
     {
         var toHash = $"{requestJson}{privateKey}";
 

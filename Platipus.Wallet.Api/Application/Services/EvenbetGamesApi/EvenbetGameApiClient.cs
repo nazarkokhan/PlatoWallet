@@ -1,5 +1,145 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
 
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using Api.Extensions.SecuritySign.Evenbet;
+using Domain.Entities.Enums;
+using External;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Responses.Evenbet.Base;
+using Results.Evenbet;
+using Results.Evenbet.WithData;
+using Results.HttpClient;
+using Results.HttpClient.HttpData;
+using Results.HttpClient.WithData;
+using Results.ResultToResultMappers;
+
 internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
 {
+    private readonly HttpClient _httpClient;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
+
+    private const string ApiBasePath = "evenbet/";
+
+    public EvenbetGameApiClient(
+        HttpClient httpClient,
+        IOptionsMonitor<JsonOptions> jsonSerializerOptions)
+    {
+        _httpClient = httpClient;
+        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.Evenbet))
+           .JsonSerializerOptions;
+    }
+
+    public Task<IResult<IHttpClientResult<EvenbetGetGamesResponse, EvenbetFailureResponse>>> GetGamesAsync(
+        Uri baseUrl,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new Dictionary<string, string?>();
+
+        return GetAsync<EvenbetGetGamesResponse>(
+            baseUrl,
+            "game/list",
+            request,
+            cancellationToken);
+    }
+
+    private async Task<IResult<IHttpClientResult<TSuccess, EvenbetFailureResponse>>> PostAsync<TSuccess, TRequest>(
+        Uri baseUrl,
+        string method,
+        TRequest request,
+        CancellationToken cancellationToken = default)
+        where TRequest : class
+    {
+        try
+        {
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
+
+            var secretKey = baseUrl.Host.Contains("localhost") ? "integrationkeyplatipus" : "6aYxrPXpYYw6S3Q";
+            var requestContent = JsonConvert.SerializeObject(request);
+            var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
+
+            var hashToken = EvenbetSecurityHash.Compute(requestContent, secretKey);
+            _httpClient.DefaultRequestHeaders.Add("Authorization", hashToken);
+
+            var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
+
+            var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
+
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            return httpResult.IsFailure
+                ? ResultFactory.Failure<IHttpClientResult<TSuccess, EvenbetFailureResponse>>(ErrorCode.Unknown)
+                : ResultFactory.Success(httpResult);
+        }
+        catch (Exception e)
+        {
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, EvenbetFailureResponse>>(
+                ErrorCode.UnknownHttpClientError,
+                e);
+        }
+    }
+
+    private async Task<IResult<IHttpClientResult<TSuccess, EvenbetFailureResponse>>> GetAsync<TSuccess>(
+        Uri baseUrl,
+        string method,
+        Dictionary<string, string?> request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}/{method}{QueryString.Create(request)}");
+            var secretKey = baseUrl.Host.Contains("localhost") ? "integrationkeyplatipus" : "6aYxrPXpYYw6S3Q";
+
+            var requestJson = JsonConvert.SerializeObject(request);
+            var hashToken = EvenbetSecurityHash.Compute(requestJson is "{}" ? "" : requestJson, secretKey);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(hashToken);
+            var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
+
+            var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
+
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+
+            return httpResult.IsFailure
+                ? ResultFactory.Failure<IHttpClientResult<TSuccess, EvenbetFailureResponse>>(ErrorCode.Unknown)
+                : ResultFactory.Success(httpResult);
+        }
+        catch (Exception)
+        {
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, EvenbetFailureResponse>>(ErrorCode.UnknownHttpClientError);
+        }
+    }
+
+    private IHttpClientResult<TSuccess, EvenbetFailureResponse> GetHttpResultAsync<TSuccess>(HttpClientRequest httpResponse)
+    {
+        try
+        {
+            var responseBody = httpResponse.ResponseData.Body;
+
+            if (string.IsNullOrEmpty(responseBody))
+            {
+                return httpResponse.Failure<TSuccess, EvenbetFailureResponse>();
+            }
+
+            var responseJson = JsonDocument.Parse(responseBody!).RootElement;
+
+            if (responseJson.TryGetProperty("error", out var error) && !error.ValueKind.Equals(JsonValueKind.Null))
+            {
+                var errorResponse = responseJson.Deserialize<EvenbetFailureResponse>(_jsonSerializerOptions);
+                if (errorResponse is not null)
+                    return httpResponse.Failure<TSuccess, EvenbetFailureResponse>(errorResponse);
+            }
+
+            var success = responseJson.Deserialize<TSuccess>(_jsonSerializerOptions);
+
+            return success is null
+                ? httpResponse.Failure<TSuccess, EvenbetFailureResponse>()
+                : httpResponse.Success<TSuccess, EvenbetFailureResponse>(success);
+        }
+        catch (Exception e)
+        {
+            return httpResponse.Failure<TSuccess, EvenbetFailureResponse>(e);
+        }
+    }
 }

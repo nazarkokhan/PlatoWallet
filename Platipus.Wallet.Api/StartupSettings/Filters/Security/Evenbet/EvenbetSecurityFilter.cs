@@ -18,45 +18,58 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
         ActionExecutingContext context,
         ActionExecutionDelegate next)
     {
-        var request = context.ActionArguments.Values
-           .OfType<IEvenbetRequest>()
-           .Single();
+        var host = context.HttpContext.Request.Host.Value;
+        var scheme = context.HttpContext.Request.Scheme;
+        var pathBase = context.HttpContext.Request.PathBase.Value;
 
-        var httpContext = context.HttpContext;
+        var baseUrl = $"{scheme}://{host}{pathBase}";
 
-        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
-        var query = dbContext.Set<Session>()
-           .Where(s => s.Id == request.Token);
-
-        var session = await query
-           .Select(
-                s => new
-                {
-                    s.ExpirationDate,
-                    CasinoSignatureKey = s.User.Casino.SignatureKey,
-                    UsedId = s.User.Id,
-                    UserPassword = s.User.Password,
-                    CasinoProvider = s.User.Casino.Params.EvenbetProvider
-                })
-           .FirstOrDefaultAsync();
-
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        var casinoSignatureKey = baseUrl.Contains("localhost") ? "integrationkeyplatipus" : "6aYxrPXpYYw6S3Q";
+        var controllerName = context.RouteData.Values["controller"];
+        if (controllerName is "WalletEvenbet")
         {
-            context.Result = EvenbetResultFactory
-               .Failure<EvenbetFailureResponse>(EvenbetErrorCode.INVALID_TOKEN)
-               .ToActionResult();
+            var request = context.ActionArguments.Values
+               .OfType<IEvenbetRequest>()
+               .Single();
 
-            return;
-        }
+            var httpContext = context.HttpContext;
 
-        const int evenbetProviderId = (int)CasinoProvider.Evenbet;
-        if (!session.CasinoProvider.Equals(evenbetProviderId.ToString()))
-        {
-            context.Result = EvenbetResultFactory
-               .Failure<EvenbetFailureResponse>(EvenbetErrorCode.AUTHORIZATION_FAILED)
-               .ToActionResult();
+            var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
+            var query = dbContext.Set<Session>()
+               .Where(s => s.Id == request.Token);
 
-            return;
+            var session = await query
+               .Select(
+                    s => new
+                    {
+                        s.ExpirationDate,
+                        CasinoSignatureKey = s.User.Casino.SignatureKey,
+                        UsedId = s.User.Id,
+                        UserPassword = s.User.Password,
+                        CasinoProvider = s.User.Casino.Params.EvenbetProvider
+                    })
+               .FirstOrDefaultAsync();
+
+            if (session?.CasinoProvider is null || session.ExpirationDate < DateTime.UtcNow)
+            {
+                context.Result = EvenbetResultFactory
+                   .Failure<EvenbetFailureResponse>(EvenbetErrorCode.INVALID_TOKEN)
+                   .ToActionResult();
+
+                return;
+            }
+
+            casinoSignatureKey = session.CasinoSignatureKey;
+
+            const int evenbetProviderId = (int)CasinoProvider.Evenbet;
+            if (!session.CasinoProvider.Equals(evenbetProviderId.ToString()))
+            {
+                context.Result = EvenbetResultFactory
+                   .Failure<EvenbetFailureResponse>(EvenbetErrorCode.AUTHORIZATION_FAILED)
+                   .ToActionResult();
+
+                return;
+            }
         }
 
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
@@ -71,7 +84,7 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
             return;
         }
 
-        var result = EvenbetSecurityHash.IsValid(authHeaderValue, jsonString, session.CasinoSignatureKey);
+        var result = EvenbetSecurityHash.IsValid(authHeaderValue, jsonString, casinoSignatureKey);
 
         if (!result)
         {
