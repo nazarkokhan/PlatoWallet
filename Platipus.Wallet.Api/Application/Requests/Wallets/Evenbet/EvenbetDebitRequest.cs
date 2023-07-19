@@ -47,7 +47,7 @@ public sealed record EvenbetDebitRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetDebitResponse(
-                (int)data!.Balance,
+                data!.Balance,
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.InternalId);
 

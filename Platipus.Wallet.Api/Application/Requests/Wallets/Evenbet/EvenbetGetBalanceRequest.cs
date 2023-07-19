@@ -37,7 +37,7 @@ public sealed record EvenbetGetBalanceRequest([property: JsonProperty("token")] 
             var data = walletResult.Data;
 
             var response = new EvenbetGetBalanceResponse(
-                (int)data!.Balance,
+                data!.Balance,
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
 
             return walletResult.ToEvenbetResult(response);

@@ -46,7 +46,7 @@ public sealed record EvenbetRollbackRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetRollbackResponse(
-                (int)data!.Balance,
+                data!.Balance,
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.InternalId);
 
