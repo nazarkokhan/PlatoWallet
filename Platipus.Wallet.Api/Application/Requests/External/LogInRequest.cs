@@ -14,6 +14,8 @@ using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
 using Services.EmaraPlayGamesApi;
 using Services.EmaraPlayGamesApi.Requests;
+using Services.EvenbetGamesApi;
+using Services.EvenbetGamesApi.Requests;
 using Services.GamesGlobalGamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
@@ -55,6 +57,7 @@ public sealed record LogInRequest(
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAtlasGameApiClient _atlasGameApiClient;
         private readonly IUranusGameApiClient _uranusGameApiClient;
+        private readonly IEvenbetGameApiClient _evenbetGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -67,7 +70,8 @@ public sealed record LogInRequest(
             IHttpContextAccessor httpContextAccessor,
             IEmaraPlayGameApiClient emaraPlayGameApiClient,
             IAtlasGameApiClient atlasGameApiClient,
-            IUranusGameApiClient uranusGameApiClient)
+            IUranusGameApiClient uranusGameApiClient,
+            IEvenbetGameApiClient evenbetGameApiClient)
         {
             _context = context;
             _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
@@ -79,6 +83,7 @@ public sealed record LogInRequest(
             _emaraPlayGameApiClient = emaraPlayGameApiClient;
             _atlasGameApiClient = atlasGameApiClient;
             _uranusGameApiClient = uranusGameApiClient;
+            _evenbetGameApiClient = evenbetGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -152,6 +157,30 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case CasinoProvider.Evenbet:
+                {
+                    var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
+                    
+                    var apiRequest = new EvenbetGetLaunchGameUrlGameApiRequest(
+                        request.Game,
+                        isDemoLaunchMode,
+                        request.CasinoId,
+                        request.Language,
+                        request.Device!,
+                        user.Currency.Id,
+                        session.Id);
+
+                    var apiResponse = await _evenbetGameApiClient.GetGameLaunchUrlAsync(
+                        baseUrl,
+                        apiRequest,
+                        cancellationToken: cancellationToken);
+
+                    if (apiResponse.IsFailure || apiResponse.Data?.Data?.Url is null)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = apiResponse.Data.Data.Url.ToString();
+                    break;
+                }
                 case CasinoProvider.Uranus:
                 {
                     var playerIp = GetPlayerIp();
