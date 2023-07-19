@@ -22,6 +22,8 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     private const string ApiBasePath = "evenbet/";
+    private const string LocalTestSecretKey = "integrationkeyplatipus";
+    private const string ProdSecretKey = "6aYxrPXpYYw6S3Q";
 
     public EvenbetGameApiClient(
         HttpClient httpClient,
@@ -68,7 +70,10 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
-            var secretKey = baseUrl.Host.Contains("localhost") ? "integrationkeyplatipus" : "6aYxrPXpYYw6S3Q";
+            var secretKey = baseUrl.Host.Contains("localhost")
+                ? LocalTestSecretKey
+                : ProdSecretKey;
+
             var requestContent = JsonConvert.SerializeObject(request);
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
@@ -101,7 +106,9 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         try
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}/{method}{QueryString.Create(request)}");
-            var secretKey = baseUrl.Host.Contains("localhost") ? "integrationkeyplatipus" : "6aYxrPXpYYw6S3Q";
+            var secretKey = baseUrl.Host.Contains("localhost")
+                ? LocalTestSecretKey
+                : ProdSecretKey;
 
             var requestJson = JsonConvert.SerializeObject(request);
             var hashToken = EvenbetSecurityHash.Compute(requestJson is "{}" ? "" : requestJson, secretKey);
