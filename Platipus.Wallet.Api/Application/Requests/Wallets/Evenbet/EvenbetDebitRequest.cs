@@ -49,7 +49,7 @@ public sealed record EvenbetDebitRequest(
             var response = new EvenbetDebitResponse(
                 data!.Balance,
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
-                data.Transaction.InternalId);
+                data.Transaction.Id);
 
             return walletResult.ToEvenbetResult(response);
         }
