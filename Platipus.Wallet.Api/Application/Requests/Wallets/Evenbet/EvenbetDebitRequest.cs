@@ -41,7 +41,7 @@ public sealed record EvenbetDebitRequest(
 
             if (walletResult.IsFailure || walletResult.Data is null)
             {
-                walletResult.ToEvenbetFailureResult<EvenbetFailureResponse>();
+                return walletResult.ToEvenbetFailureResult<EvenbetDebitResponse>();
             }
 
             var data = walletResult.Data;

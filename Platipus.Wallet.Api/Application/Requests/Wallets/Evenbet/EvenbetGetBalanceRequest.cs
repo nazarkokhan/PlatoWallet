@@ -31,7 +31,7 @@ public sealed record EvenbetGetBalanceRequest([property: JsonProperty("token")] 
 
             if (walletResult.IsFailure || walletResult.Data is null)
             {
-                walletResult.ToEvenbetFailureResult<EvenbetFailureResponse>();
+                return walletResult.ToEvenbetFailureResult<EvenbetGetBalanceResponse>();
             }
 
             var data = walletResult.Data;

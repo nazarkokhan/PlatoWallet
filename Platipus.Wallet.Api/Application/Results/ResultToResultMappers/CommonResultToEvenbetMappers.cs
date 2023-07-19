@@ -26,7 +26,7 @@ public static class CommonResultToEvenbetMappers
                 result.Error.ToEvenbetErrorCode(),
                 exception: result.Exception);
 
-    public static EvenbetErrorCode ToEvenbetErrorCode(this ErrorCode source)
+    private static EvenbetErrorCode ToEvenbetErrorCode(this ErrorCode source)
     {
         return source switch
         {
