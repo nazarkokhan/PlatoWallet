@@ -1,14 +1,15 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi.External;
 
+using Application.Requests.Wallets.Evenbet.Models;
 using Newtonsoft.Json;
 using Results.Evenbet.WithData;
 using Results.ResultToResultMappers;
 using Wallet;
 
 public sealed record EvenbetGetGamesRequest([property: JsonProperty("environment")] string Environment)
-    : IRequest<IEvenbetResult<EvenbetGetGamesResponse>>
+    : IRequest<IEvenbetResult<List<EvenbetGameModel>>>
 {
-    public sealed class Handler : IRequestHandler<EvenbetGetGamesRequest, IEvenbetResult<EvenbetGetGamesResponse>>
+    public sealed class Handler : IRequestHandler<EvenbetGetGamesRequest, IEvenbetResult<List<EvenbetGameModel>>>
     {
         private readonly IWalletService _walletService;
         private readonly IEvenbetGameApiClient _evenbetGameApiClient;
@@ -21,7 +22,7 @@ public sealed record EvenbetGetGamesRequest([property: JsonProperty("environment
             _evenbetGameApiClient = evenbetGameApiClient;
         }
 
-        public async Task<IEvenbetResult<EvenbetGetGamesResponse>> Handle(
+        public async Task<IEvenbetResult<List<EvenbetGameModel>>> Handle(
             EvenbetGetGamesRequest request,
             CancellationToken cancellationToken)
         {
@@ -29,7 +30,7 @@ public sealed record EvenbetGetGamesRequest([property: JsonProperty("environment
 
             if (walletResponse.Data is null)
             {
-                return walletResponse.ToEvenbetFailureResult<EvenbetGetGamesResponse>();
+                return walletResponse.ToEvenbetFailureResult<List<EvenbetGameModel>>();
             }
 
             var clientResponse = await _evenbetGameApiClient.GetGamesAsync(
@@ -37,10 +38,10 @@ public sealed record EvenbetGetGamesRequest([property: JsonProperty("environment
                 cancellationToken);
 
             if (clientResponse.IsFailure || clientResponse.Data?.Data is null)
-                return clientResponse.ToEvenbetFailureResult<EvenbetGetGamesResponse>();
+                return clientResponse.ToEvenbetFailureResult<List<EvenbetGameModel>>();
 
-            var games = clientResponse.Data.Data.Games;
-            var response = new EvenbetGetGamesResponse(games);
+            var games = clientResponse.Data.Data;
+            var response = new List<EvenbetGameModel>(games);
 
             return clientResponse.ToEvenbetResult(response);
         }

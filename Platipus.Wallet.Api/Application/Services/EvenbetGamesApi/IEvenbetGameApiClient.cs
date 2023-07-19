@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
 
+using Application.Requests.Wallets.Evenbet.Models;
 using External;
 using Requests;
 using Responses.Evenbet.Base;
@@ -7,7 +8,7 @@ using Results.HttpClient.WithData;
 
 public interface IEvenbetGameApiClient
 {
-    Task<IResult<IHttpClientResult<EvenbetGetGamesResponse, EvenbetFailureResponse>>> GetGamesAsync(
+    Task<IResult<IHttpClientResult<List<EvenbetGameModel>, EvenbetFailureResponse>>> GetGamesAsync(
         Uri baseUrl,
         CancellationToken cancellationToken = default);
     

@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Api.Extensions.SecuritySign.Evenbet;
+using Application.Requests.Wallets.Evenbet.Models;
 using Domain.Entities.Enums;
 using External;
 using Microsoft.AspNetCore.Mvc;
@@ -31,13 +32,13 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
            .JsonSerializerOptions;
     }
 
-    public Task<IResult<IHttpClientResult<EvenbetGetGamesResponse, EvenbetFailureResponse>>> GetGamesAsync(
+    public Task<IResult<IHttpClientResult<List<EvenbetGameModel>, EvenbetFailureResponse>>> GetGamesAsync(
         Uri baseUrl,
         CancellationToken cancellationToken = default)
     {
         var request = new Dictionary<string, string?>();
 
-        return GetAsync<EvenbetGetGamesResponse>(
+        return GetAsync<List<EvenbetGameModel>>(
             baseUrl,
             "game/list",
             request,
@@ -134,7 +135,9 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
 
             var responseJson = JsonDocument.Parse(responseBody!).RootElement;
 
-            if (responseJson.TryGetProperty("error", out var error) && !error.ValueKind.Equals(JsonValueKind.Null))
+            if (responseJson.ValueKind is JsonValueKind.Object
+             && responseJson.TryGetProperty("error", out var error)
+             && !error.ValueKind.Equals(JsonValueKind.Null))
             {
                 var errorResponse = responseJson.Deserialize<EvenbetFailureResponse>(_jsonSerializerOptions);
                 if (errorResponse is not null)
