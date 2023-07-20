@@ -19,5 +19,6 @@ public enum CasinoProvider
     EmaraPlay, 
     Atlas,
     Uranus,
-    Evenbet
+    Evenbet,
+    Anakatech
 }

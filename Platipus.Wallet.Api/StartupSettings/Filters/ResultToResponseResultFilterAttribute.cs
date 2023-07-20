@@ -24,7 +24,9 @@ using Application.Requests.Wallets.Sw.Base.Response;
 using Application.Requests.Wallets.Uis;
 using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Requests.Wallets.Uranus.Base;
+using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
+using Application.Results.Anakatech.WithData;
 using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
@@ -69,6 +71,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
+
                 case ISwResult swResult:
                 {
                     var errorCode = swResult.Error;
@@ -80,6 +83,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case ISoftBetResult { IsSuccess: true } softBetResult:
                 {
                     if (softBetResult is not ISoftBetResult<object> objectResult)
@@ -88,6 +92,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.Result = new OkObjectResult(objectResult.Data);
                     return;
                 }
+
                 case ISoftBetResult softBetResult:
                 {
                     var errorCode = softBetResult.Error;
@@ -103,12 +108,15 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IUisResult<object> { IsSuccess: true } uisResult:
                     context.Result = new OkObjectResult(uisResult.Data)
                     {
                         ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
                     };
+
                     return;
+
                 case IUisResult<object> uisResult:
                 {
                     var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
@@ -135,6 +143,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, container);
                     break;
                 }
+
                 case IBetflagResult<object> betflagResult:
                 {
                     var errorCode = betflagResult.Error;
@@ -164,9 +173,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IReevoResult<object> { IsSuccess: true } reevoResult:
                     context.Result = new OkObjectResult(reevoResult.Data);
                     return;
+
                 case IReevoResult<object> reevoResult:
                 {
                     var errorCode = reevoResult.Error;
@@ -178,9 +189,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IEverymatrixResult<object> { IsSuccess: true } everymatrixResult:
                     context.Result = new OkObjectResult(everymatrixResult.Data);
                     return;
+
                 case IEverymatrixResult<object> everymatrixResult:
                 {
                     var errorCode = everymatrixResult.Error;
@@ -192,9 +205,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IBetconstructResult<object> { IsSuccess: true } betConstructResult:
                     context.Result = new OkObjectResult(betConstructResult.Data);
                     return;
+
                 case IBetconstructResult<object> betConstructResult:
                 {
                     var errorCode = betConstructResult.Error;
@@ -206,9 +221,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IEmaraPlayResult<object> { IsSuccess: true } emaraPlayResult:
                     context.Result = new OkObjectResult(emaraPlayResult.Data);
                     return;
+
                 case IEmaraPlayResult<object> emaraPlayResult:
                 {
                     var errorCode = emaraPlayResult.Error;
@@ -219,9 +236,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IAtlasResult<object> { IsSuccess: true } atlasPlatformResult:
                     context.Result = new OkObjectResult(atlasPlatformResult.Data);
                     return;
+
                 case IAtlasResult<object> atlasPlatformResult:
                 {
                     var errorCode = atlasPlatformResult.Error;
@@ -232,36 +251,56 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IUranusResult<object> { IsSuccess: true } evoplayResult:
                     context.Result = new OkObjectResult(evoplayResult.Data);
                     return;
+
                 case IUranusResult<object> evoplayResult:
                 {
                     var errorCode = evoplayResult.Error;
 
                     var errorResponse = new UranusFailureResponse(
                         new UranusCommonErrorResponse(
-                        errorCode.Humanize(), 
-                        errorCode.ToString(),
-                        Array.Empty<object>())
-                        );
+                            errorCode.Humanize(),
+                            errorCode.ToString(),
+                            Array.Empty<object>()));
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
                     break;
                 }
+
                 case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
                     context.Result = new OkObjectResult(evenbetResult.Data);
                     return;
+
                 case IEvenbetResult<object> evenbetResult:
                 {
                     var errorCode = evenbetResult.Error;
 
                     var errorResponse = new EvenbetFailureResponse(
                         new EvenbetErrorResponse(
-                            (int)errorCode, 
-                            errorCode.Humanize())
-                    );
+                            (int)errorCode,
+                            errorCode.Humanize()));
+
+                    context.Result = new OkObjectResult(errorResponse);
+                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    break;
+                }
+
+                case IAnakatechResult<object> { IsSuccess: true } evenbetResult:
+                    context.Result = new OkObjectResult(evenbetResult.Data);
+                    return;
+
+                case IAnakatechResult<object> evenbetResult:
+                {
+                    var errorCode = evenbetResult.Error;
+
+                    var errorResponse = new AnakatechErrorResponse(
+                        false,
+                        0,
+                        errorCode.Humanize());
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);
@@ -326,8 +365,9 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 if (openboxActionResult.Result is IOpenboxResult<object> objectResult)
                 {
                     var jsonOptions = services.GetRequiredService<IOptionsMonitor<JsonOptions>>()
-                        .Get(CasinoProvider.Openbox.ToString())
-                        .JsonSerializerOptions;
+                       .Get(CasinoProvider.Openbox.ToString())
+                       .JsonSerializerOptions;
+
                     var payload = JsonSerializer.Serialize(objectResult.Data, jsonOptions);
                     var openboxObjResponse = new OpenboxSingleResponse(payload);
                     context.Result = new OkObjectResult(openboxObjResponse);
@@ -405,11 +445,15 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
             context.HttpContext.Items.Add(responseItemsKey, errorResponse);
         }
 
-        if (context.Result is not ExternalActionResult externalActionResult) return;
+        if (context.Result is not ExternalActionResult externalActionResult)
+            return;
+
         {
             if (externalActionResult.Result.IsSuccess)
             {
-                if (externalActionResult.Result is not IResult<object> objectResult) return;
+                if (externalActionResult.Result is not IResult<object> objectResult)
+                    return;
+
                 context.Result = new OkObjectResult(objectResult.Data);
                 return;
             }
