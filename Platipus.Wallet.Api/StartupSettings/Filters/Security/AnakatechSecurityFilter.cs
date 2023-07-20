@@ -40,7 +40,7 @@ public sealed class AnakatechSecurityFilter : IAsyncActionFilter
                 })
            .FirstOrDefaultAsync();
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session?.CasinoProvider is null || session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = AnakatechResultFactory
                .Failure<AnakatechErrorResponse>(AnakatechErrorCode.InvalidPlayerIdOrSessionId)
@@ -72,7 +72,7 @@ public sealed class AnakatechSecurityFilter : IAsyncActionFilter
         }
 
         var secret = secretKeyElement.GetString();
-        if (!string.Equals(secret, session.CasinoProvider))
+        if (!string.Equals(secret, session.CasinoSignatureKey))
         {
             context.Result = AnakatechResultFactory
                .Failure<AnakatechErrorResponse>(AnakatechErrorCode.InvalidSecret)

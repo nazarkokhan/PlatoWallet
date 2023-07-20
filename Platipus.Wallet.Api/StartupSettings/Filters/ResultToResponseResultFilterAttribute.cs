@@ -300,7 +300,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     var errorResponse = new AnakatechErrorResponse(
                         false,
                         0,
-                        errorCode.Humanize());
+                        errorCode.ToString());
 
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(responseItemsKey, errorResponse);

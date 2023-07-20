@@ -38,7 +38,8 @@ public static class StartupExtensions
            .AddScoped<UranusSecurityFilter>()
            .AddScoped<UranusExternalSecurityFilter>()
            .AddSingleton<EvenbetMockedErrorActionFilter>()
-           .AddScoped<EvenbetSecurityFilter>();
+           .AddScoped<EvenbetSecurityFilter>()
+           .AddScoped<AnakatechSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -142,6 +143,14 @@ public static class StartupExtensions
                 })
            .AddJsonOptions(
                 nameof(CasinoProvider.Evenbet),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                })
+           .AddJsonOptions(
+                nameof(CasinoProvider.Anakatech),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
