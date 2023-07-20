@@ -2,10 +2,9 @@
 
 using Base;
 using FluentValidation;
-using Helpers.Evenbet;
+using Helpers.Common;
 using Newtonsoft.Json;
 using Responses.Evenbet;
-using Responses.Evenbet.Base;
 using Results.Evenbet.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
@@ -36,7 +35,7 @@ public sealed record EvenbetDebitRequest(
                 request.Token,
                 roundId: request.RoundId,
                 transactionId: request.TransactionId,
-                amount: EvenbetMoneyHelper.ConvertToWallet(request.Amount),
+                amount: MoneyHelper.ConvertFromCents(request.Amount),
                 roundFinished: request.EndRound,
                 cancellationToken: cancellationToken);
 
@@ -48,7 +47,7 @@ public sealed record EvenbetDebitRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetDebitResponse(
-                EvenbetMoneyHelper.ConvertFromWallet(data!.Balance),
+                MoneyHelper.ConvertToCents(data!.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 

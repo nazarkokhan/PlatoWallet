@@ -2,10 +2,9 @@
 
 using Base;
 using FluentValidation;
-using Helpers.Evenbet;
+using Helpers.Common;
 using Newtonsoft.Json;
 using Responses.Evenbet;
-using Responses.Evenbet.Base;
 using Results.Evenbet.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
@@ -36,7 +35,7 @@ public sealed record EvenbetRollbackRequest(
                 request.Token,
                 roundId: request.RoundId,
                 transactionId: request.RefTransactionId,
-                amount: EvenbetMoneyHelper.ConvertToWallet(request.Amount),
+                amount: MoneyHelper.ConvertFromCents(request.Amount),
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure || walletResult.Data is null)
@@ -47,7 +46,7 @@ public sealed record EvenbetRollbackRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetRollbackResponse(
-                EvenbetMoneyHelper.ConvertFromWallet(data!.Balance),
+                MoneyHelper.ConvertToCents(data!.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 
