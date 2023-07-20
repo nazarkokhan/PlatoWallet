@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 public sealed record EvenbetLoginResponse(
     [property: JsonProperty("token")] string Token,
-    [property: JsonProperty("balance")] decimal Balance,
+    [property: JsonProperty("balance")] int Balance,
     [property: JsonProperty("currency")] string Currency,
     [property: JsonProperty("nickname")] string Nickname,
     [property: JsonProperty("timestamp")] string Timestamp,

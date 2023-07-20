@@ -2,6 +2,7 @@
 
 using Base;
 using FluentValidation;
+using Helpers.Evenbet;
 using Newtonsoft.Json;
 using Responses.Evenbet;
 using Responses.Evenbet.Base;
@@ -15,7 +16,7 @@ public sealed record EvenbetRollbackRequest(
         [property: JsonProperty("roundId")] string RoundId,
         [property: JsonProperty("transactionId")] string TransactionId,
         [property: JsonProperty("refTransactionId")] string RefTransactionId,
-        [property: JsonProperty("amount")] decimal Amount)
+        [property: JsonProperty("amount")] int Amount)
     : IEvenbetRequest, IRequest<IEvenbetResult<EvenbetRollbackResponse>>
 {
     public sealed class Handler : IRequestHandler<EvenbetRollbackRequest, IEvenbetResult<EvenbetRollbackResponse>>
@@ -35,7 +36,7 @@ public sealed record EvenbetRollbackRequest(
                 request.Token,
                 roundId: request.RoundId,
                 transactionId: request.RefTransactionId,
-                amount: request.Amount,
+                amount: EvenbetMoneyHelper.ConvertToWallet(request.Amount),
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure || walletResult.Data is null)
@@ -46,7 +47,7 @@ public sealed record EvenbetRollbackRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetRollbackResponse(
-                data!.Balance,
+                EvenbetMoneyHelper.ConvertFromWallet(data!.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 
@@ -81,7 +82,7 @@ public sealed record EvenbetRollbackRequest(
             RuleFor(x => x.Amount)
                .NotEmpty()
                .WithMessage("Amount is required.")
-               .GreaterThanOrEqualTo(0.0M)
+               .GreaterThanOrEqualTo(0)
                .WithMessage("Amount must be greater than or equal 0.");
         }
     }

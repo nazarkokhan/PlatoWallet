@@ -3,6 +3,6 @@
 using Newtonsoft.Json;
 
 public abstract record EvenbetCommonResponseWithTransaction(
-    decimal Balance,
+    int Balance,
     string Timestamp,
     [property: JsonProperty("transactionId")] string TransactionId) : EvenbetCommonResponse(Balance, Timestamp);

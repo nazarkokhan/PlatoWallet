@@ -2,6 +2,7 @@
 
 using Application.Requests.Wallets.Evenbet.Base;using Domain.Entities;
 using FluentValidation;
+using Helpers.Evenbet;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -46,7 +47,7 @@ public sealed record EvenbetLoginRequest
 
             var response = new EvenbetLoginResponse(
                 loginData.Token,
-                loginData.Balance,
+                EvenbetMoneyHelper.ConvertFromWallet(loginData.Balance),
                 loginData.Currency,
                 loginData.Nickname,
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),

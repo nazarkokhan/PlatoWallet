@@ -2,6 +2,7 @@
 
 using Base;
 using FluentValidation;
+using Helpers.Evenbet;
 using Newtonsoft.Json;
 using Responses.Evenbet;
 using Responses.Evenbet.Base;
@@ -37,7 +38,7 @@ public sealed record EvenbetGetBalanceRequest([property: JsonProperty("token")] 
             var data = walletResult.Data;
 
             var response = new EvenbetGetBalanceResponse(
-                data!.Balance,
+                EvenbetMoneyHelper.ConvertFromWallet(data!.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString());
 
             return walletResult.ToEvenbetResult(response);

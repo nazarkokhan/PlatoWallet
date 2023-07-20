@@ -3,6 +3,6 @@
 using Base;
 
 public sealed record EvenbetRollbackResponse(
-    decimal Balance,
+    int Balance,
     string Timestamp,
     string TransactionId) : EvenbetCommonResponseWithTransaction(Balance, Timestamp, TransactionId);

@@ -3,6 +3,6 @@
 using Base;
 
 public sealed record EvenbetGetBalanceResponse(
-        decimal Balance,
+        int Balance,
         string Timestamp)
     : EvenbetCommonResponse(Balance, Timestamp);
