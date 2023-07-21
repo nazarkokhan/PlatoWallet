@@ -18,13 +18,7 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
         ActionExecutingContext context,
         ActionExecutionDelegate next)
     {
-        var host = context.HttpContext.Request.Host.Value;
-        var scheme = context.HttpContext.Request.Scheme;
-        var pathBase = context.HttpContext.Request.PathBase.Value;
-
-        var baseUrl = $"{scheme}://{host}{pathBase}";
-
-        var casinoSignatureKey = baseUrl.Contains("localhost") ? "integrationkeyplatipus" : "6aYxrPXpYYw6S3Q";
+        var casinoSignatureKey = "integrationkeyplatipus";
         var controllerName = context.RouteData.Values["controller"];
         if (controllerName is "WalletEvenbet")
         {
