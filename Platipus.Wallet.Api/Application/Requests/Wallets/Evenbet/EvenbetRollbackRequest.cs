@@ -46,7 +46,7 @@ public sealed record EvenbetRollbackRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetRollbackResponse(
-                MoneyHelper.ConvertToCents(data!.Balance),
+                (int)MoneyHelper.ConvertToCents(data!.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 

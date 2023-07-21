@@ -7,8 +7,13 @@ public ref struct MoneyHelper
         return amount / 100m;
     }
     
-    public static int ConvertToCents(decimal amount)
+    public static decimal ConvertFromCents(long amount)
     {
-        return (int)Math.Round(amount * 100);
+        return amount / 100m;
+    }
+    
+    public static long ConvertToCents(decimal amount)
+    {
+        return (long)Math.Round(amount * 100);
     }
 }

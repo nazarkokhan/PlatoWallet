@@ -2,7 +2,7 @@
 
 public abstract record AnakatechBaseResponse(
     bool Success,
-    int Balance,
+    long Balance,
     string? ErrorCode,
     double CashBalance = 0,
     double BonusBalance = 0);

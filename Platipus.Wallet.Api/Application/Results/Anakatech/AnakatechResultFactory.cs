@@ -10,7 +10,7 @@ public static class AnakatechResultFactory
 
     public static AnakatechResult Failure(
         AnakatechErrorCode errorCode,
-        int balance,
+        long balance,
         bool success,
         Exception? exception = null)
         => new(
@@ -30,7 +30,7 @@ public static class AnakatechResultFactory
 
     public static AnakatechResult<TData> Failure<TData>(
         AnakatechErrorCode errorCode,
-        int balance = default,
+        long balance = default,
         bool success = false,
         Exception? exception = null)
         => new(

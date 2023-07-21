@@ -2,9 +2,9 @@
 
 public record AnakatechSuccessResponse(
     bool Success,
-    int Balance,
-    string? ErrorCode,
+    long Balance,
     string Currency,
+    string? ErrorCode = null,
     double CashBalance = 0,
     double BonusBalance = 0) : AnakatechBaseResponse(
     Success,

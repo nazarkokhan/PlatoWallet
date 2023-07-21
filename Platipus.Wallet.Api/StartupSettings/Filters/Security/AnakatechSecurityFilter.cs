@@ -19,7 +19,7 @@ public sealed class AnakatechSecurityFilter : IAsyncActionFilter
         ActionExecutionDelegate next)
     {
         var request = context.ActionArguments.Values
-           .OfType<IAnakatechRequest>()
+           .OfType<IAnakatechBaseRequest>()
            .Single();
 
         var httpContext = context.HttpContext;

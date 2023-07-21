@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Anakatech;
 
 using Base;
+using Enums;
 using FluentValidation;
 using Helpers.Common;
 using Newtonsoft.Json;
@@ -16,7 +17,7 @@ public sealed record AnakatechGetPlayerBalanceRequest(
         [property: JsonProperty("playerId")] string PlayerId,
         [property: JsonProperty("providerGameId")] string ProviderGameId,
         [property: JsonProperty("playMode")] int PlayMode)
-    : IAnakatechRequest, IRequest<IAnakatechResult<AnakatechGetPlayerBalanceResponse>>
+    : IAnakatechBaseRequest, IRequest<IAnakatechResult<AnakatechGetPlayerBalanceResponse>>
 {
     public sealed class Handler
         : IRequestHandler<AnakatechGetPlayerBalanceRequest, IAnakatechResult<AnakatechGetPlayerBalanceResponse>>
@@ -77,7 +78,7 @@ public sealed record AnakatechGetPlayerBalanceRequest(
                .Length(1, 256);
 
             RuleFor(x => x.PlayMode)
-               .Must(x => x is 1 or 3)
+               .Must(x => x is (int)AnakatechPlayMode.Anonymous or (int)AnakatechPlayMode.RealMoney)
                .WithMessage("PlayMode must be either RealMoney (1) or Anonymous (3)");
         }
     }

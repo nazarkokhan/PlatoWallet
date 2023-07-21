@@ -2,8 +2,9 @@
 
 using Base;
 
-public sealed record AnakatechGetPlayerBalanceResponse(
+public sealed record AnakatechCreditResponse(
     bool Success,
+    string ReferenceId,
     long Balance,
     string Currency,
     string? ErrorCode = null,

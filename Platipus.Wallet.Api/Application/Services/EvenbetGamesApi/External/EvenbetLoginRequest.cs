@@ -47,7 +47,7 @@ public sealed record EvenbetLoginRequest
 
             var response = new EvenbetLoginResponse(
                 loginData.Token,
-                MoneyHelper.ConvertToCents(loginData.Balance),
+                (int)MoneyHelper.ConvertToCents(loginData.Balance),
                 loginData.Currency,
                 loginData.Nickname,
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),

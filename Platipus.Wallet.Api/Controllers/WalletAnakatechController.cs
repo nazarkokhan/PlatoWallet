@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
+using Application.Requests.Wallets;
 using Application.Requests.Wallets.Anakatech;
 using Application.Responses.Anakatech;
 using Application.Responses.Anakatech.Base;
@@ -32,24 +33,24 @@ public sealed class WalletAnakatechController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    // [HttpPost("debit")]
-    // [ProducesResponseType(typeof(EvenbetDebitResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Debit(
-    //     [FromBody] EvenbetDebitRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
-    // [HttpPost("credit")]
-    // [ProducesResponseType(typeof(EvenbetCreditResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Credit(
-    //     [FromBody] EvenbetCreditRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
-    // [HttpPost("rollback")]
-    // [ProducesResponseType(typeof(EvenbetRollbackResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> Rollback(
-    //     [FromBody] EvenbetRollbackRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    [HttpPost("debit")]
+    [ProducesResponseType(typeof(AnakatechDebitResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Debit(
+        [FromBody] AnakatechDebitRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("credit")]
+    [ProducesResponseType(typeof(AnakatechCreditResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Credit(
+        [FromBody] AnakatechCreditRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("rollbackDebit")]
+    [ProducesResponseType(typeof(AnakatechRollbackResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Rollback(
+        [FromBody] AnakatechRollbackRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

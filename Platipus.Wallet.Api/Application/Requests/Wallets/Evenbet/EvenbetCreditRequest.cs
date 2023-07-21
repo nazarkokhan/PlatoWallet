@@ -47,7 +47,7 @@ public sealed record EvenbetCreditRequest(
             var data = walletResult.Data;
 
             var response = new EvenbetCreditResponse(
-                MoneyHelper.ConvertToCents(data!.Balance),
+                (int)MoneyHelper.ConvertToCents(data!.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 

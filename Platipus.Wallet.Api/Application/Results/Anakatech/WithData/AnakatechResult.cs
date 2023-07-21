@@ -12,7 +12,7 @@ public sealed record AnakatechResult<TData> : BaseResult<AnakatechErrorCode, TDa
 
     public AnakatechResult(
         AnakatechErrorCode errorCode,
-        int balance,
+        long balance,
         bool success,
         Exception? exception)
         : base(errorCode, exception)
@@ -25,7 +25,7 @@ public sealed record AnakatechResult<TData> : BaseResult<AnakatechErrorCode, TDa
     }
 
     public bool Success { get; }
-    public int Balance { get; }
+    public long Balance { get; }
     public double CashBalance { get; }
     public double BonusBalance { get; }
     public string? ErrorCode { get; }

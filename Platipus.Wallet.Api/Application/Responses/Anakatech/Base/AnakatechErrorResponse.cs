@@ -2,7 +2,7 @@
 
 public sealed record AnakatechErrorResponse(
     bool Success,
-    int Balance,
+    long Balance,
     string? ErrorCode) : AnakatechBaseResponse(
     Success,
     Balance,

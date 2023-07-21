@@ -2,8 +2,9 @@
 
 using Base;
 
-public sealed record AnakatechGetPlayerBalanceResponse(
+public sealed record AnakatechRollbackResponse(
     bool Success,
+    string ReferenceId,
     long Balance,
     string Currency,
     string? ErrorCode = null,
@@ -11,7 +12,7 @@ public sealed record AnakatechGetPlayerBalanceResponse(
     double BonusBalance = 0) : AnakatechSuccessResponse(
     Success,
     Balance,
-    ErrorCode,
     Currency,
+    ErrorCode,
     CashBalance,
     BonusBalance);

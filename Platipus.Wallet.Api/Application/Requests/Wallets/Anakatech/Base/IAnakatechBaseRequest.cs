@@ -2,7 +2,7 @@
 
 using Requests.Base;
 
-public interface IAnakatechRequest : IBaseWalletRequest
+public interface IAnakatechBaseRequest : IBaseWalletRequest
 {
     public string Secret { get; }
 

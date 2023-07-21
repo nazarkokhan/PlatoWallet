@@ -18,11 +18,14 @@ public sealed class AnakatechMockedErrorActionFilter : AbstractMockedErrorAction
         IBaseWalletRequest baseRequest,
         ActionExecutedContext actionExecutedContext)
     {
-        var request = (IAnakatechRequest)baseRequest;
+        var request = (IAnakatechBaseRequest)baseRequest;
 
         var walletMethod = request switch
         {
             AnakatechGetPlayerBalanceRequest => MockedErrorMethod.Balance,
+            AnakatechCreditRequest => MockedErrorMethod.Win,
+            AnakatechDebitRequest => MockedErrorMethod.Bet,
+            AnakatechRollbackRequest => MockedErrorMethod.Rollback,
             _ => throw new ArgumentOutOfRangeException(nameof(baseRequest), "There is no such method in controller.")
         };
 
