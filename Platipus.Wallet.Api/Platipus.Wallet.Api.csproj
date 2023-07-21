@@ -53,7 +53,6 @@
         <Folder Include="Application\Requests\Wallets\Anakatech\Models\" />
         <Folder Include="Application\Responses\Uranus\" />
         <Folder Include="Application\Results\Base\WithData\WithError" />
-        <Folder Include="Application\Services\AnakatechGamesApi\" />
     </ItemGroup>
 
     <ItemGroup>

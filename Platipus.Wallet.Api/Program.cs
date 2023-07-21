@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
+using Platipus.Wallet.Api.Application.Services.AnakatechGamesApi;
 using Platipus.Wallet.Api.Application.Services.AtlasGamesApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
@@ -180,7 +181,10 @@ try
        .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>()
        .Services
        .AddSingleton<IEvenbetGameApiClient, EvenbetGameApiClient>()
-       .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>();
+       .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>()
+       .Services
+       .AddSingleton<IAnakatechGameApiClient, AnakatechGameApiClient>()
+       .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>();
 
     services
        .AddHealthChecks()

@@ -10,6 +10,9 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Services.AnakatechGamesApi;
+using Services.AnakatechGamesApi.External;
+using Services.AnakatechGamesApi.Requests;
 using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
 using Services.EmaraPlayGamesApi;
@@ -58,6 +61,7 @@ public sealed record LogInRequest(
         private readonly IAtlasGameApiClient _atlasGameApiClient;
         private readonly IUranusGameApiClient _uranusGameApiClient;
         private readonly IEvenbetGameApiClient _evenbetGameApiClient;
+        private readonly IAnakatechGameApiClient _anakatechGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -71,7 +75,8 @@ public sealed record LogInRequest(
             IEmaraPlayGameApiClient emaraPlayGameApiClient,
             IAtlasGameApiClient atlasGameApiClient,
             IUranusGameApiClient uranusGameApiClient,
-            IEvenbetGameApiClient evenbetGameApiClient)
+            IEvenbetGameApiClient evenbetGameApiClient,
+            IAnakatechGameApiClient anakatechGameApiClient)
         {
             _context = context;
             _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
@@ -84,6 +89,7 @@ public sealed record LogInRequest(
             _atlasGameApiClient = atlasGameApiClient;
             _uranusGameApiClient = uranusGameApiClient;
             _evenbetGameApiClient = evenbetGameApiClient;
+            _anakatechGameApiClient = anakatechGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -157,10 +163,30 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                // case CasinoProvider.Anakatech:
+                // {
+                //     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
+                //
+                //     var apiRequest = new AnakatechLaunchGameApiRequest(
+                //         "31");
+                //
+                //     var apiResponse = await _anakatechGameApiClient.GetLaunchGameUrlAsBytesAsync(
+                //         baseUrl,
+                //         apiRequest,
+                //         cancellationToken: cancellationToken);
+                //
+                //     if (apiResponse.IsFailure || apiResponse.Data?.Data is null)
+                //         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+                //
+                //     var gameUrlBytes = await AnakatechLaunchGameRequest.Handler.GetBytesFromStream(apiResponse.Data.Data);
+                //     launchUrl = Encoding.UTF8.GetString(gameUrlBytes);
+                //     break;
+                // }
+
                 case CasinoProvider.Evenbet:
                 {
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
-                    
+
                     var apiRequest = new EvenbetGetLaunchGameUrlGameApiRequest(
                         request.Game,
                         isDemoLaunchMode,
@@ -181,6 +207,7 @@ public sealed record LogInRequest(
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
                 }
+
                 case CasinoProvider.Uranus:
                 {
                     var playerIp = GetPlayerIp();
