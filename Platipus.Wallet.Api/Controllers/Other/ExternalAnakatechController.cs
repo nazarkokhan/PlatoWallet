@@ -21,13 +21,16 @@ public sealed class ExternalAnakatechController : RestApiController
         _mediator = mediator;
     }
 
-    [HttpPost("launchGame")]
+    [HttpGet("launchGame")]
     [ProducesResponseType(typeof(Uri), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPlayerBalance(
         [FromBody] AnakatechLaunchGameRequest request,
         CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(request, cancellationToken);
+        if (response.Data is null)
+            return Ok(new AnakatechErrorResponse(false, 0, "Unknown error"));
+
         var gameUrl = response.Data.AbsoluteUri;
         return Redirect(gameUrl);
     }
