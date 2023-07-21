@@ -23,7 +23,6 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
 
     private const string ApiBasePath = "evenbet/";
     private const string LocalTestSecretKey = "integrationkeyplatipus";
-    private const string ProdSecretKey = "6aYxrPXpYYw6S3Q";
 
     public EvenbetGameApiClient(
         HttpClient httpClient,
@@ -70,14 +69,10 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
-            var secretKey = baseUrl.Host.Contains("localhost")
-                ? LocalTestSecretKey
-                : ProdSecretKey;
-
             var requestContent = JsonConvert.SerializeObject(request);
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
-            var hashToken = EvenbetSecurityHash.Compute(requestContent, secretKey);
+            var hashToken = EvenbetSecurityHash.Compute(requestContent, LocalTestSecretKey);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(hashToken);
 
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
@@ -106,12 +101,9 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         try
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}/{method}{QueryString.Create(request)}");
-            var secretKey = baseUrl.Host.Contains("localhost")
-                ? LocalTestSecretKey
-                : ProdSecretKey;
 
             var requestJson = JsonConvert.SerializeObject(request);
-            var hashToken = EvenbetSecurityHash.Compute(requestJson is "{}" ? "" : requestJson, secretKey);
+            var hashToken = EvenbetSecurityHash.Compute(requestJson is "{}" ? "" : requestJson, LocalTestSecretKey);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(hashToken);
             var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
