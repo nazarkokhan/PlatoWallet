@@ -79,11 +79,11 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
             var responseBody = httpResponse.ResponseData.Body;
 
             if (string.IsNullOrEmpty(responseBody))
-            {
+            {//TODO remove braces if simple check and failure result
                 return httpResponse.Failure<TSuccess, AnakatechErrorResponse>();
             }
 
-            var responseJson = JsonDocument.Parse(responseBody!).RootElement;
+            var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
             if (responseJson.ValueKind is JsonValueKind.Object
              && responseJson.TryGetProperty("error", out var error)

@@ -95,6 +95,7 @@ public record CreateCasinoRequest(
                                         || casino.Params.Hub88PrivateGameServiceSecuritySign is null) => false,
                 CasinoProvider.Reevo when (casino.Params.ReevoCallerId is null || casino.Params.ReevoCallerPassword is null) =>
                     false,
+                //TODO add validation for Anakatech, Evenbet, Uranus etc...
                 _ => true
             };
         }
