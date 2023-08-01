@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Controllers;
 
 using System.Text.Json;
 using Abstract;
-using Application.Extensions;
 using Application.Requests.Wallets.SoftBet;
 using Application.Requests.Wallets.SoftBet.Base;
 using Application.Requests.Wallets.SoftBet.Base.Params;
@@ -14,6 +13,7 @@ using Domain.Entities.Enums;
 using Extensions;
 using Extensions.SecuritySign;
 using Infrastructure.Persistence;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -55,20 +55,20 @@ public class WalletISoftBetController : RestApiController
         try
         {
             var casino = await _context.Set<Casino>()
-                .Where(
+               .Where(
                     c => c.InternalId == request.LicenseeId
                       && c.Users.Any(u => u.Username == request.Username))
-                .Select(
+               .Select(
                     c => new
                     {
                         c.SignatureKey,
                         c.Params.ISoftBetProviderId
                     })
-                .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null || casino.ISoftBetProviderId != providerId)
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.ConfigurationForGivenParametersDoesNotExist)
-                    .ToActionResult();
+                   .ToActionResult();
 
             var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
             var isValidHash = SoftbetSecurityHash.IsValid(hash, rawRequestBytes, casino.SignatureKey);
@@ -91,14 +91,14 @@ public class WalletISoftBetController : RestApiController
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
 
             var session = await _context.Set<Session>()
-                .Where(c => c.Id == request.SessionId)
-                .Select(
+               .Where(c => c.Id == request.SessionId)
+               .Select(
                     c => new
                     {
                         c.Id,
                         c.ExpirationDate
                     })
-                .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (session is null || session.ExpirationDate < DateTime.UtcNow)
                 return SoftBetResultFactory.Failure(SoftBetErrorMessage.PlayerAuthenticationFailed).ToActionResult();
@@ -110,6 +110,7 @@ public class WalletISoftBetController : RestApiController
                 case "balance":
                     payloadRequestObj = new SoftBetGetBalanceRequest(request.SessionId, request.Username);
                     break;
+
                 case "bet":
                     var betParams = actionParams.Deserialize<BetParameters>(_jsonSerializerOptions)!;
                     payloadRequestObj = new SoftBetBetRequest(
@@ -121,6 +122,7 @@ public class WalletISoftBetController : RestApiController
                         betParams.RoundId,
                         betParams.TransactionId);
                     break;
+
                 case "win":
                     var winParams = actionParams.Deserialize<WinParameters>(_jsonSerializerOptions)!;
                     payloadRequestObj = new SoftBetWinRequest(
@@ -133,6 +135,7 @@ public class WalletISoftBetController : RestApiController
                         winParams.TransactionId,
                         winParams.CloseRound);
                     break;
+
                 case "cancel":
                     var cancelParams = actionParams.Deserialize<CancelParameters>(_jsonSerializerOptions)!;
                     payloadRequestObj = new SoftBetCancelRequest(
@@ -142,6 +145,7 @@ public class WalletISoftBetController : RestApiController
                         cancelParams.RoundId,
                         cancelParams.TransactionId);
                     break;
+
                 case "end":
                     var endParams = actionParams.Deserialize<EndParameters>(_jsonSerializerOptions)!;
                     payloadRequestObj = new SoftBetEndRequest(
@@ -168,13 +172,13 @@ public class WalletISoftBetController : RestApiController
     [HttpPost("private/test/get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string username,
-        [FromBody] JsonDocument request,
+        [FromBody, PublicAPI] JsonDocument request,
         [FromServices] WalletDbContext dbContext,
         CancellationToken cancellationToken)
     {
         var user = await dbContext.Set<User>()
-            .Where(c => c.Username == username)
-            .Select(
+           .Where(c => c.Username == username)
+           .Select(
                 c => new
                 {
                     UserId = c.Id,
@@ -184,14 +188,14 @@ public class WalletISoftBetController : RestApiController
                         c.Casino.SignatureKey,
                     }
                 })
-            .FirstOrDefaultAsync(cancellationToken);
+           .FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)
             return ResultFactory.Failure(ErrorCode.UserNotFound).ToActionResult();
 
         var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
 
-        var securityValue = user.Map(u => SoftbetSecurityHash.Compute(rawRequestBytes, u.Casino.SignatureKey));
+        var securityValue = SoftbetSecurityHash.Compute(rawRequestBytes, user.Casino.SignatureKey);
 
         return Ok(securityValue);
     }

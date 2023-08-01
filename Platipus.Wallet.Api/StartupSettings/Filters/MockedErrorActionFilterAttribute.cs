@@ -48,9 +48,9 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
         var searchMockBySession = false;
 
         var requestRoute = context.ActionDescriptor.EndpointMetadata
-            .OfType<HttpMethodAttribute>()
-            .SingleOrDefault()
-            ?.Template;
+           .OfType<HttpMethodAttribute>()
+           .SingleOrDefault()
+          ?.Template;
 
         var actionArgumentsValues = context.ActionArguments.Values;
         switch (context.Controller)
@@ -59,8 +59,10 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             {
                 var singleRequest = actionArgumentsValues.OfType<OpenboxSingleRequest>().Single();
 
-                if (!httpContext.Items.TryGetValue(HttpContextItems.OpenboxPayloadRequestObj, out var payloadRequestObj)
-                    || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
+                if (!httpContext.Items.TryGetValue(
+                        HttpContextItems.OpenboxDecryptedPayloadRequestObject,
+                        out var payloadRequestObj)
+                 || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
                 {
                     LogOpenboxMockingFailed(logger, singleRequest);
                     return;
@@ -71,17 +73,19 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 currentMethod = singleRequest.Method switch
                 {
                     OpenboxHelpers.GetPlayerBalance => MockedErrorMethod.Balance,
-                    OpenboxHelpers.MoneyTransactions => (openboxPayloadObj as OpenboxMoneyTransactionRequest)?.OrderType switch
-                    {
-                        3 => MockedErrorMethod.Bet,
-                        4 => MockedErrorMethod.Win,
-                        _ => null
-                    },
+                    OpenboxHelpers.MoneyTransactions => (openboxPayloadObj as OpenboxMoneyTransactionRequest)?.OrderType
+                        switch
+                        {
+                            3 => MockedErrorMethod.Bet,
+                            4 => MockedErrorMethod.Win,
+                            _ => null
+                        },
                     OpenboxHelpers.CancelTransaction => MockedErrorMethod.Rollback,
                     _ => null
                 };
                 break;
             }
+
             case WalletISoftBetController:
             {
                 var singleRequest = actionArgumentsValues.OfType<SoftBetSingleRequest>().Single();
@@ -97,6 +101,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 };
                 break;
             }
+
             case WalletSwController:
             {
                 var singleRequest = actionArgumentsValues.OfType<ISwBaseRequest>().Single();
@@ -119,6 +124,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 };
                 break;
             }
+
             case WalletReevoController:
             {
                 var singleRequest = actionArgumentsValues.OfType<ReevoSingleRequest>().Single();
@@ -134,9 +140,11 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 };
                 break;
             }
+
             case WalletUisController when requestRoute is null:
                 logger.LogCritical("Request route not found");
                 return;
+
             case WalletUisController:
             {
                 var baseRequest = context.ActionArguments.Values.OfType<IUisRequest>().Single();
@@ -159,6 +167,7 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 usernameOrSession = request.UserId;
                 break;
             }
+
             default:
             {
                 if (requestRoute is null)
@@ -178,8 +187,8 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                 };
 
                 var walletRequest = actionArgumentsValues
-                    .OfType<IBaseWalletRequest>()
-                    .SingleOrDefault();
+                   .OfType<IBaseWalletRequest>()
+                   .SingleOrDefault();
 
                 (usernameOrSession, searchMockBySession) = walletRequest switch
                 {
@@ -222,15 +231,15 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             var dbContext = services.GetRequiredService<WalletDbContext>();
 
             var mockedErrorQuery = dbContext.Set<MockedError>()
-                .Where(e => e.Method == currentMethod)
-                .Where(
+               .Where(e => e.Method == currentMethod)
+               .Where(
                     e => searchMockBySession
                         ? e.User.Sessions.Any(s => s.Id == usernameOrSession)
                         : e.User.Username == usernameOrSession);
 
             var mockedError = await mockedErrorQuery
-                .OrderBy(e => e.ExecutionOrder)
-                .FirstOrDefaultAsync();
+               .OrderBy(e => e.ExecutionOrder)
+               .FirstOrDefaultAsync();
 
             if (mockedError is null)
             {
@@ -258,7 +267,6 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
             if (mockedError.Timeout is not null)
                 await Task.Delay(mockedError.Timeout.Value);
 
-            const string responseItem = "response";
             switch (mockedError.ContentType)
             {
                 case MediaTypeNames.Application.Json:
@@ -267,35 +275,40 @@ public class MockedErrorActionFilterAttribute : ActionFilterAttribute
                     try
                     {
                         response = JsonDocument.Parse(mockedError.Body);
-                        context.HttpContext.Items.Add(responseItem, response);
                     }
                     catch (Exception e)
                     {
                         logger.LogWarning(e, "Error deserializing mocked error body");
-                        context.HttpContext.Items.Add(responseItem, mockedError.Body);
                     }
 
-                    executedContext.Result = new ObjectResult(response ?? mockedError.Body)
+                    response ??= mockedError.Body;
+                    httpContext.Items.Add(HttpContextItems.ResponseObject, mockedError.Body);
+
+                    executedContext.Result = new ObjectResult(response)
                     {
                         StatusCode = (int?)mockedError.HttpStatusCode
                     };
+
                     break;
                 }
-                case MediaTypeNames.Text.Plain or MediaTypeNames.Text.Xml or MediaTypeNames.Text.Html or _:
+
+                default:
                 {
-                    context.HttpContext.Items.Add(responseItem, mockedError.Body);
                     executedContext.Result = new ContentResult
                     {
                         Content = mockedError.Body,
                         StatusCode = (int?)mockedError.HttpStatusCode,
                         ContentType = mockedError.ContentType
                     };
+
+                    httpContext.Items.Add(HttpContextItems.ResponseObject, mockedError.Body);
+
                     break;
                 }
             }
 
             var updMockQuery = dbContext.Set<MockedError>()
-                .Where(e => e.Id == mockedError.Id);
+               .Where(e => e.Id == mockedError.Id);
 
             var updMockRows = mockedError.Count > 1
                 ? await updMockQuery.ExecuteUpdateAsync(e => e.SetProperty(p => p.Count, p => p.Count - 1))

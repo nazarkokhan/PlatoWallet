@@ -19,7 +19,7 @@ using StartupSettings.Filters.NewFilterStyle;
 
 [Route("wallet/openbox/")]
 [ServiceFilter(typeof(OpenboxMockedErrorActionFilter), Order = 1)]
-[JsonSettingsName(nameof(CasinoProvider.Openbox))]
+[JsonSettingsName(CasinoProvider.Openbox)]
 public class WalletOpenboxController : RestApiController
 {
     private readonly IMediator _mediator;
@@ -60,12 +60,14 @@ public class WalletOpenboxController : RestApiController
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
             var decryptedPayloadJson = OpenboxSecurityPayload.Decrypt(request.Payload, casino.SignatureKey);
-            var payloadType = OpenboxHelpers.GetRequestType(request.Method);
+            HttpContext.Items.Add(HttpContextItems.OpenboxDecryptedPayloadJsonString, decryptedPayloadJson);
 
+            var payloadType = OpenboxHelpers.GetRequestType(request.Method);
             if (payloadType is null)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
             var payloadRequestObj = JsonSerializer.Deserialize(decryptedPayloadJson, payloadType, _jsonSerializerOptions);
+            HttpContext.Items.Add(HttpContextItems.OpenboxDecryptedPayloadRequestObject, payloadRequestObj);
             if (payloadRequestObj is not IOpenboxBaseRequest decryptedPayload)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
 
@@ -88,9 +90,6 @@ public class WalletOpenboxController : RestApiController
 
             if (casino.Id != session.UserCasinoId)
                 return OpenboxResultFactory.Failure(OpenboxErrorCode.ParameterError).ToActionResult();
-
-            HttpContext.Items.Add(HttpContextItems.OpenboxPayloadRequestObj, decryptedPayload);
-            _logger.LogInformation("Openbox decrypted payload: {OpenboxDecryptedPayload}", decryptedPayload);
 
             var responseObj = await _mediator.Send(decryptedPayload, cancellationToken);
             if (responseObj is not IOpenboxResult response)

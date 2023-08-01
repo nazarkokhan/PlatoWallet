@@ -39,15 +39,14 @@ public sealed record EvenbetDebitRequest(
                 roundFinished: request.EndRound,
                 cancellationToken: cancellationToken);
 
+            //TODO why check null?
             if (walletResult.IsFailure || walletResult.Data is null)
-            {
                 return walletResult.ToEvenbetFailureResult<EvenbetDebitResponse>();
-            }
 
             var data = walletResult.Data;
 
             var response = new EvenbetDebitResponse(
-                (int)MoneyHelper.ConvertToCents(data!.Balance),
+                (int)MoneyHelper.ConvertToCents(data!.Balance), //TODO why ! before accessing data?
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 
@@ -55,6 +54,7 @@ public sealed record EvenbetDebitRequest(
         }
     }
 
+    //TODO did you test it? Are you sure it is used and is useful to you?
     public sealed class EvenbetDebitRequestValidator : AbstractValidator<EvenbetDebitRequest>
     {
         public EvenbetDebitRequestValidator()

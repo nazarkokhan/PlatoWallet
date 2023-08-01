@@ -41,6 +41,6 @@ public class ExternalGamelistController : RestApiController
     [HttpPost("casino-gamelist")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CommonErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddCasinoGames(SetCasinoGamesRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> SetCasinoGames(SetCasinoGamesRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

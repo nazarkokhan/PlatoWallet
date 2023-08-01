@@ -1,17 +1,7 @@
-namespace Platipus.Wallet.Api.Obsolete;
-
-using System.Text;
-using StartupSettings;
+namespace Platipus.Wallet.Api.StartupSettings.Middlewares;
 
 public class BufferResponseBodyMiddleware : IMiddleware
 {
-    private readonly ILogger<BufferResponseBodyMiddleware> _logger;
-
-    public BufferResponseBodyMiddleware(ILogger<BufferResponseBodyMiddleware> logger)
-    {
-        _logger = logger;
-    }
-
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var originalBody = context.Response.Body;
@@ -36,8 +26,5 @@ public class BufferResponseBodyMiddleware : IMiddleware
         }
 
         context.Items.Add(HttpContextItems.ResponseBodyBytes, responseBytes);
-
-        var str = Encoding.UTF8.GetString(responseBytes);
-        _logger.LogInformation("Response body: {ResponseBodyBytes}", str);
     }
 }

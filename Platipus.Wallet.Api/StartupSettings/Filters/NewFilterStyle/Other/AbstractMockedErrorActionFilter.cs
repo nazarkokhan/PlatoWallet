@@ -27,13 +27,6 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
     {
         Logger.LogDebug("Handling request with possible mocked error");
 
-        var actionName = context.ActionDescriptor.RouteValues["action"];
-        if (actionName is not null && actionName.Equals("Login", StringComparison.OrdinalIgnoreCase))
-        {
-            await next();
-            return;
-        }
-        
         var executedContext = await next();
 
         var walletRequest = context.ActionArguments.Values
@@ -44,7 +37,7 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 
         if (mockedErrorIdentifiers is null)
         {
-            Logger.LogInformation("ErrorMockMethod not found");
+            Logger.LogDebug("ErrorMockMethod not found");
             return;
         }
 
@@ -126,8 +119,6 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
         if (mockedError.Timeout is not null)
             await Task.Delay(mockedError.Timeout.Value);
 
-        const string responseItem = "response";
-
         switch (mockedError.ContentType)
         {
             case MediaTypeNames.Application.Json:
@@ -136,15 +127,16 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
                 try
                 {
                     response = JsonDocument.Parse(mockedError.Body);
-                    httpContext.Items.Add(responseItem, response);
                 }
                 catch (Exception e)
                 {
                     Logger.LogWarning(e, "Error deserializing mocked error body");
-                    httpContext.Items.Add(responseItem, mockedError.Body);
                 }
 
-                executedContext.Result = new ObjectResult(response ?? mockedError.Body)
+                response ??= mockedError.Body;
+                httpContext.Items.Add(HttpContextItems.ResponseObject, response);
+
+                executedContext.Result = new ObjectResult(response)
                 {
                     StatusCode = (int?)mockedError.HttpStatusCode
                 };
@@ -154,7 +146,8 @@ public abstract class AbstractMockedErrorActionFilter : IAsyncActionFilter
 
             default:
             {
-                httpContext.Items.Add(responseItem, mockedError.Body);
+                httpContext.Items.Add(HttpContextItems.ResponseObject, mockedError.Body);
+
                 executedContext.Result = new ContentResult
                 {
                     Content = mockedError.Body,

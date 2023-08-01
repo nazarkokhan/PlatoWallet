@@ -1,11 +1,13 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Betflag;
 
 using Base;
+using JetBrains.Annotations;
 using Results.Betflag;
 using Results.Betflag.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
+[PublicAPI]
 public record BetflagBalanceRequest(
     string Key,
     long Timestamp,

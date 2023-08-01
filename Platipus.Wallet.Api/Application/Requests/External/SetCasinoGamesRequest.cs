@@ -20,22 +20,26 @@ public record SetCasinoGamesRequest(string CasinoId, List<string> GameLaunchName
             CancellationToken cancellationToken)
         {
             var casino = await _context.Set<Casino>()
-                .Where(c => c.Id == request.CasinoId)
-                .Include(c => c.CasinoGames)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(c => c.Id == request.CasinoId)
+               .Include(c => c.CasinoGames)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (casino is null)
                 return ResultFactory.Failure(ErrorCode.CasinoNotFound);
 
             var games = await _context.Set<Game>()
-                .Where(g => request.GameLaunchNames.Contains(g.LaunchName))
-                .Select(g => g.Id)
-                .ToListAsync(cancellationToken);
+               .Where(g => request.GameLaunchNames.Contains(g.LaunchName))
+               .Select(g => g.Id)
+               .ToListAsync(cancellationToken);
+
+            if (request.GameLaunchNames.Count != games.Count)
+                return ResultFactory.Failure(ErrorCode.GameNotFound);
+
             _context.RemoveRange(casino.CasinoGames);
 
             var casinoGamesToAdd = games
-                .Select(g => new CasinoGames { GameId = g })
-                .ToList();
+               .Select(g => new CasinoGames { GameId = g })
+               .ToList();
 
             _context.AddRange(casinoGamesToAdd);
             casino.CasinoGames.AddRange(casinoGamesToAdd);

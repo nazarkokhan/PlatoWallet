@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -23,7 +24,6 @@ using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
-using Platipus.Wallet.Api.Obsolete;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
 using Platipus.Wallet.Api.StartupSettings.Factories;
 using Platipus.Wallet.Api.StartupSettings.Filters;
@@ -44,20 +44,29 @@ try
        .Enrich.WithEnvironmentName()
        .Enrich.WithEnvironmentUserName()
        .Enrich.WithAppVersion()
+       .Destructure.ByTransformingWhere<JsonDocument>(t => t == typeof(JsonDocument), v => v.ToConcreteObject()!)
        .WriteTo.File("./logs/static-logger.txt")
        .CreateBootstrapLogger();
 
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+    builder.Host.UseSerilog(
+        (context, configuration) => configuration.ReadFrom.Configuration(context.Configuration)
+           .Destructure.ByTransformingWhere<JsonDocument>(t => t == typeof(JsonDocument), v => v.ToConcreteObject()!));
 
     var builderConfiguration = builder.Configuration;
     var services = builder.Services;
 
     const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO now it is dynamic from config, remove
+
+    // Middlewares
+    services
+       .AddSingleton<BufferResponseBodyMiddleware>()
+       .AddSingleton<BufferRequestBodyMiddleware>()
+       .AddSingleton<LoggingMiddleware>()
+       .AddSingleton<ExceptionHandlerMiddleware>();
+
     services
        .AddScoped<IWalletService, WalletService>()
-       .AddTransient<ExceptionHandlerMiddleware>()
-       .AddTransient<BufferResponseBodyMiddleware>()
        .AddControllers(
             options =>
             {
@@ -68,11 +77,10 @@ try
                 options.OutputFormatters.Add(new CustomXmlSerializerOutputFormatter());
 
                 // Action
-                options.Filters.Add<SaveRequestActionFilterAttribute>(1);
+                options.Filters.Add<SaveRequestDataFilterAttribute>(-5000);
 
                 // Result
                 options.Filters.Add<ResultToResponseResultFilterAttribute>(1);
-                options.Filters.Add<LoggingResultFilterAttribute>(2);
             })
        .AddJsonOptions(
             options =>
@@ -131,7 +139,10 @@ try
                 if (builder.Environment.IsDevelopment() || builder.Environment.IsDebug())
                     optionsBuilder.EnableSensitiveDataLogging();
             })
-       .AddTransient<SupportedCurrenciesFactory>()
+       .AddTransient<SupportedCurrenciesFactory>();
+
+    // GameServer APIs
+    services
        .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
        .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
             options =>
@@ -190,15 +201,10 @@ try
        .AddHealthChecks()
        .AddNpgSql(builderConfiguration.GetConnectionString(nameof(WalletDbContext))!, name: nameof(WalletDbContext));
 
-    services.AddXmlRpc();
+    services.AddXmlRpc(); //TODO remove with gg provider code
     services.AddHttpContextAccessor();
-    var app = builder.Build();
 
-    app.UseExceptionHandler(
-        exceptionAppBuilder =>
-        {
-            exceptionAppBuilder.UseMiddleware<ExceptionHandlerMiddleware>();
-        });
+    var app = builder.Build();
 
     if (!app.Environment.IsProduction())
     {
@@ -206,21 +212,14 @@ try
         app.UseSwaggerUI();
     }
 
-    app.EnableBufferingAndSaveRawRequest();
-    app.UseRequestLocalization();
+    app.UseMiddleware<LoggingMiddleware>();
 
-    app.UseMiddleware<BufferResponseBodyMiddleware>();
+    app.UseRouting();
 
-    var assemblyName = Assembly.GetEntryAssembly()?.FullName!;
-    app.MapGet(
-        string.Empty,
-        async (HttpContext context, IWebHostEnvironment environment) =>
-        {
-            if (!environment.IsProduction())
-                context.Response.Redirect("/swagger/index.html");
-            else
-                await context.Response.WriteAsync(assemblyName);
-        });
+    app.BufferRequestBody();
+    app.BufferResponseBody();
+
+    app.UseMiddleware<ExceptionHandlerMiddleware>();
 
     app.MapVersion();
     app.MapConfigname();

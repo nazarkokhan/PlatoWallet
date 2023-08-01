@@ -51,7 +51,6 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {
-        const string responseItemsKey = "response";
         if (context.Cancel)
             return;
 
@@ -80,10 +79,12 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                     context.Result = new BadRequestObjectResult(errorResponse);
 
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
+                //TODO why ResponseObject not added?
+                //TODO why split on two switch cases?
                 case ISoftBetResult { IsSuccess: true } softBetResult:
                 {
                     if (softBetResult is not ISoftBetResult<object> objectResult)
@@ -105,29 +106,35 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                     context.Result = new BadRequestObjectResult(errorResponse);
 
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
-                case IUisResult<object> { IsSuccess: true } uisResult:
-                    context.Result = new OkObjectResult(uisResult.Data)
-                    {
-                        ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
-                    };
-
-                    return;
-
+                // TODO use one case for one provider everywhere as i made here!
                 case IUisResult<object> uisResult:
                 {
+                    if (uisResult.IsSuccess)
+                    {
+                        context.Result = new OkObjectResult(uisResult.Data)
+                        {
+                            ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                        };
+                        break;
+                    }
+
                     var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
                     var responseObject = new UisErrorResponse(uisResult.Error);
 
                     object container = requestObject switch
                     {
                         UisAuthenticateRequest uisRequest
-                            => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(uisRequest, responseObject),
+                            => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(
+                                uisRequest,
+                                responseObject),
                         UisChangeBalanceRequest uisRequest
-                            => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
+                            => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(
+                                uisRequest,
+                                responseObject),
                         UisGetBalanceRequest uisRequest
                             => new UisResponseContainer<UisGetBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
                         UisStatusRequest uisRequest
@@ -140,7 +147,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
                     };
 
-                    context.HttpContext.Items.Add(responseItemsKey, container);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, container);
                     break;
                 }
 
@@ -170,7 +177,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                     context.Result = new OkObjectResult(errorResponse);
 
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
@@ -186,7 +193,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                     context.Result = new OkObjectResult(errorResponse);
 
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
@@ -202,10 +209,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                     context.Result = new OkObjectResult(errorResponse);
 
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
+                //TODO fix
                 case IBetconstructResult<object> { IsSuccess: true } betConstructResult:
                     context.Result = new OkObjectResult(betConstructResult.Data);
                     return;
@@ -218,7 +226,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                     context.Result = new OkObjectResult(errorResponse);
 
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
@@ -233,7 +241,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     var errorResponse = new EmaraPlayErrorResponse(errorCode);
 
                     context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
@@ -248,14 +256,18 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     var errorResponse = new AtlasErrorResponse(errorCode.Humanize(), (int)errorCode);
 
                     context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
                 case IUranusResult<object> { IsSuccess: true } evoplayResult:
+                {
                     context.Result = new OkObjectResult(evoplayResult.Data);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, evoplayResult.Data);
                     return;
+                }
 
+                //TODO why split switch
                 case IUranusResult<object> evoplayResult:
                 {
                     var errorCode = evoplayResult.Error;
@@ -267,13 +279,18 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                             Array.Empty<object>()));
 
                     context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
+                //TODO what is going to happen when result is failure?
                 case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
+                {
                     context.Result = new OkObjectResult(evenbetResult.Data);
+
+                    //TODO why dont you add HttpContext.Items? It is used for logging!
                     return;
+                }
 
                 case IEvenbetResult<object> evenbetResult:
                 {
@@ -285,7 +302,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                             errorCode.Humanize()));
 
                     context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
 
@@ -303,7 +320,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         errorCode.ToString());
 
                     context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
             }
@@ -330,7 +347,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
 
         if (context.Result is DafabetExternalActionResult dafabetActionResult)
@@ -355,7 +372,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
 
         if (context.Result is OpenboxExternalActionResult openboxActionResult)
@@ -385,7 +402,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
 
         if (context.Result is Hub88ExternalActionResult hub88ActionResult)
@@ -409,7 +426,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.Result = new OkObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
 
         if (context.Result is SoftswissExternalActionResult softswissActionResult)
@@ -442,7 +459,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.Result = new BadRequestObjectResult(errorResponse) { StatusCode = statusCode };
 
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
 
         if (context.Result is not ExternalActionResult externalActionResult)
@@ -464,7 +481,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.Result = new BadRequestObjectResult(errorResponse);
 
-            context.HttpContext.Items.Add(responseItemsKey, errorResponse);
+            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
     }
 }

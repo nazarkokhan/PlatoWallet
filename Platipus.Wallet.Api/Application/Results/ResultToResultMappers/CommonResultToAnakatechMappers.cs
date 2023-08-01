@@ -10,6 +10,7 @@ public static class CommonResultToAnakatechMappers
             ? AnakatechResultFactory.Failure<TData>(result.Error.ToAnakatechErrorCode(), exception: result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
+    //TODO it is never used
     public static IAnakatechResult ToAnakatechResult(this IResult result)
         => result.IsSuccess
             ? AnakatechResultFactory.Success()

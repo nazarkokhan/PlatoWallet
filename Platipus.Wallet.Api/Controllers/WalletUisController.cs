@@ -4,10 +4,12 @@ using System.Net.Mime;
 using Abstract;
 using Application.Requests.Wallets.Uis;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters;
 
 [Route("wallet/uis")]
@@ -15,6 +17,7 @@ using StartupSettings.Filters;
 // [UisSecurityFilter(Order = 2)]
 [Produces(MediaTypeNames.Application.Xml)]
 [Consumes(MediaTypeNames.Application.Xml)]
+[JsonSettingsName(CasinoProvider.Uis)]
 public class WalletUisController : ApiController
 {
     private readonly IMediator _mediator;

@@ -9,17 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 public class TestController : RestApiController
 {
     [HttpPost("stringify-json")]
-    public IActionResult Stringify([FromBody] JsonNode request)
+    public IActionResult Stringify([FromBody] JsonDocument request)
     {
-        var jsonText = request.ToJsonString();
+        var jsonText = request.RootElement.ToString();
         return Ok(jsonText);
     }
 
     [HttpGet("de-stringify-json")]
     public IActionResult Stringify(string jsonString)
     {
-        var jsonNode = JsonDocument.Parse(jsonString.Replace("\\\"", "\""));
-        return Ok(jsonNode);
+        var jsonDocument = JsonDocument.Parse(jsonString.Replace("\\\"", "\""));
+        return Ok(jsonDocument);
     }
 
     [HttpGet("openbox/unix-now")]

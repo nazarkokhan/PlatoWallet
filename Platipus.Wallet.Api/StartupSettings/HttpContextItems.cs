@@ -2,16 +2,20 @@ namespace Platipus.Wallet.Api.StartupSettings;
 
 public static class HttpContextItems
 {
+    public const string Provider = nameof(Provider);
+
     public const string RequestObject = nameof(RequestObject);
     public const string ResponseObject = nameof(ResponseObject);
 
     public const string RequestBodyBytes = nameof(RequestBodyBytes);
     public const string ResponseBodyBytes = nameof(ResponseBodyBytes);
 
-    public const string BetflagCasinoSecretKey = nameof(BetflagCasinoSecretKey);
-    public const string OpenboxPayloadRequestObj = nameof(OpenboxPayloadRequestObj);
+    public const string RequestQueryString = nameof(RequestQueryString);
 
-    public const string SoftBetPayloadRequestObj = nameof(SoftBetPayloadRequestObj);
+    public const string BetflagCasinoSecretKey = nameof(BetflagCasinoSecretKey);
+
+    public const string OpenboxDecryptedPayloadJsonString = nameof(OpenboxDecryptedPayloadJsonString);
+    public const string OpenboxDecryptedPayloadRequestObject = nameof(OpenboxDecryptedPayloadRequestObject);
 
     public static byte[] GetRequestBodyBytesItem(this HttpContext httpContext)
     {

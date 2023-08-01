@@ -12,7 +12,7 @@ using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security;
 
-[Route("wallet/anakatech/")]
+[Route("wallet/anakatech")]
 [ServiceFilter(typeof(AnakatechMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(AnakatechSecurityFilter), Order = 2)]
 [JsonSettingsName(nameof(CasinoProvider.Anakatech))]

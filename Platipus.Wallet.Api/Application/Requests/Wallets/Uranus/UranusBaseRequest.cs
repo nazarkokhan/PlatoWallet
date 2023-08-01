@@ -4,6 +4,7 @@ using Base;
 using Data;
 using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
 
+//TODO?????
 public abstract record UranusBaseRequest(
         string SessionToken,
         string PlayerId,

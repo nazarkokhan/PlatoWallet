@@ -65,6 +65,7 @@ public sealed record AnakatechCreditRequest(
         }
     }
 
+    //TODO how do you convert it to acceptable response that replicates real wallet behaviour?
     public sealed class AnakatechCreditRequestValidator : AbstractValidator<AnakatechCreditRequest>
     {
         public AnakatechCreditRequestValidator()

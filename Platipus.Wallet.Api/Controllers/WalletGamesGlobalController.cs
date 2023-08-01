@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 [Route("wallet/games-global")]
 [Produces(MediaTypeNames.Application.Xml)]
 [Consumes(MediaTypeNames.Application.Xml)]
+[Obsolete]
+//TODO remove all GamesGlobalCode
 public class WalletGamesGlobalController : Controller
 {
     [HttpPost]

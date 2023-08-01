@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Domain.Entities.Enums;
 
+//TODO rename to WalletProvider
 public enum CasinoProvider
 {
     Psw,

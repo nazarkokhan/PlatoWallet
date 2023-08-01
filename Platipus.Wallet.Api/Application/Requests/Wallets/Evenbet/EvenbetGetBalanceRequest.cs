@@ -48,7 +48,7 @@ public sealed record EvenbetGetBalanceRequest([property: JsonProperty("token")] 
     {
         public EvenbetGetBalanceRequestValidator()
         {
-            RuleFor(x => x.Token)
+            RuleFor(x => x.Token) //TODO???
                .NotEmpty()
                .WithMessage("Token is required!");
         }

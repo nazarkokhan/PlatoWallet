@@ -26,7 +26,7 @@ public class OpenboxMockedErrorActionFilter : AbstractMockedErrorActionFilter
         var request = (OpenboxSingleRequest)baseRequest;
 
         if (!actionExecutedContext.HttpContext.Items.TryGetValue(
-                HttpContextItems.OpenboxPayloadRequestObj,
+                HttpContextItems.OpenboxDecryptedPayloadRequestObject,
                 out var payloadRequestObj)
          || payloadRequestObj is not IOpenboxBaseRequest openboxPayloadObj)
         {
