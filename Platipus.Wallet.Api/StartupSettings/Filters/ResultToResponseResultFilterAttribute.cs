@@ -113,41 +113,47 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 // TODO use one case for one provider everywhere as i made here!
                 case IUisResult<object> uisResult:
                 {
+                    object responseObject;
                     if (uisResult.IsSuccess)
                     {
-                        context.Result = new OkObjectResult(uisResult.Data)
+                        responseObject = uisResult.Data;
+                        context.Result = new OkObjectResult(responseObject)
                         {
                             ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
                         };
-                        break;
+                    }
+                    else
+                    {
+                        var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
+                        var errorResponse = new UisErrorResponse(uisResult.Error);
+
+                        object container = requestObject switch
+                        {
+                            UisAuthenticateRequest uisRequest
+                                => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(
+                                    uisRequest,
+                                    errorResponse),
+                            UisChangeBalanceRequest uisRequest
+                                => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(
+                                    uisRequest,
+                                    errorResponse),
+                            UisGetBalanceRequest uisRequest
+                                => new UisResponseContainer<UisGetBalanceRequest, UisErrorResponse>(
+                                    uisRequest,
+                                    errorResponse),
+                            UisStatusRequest uisRequest
+                                => new UisResponseContainer<UisStatusRequest, UisErrorResponse>(uisRequest, errorResponse),
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+
+                        context.Result = new OkObjectResult(container)
+                        {
+                            ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                        };
+                        responseObject = container;
                     }
 
-                    var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
-                    var responseObject = new UisErrorResponse(uisResult.Error);
-
-                    object container = requestObject switch
-                    {
-                        UisAuthenticateRequest uisRequest
-                            => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(
-                                uisRequest,
-                                responseObject),
-                        UisChangeBalanceRequest uisRequest
-                            => new UisResponseContainer<UisChangeBalanceRequest, UisErrorResponse>(
-                                uisRequest,
-                                responseObject),
-                        UisGetBalanceRequest uisRequest
-                            => new UisResponseContainer<UisGetBalanceRequest, UisErrorResponse>(uisRequest, responseObject),
-                        UisStatusRequest uisRequest
-                            => new UisResponseContainer<UisStatusRequest, UisErrorResponse>(uisRequest, responseObject),
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-
-                    context.Result = new OkObjectResult(container)
-                    {
-                        ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
-                    };
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, container);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     break;
                 }
 
