@@ -8,10 +8,10 @@ public class SaveRequestDataFilterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        var hasRequestBody = context.ActionArguments.TryGetValue("request", out var request);
-
-        if (hasRequestBody)
-            context.HttpContext.Items.Add(HttpContextItems.RequestObject, request);
+        var request = context.ActionArguments.Values
+           .OfType<IRequest>()
+           .SingleOrDefault();
+        context.HttpContext.Items.Add(HttpContextItems.RequestObject, request);
 
         var provider = context.Controller
            .GetType()
