@@ -7,12 +7,12 @@ using Domain.Entities.Enums;
 using External;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Requests;
 using Responses.Evenbet.Base;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
 {
@@ -66,7 +66,7 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
-            var requestContent = JsonConvert.SerializeObject(request);
+            var requestContent = JsonSerializer.Serialize(request, _jsonSerializerOptions);
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);

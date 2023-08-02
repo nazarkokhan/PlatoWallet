@@ -13,6 +13,7 @@ using Requests;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 public sealed class UranusGameApiClient : IUranusGameApiClient
 {
@@ -31,31 +32,43 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
            .JsonSerializerOptions;
     }
 
-    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetGameLaunchUrlAsync(
-        Uri baseUrl,
-        UranusGetLaunchUrlGameApiRequest apiRequest,
-        CancellationToken cancellationToken = default)
+    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>>
+        GetGameLaunchUrlAsync(
+            Uri baseUrl,
+            UranusGetLaunchUrlGameApiRequest apiRequest,
+            CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetLaunchUrlGameApiRequest>(
-            baseUrl, "game/launch", apiRequest, cancellationToken);
+            baseUrl,
+            "game/launch",
+            apiRequest,
+            cancellationToken);
     }
 
-    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusAvailableGamesData>, UranusFailureResponse>>> GetAvailableGamesAsync(
-        Uri baseUrl,
-        UranusGetAvailableGamesGameApiRequest apiRequest,
-        CancellationToken cancellationToken = default)
+    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusAvailableGamesData>, UranusFailureResponse>>>
+        GetAvailableGamesAsync(
+            Uri baseUrl,
+            UranusGetAvailableGamesGameApiRequest apiRequest,
+            CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusAvailableGamesData>, UranusGetAvailableGamesGameApiRequest>(
-            baseUrl, "game/list", apiRequest, cancellationToken);
+            baseUrl,
+            "game/list",
+            apiRequest,
+            cancellationToken);
     }
 
-    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetDemoLaunchUrlAsync(
-        Uri baseUrl,
-        UranusGetDemoLaunchUrlGameApiRequest apiRequest,
-        CancellationToken cancellationToken = default)
+    public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>>
+        GetDemoLaunchUrlAsync(
+            Uri baseUrl,
+            UranusGetDemoLaunchUrlGameApiRequest apiRequest,
+            CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetDemoLaunchUrlGameApiRequest>(
-            baseUrl, "game/demo", apiRequest, cancellationToken);
+            baseUrl,
+            "game/demo",
+            apiRequest,
+            cancellationToken);
     }
 
     private async Task<IResult<IHttpClientResult<TSuccess, UranusFailureResponse>>> PostAsync<TSuccess, TRequest>(
@@ -69,7 +82,7 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
-            var requestContent = JsonConvert.SerializeObject(request);
+            var requestContent = JsonSerializer.Serialize(request, _jsonSerializerOptions);
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
             var xSignature = UranusSecurityHash.Compute(requestContent, SecretKey);

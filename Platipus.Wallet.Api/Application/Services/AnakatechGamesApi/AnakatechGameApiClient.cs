@@ -11,6 +11,7 @@ using Responses.Anakatech.Base;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
 {
@@ -52,7 +53,7 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
-            var requestContent = JsonConvert.SerializeObject(request);
+            var requestContent = JsonSerializer.Serialize(request, _jsonSerializerOptions);
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
@@ -79,7 +80,8 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
             var responseBody = httpResponse.ResponseData.Body;
 
             if (string.IsNullOrEmpty(responseBody))
-            {//TODO remove braces if simple check and failure result
+            {
+                //TODO remove braces if simple check and failure result
                 return httpResponse.Failure<TSuccess, AnakatechErrorResponse>();
             }
 

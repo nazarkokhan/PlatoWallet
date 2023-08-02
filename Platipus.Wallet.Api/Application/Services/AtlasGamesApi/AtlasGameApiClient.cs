@@ -7,7 +7,6 @@ using Application.Requests.Wallets.Atlas.Base;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Requests;
 using Responses.AtlasPlatform;
 using Results.HttpClient;
@@ -86,7 +85,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
 
-            var requestContent = JsonConvert.SerializeObject(request); //TODO why not using naming policy from json settings?
+            var requestContent = JsonSerializer.Serialize(request, _jsonSerializerOptions);
             var content = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
