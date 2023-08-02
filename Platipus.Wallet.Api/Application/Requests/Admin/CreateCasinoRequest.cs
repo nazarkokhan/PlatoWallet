@@ -46,7 +46,7 @@ public record CreateCasinoRequest(
                 .ToListAsync(cancellationToken);
 
             var matchedCurrencies = supportedCurrencies
-                .Where(c => request.Currencies.Any(rc => rc == c.Id))
+                .Where(c => request.Currencies.Exists(rc => rc == c.Id))
                 .ToList();
 
             if (matchedCurrencies.Count != request.Currencies.Count)
@@ -95,7 +95,11 @@ public record CreateCasinoRequest(
                                         || casino.Params.Hub88PrivateGameServiceSecuritySign is null) => false,
                 WalletProvider.Reevo when (casino.Params.ReevoCallerId is null || casino.Params.ReevoCallerPassword is null) =>
                     false,
-                //TODO add validation for Anakatech, Evenbet, Uranus etc...
+                WalletProvider.EmaraPlay when casino.Params.EmaraPlayProvider is null => false,
+                WalletProvider.Atlas when casino.Params.AtlasProvider is null => false,
+                WalletProvider.Anakatech when casino.Params.AnakatechProvider is null => false,
+                WalletProvider.Evenbet when casino.Params.EvenbetProvider is null => false,
+                WalletProvider.Uranus when casino.Params.UranusProvider is null => false,
                 _ => true
             };
         }
