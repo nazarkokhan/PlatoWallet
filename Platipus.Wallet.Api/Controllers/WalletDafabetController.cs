@@ -20,7 +20,7 @@ using StartupSettings.Filters.Security;
 [ProducesResponseType(typeof(DafabetBaseResponse), StatusCodes.Status200OK)]
 [MockedErrorActionFilter(Order = 1)]
 [DatabetSecurityFilter(Order = 2)]
-[JsonSettingsName(CasinoProvider.Dafabet)]
+[JsonSettingsName(WalletProvider.Dafabet)]
 public class WalletDafabetController : RestApiController
 {
     private readonly IMediator _mediator;
@@ -78,7 +78,7 @@ public class WalletDafabetController : RestApiController
         CancellationToken cancellationToken)
     {
         var casino = await dbContext.Set<Casino>()
-            .Where(c => c.Id == casinoId && c.Provider == CasinoProvider.Dafabet)
+            .Where(c => c.Id == casinoId && c.Provider == WalletProvider.Dafabet)
             .Select(c => new { c.SignatureKey })
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -123,7 +123,7 @@ public sealed record LogInRequest(
                 IsTemporaryToken = true
             };
 
-            if (casino.Provider != CasinoProvider.Reevo || casino.Provider != CasinoProvider.Softswiss)
+            if (casino.Provider != WalletProvider.Reevo || casino.Provider != WalletProvider.Softswiss)
             {
                 _context.Add(session);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -156,7 +156,7 @@ public sealed record LogInRequest(
             if (environment is null)
                 return ResultFactory.Failure<Response>(ErrorCode.EnvironmentNotFound);
 
-            var baseUrl = casino.Provider is CasinoProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
+            var baseUrl = casino.Provider is WalletProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
 
             string? httpRequestMessage = null;
             string? httpResponseMessage = null;
@@ -183,7 +183,7 @@ public sealed record LogInRequest(
                 //     break;
                 // }
 
-                case CasinoProvider.Evenbet:
+                case WalletProvider.Evenbet:
                 {
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
 
@@ -208,7 +208,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.Uranus:
+                case WalletProvider.Uranus:
                 {
                     var playerIp = GetPlayerIp();
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
@@ -247,7 +247,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.Atlas:
+                case WalletProvider.Atlas:
                 {
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
                     const string stringToEncode = "atlas:password123";
@@ -276,7 +276,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.EmaraPlay:
+                case WalletProvider.EmaraPlay:
                 {
                     var ip = GetPlayerIp();
 
@@ -306,7 +306,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.Psw or CasinoProvider.Betflag:
+                case WalletProvider.Psw or WalletProvider.Betflag:
                 {
                     var getGameLinkResult = await _pswAndBetflagGameApiClient.GetLaunchUrlAsync(
                         baseUrl,
@@ -324,7 +324,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.Openbox:
+                case WalletProvider.Openbox:
                     launchUrl = GetOpenboxLaunchUrl(
                         baseUrl,
                         session.Id,
@@ -336,7 +336,7 @@ public sealed record LogInRequest(
 
                     break;
 
-                case CasinoProvider.Dafabet:
+                case WalletProvider.Dafabet:
                     launchUrl = GetDafabetLaunchUrlAsync(
                         baseUrl,
                         request.Game,
@@ -352,7 +352,7 @@ public sealed record LogInRequest(
 
                     break;
 
-                case CasinoProvider.Hub88:
+                case WalletProvider.Hub88:
                 {
                     var getHub88GameLinkRequestDto = new Hub88GetGameLinkGamesApiRequestDto(
                         user.Username,
@@ -379,7 +379,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.Softswiss:
+                case WalletProvider.Softswiss:
                 {
                     var getGameLinkResult = await _softswissGamesApiClient.GetLaunchUrlAsync(
                         baseUrl,
@@ -422,7 +422,7 @@ public sealed record LogInRequest(
                     break;
                 }
 
-                case CasinoProvider.Sw:
+                case WalletProvider.Sw:
                     launchUrl = GetSwLaunchUrl(
                         baseUrl,
                         session.Id,
@@ -432,7 +432,7 @@ public sealed record LogInRequest(
 
                     break;
 
-                case CasinoProvider.SoftBet:
+                case WalletProvider.SoftBet:
                     launchUrl = GetSoftBetLaunchUrlAsync(
                         baseUrl,
                         game.GameServerId,
@@ -443,7 +443,7 @@ public sealed record LogInRequest(
 
                     break;
 
-                case CasinoProvider.GamesGlobal:
+                case WalletProvider.GamesGlobal:
                     var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
                         baseUrl,
                         session.Id,
@@ -453,7 +453,7 @@ public sealed record LogInRequest(
                     launchUrl = getLaunchUrlResult.Data ?? "";
                     break;
 
-                case CasinoProvider.Uis:
+                case WalletProvider.Uis:
                     launchUrl = GetUisLaunchUrl(
                         environment.UisBaseUrl,
                         session.Id,
@@ -462,7 +462,7 @@ public sealed record LogInRequest(
 
                     break;
 
-                case CasinoProvider.Reevo:
+                case WalletProvider.Reevo:
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
                         baseUrl,
                         new ReevoGetGameGameApiRequest(
@@ -491,7 +491,7 @@ public sealed record LogInRequest(
                     launchUrl = dataSuccess.Response;
                     break;
 
-                case CasinoProvider.Everymatrix:
+                case WalletProvider.Everymatrix:
                     launchUrl = GetEveryMatrixLaunchUrlAsync(
                         baseUrl,
                         casino.Id,
@@ -505,7 +505,7 @@ public sealed record LogInRequest(
 
                     break;
 
-                case CasinoProvider.BetConstruct:
+                case WalletProvider.BetConstruct:
                     launchUrl = GetBetConstructLaunchUrlAsync(
                         baseUrl,
                         game.GameServerId,

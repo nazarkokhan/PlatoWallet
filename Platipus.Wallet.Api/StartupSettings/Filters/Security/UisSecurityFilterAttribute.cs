@@ -50,7 +50,7 @@ public class UisSecurityFilterAttribute : ActionFilterAttribute
                 })
             .FirstOrDefaultAsync(context.HttpContext.RequestAborted);
 
-        if (user is null || user.IsDisabled || user.Casino.Provider is not CasinoProvider.Uis)
+        if (user is null || user.IsDisabled || user.Casino.Provider is not WalletProvider.Uis)
         {
             context.Result = DafabetResultFactory.Failure(DafabetErrorCode.PlayerNotFound).ToActionResult();
             return;

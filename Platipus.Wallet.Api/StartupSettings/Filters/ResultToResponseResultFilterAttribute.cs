@@ -388,7 +388,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 if (openboxActionResult.Result is IOpenboxResult<object> objectResult)
                 {
                     var jsonOptions = services.GetRequiredService<IOptionsMonitor<JsonOptions>>()
-                       .Get(CasinoProvider.Openbox.ToString())
+                       .Get(WalletProvider.Openbox.ToString())
                        .JsonSerializerOptions;
 
                     var payload = JsonSerializer.Serialize(objectResult.Data, jsonOptions);

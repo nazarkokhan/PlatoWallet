@@ -27,7 +27,7 @@ public sealed class EmaraPlayGameApiClient : IEmaraPlayGameApiClient
         IOptionsMonitor<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.EmaraPlay))
+        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.EmaraPlay))
             .JsonSerializerOptions;
     }
 

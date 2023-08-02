@@ -46,7 +46,7 @@ public sealed class AtlasSecurityFilter : IAsyncActionFilter
             return;
         }
         
-        const int atlasProviderId = (int)CasinoProvider.Atlas; 
+        const int atlasProviderId = (int)WalletProvider.Atlas; 
         if (!session.CasinoProvider.Equals(atlasProviderId.ToString()))
         {
             context.Result = AtlasResultFactory

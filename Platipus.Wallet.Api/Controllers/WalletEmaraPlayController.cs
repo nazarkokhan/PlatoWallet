@@ -15,7 +15,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/emara-play")]
 [ServiceFilter(typeof(EmaraPlayMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(EmaraPlaySecurityFilter), Order = 2)]
-[JsonSettingsName(CasinoProvider.EmaraPlay)]
+[JsonSettingsName(WalletProvider.EmaraPlay)]
 [ProducesErrorResponseType(typeof(EmaraPlayErrorResponse))]
 public sealed class WalletEmaraPlayController : RestApiController
 {

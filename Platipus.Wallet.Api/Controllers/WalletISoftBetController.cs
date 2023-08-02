@@ -23,7 +23,7 @@ using StartupSettings.Filters;
 
 [Route("wallet/isoftbet")]
 [MockedErrorActionFilter(Order = 1)]
-[JsonSettingsName(CasinoProvider.SoftBet)]
+[JsonSettingsName(WalletProvider.SoftBet)]
 [ProducesResponseType(typeof(SoftBetErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletISoftBetController : RestApiController
 {
@@ -39,7 +39,7 @@ public class WalletISoftBetController : RestApiController
         ILogger<WalletISoftBetController> logger)
     {
         _mediator = mediator;
-        _jsonSerializerOptions = options.Get(CasinoProvider.SoftBet.ToString()).JsonSerializerOptions;
+        _jsonSerializerOptions = options.Get(WalletProvider.SoftBet.ToString()).JsonSerializerOptions;
         _context = context;
         _logger = logger;
     }

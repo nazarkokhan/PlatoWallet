@@ -8,7 +8,7 @@ public interface IPswAndBetflagGameApiClient
 {
     Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
         Uri baseUrl,
-        CasinoProvider casinoProvider,
+        WalletProvider walletProvider,
         string casinoId,
         string sessionId,
         string user,

@@ -46,13 +46,13 @@ public static class StartupExtensions
     {
         builder
            .AddJsonOptions(
-                nameof(CasinoProvider.Dafabet),
+                nameof(WalletProvider.Dafabet),
                 options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Openbox),
+                nameof(WalletProvider.Openbox),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
@@ -60,21 +60,21 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Hub88),
+                nameof(WalletProvider.Hub88),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Softswiss),
+                nameof(WalletProvider.Softswiss),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Sw),
+                nameof(WalletProvider.Sw),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonLowerCaseNamingPolicy();
@@ -82,52 +82,52 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.SoftBet),
+                nameof(WalletProvider.SoftBet),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonLowerCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Betflag),
+                nameof(WalletProvider.Betflag),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Uis),
+                nameof(WalletProvider.Uis),
                 options =>
                 {
                     // options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Reevo),
+                nameof(WalletProvider.Reevo),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonBoolAsNumberStringConverter());
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Everymatrix),
+                nameof(WalletProvider.Everymatrix),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.BetConstruct),
+                nameof(WalletProvider.BetConstruct),
                 _ =>
                 {
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.EmaraPlay),
+                nameof(WalletProvider.EmaraPlay),
                 options =>
                 {
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Atlas),
+                nameof(WalletProvider.Atlas),
                 options =>
                 {
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
@@ -135,14 +135,14 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Uranus),
+                nameof(WalletProvider.Uranus),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Evenbet),
+                nameof(WalletProvider.Evenbet),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -150,7 +150,7 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 })
            .AddJsonOptions(
-                nameof(CasinoProvider.Anakatech),
+                nameof(WalletProvider.Anakatech),
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

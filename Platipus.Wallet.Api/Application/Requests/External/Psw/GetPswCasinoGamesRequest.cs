@@ -28,7 +28,7 @@ public record GetPswCasinoGamesRequest(string CasinoId) : IRequest<IPswResult<Ps
             var casinoExist = await _context.Set<Casino>()
                 .Where(
                     c => c.Id == request.CasinoId
-                      && c.Provider == CasinoProvider.Psw)
+                      && c.Provider == WalletProvider.Psw)
                 .AnyAsync(cancellationToken);
 
             if (!casinoExist)

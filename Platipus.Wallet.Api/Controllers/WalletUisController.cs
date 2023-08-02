@@ -17,7 +17,7 @@ using StartupSettings.Filters;
 // [UisSecurityFilter(Order = 2)]
 [Produces(MediaTypeNames.Application.Xml)]
 [Consumes(MediaTypeNames.Application.Xml)]
-[JsonSettingsName(CasinoProvider.Uis)]
+[JsonSettingsName(WalletProvider.Uis)]
 public class WalletUisController : ApiController
 {
     private readonly IMediator _mediator;

@@ -22,7 +22,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/reevo")]
 [MockedErrorActionFilter(Order = 1)]
 [ReevoSecurityFilter(Order = 2)]
-[JsonSettingsName(CasinoProvider.Reevo)]
+[JsonSettingsName(WalletProvider.Reevo)]
 [ProducesResponseType(typeof(ReevoErrorResponse), StatusCodes.Status200OK)]
 [ProducesResponseType(typeof(ReevoSuccessResponse), StatusCodes.Status200OK)]
 public class WalletReevoController : RestApiController

@@ -15,7 +15,7 @@ public static class SeedExtension
     public record MigrationDefaultCasinoDto
     {
         public string Id { get; set; }
-        public CasinoProvider Provider { get; set; }
+        public WalletProvider Provider { get; set; }
         public string SignatureKey { get; set; }
         public int? InternalId { get; set; }
         public string GameEnvironmentId { get; set; }

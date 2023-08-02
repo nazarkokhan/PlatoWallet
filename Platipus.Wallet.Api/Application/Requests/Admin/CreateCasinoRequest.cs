@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 public record CreateCasinoRequest(
     [property: DefaultValue("custom_psw")] string CasinoId,
     [property: DefaultValue("12345678")] string SignatureKey,
-    CasinoProvider Provider,
+    WalletProvider Provider,
     List<string> Currencies,
     Casino.SpecificParams Params,
     [property: DefaultValue("test")] string Environment) : IRequest<IResult>
@@ -52,7 +52,7 @@ public record CreateCasinoRequest(
             if (matchedCurrencies.Count != request.Currencies.Count)
                 return ResultFactory.Failure(ErrorCode.InvalidCurrency);
 
-            if (request.Provider is CasinoProvider.Dafabet)
+            if (request.Provider is WalletProvider.Dafabet)
             {
                 var dafabetCasinoExist = await _context.Set<Casino>()
                     .Where(e => e.Provider == request.Provider)
@@ -88,12 +88,12 @@ public record CreateCasinoRequest(
         {
             return casino.Provider switch
             {
-                CasinoProvider.SoftBet when (casino.Params.ISoftBetProviderId is null) => false,
-                CasinoProvider.Openbox when (casino.Params.OpenboxVendorUid is null) => false,
-                CasinoProvider.Hub88 when (casino.Params.Hub88PrivateWalletSecuritySign is null
+                WalletProvider.SoftBet when (casino.Params.ISoftBetProviderId is null) => false,
+                WalletProvider.Openbox when (casino.Params.OpenboxVendorUid is null) => false,
+                WalletProvider.Hub88 when (casino.Params.Hub88PrivateWalletSecuritySign is null
                                         || casino.Params.Hub88PublicGameServiceSecuritySign is null
                                         || casino.Params.Hub88PrivateGameServiceSecuritySign is null) => false,
-                CasinoProvider.Reevo when (casino.Params.ReevoCallerId is null || casino.Params.ReevoCallerPassword is null) =>
+                WalletProvider.Reevo when (casino.Params.ReevoCallerId is null || casino.Params.ReevoCallerPassword is null) =>
                     false,
                 //TODO add validation for Anakatech, Evenbet, Uranus etc...
                 _ => true

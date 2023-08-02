@@ -10,7 +10,7 @@ public class Casino : Entity<string>
 {
     public Casino(
         string id,
-        CasinoProvider provider,
+        WalletProvider provider,
         string signatureKey,
         string gameEnvironmentId = GameEnvironment.Default)
     {
@@ -20,7 +20,7 @@ public class Casino : Entity<string>
         GameEnvironmentId = gameEnvironmentId;
     }
 
-    public CasinoProvider Provider { get; set; }
+    public WalletProvider Provider { get; set; }
 
     public string SignatureKey { get; set; }
 

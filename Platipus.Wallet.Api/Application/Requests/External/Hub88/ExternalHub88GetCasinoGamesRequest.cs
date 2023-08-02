@@ -30,7 +30,7 @@ public record ExternalHub88GetCasinoGamesRequest(string CasinoId) : IRequest<IHu
             var casinoExist = await _context.Set<Casino>()
                 .Where(
                     c => c.Id == request.CasinoId
-                      && c.Provider == CasinoProvider.Hub88)
+                      && c.Provider == WalletProvider.Hub88)
                 .AnyAsync(cancellationToken);
 
             if (!casinoExist)

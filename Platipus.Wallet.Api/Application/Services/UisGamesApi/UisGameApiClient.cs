@@ -18,7 +18,7 @@ public class UisGameApiClient : IUisGameApiClient
     public UisGameApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Uis)).JsonSerializerOptions;
+        _jsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Uis)).JsonSerializerOptions;
     }
 
     public async Task<IResult<IHttpClientResult<UisGameApiCreateAwardResponse, UisGameApiErrorResponse>>> CreateAwardAsync(

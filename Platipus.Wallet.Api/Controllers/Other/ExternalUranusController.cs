@@ -12,7 +12,7 @@ using StartupSettings.Filters.Security.Uranus;
 
 [Route("external/uranus/game")]
 [ServiceFilter(typeof(UranusExternalSecurityFilter), Order = 1)]
-[JsonSettingsName(CasinoProvider.Uranus)]
+[JsonSettingsName(WalletProvider.Uranus)]
 [ProducesResponseType(typeof(UranusFailureResponse), StatusCodes.Status200OK)]
 public sealed class ExternalUranusController : RestApiController
 {

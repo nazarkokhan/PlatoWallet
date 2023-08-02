@@ -5,7 +5,7 @@ using Domain.Entities.Enums;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class JsonSettingsNameAttribute : Attribute
 {
-    public JsonSettingsNameAttribute(CasinoProvider type)
+    public JsonSettingsNameAttribute(WalletProvider type)
     {
         Name = type.ToString();
         Type = type;
@@ -13,5 +13,5 @@ public class JsonSettingsNameAttribute : Attribute
 
     public string Name { get; }
 
-    public CasinoProvider Type { get; }
+    public WalletProvider Type { get; }
 }

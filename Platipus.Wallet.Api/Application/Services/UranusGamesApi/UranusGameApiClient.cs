@@ -27,7 +27,7 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
         IOptionsMonitor<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.Uranus))
+        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.Uranus))
            .JsonSerializerOptions;
     }
 

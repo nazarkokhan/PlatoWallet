@@ -49,7 +49,7 @@ public sealed class AnakatechSecurityFilter : IAsyncActionFilter
             return;
         }
 
-        const int uranusProviderId = (int)CasinoProvider.Anakatech; //TODO wtf
+        const int uranusProviderId = (int)WalletProvider.Anakatech; //TODO wtf
         if (!session.CasinoProvider.Equals(uranusProviderId.ToString()))
         {
             context.Result = AnakatechResultFactory

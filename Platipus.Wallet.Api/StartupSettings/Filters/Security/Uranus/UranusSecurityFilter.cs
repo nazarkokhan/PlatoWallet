@@ -50,7 +50,7 @@ public sealed class UranusSecurityFilter : IAsyncActionFilter
             return;
         }
 
-        const int uranusProviderId = (int)CasinoProvider.Uranus;
+        const int uranusProviderId = (int)WalletProvider.Uranus;
         if (!session.CasinoProvider.Equals(uranusProviderId.ToString()))
         {
             context.Result = UranusResultFactory

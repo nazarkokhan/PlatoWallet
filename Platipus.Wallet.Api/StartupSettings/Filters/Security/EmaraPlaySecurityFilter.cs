@@ -48,7 +48,7 @@ public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
             return;
         }
 
-        const int emaraplayProviderId = (int)CasinoProvider.EmaraPlay; 
+        const int emaraplayProviderId = (int)WalletProvider.EmaraPlay; 
         if (!session.CasinoProvider.Equals(emaraplayProviderId.ToString()))
         {
             context.Result = EmaraPlayResultFactory

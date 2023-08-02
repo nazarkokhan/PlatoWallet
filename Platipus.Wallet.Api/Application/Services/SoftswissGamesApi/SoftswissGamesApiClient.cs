@@ -35,7 +35,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         _scopeFactory = scopeFactory;
         _logger = logger;
         _currencyMultipliers = currencyMultipliers.Value;
-        _softswissJsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Softswiss)).JsonSerializerOptions;
+        _softswissJsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Softswiss)).JsonSerializerOptions;
     }
 
     public async Task<IResult<SoftswissBoxGamesApiResponse<SoftswissGetGameLinkGameApiResponse>>> GetLaunchUrlAsync(

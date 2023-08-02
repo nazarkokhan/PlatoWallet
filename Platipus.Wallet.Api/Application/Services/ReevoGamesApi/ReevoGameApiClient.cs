@@ -15,7 +15,7 @@ public class ReevoGameApiClient : IReevoGameApiClient
     public ReevoGameApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions)
     {
         _httpClient = httpClient;
-        _hub88JsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Reevo)).JsonSerializerOptions;
+        _hub88JsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Reevo)).JsonSerializerOptions;
     }
 
     public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameGameApiResponse>>> GetGameAsync(

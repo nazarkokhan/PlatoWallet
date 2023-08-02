@@ -24,7 +24,7 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
         IOptionsMonitor<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.Anakatech))
+        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.Anakatech))
            .JsonSerializerOptions;
     }
 

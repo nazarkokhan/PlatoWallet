@@ -31,7 +31,7 @@ public class LoggingMiddleware : IMiddleware
         if (_pathsToSkip.Contains(context.Request.Path))
             return;
 
-        var provider = context.Items[HttpContextItems.Provider] as CasinoProvider?;
+        var provider = context.Items[HttpContextItems.Provider] as WalletProvider?;
         var request = context.Items[HttpContextItems.RequestObject];
         var rawRequestBytes = context.Items[HttpContextItems.RequestBodyBytes] as byte[];
         var rawRequestBody = rawRequestBytes?.Map(b => Encoding.UTF8.GetString(b));
@@ -47,7 +47,7 @@ public class LoggingMiddleware : IMiddleware
         var requestHeaders = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString());
         var responseHeaders = context.Response.Headers.ToDictionary(x => x.Key, x => x.Value.ToString());
 
-        if (provider is CasinoProvider.Openbox)
+        if (provider is WalletProvider.Openbox)
         {
             var openboxDecryptedPayloadJsonString = context.Items[HttpContextItems.OpenboxDecryptedPayloadJsonString];
             var openboxDecryptedPayloadRequestObject = context.Items[HttpContextItems.OpenboxDecryptedPayloadRequestObject];

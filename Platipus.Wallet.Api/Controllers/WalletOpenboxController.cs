@@ -19,7 +19,7 @@ using StartupSettings.Filters.NewFilterStyle;
 
 [Route("wallet/openbox/")]
 [ServiceFilter(typeof(OpenboxMockedErrorActionFilter), Order = 1)]
-[JsonSettingsName(CasinoProvider.Openbox)]
+[JsonSettingsName(WalletProvider.Openbox)]
 public class WalletOpenboxController : RestApiController
 {
     private readonly IMediator _mediator;
@@ -34,7 +34,7 @@ public class WalletOpenboxController : RestApiController
         ILogger<WalletOpenboxController> logger)
     {
         _mediator = mediator;
-        _jsonSerializerOptions = options.Get(nameof(CasinoProvider.Openbox)).JsonSerializerOptions;
+        _jsonSerializerOptions = options.Get(nameof(WalletProvider.Openbox)).JsonSerializerOptions;
         _context = context;
         _logger = logger;
     }
@@ -47,7 +47,7 @@ public class WalletOpenboxController : RestApiController
         {
             var casino = await _context.Set<Casino>()
                 .Where(
-                    c => c.Provider == CasinoProvider.Openbox
+                    c => c.Provider == WalletProvider.Openbox
                       && c.Params.OpenboxVendorUid == request.VendorUid)
                 .Select(
                     c => new
@@ -106,7 +106,7 @@ public class WalletOpenboxController : RestApiController
 }
 
 [Route("wallet/private/openbox")]
-[JsonSettingsName(CasinoProvider.Everymatrix)]
+[JsonSettingsName(WalletProvider.Everymatrix)]
 public class WalletOpenboxPrivateController : RestApiController
 {
     [HttpPost("get-security-value")]
@@ -118,7 +118,7 @@ public class WalletOpenboxPrivateController : RestApiController
     {
         var casino = await dbContext.Set<Casino>()
             .Where(
-                c => c.Provider == CasinoProvider.Openbox
+                c => c.Provider == WalletProvider.Openbox
                   && c.Params.OpenboxVendorUid == vendorUid)
             .Select(
                 c => new

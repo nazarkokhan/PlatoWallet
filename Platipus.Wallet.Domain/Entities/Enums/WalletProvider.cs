@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Domain.Entities.Enums;
 
-//TODO rename to WalletProvider
-public enum CasinoProvider
+public enum WalletProvider
 {
     Psw,
     Dafabet,
@@ -17,7 +16,7 @@ public enum CasinoProvider
     Everymatrix,
     BetConstruct,
     PariMatch,
-    EmaraPlay, 
+    EmaraPlay,
     Atlas,
     Uranus,
     Evenbet,

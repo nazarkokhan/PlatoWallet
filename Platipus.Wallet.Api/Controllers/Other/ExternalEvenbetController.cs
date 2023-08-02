@@ -11,7 +11,7 @@ using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.Security.Evenbet;
 
 [Route("external/evenbet/game")]
-[JsonSettingsName(CasinoProvider.Evenbet)]
+[JsonSettingsName(WalletProvider.Evenbet)]
 [ProducesResponseType(typeof(EvenbetFailureResponse), StatusCodes.Status200OK)]
 public sealed class ExternalEvenbetController : RestApiController
 {

@@ -36,7 +36,7 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
 
     public async Task<IPswResult<GetLaunchUrlResponseDto>> GetLaunchUrlAsync(
         Uri baseUrl,
-        CasinoProvider casinoProvider,
+        WalletProvider walletProvider,
         string casinoId,
         string sessionId,
         string user,
@@ -51,7 +51,7 @@ public class PswAndBetflagGameApiClient : IPswAndBetflagGameApiClient
     {
         var launchModePath = launchModeType is LaunchMode.Real ? "session" : "demo";
         var response = await PostSignedRequestAsync<PswGetGameLinkGamesApiRequest, GetLaunchUrlResponseDto>(
-            new Uri(baseUrl, $"{casinoProvider.ToString().ToLower()}/game/{launchModePath}").AbsoluteUri,
+            new Uri(baseUrl, $"{walletProvider.ToString().ToLower()}/game/{launchModePath}").AbsoluteUri,
             new PswGetGameLinkGamesApiRequest(
                 casinoId,
                 sessionId,

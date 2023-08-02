@@ -26,7 +26,7 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         IOptionsMonitor<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.Evenbet))
+        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.Evenbet))
            .JsonSerializerOptions;
     }
 

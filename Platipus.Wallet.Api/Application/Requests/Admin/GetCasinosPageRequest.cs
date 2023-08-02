@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 public record GetCasinosPageRequest(
     PageRequest Page,
     string? CasinoId,
-    CasinoProvider? Provider) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
+    WalletProvider? Provider) : IRequest<IResult<IPage<GetCasinosPageRequest.Response>>>
 {
     public class Handler : IRequestHandler<GetCasinosPageRequest, IResult<IPage<Response>>>
     {
@@ -70,7 +70,7 @@ public record GetCasinosPageRequest(
 
     public record Response(
         string Id,
-        CasinoProvider? Provider,
+        WalletProvider? Provider,
         string SignatureKey,
         int InternalId,
         string GameEnvironmentId,

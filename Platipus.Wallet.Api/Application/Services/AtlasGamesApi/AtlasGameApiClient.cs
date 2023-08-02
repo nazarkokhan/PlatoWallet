@@ -26,7 +26,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         IOptionsMonitor<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(CasinoProvider.Atlas))
+        _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.Atlas))
             .JsonSerializerOptions;
     }
 

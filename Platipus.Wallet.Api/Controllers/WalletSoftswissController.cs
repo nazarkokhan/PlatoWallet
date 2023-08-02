@@ -20,7 +20,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/softswiss")]
 [ServiceFilter(typeof(SoftswissMockedErrorActionFilter), Order = 1)]
 [SoftswissSecurityFilter(Order = 2)]
-[JsonSettingsName(CasinoProvider.Softswiss)]
+[JsonSettingsName(WalletProvider.Softswiss)]
 [ProducesResponseType(typeof(SoftswissErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletSoftswissController : RestApiController
 {
@@ -54,7 +54,7 @@ public class WalletSoftswissController : RestApiController
 }
 
 [Route("wallet/private/softswiss")]
-[JsonSettingsName(CasinoProvider.Softswiss)]
+[JsonSettingsName(WalletProvider.Softswiss)]
 public class WalletSoftswissPrivateController : RestApiController
 {
     [HttpPost("get-security-value")]

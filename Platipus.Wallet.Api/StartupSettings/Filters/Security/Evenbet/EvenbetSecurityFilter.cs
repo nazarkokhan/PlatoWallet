@@ -55,7 +55,7 @@ public sealed class EvenbetSecurityFilter : IAsyncActionFilter
 
             casinoSignatureKey = session.CasinoSignatureKey;
 
-            const int evenbetProviderId = (int)CasinoProvider.Evenbet;
+            const int evenbetProviderId = (int)WalletProvider.Evenbet;
             if (!session.CasinoProvider.Equals(evenbetProviderId.ToString()))
             {
                 context.Result = EvenbetResultFactory

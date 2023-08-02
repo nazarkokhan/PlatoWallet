@@ -22,7 +22,7 @@ public class Hub88GamesApiClient : IHub88GamesApiClient
     public Hub88GamesApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions)
     {
         _httpClient = httpClient;
-        _hub88JsonSerializerOptions = jsonOptions.Get(nameof(CasinoProvider.Hub88)).JsonSerializerOptions;
+        _hub88JsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Hub88)).JsonSerializerOptions;
     }
 
     //Game
