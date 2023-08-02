@@ -150,6 +150,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         {
                             ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
                         };
+
                         responseObject = container;
                     }
 
@@ -266,17 +267,17 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     break;
                 }
 
-                case IUranusResult<object> { IsSuccess: true } evoplayResult:
+                case IUranusResult<object> { IsSuccess: true } uranusResult:
                 {
-                    context.Result = new OkObjectResult(evoplayResult.Data);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, evoplayResult.Data);
+                    context.Result = new OkObjectResult(uranusResult.Data);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, uranusResult.Data);
                     return;
                 }
 
                 //TODO why split switch
-                case IUranusResult<object> evoplayResult:
+                case IUranusResult<object> uranusResult:
                 {
-                    var errorCode = evoplayResult.Error;
+                    var errorCode = uranusResult.Error;
 
                     var errorResponse = new UranusFailureResponse(
                         new UranusCommonErrorResponse(
@@ -293,8 +294,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
                 {
                     context.Result = new OkObjectResult(evenbetResult.Data);
-
-                    //TODO why dont you add HttpContext.Items? It is used for logging!
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, evenbetResult.Data);
                     return;
                 }
 

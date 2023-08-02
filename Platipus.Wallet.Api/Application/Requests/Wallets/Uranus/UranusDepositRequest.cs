@@ -45,8 +45,8 @@ public sealed record UranusDepositRequest(
 
             var response = new UranusSuccessResponse<UranusCommonDataWithTransaction>(
                 new UranusCommonDataWithTransaction(
-                    walletResult.Data?.Currency,  //TODO how can data be null????
-                    walletResult.Data!.Balance, 
+                    walletResult.Data.Currency,
+                    walletResult.Data.Balance, 
                     walletResult.Data.Transaction.Id)
             );
             return UranusResultFactory.Success(response);
