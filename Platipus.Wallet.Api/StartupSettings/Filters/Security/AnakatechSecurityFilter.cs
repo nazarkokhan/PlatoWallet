@@ -49,8 +49,8 @@ public sealed class AnakatechSecurityFilter : IAsyncActionFilter
             return;
         }
 
-        const int uranusProviderId = (int)WalletProvider.Anakatech; //TODO wtf
-        if (!session.CasinoProvider.Equals(uranusProviderId.ToString()))
+        const int anakatechProviderId = (int)WalletProvider.Anakatech;
+        if (!session.CasinoProvider.Equals(anakatechProviderId.ToString()))
         {
             context.Result = AnakatechResultFactory
                .Failure<AnakatechErrorResponse>(AnakatechErrorCode.InvalidArgument)

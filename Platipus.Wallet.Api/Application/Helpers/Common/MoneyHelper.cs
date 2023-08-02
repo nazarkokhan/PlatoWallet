@@ -2,12 +2,6 @@
 
 public ref struct MoneyHelper
 {
-    //TODO code duplication? Yiu can accept long
-    public static decimal ConvertFromCents(int amount)
-    {
-        return amount / 100m;
-    }
-    
     public static decimal ConvertFromCents(long amount)
     {
         return amount / 100m;
