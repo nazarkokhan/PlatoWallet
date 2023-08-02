@@ -19,6 +19,12 @@ public sealed class EvenbetMockedErrorActionFilter : AbstractMockedErrorActionFi
         ActionExecutedContext actionExecutedContext)
     {
         var request = (IEvenbetRequest)baseRequest;
+        
+        var actionName = actionExecutedContext.ActionDescriptor.RouteValues["action"];
+        if (actionName is not null && actionName.Equals("Login", StringComparison.OrdinalIgnoreCase))
+        {
+            return new MockedErrorIdentifiers(MockedErrorMethod.Balance, request.Token, true);;
+        }
 
         var walletMethod = request switch
         {
