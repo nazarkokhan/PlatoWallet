@@ -21,7 +21,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/hub88")]
 [MockedErrorActionFilter(Order = 1)]
 [Hub88SecurityFilter(Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Hub88))]
+[JsonSettingsName(CasinoProvider.Hub88)]
 public class WalletHub88Controller : RestApiController
 {
     private readonly IMediator _mediator;

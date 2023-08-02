@@ -17,7 +17,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/betflag")]
 [ServiceFilter(typeof(BetflagMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(BetflagSecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Betflag))]
+[JsonSettingsName(CasinoProvider.Betflag)]
 [ProducesResponseType(typeof(BetflagErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetflagController : RestApiController
 {

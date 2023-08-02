@@ -14,7 +14,7 @@ using StartupSettings.Filters.Security.Uranus;
 [Route("wallet/uranus/")]
 [ServiceFilter(typeof(UranusMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(UranusSecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Uranus))]
+[JsonSettingsName(CasinoProvider.Uranus)]
 [ProducesResponseType(typeof(UranusFailureResponse), StatusCodes.Status200OK)]
 public sealed class WalletUranusController : RestApiController
 {

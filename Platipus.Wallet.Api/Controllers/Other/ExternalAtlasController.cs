@@ -12,7 +12,7 @@ using StartupSettings.Filters.Security.AtlasPlatform;
 
 [Route("external/atlas")]
 [ServiceFilter(typeof(AtlasExternalSecurityFilter), Order = 1)]
-[JsonSettingsName(nameof(CasinoProvider.Atlas))]
+[JsonSettingsName(CasinoProvider.Atlas)]
 public sealed class ExternalAtlasController : RestApiController
 {
     private readonly IMediator _mediator;

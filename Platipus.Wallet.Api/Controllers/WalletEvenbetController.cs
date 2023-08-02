@@ -15,7 +15,7 @@ using StartupSettings.Filters.Security.Evenbet;
 [Route("wallet/evenbet/")]
 [ServiceFilter(typeof(EvenbetMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(EvenbetSecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Evenbet))]
+[JsonSettingsName(CasinoProvider.Evenbet)]
 [ProducesResponseType(typeof(EvenbetFailureResponse), StatusCodes.Status200OK)]
 public sealed class WalletEvenbetController : RestApiController
 {

@@ -19,7 +19,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/sw")]
 [MockedErrorActionFilter(Order = 1)]
 [SwSecurityFilter(Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Sw))]
+[JsonSettingsName(CasinoProvider.Sw)]
 [ProducesResponseType(typeof(SwErrorResponse), StatusCodes.Status200OK)]
 [Consumes("application/x-www-form-urlencoded")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -76,7 +76,7 @@ public class WalletSwController : ApiController
 }
 
 [Route("wallet/private/softswiss")]
-[JsonSettingsName(nameof(CasinoProvider.Sw))]
+[JsonSettingsName(CasinoProvider.Sw)]
 public class WalletSwPrivateController : RestApiController
 {
     [HttpPost("get-security-value/hash")]

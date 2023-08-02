@@ -19,7 +19,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/betconstruct")]
 [ServiceFilter(typeof(BetconstructMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(BetconstructSecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.BetConstruct))]
+[JsonSettingsName(CasinoProvider.BetConstruct)]
 [ProducesResponseType(typeof(BetconstructErrorResponse), StatusCodes.Status200OK)]
 public class WalletBetConstructController : RestApiController
 {
@@ -57,7 +57,7 @@ public class WalletBetConstructController : RestApiController
 }
 
 [Route("wallet/private/betconstruct")]
-[JsonSettingsName(nameof(CasinoProvider.BetConstruct))]
+[JsonSettingsName(CasinoProvider.BetConstruct)]
 public class WalletBetConstructTestController : RestApiController
 {
     [HttpPost("get-security-value")]

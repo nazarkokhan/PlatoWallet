@@ -21,7 +21,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/psw")]
 [MockedErrorActionFilter(Order = 1)]
 [PswSecurityFilter(Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Psw))]
+[JsonSettingsName(CasinoProvider.Psw)]
 [ProducesResponseType(typeof(PswErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletPswController : RestApiController
 {

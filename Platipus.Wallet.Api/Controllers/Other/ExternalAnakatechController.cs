@@ -10,7 +10,7 @@ using StartupSettings.Filters.Security;
 
 [Route("external/anakatech/")]
 [ServiceFilter(typeof(AnakatechSecurityFilter))]
-[JsonSettingsName(nameof(CasinoProvider.Anakatech))]
+[JsonSettingsName(CasinoProvider.Anakatech)]
 [ProducesResponseType(typeof(AnakatechErrorResponse), StatusCodes.Status200OK)]
 public sealed class ExternalAnakatechController : RestApiController
 {

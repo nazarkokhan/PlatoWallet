@@ -17,7 +17,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/everymatrix")]
 [MockedErrorActionFilter(Order = 1)]
 [EverymatrixSecurityFilter(Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+[JsonSettingsName(CasinoProvider.Everymatrix)]
 [ProducesResponseType(typeof(EverymatrixErrorResponse), StatusCodes.Status200OK)]
 public class WalletEverymatrixController : RestApiController
 {
@@ -62,7 +62,7 @@ public class WalletEverymatrixController : RestApiController
 }
 
 [Route("wallet/private/everymatrix")]
-[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+[JsonSettingsName(CasinoProvider.Everymatrix)]
 public class WalletEverymatrixPrivateController : RestApiController
 {
     [HttpPost("get-security-value")]

@@ -20,7 +20,7 @@ using StartupSettings.Filters.Security;
 [ProducesResponseType(typeof(DafabetBaseResponse), StatusCodes.Status200OK)]
 [MockedErrorActionFilter(Order = 1)]
 [DatabetSecurityFilter(Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Dafabet))]
+[JsonSettingsName(CasinoProvider.Dafabet)]
 public class WalletDafabetController : RestApiController
 {
     private readonly IMediator _mediator;

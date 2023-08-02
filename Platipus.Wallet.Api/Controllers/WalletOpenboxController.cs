@@ -106,7 +106,7 @@ public class WalletOpenboxController : RestApiController
 }
 
 [Route("wallet/private/openbox")]
-[JsonSettingsName(nameof(CasinoProvider.Everymatrix))]
+[JsonSettingsName(CasinoProvider.Everymatrix)]
 public class WalletOpenboxPrivateController : RestApiController
 {
     [HttpPost("get-security-value")]

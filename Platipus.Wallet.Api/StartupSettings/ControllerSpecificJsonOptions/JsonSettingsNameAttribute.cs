@@ -6,15 +6,9 @@ using Domain.Entities.Enums;
 public class JsonSettingsNameAttribute : Attribute
 {
     public JsonSettingsNameAttribute(CasinoProvider type)
-        : this(type.ToString())
     {
-    }
-
-    //TODO remove. Use new constructor
-    public JsonSettingsNameAttribute(string name)
-    {
-        Name = name;
-        Type = Enum.Parse<CasinoProvider>(name);
+        Name = type.ToString();
+        Type = type;
     }
 
     public string Name { get; }

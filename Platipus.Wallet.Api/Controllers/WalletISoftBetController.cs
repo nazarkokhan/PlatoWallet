@@ -23,7 +23,7 @@ using StartupSettings.Filters;
 
 [Route("wallet/isoftbet")]
 [MockedErrorActionFilter(Order = 1)]
-[JsonSettingsName(nameof(CasinoProvider.SoftBet))]
+[JsonSettingsName(CasinoProvider.SoftBet)]
 [ProducesResponseType(typeof(SoftBetErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletISoftBetController : RestApiController
 {

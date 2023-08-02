@@ -15,7 +15,7 @@ using StartupSettings.Filters.Security;
 [Route("wallet/anakatech")]
 [ServiceFilter(typeof(AnakatechMockedErrorActionFilter), Order = 1)]
 [ServiceFilter(typeof(AnakatechSecurityFilter), Order = 2)]
-[JsonSettingsName(nameof(CasinoProvider.Anakatech))]
+[JsonSettingsName(CasinoProvider.Anakatech)]
 [ProducesResponseType(typeof(AnakatechErrorResponse), StatusCodes.Status200OK)]
 public sealed class WalletAnakatechController : RestApiController
 {
