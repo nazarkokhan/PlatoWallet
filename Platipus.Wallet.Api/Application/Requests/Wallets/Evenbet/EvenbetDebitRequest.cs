@@ -38,15 +38,14 @@ public sealed record EvenbetDebitRequest(
                 amount: MoneyHelper.ConvertFromCents(request.Amount),
                 roundFinished: request.EndRound,
                 cancellationToken: cancellationToken);
-
-            //TODO why check null?
-            if (walletResult.IsFailure || walletResult.Data is null)
+            
+            if (walletResult.IsFailure)
                 return walletResult.ToEvenbetFailureResult<EvenbetDebitResponse>();
 
             var data = walletResult.Data;
 
             var response = new EvenbetDebitResponse(
-                (int)MoneyHelper.ConvertToCents(data!.Balance), //TODO why ! before accessing data?
+                (int)MoneyHelper.ConvertToCents(data.Balance),
                 DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
                 data.Transaction.Id);
 
