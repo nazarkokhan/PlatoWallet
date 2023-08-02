@@ -1,9 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
 
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Api.Extensions.SecuritySign.Evenbet;
 using Application.Requests.Wallets.Evenbet.Models;
 using Domain.Entities.Enums;
 using External;
@@ -22,7 +20,6 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     private const string ApiBasePath = "evenbet/";
-    private const string LocalTestSecretKey = "integrationkeyplatipus";
 
     public EvenbetGameApiClient(
         HttpClient httpClient,
@@ -72,9 +69,6 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
             var requestContent = JsonConvert.SerializeObject(request);
             var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
-            var hashToken = EvenbetSecurityHash.Compute(requestContent, LocalTestSecretKey);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(hashToken);
-
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
@@ -102,9 +96,6 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}/{method}{QueryString.Create(request)}");
 
-            var requestJson = JsonConvert.SerializeObject(request);
-            var hashToken = EvenbetSecurityHash.Compute(requestJson is "{}" ? "" : requestJson, LocalTestSecretKey);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(hashToken);
             var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
@@ -132,7 +123,7 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
                 return httpResponse.Failure<TSuccess, EvenbetFailureResponse>();
             }
 
-            var responseJson = JsonDocument.Parse(responseBody!).RootElement;
+            var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
             if (responseJson.ValueKind is JsonValueKind.Object
              && responseJson.TryGetProperty("error", out var error)
