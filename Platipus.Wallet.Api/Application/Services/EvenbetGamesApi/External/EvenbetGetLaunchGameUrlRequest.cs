@@ -30,17 +30,12 @@ public sealed record EvenbetGetLaunchGameUrlRequest(
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(request.Environment, cancellationToken);
 
-            if (walletResponse.Data is null)
-            {
-                return walletResponse.ToEvenbetFailureResult<EvenbetGetLaunchGameUrlResponse>();
-            }
-
             var clientResponse = await _evenbetGameApiClient.GetGameLaunchUrlAsync(
                 walletResponse.Data.BaseUrl,
                 request.ApiRequest,
                 cancellationToken);
 
-            if (clientResponse.IsFailure || clientResponse.Data?.Data is null)
+            if (clientResponse.IsFailure)
                 return clientResponse.ToEvenbetFailureResult<EvenbetGetLaunchGameUrlResponse>();
 
             var gameUrl = clientResponse.Data.Data.Url;
