@@ -2,6 +2,7 @@
 
 using System.Text;
 using System.Text.Json;
+using Api.Extensions;
 using Application.Requests.Wallets.Evenbet.Models;
 using Domain.Entities.Enums;
 using External;
@@ -48,10 +49,21 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         EvenbetGetLaunchGameUrlGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
-        return PostAsync<EvenbetGetLaunchGameUrlResponse, EvenbetGetLaunchGameUrlGameApiRequest>(
+        var requestToServer = new Dictionary<string, string?>
+        {
+            { nameof(request.Token).ToCamelCase(), request.Token },
+            { nameof(request.Currency).ToCamelCase(), request.Currency },
+            { nameof(request.CasinoId).ToCamelCase(), request.CasinoId },
+            { nameof(request.Language).ToCamelCase(), request.Language },
+            { nameof(request.GameId).ToCamelCase(), request.GameId },
+            { nameof(request.Platform).ToCamelCase(), request.Platform },
+            { nameof(request.Mode).ToCamelCase(), request.Mode ? "1" : "0" },
+        };
+
+        return GetAsync<EvenbetGetLaunchGameUrlResponse>(
             baseUrl,
             "game/launch",
-            request,
+            requestToServer,
             cancellationToken);
     }
 
