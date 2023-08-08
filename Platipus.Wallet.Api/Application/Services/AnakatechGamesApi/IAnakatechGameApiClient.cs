@@ -6,7 +6,7 @@ using Results.HttpClient.WithData;
 
 public interface IAnakatechGameApiClient
 {
-    Task<IResult<IHttpClientResult<Stream, AnakatechErrorResponse>>> GetLaunchGameUrlAsBytesAsync(
+    Task<IResult<IHttpClientResult<string, AnakatechErrorResponse>>> GetLaunchGameUrlAsBytesAsync(
         Uri baseUrl,
         AnakatechLaunchGameApiRequest apiRequest,
         CancellationToken cancellationToken = default);

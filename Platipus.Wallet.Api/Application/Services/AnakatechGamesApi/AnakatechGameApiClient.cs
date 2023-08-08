@@ -2,6 +2,7 @@
 
 using System.Text;
 using System.Text.Json;
+using Api.Extensions;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -29,51 +30,91 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
            .JsonSerializerOptions;
     }
 
-    public Task<IResult<IHttpClientResult<Stream, AnakatechErrorResponse>>> GetLaunchGameUrlAsBytesAsync(
+    public Task<IResult<IHttpClientResult<string, AnakatechErrorResponse>>> GetLaunchGameUrlAsBytesAsync(
         Uri baseUrl,
         AnakatechLaunchGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
         const string methodName = "launchGame";
-        return PostAsync<Stream, AnakatechLaunchGameApiRequest>(
+        const string lobbyUrlKey = "lobbyURL";
+
+        var requestToSend = new Dictionary<string, string?>
+        {
+            { nameof(apiRequest.CustomerId).ToCamelCase(), apiRequest.CustomerId },
+            { nameof(apiRequest.BrandId).ToCamelCase(), apiRequest.BrandId },
+            { nameof(apiRequest.PlayerId).ToCamelCase(), apiRequest.PlayerId },
+            { nameof(apiRequest.Nickname).ToCamelCase(), apiRequest.Nickname },
+            { nameof(apiRequest.Currency).ToCamelCase(), apiRequest.Currency },
+            { nameof(apiRequest.Language).ToCamelCase(), apiRequest.Language },
+            { nameof(apiRequest.Country).ToCamelCase(), apiRequest.Country },
+            { nameof(apiRequest.ProviderGameId).ToCamelCase(), apiRequest.ProviderGameId },
+            { lobbyUrlKey, apiRequest.LobbyUrl },
+            { nameof(apiRequest.Jurisdiction).ToCamelCase(), apiRequest.Jurisdiction },
+            { nameof(apiRequest.OriginUrl).ToCamelCase(), apiRequest.OriginUrl },
+            { nameof(apiRequest.PlayMode).ToCamelCase(), apiRequest.PlayMode.ToString() },
+            { nameof(apiRequest.SecurityToken).ToCamelCase(), apiRequest.SecurityToken },
+            { nameof(apiRequest.Balance).ToCamelCase(), apiRequest.Balance.ToString() },
+            { nameof(apiRequest.RealityCheckInterval).ToCamelCase(), apiRequest.RealityCheckInterval.ToString() }
+        };
+
+        if (apiRequest.Audio is not null)
+        {
+            requestToSend.Add(nameof(apiRequest.Audio).ToCamelCase(), apiRequest.Audio.ToString());
+        }
+
+        if (apiRequest.RealityCheckStartTime is not null)
+        {
+            requestToSend.Add(
+                nameof(apiRequest.RealityCheckStartTime).ToCamelCase(),
+                apiRequest.RealityCheckStartTime.ToString());
+        }
+
+        if (apiRequest.MinBet is not null)
+        {
+            requestToSend.Add(nameof(apiRequest.MinBet).ToCamelCase(), apiRequest.MinBet.ToString());
+        }
+
+        if (apiRequest.MaxTotalBet is not null)
+        {
+            requestToSend.Add(nameof(apiRequest.MaxTotalBet).ToCamelCase(), apiRequest.MaxTotalBet.ToString());
+        }
+
+        return GetAsync<string>(
             baseUrl,
             methodName,
-            apiRequest,
+            requestToSend,
             cancellationToken);
     }
 
-    private async Task<IResult<IHttpClientResult<TSuccess, AnakatechErrorResponse>>> PostAsync<TSuccess, TRequest>(
+    private async Task<IResult<IHttpClientResult<TSuccess, AnakatechErrorResponse>>> GetAsync<TSuccess>(
         Uri baseUrl,
         string method,
-        TRequest request,
+        Dictionary<string, string?> request,
         CancellationToken cancellationToken = default)
-        where TRequest : class
     {
         try
         {
-            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{method}");
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}/{method}{QueryString.Create(request)}");
 
-            var requestContent = JsonSerializer.Serialize(request, _jsonSerializerOptions);
-            var jsonContent = new StringContent(requestContent, Encoding.UTF8, "application/json");
-
-            var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
+            var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
+
             return httpResult.IsFailure
                 ? ResultFactory.Failure<IHttpClientResult<TSuccess, AnakatechErrorResponse>>(ErrorCode.Unknown)
                 : ResultFactory.Success(httpResult);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            return ResultFactory.Failure<IHttpClientResult<TSuccess, AnakatechErrorResponse>>(
-                ErrorCode.UnknownHttpClientError,
-                e);
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, AnakatechErrorResponse>>(ErrorCode.UnknownHttpClientError);
         }
     }
 
-    private IHttpClientResult<TSuccess, AnakatechErrorResponse> GetHttpResultAsync<TSuccess>(HttpClientRequest httpResponse)
+    private IHttpClientResult<TSuccess, AnakatechErrorResponse> GetHttpResultAsync<TSuccess>(
+        HttpClientRequest httpResponse,
+        string methodName)
     {
         try
         {
@@ -81,10 +122,13 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
 
             if (string.IsNullOrEmpty(responseBody))
             {
-                //TODO remove braces if simple check and failure result
                 return httpResponse.Failure<TSuccess, AnakatechErrorResponse>();
             }
 
+            if (methodName is "launchGame")
+            {
+                return httpResponse.Success<TSuccess, AnakatechErrorResponse>((TSuccess)(object)responseBody);
+            }
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
             if (responseJson.ValueKind is JsonValueKind.Object

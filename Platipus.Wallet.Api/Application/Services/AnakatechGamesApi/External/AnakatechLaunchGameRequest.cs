@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.AnakatechGamesApi.External;
 
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Requests;
 using Results.Anakatech.WithData;
@@ -9,9 +10,9 @@ using Wallet;
 
 public sealed record AnakatechLaunchGameRequest(
     [property: JsonProperty("environment")] string Environment,
-    [property: JsonProperty("apiRequest")] AnakatechLaunchGameApiRequest ApiRequest) : IRequest<IAnakatechResult<Uri>>
+    [property: JsonProperty("apiRequest")] AnakatechLaunchGameApiRequest ApiRequest) : IRequest<IAnakatechResult<string>>
 {
-    public sealed class Handler : IRequestHandler<AnakatechLaunchGameRequest, IAnakatechResult<Uri>>
+    public sealed class Handler : IRequestHandler<AnakatechLaunchGameRequest, IAnakatechResult<string>>
     {
         private readonly IWalletService _walletService;
         private readonly IAnakatechGameApiClient _anakatechGameApiClient;
@@ -24,37 +25,24 @@ public sealed record AnakatechLaunchGameRequest(
             _anakatechGameApiClient = anakatechGameApiClient;
         }
 
-        public async Task<IAnakatechResult<Uri>> Handle(
+        public async Task<IAnakatechResult<string>> Handle(
             AnakatechLaunchGameRequest request,
             CancellationToken cancellationToken)
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(request.Environment, cancellationToken);
-
-            if (walletResponse.Data is null)
-            {
-                return walletResponse.ToAnakatechFailureResult<Uri>();
-            }
 
             var clientResponse = await _anakatechGameApiClient.GetLaunchGameUrlAsBytesAsync(
                 walletResponse.Data.BaseUrl,
                 request.ApiRequest,
                 cancellationToken);
 
-            if (clientResponse.IsFailure || clientResponse.Data?.Data is null)
-                return clientResponse.ToAnakatechFailureResult<Uri>();
-
-            var gameUrlBytes = await GetBytesFromStream(clientResponse.Data.Data);
-            var gameUrl = Encoding.UTF8.GetString(gameUrlBytes);
-
-            var response = new Uri(gameUrl);
-            return clientResponse.ToAnakatechResult(response);
-        }
-        
-        public static async Task<byte[]> GetBytesFromStream(Stream stream)
-        {
-            using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-            return memoryStream.ToArray();
+            if (clientResponse.IsFailure)
+                return clientResponse.ToAnakatechFailureResult<string>();
+            
+            var gameLaunchScript = clientResponse.Data.Data;
+            var processedScript = Regex.Unescape(gameLaunchScript);
+            
+            return clientResponse.ToAnakatechResult(processedScript);
         }
     }
 }

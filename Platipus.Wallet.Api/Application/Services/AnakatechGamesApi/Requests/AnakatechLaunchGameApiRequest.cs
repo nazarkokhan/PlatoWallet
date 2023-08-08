@@ -15,12 +15,12 @@ public sealed record AnakatechLaunchGameApiRequest(
     [JsonProperty("currency")] string Currency,
     [JsonProperty("language")] string Language,
     [JsonProperty("country")] string Country,
-    [JsonProperty("lobbyUrl")] string LobbyUrl,
+    [JsonProperty("lobbyURL")] string LobbyUrl,
     [JsonProperty("jurisdiction")] string Jurisdiction,
     [JsonProperty("originUrl")] string OriginUrl,
     [JsonProperty("realityCheckInterval")] int RealityCheckInterval,
-    [JsonProperty("realityCheckStartTime")] int? RealityCheckStartTime,
-    [JsonProperty("audio")] int? Audio,
-    [JsonProperty("minBet")] int? MinBet,
-    [JsonProperty("maxTotalBet")] int? MaxTotalBet,
-    [JsonProperty("defaultBet")] int? DefaultBet);
+    [JsonProperty("realityCheckStartTime")] int? RealityCheckStartTime = null,
+    [JsonProperty("audio")] int? Audio = null,
+    [JsonProperty("minBet")] int? MinBet = null,
+    [JsonProperty("maxTotalBet")] int? MaxTotalBet = null,
+    [JsonProperty("defaultBet")] int? DefaultBet = null);
