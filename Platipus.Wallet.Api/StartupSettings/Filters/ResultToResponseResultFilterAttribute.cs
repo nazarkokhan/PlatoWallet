@@ -2,6 +2,7 @@ using Humanizer;
 
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
+using System.Net;
 using Application.Requests.Wallets.EmaraPlay.Base;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
 using System.Net.Mime;
@@ -312,13 +313,27 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     break;
                 }
 
-                case IAnakatechResult<object> { IsSuccess: true } evenbetResult:
-                    context.Result = new OkObjectResult(evenbetResult.Data);
-                    return;
-
-                case IAnakatechResult<object> evenbetResult:
+                case IAnakatechResult<object> { IsSuccess: true } anakatechResult:
                 {
-                    var errorCode = evenbetResult.Error;
+                    if (anakatechResult.Data.ToString()!.Contains("<script type='text/javascript'>"))
+                    {
+                        context.Result = new ContentResult
+                        {
+                            ContentType = "text/html",
+                            StatusCode = (int)HttpStatusCode.OK,
+                            Content = anakatechResult.Data.ToString()
+                        };
+
+                        return;
+                    }
+
+                    context.Result = new OkObjectResult(anakatechResult.Data);
+                    return;
+                }
+
+                case IAnakatechResult<object> anakatechResult:
+                {
+                    var errorCode = anakatechResult.Error;
 
                     var errorResponse = new AnakatechErrorResponse(
                         false,

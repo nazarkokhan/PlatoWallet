@@ -116,39 +116,62 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
         HttpClientRequest httpResponse,
         string methodName)
     {
+        var responseBody = httpResponse.ResponseData.Body;
+
+        if (string.IsNullOrEmpty(responseBody))
+            return httpResponse.Failure<TSuccess, AnakatechErrorResponse>();
+
+        JsonDocument parsedJson;
         try
         {
-            var responseBody = httpResponse.ResponseData.Body;
-
-            if (string.IsNullOrEmpty(responseBody))
-            {
-                return httpResponse.Failure<TSuccess, AnakatechErrorResponse>();
-            }
-
-            if (methodName is "launchGame")
-            {
-                return httpResponse.Success<TSuccess, AnakatechErrorResponse>((TSuccess)(object)responseBody);
-            }
-            var responseJson = JsonDocument.Parse(responseBody).RootElement;
-
-            if (responseJson.ValueKind is JsonValueKind.Object
-             && responseJson.TryGetProperty("error", out var error)
-             && !error.ValueKind.Equals(JsonValueKind.Null))
-            {
-                var errorResponse = responseJson.Deserialize<AnakatechErrorResponse>(_jsonSerializerOptions);
-                if (errorResponse is not null)
-                    return httpResponse.Failure<TSuccess, AnakatechErrorResponse>(errorResponse);
-            }
-
-            var success = responseJson.Deserialize<TSuccess>(_jsonSerializerOptions);
-
-            return success is null
-                ? httpResponse.Failure<TSuccess, AnakatechErrorResponse>()
-                : httpResponse.Success<TSuccess, AnakatechErrorResponse>(success);
+            parsedJson = JsonDocument.Parse(responseBody);
         }
-        catch (Exception e)
+        catch
         {
-            return httpResponse.Failure<TSuccess, AnakatechErrorResponse>(e);
+            if (methodName is "launchGame" && !responseBody.Contains("errorCode"))
+                return httpResponse.Success<TSuccess, AnakatechErrorResponse>((TSuccess)(object)responseBody);
+
+            throw;
         }
+
+        return methodName switch
+        {
+            "launchGame" => HandleLaunchGameResponse<TSuccess>(parsedJson, responseBody, httpResponse),
+            _ => HandleDefaultResponse<TSuccess>(parsedJson, httpResponse)
+        };
+    }
+
+    private IHttpClientResult<TSuccess, AnakatechErrorResponse> HandleLaunchGameResponse<TSuccess>(
+        JsonDocument parsedJson,
+        string responseBody,
+        HttpClientRequest httpResponse)
+    {
+        if (!responseBody.Contains("errorCode"))
+            return httpResponse.Success<TSuccess, AnakatechErrorResponse>((TSuccess)(object)responseBody);
+
+        var errorResponse = parsedJson.RootElement.Deserialize<AnakatechErrorResponse>(_jsonSerializerOptions);
+        return errorResponse is not null
+            ? httpResponse.Failure<TSuccess, AnakatechErrorResponse>(errorResponse)
+            : httpResponse.Failure<TSuccess, AnakatechErrorResponse>();
+    }
+
+    private IHttpClientResult<TSuccess, AnakatechErrorResponse> HandleDefaultResponse<TSuccess>(
+        JsonDocument parsedJson,
+        HttpClientRequest httpResponse)
+    {
+        var root = parsedJson.RootElement;
+        if (root.ValueKind == JsonValueKind.Object
+         && root.TryGetProperty("error", out var error)
+         && error.ValueKind != JsonValueKind.Null)
+        {
+            var errorResponse = root.Deserialize<AnakatechErrorResponse>(_jsonSerializerOptions);
+            if (errorResponse is not null)
+                return httpResponse.Failure<TSuccess, AnakatechErrorResponse>(errorResponse);
+        }
+
+        var success = root.Deserialize<TSuccess>(_jsonSerializerOptions);
+        return success is null
+            ? httpResponse.Failure<TSuccess, AnakatechErrorResponse>()
+            : httpResponse.Success<TSuccess, AnakatechErrorResponse>(success);
     }
 }

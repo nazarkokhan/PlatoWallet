@@ -5,6 +5,7 @@ using Abstract;
 using Application.Responses.Anakatech.Base;
 using Application.Services.AnakatechGamesApi.External;
 using Domain.Entities.Enums;
+using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 
@@ -21,19 +22,9 @@ public sealed class ExternalAnakatechController : RestApiController
     }
 
     [HttpPost("launchGame")]
-    [Produces("text/html")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> LaunchGame(
         [FromBody] AnakatechLaunchGameRequest request,
         CancellationToken cancellationToken)
-    {
-        var response = await _mediator.Send(request, cancellationToken);
-        var launchGameScript = response.Data;
-        return new ContentResult
-        {
-            ContentType = "text/html",
-            StatusCode = (int)HttpStatusCode.OK,
-            Content = launchGameScript
-        };
-    }
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
