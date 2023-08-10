@@ -142,8 +142,14 @@ public class WalletOpenboxPrivateController : RestApiController
         string signatureKey,
         string requestPayload)
     {
-        var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, signatureKey);
-
-        return Ok(decryptedPayload);
+        try
+        {
+            var decryptedPayload = OpenboxSecurityPayload.Decrypt(requestPayload, signatureKey);
+            return Ok(decryptedPayload);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }
