@@ -17,7 +17,7 @@ public class LoggingMiddleware : IMiddleware
         _pathsToSkip = new HashSet<string>
         {
             "/",
-            "/healthz", //TODO
+            "/health",
             "/version",
             "/config",
             "/configname"

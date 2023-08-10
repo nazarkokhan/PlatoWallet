@@ -224,7 +224,7 @@ try
     app.MapVersion();
     app.MapConfigname();
     app.MapConfig();
-    app.MapHealth("healthz"); // TODO temporary, ask devops to remove z
+    app.MapHealth();
 
     app.MapControllers();
 
