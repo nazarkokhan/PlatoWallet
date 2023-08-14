@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi.External;
 
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Requests;
 using Results.Evenbet.WithData;
@@ -9,9 +10,9 @@ using Wallet;
 public sealed record EvenbetGetLaunchGameUrlRequest(
         [property: JsonProperty("environment")] string Environment,
         [property: JsonProperty("apiRequest")] EvenbetGetLaunchGameUrlGameApiRequest ApiRequest)
-    : IRequest<IEvenbetResult<EvenbetGetLaunchGameUrlResponse>>
+    : IRequest<IEvenbetResult<string>>
 {
-    public sealed class Handler : IRequestHandler<EvenbetGetLaunchGameUrlRequest, IEvenbetResult<EvenbetGetLaunchGameUrlResponse>>
+    public sealed class Handler : IRequestHandler<EvenbetGetLaunchGameUrlRequest, IEvenbetResult<string>>
     {
         private readonly IWalletService _walletService;
         private readonly IEvenbetGameApiClient _evenbetGameApiClient;
@@ -24,7 +25,7 @@ public sealed record EvenbetGetLaunchGameUrlRequest(
             _evenbetGameApiClient = evenbetGameApiClient;
         }
 
-        public async Task<IEvenbetResult<EvenbetGetLaunchGameUrlResponse>> Handle(
+        public async Task<IEvenbetResult<string>> Handle(
             EvenbetGetLaunchGameUrlRequest request,
             CancellationToken cancellationToken)
         {
@@ -36,12 +37,12 @@ public sealed record EvenbetGetLaunchGameUrlRequest(
                 cancellationToken);
 
             if (clientResponse.IsFailure)
-                return clientResponse.ToEvenbetFailureResult<EvenbetGetLaunchGameUrlResponse>();
+                return clientResponse.ToEvenbetFailureResult<string>();
 
-            var gameUrl = clientResponse.Data.Data.Url;
-            var response = new EvenbetGetLaunchGameUrlResponse(gameUrl);
+            var gameLaunchScript = clientResponse.Data.Data;
+            var processedScript = Regex.Unescape(gameLaunchScript);
 
-            return clientResponse.ToEvenbetResult(response);
+            return clientResponse.ToEvenbetResult(processedScript);
         }
     }
 }

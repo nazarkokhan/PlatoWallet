@@ -11,8 +11,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Services.AnakatechGamesApi;
-using Services.AnakatechGamesApi.External;
-using Services.AnakatechGamesApi.Requests;
 using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
 using Services.EmaraPlayGamesApi;
@@ -201,10 +199,25 @@ public sealed record LogInRequest(
                         apiRequest,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure || apiResponse.Data?.Data?.Url is null)
+                    if (apiResponse.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = apiResponse.Data.Data.Url.ToString();
+                    var script = apiResponse.Data.Data;
+                    launchUrl = string.Empty;
+
+                    const string startDelimiter = "window.location.assign(\"";
+                    const string endDelimiter = ");";
+
+                    var startPosition = script.IndexOf(startDelimiter, StringComparison.Ordinal);
+                    var endPosition = script.LastIndexOf(endDelimiter, StringComparison.Ordinal);
+
+                    if (startPosition > -1 && endPosition > -1) // ensuring both delimiters are found
+                    {
+                        launchUrl = script.Substring(
+                            startPosition + startDelimiter.Length,
+                            endPosition - (startPosition + startDelimiter.Length));
+                    }
+
                     break;
                 }
 

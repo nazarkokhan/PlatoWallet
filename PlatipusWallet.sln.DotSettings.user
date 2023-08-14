@@ -5,8 +5,8 @@
   &lt;Assembly Path="/Users/nazarkokhan/.nuget/packages/horizon.xmlrpc.server/2.5.0/lib/netstandard2.0/Horizon.XmlRpc.Server.dll" /&gt;
   &lt;Assembly Path="/Users/nazarkokhan/.nuget/packages/horizon.xmlrpc.core/2.5.0/lib/netstandard2.0/Horizon.XmlRpc.Core.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a65a5989_002D4dd2_002D4e36_002Da25d_002Dc634a973b20f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Solution /&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a65a5989_002D4dd2_002D4e36_002Da25d_002Dc634a973b20f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=betconstruct/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Betflag/@EntryIndexedValue">True</s:Boolean>

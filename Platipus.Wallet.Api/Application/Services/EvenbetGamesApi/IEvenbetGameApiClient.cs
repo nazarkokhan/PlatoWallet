@@ -12,7 +12,7 @@ public interface IEvenbetGameApiClient
         Uri baseUrl,
         CancellationToken cancellationToken = default);
     
-    Task<IResult<IHttpClientResult<EvenbetGetLaunchGameUrlResponse, EvenbetFailureResponse>>> GetGameLaunchUrlAsync(
+    Task<IResult<IHttpClientResult<string, EvenbetFailureResponse>>> GetGameLaunchUrlAsync(
         Uri baseUrl,
         EvenbetGetLaunchGameUrlGameApiRequest request,
         CancellationToken cancellationToken = default);

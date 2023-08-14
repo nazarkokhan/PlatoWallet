@@ -29,6 +29,7 @@ using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
 using Application.Results.Anakatech.WithData;
 using Application.Results.Atlas.WithData;
+using Application.Results.Base;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Evenbet.WithData;
@@ -270,12 +271,23 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                 case IUranusResult<object> { IsSuccess: true } uranusResult:
                 {
+                    if (ResultAsJavaScript(uranusResult))
+                    {
+                        context.Result = new ContentResult
+                        {
+                            ContentType = "text/html",
+                            StatusCode = (int)HttpStatusCode.OK,
+                            Content = uranusResult.Data.ToString()
+                        };
+
+                        return;
+                    }
+                    
                     context.Result = new OkObjectResult(uranusResult.Data);
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, uranusResult.Data);
                     return;
                 }
-
-                //TODO why split switch
+                
                 case IUranusResult<object> uranusResult:
                 {
                     var errorCode = uranusResult.Error;
@@ -290,10 +302,20 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
-
-                //TODO what is going to happen when result is failure?
+                
                 case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
                 {
+                    if (ResultAsJavaScript(evenbetResult))
+                    {
+                        context.Result = new ContentResult
+                        {
+                            ContentType = "text/html",
+                            StatusCode = (int)HttpStatusCode.OK,
+                            Content = evenbetResult.Data.ToString()
+                        };
+
+                        return;
+                    }
                     context.Result = new OkObjectResult(evenbetResult.Data);
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, evenbetResult.Data);
                     return;
@@ -315,7 +337,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                 case IAnakatechResult<object> { IsSuccess: true } anakatechResult:
                 {
-                    if (anakatechResult.Data.ToString()!.Contains("<script type='text/javascript'>"))
+                    if (ResultAsJavaScript(anakatechResult))
                     {
                         context.Result = new ContentResult
                         {
@@ -504,5 +526,10 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
             context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
+    }
+
+    private static bool ResultAsJavaScript(dynamic result)
+    {
+        return result.Data.ToString()!.Contains("<script type='text/javascript'>");
     }
 }
