@@ -6,6 +6,7 @@ using Application.Requests.Test;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
+using StartupSettings.Attributes.Swagger;
 
 [Route("external")]
 public class ExternalController : RestApiController
@@ -21,6 +22,7 @@ public class ExternalController : RestApiController
 
     [HttpPost("login")]
     [ProducesResponseType(typeof(LogInRequest.Response), StatusCodes.Status200OK)]
+    [ApplyRemoveNullProperties]
     public async Task<IActionResult> LogIn(LogInRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 

@@ -11,6 +11,7 @@ using Filters.NewFilterStyle;
 using Filters.Security;
 using Filters.Security.Evenbet;
 using Filters.Security.Uranus;
+using Filters.Swagger;
 using JorgeSerrano.Json;
 using JsonConverters;
 using Microsoft.OpenApi.Any;
@@ -217,6 +218,9 @@ public static class StartupExtensions
                         Format = "time",
                         Example = OpenApiAnyFactory.CreateFromJson($"\"{DateTime.UtcNow:HH:mm}\"")
                     });
+
+                options.UseInlineDefinitionsForEnums();
+                options.SchemaFilter<RemoveNullPropertiesSchemaFilter>();
             });
 
         return services;

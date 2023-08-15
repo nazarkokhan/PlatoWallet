@@ -43,22 +43,22 @@ public sealed record LogInRequest(
         [property: DefaultValue("password")] string Password,
         [property: DefaultValue("openbox")] string CasinoId,
         [property: DefaultValue("extragems")] string Game,
-        [property: DefaultValue("test")] string? Environment,
-        [property: DefaultValue("some_lobby_url")] string? Lobby,
+        [property: DefaultValue("test")] string Environment,
+        [property: DefaultValue("some_lobby_url")] string Lobby,
         LaunchMode LaunchMode,
         [property: DefaultValue(null)] int? PswRealityCheck,
         [property: DefaultValue(null)] string? Device,
         [property: DefaultValue("en")] string Language,
         [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier,
-        [property: DefaultValue("some customer id: 12")] string? CustomerId,
-        [property: DefaultValue("some brand id: 21")] string? BrandId,
-        [property: DefaultValue("some security token: 21312_214123")] string? SecurityToken,
-        [property: DefaultValue("some nickname goes here")] string? Nickname,
-        [property: DefaultValue(1000)] int? Balance,
-        [property: DefaultValue("ukraine")] string? Country,
-        [property: DefaultValue("some jurisdiction value")] string? Jurisdiction,
-        [property: DefaultValue("some url")] string? OriginUrl,
-        [property: DefaultValue(10)] int? RealityCheckInterval)
+        [property: DefaultValue(null)] string? CustomerId,
+        [property: DefaultValue(null)] string? BrandId,
+        [property: DefaultValue(null)] string? SecurityToken,
+        [property: DefaultValue(null)] string? Nickname,
+        [property: DefaultValue(null)] int? Balance,
+        [property: DefaultValue(null)] string? Country,
+        [property: DefaultValue(null)] string? Jurisdiction,
+        [property: DefaultValue(null)] string? OriginUrl,
+        [property: DefaultValue(null)] int? RealityCheckInterval)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
