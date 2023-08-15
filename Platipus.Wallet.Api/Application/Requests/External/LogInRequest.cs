@@ -2,10 +2,12 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using System.ComponentModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
+using Helpers.Common;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -205,21 +207,8 @@ public sealed record LogInRequest(
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     var script = apiResponse.Data.Data;
-                    launchUrl = string.Empty;
 
-                    const string startDelimiter = "window.location.assign(\"";
-                    const string endDelimiter = ");";
-
-                    var startPosition = script.IndexOf(startDelimiter, StringComparison.Ordinal);
-                    var endPosition = script.LastIndexOf(endDelimiter, StringComparison.Ordinal);
-
-                    if (startPosition > -1 && endPosition > -1) // ensuring both delimiters are found
-                    {
-                        launchUrl = script.Substring(
-                            startPosition + startDelimiter.Length,
-                            endPosition - (startPosition + startDelimiter.Length));
-                    }
-
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(script, request.Environment ?? "local");
                     break;
                 }
 
