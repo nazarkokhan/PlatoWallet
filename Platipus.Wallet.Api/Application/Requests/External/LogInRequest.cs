@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using System.ComponentModel;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.Json.Serialization;
 using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -12,8 +12,10 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Results.Base;
 using Services.AnakatechGamesApi;
+using Services.AnakatechGamesApi.Requests;
 using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
 using Services.EmaraPlayGamesApi;
@@ -33,6 +35,7 @@ using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;
 using StartupSettings.Factories;
 using StartupSettings.Options;
+using Wallets.Anakatech.Enums;
 using Wallets.Psw.Base.Response;
 
 public sealed record LogInRequest(
@@ -46,7 +49,16 @@ public sealed record LogInRequest(
         [property: DefaultValue(null)] int? PswRealityCheck,
         [property: DefaultValue(null)] string? Device,
         [property: DefaultValue("en")] string Language,
-        [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier)
+        [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier,
+        [property: DefaultValue("some customer id: 12")] string? CustomerId,
+        [property: DefaultValue("some brand id: 21")] string? BrandId,
+        [property: DefaultValue("some security token: 21312_214123")] string? SecurityToken,
+        [property: DefaultValue("some nickname goes here")] string? Nickname,
+        [property: DefaultValue(1000)] int? Balance,
+        [property: DefaultValue("ukraine")] string? Country,
+        [property: DefaultValue("some jurisdiction value")] string? Jurisdiction,
+        [property: DefaultValue("some url")] string? OriginUrl,
+        [property: DefaultValue(10)] int? RealityCheckInterval)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
@@ -165,25 +177,50 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
-                // case CasinoProvider.Anakatech:
-                // {
-                //     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
-                //
-                //     var apiRequest = new AnakatechLaunchGameApiRequest(
-                //         "31");
-                //
-                //     var apiResponse = await _anakatechGameApiClient.GetLaunchGameUrlAsBytesAsync(
-                //         baseUrl,
-                //         apiRequest,
-                //         cancellationToken: cancellationToken);
-                //
-                //     if (apiResponse.IsFailure || apiResponse.Data?.Data is null)
-                //         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
-                //
-                //     var gameUrlBytes = await AnakatechLaunchGameRequest.Handler.GetBytesFromStream(apiResponse.Data.Data);
-                //     launchUrl = Encoding.UTF8.GetString(gameUrlBytes);
-                //     break;
-                // }
+                case WalletProvider.Anakatech:
+                {
+                    var playMode = request.LaunchMode is LaunchMode.Real
+                        ? (int)AnakatechPlayMode.RealMoney
+                        : (int)AnakatechPlayMode.Anonymous;
+
+                    var apiRequest = new AnakatechLaunchGameApiRequest(
+                        request.CustomerId!,
+                        request.BrandId!,
+                        session.Id,
+                        request.SecurityToken!,
+                        user.Id.ToString(),
+                        request.Game,
+                        playMode,
+                        request.Nickname!,
+                        request.Balance,
+                        user.Currency.Id,
+                        request.Language,
+                        request.Country!,
+                        request.Lobby ?? "default_lobby",
+                        request.Jurisdiction!,
+                        request.OriginUrl!,
+                        request.RealityCheckInterval);
+
+                    var apiResponse = await _anakatechGameApiClient.GetLaunchGameUrlAsBytesAsync(
+                        baseUrl,
+                        apiRequest,
+                        cancellationToken: cancellationToken);
+
+                    if (apiResponse.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var script = apiResponse.Data.Data;
+
+                    var environmentToUse = request.Environment ?? "local";
+                    if (environmentToUse is "test")
+                    {
+                        environmentToUse = "local";
+                    }
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(script, environmentToUse);
+
+                    break;
+                }
 
                 case WalletProvider.Evenbet:
                 {

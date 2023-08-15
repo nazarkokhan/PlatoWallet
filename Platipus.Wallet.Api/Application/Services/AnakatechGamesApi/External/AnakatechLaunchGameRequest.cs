@@ -1,6 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.AnakatechGamesApi.External;
 
-using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Requests;
