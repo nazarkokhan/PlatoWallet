@@ -10,6 +10,7 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Results.Base;
 using Services.AnakatechGamesApi;
 using Services.AtlasGamesApi;
 using Services.AtlasGamesApi.Requests;
@@ -26,6 +27,7 @@ using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
 using Services.SoftswissGamesApi;
 using Services.UranusGamesApi;
+using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;
 using StartupSettings.Factories;
 using StartupSettings.Options;
@@ -226,13 +228,13 @@ public sealed record LogInRequest(
                     var playerIp = GetPlayerIp();
                     var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
 
-                    var apiRequest = isDemoLaunchMode
+                    IUranusCommonGetLaunchUrlApiRequest apiApiRequest = isDemoLaunchMode
                         ? new UranusGetDemoLaunchUrlGameApiRequest(
                             request.Game,
                             request.Language,
                             request.Device!,
                             PlayerIp: playerIp,
-                            LobbyUrl: request.Lobby!) as dynamic
+                            LobbyUrl: request.Lobby!)
                         : new UranusGetLaunchUrlGameApiRequest(
                             request.Game,
                             session.Id,
@@ -245,18 +247,17 @@ public sealed record LogInRequest(
                     var apiResponse = isDemoLaunchMode
                         ? await _uranusGameApiClient.GetDemoLaunchUrlAsync(
                             baseUrl,
-                            apiRequest,
+                            apiApiRequest,
                             cancellationToken: cancellationToken)
                         : await _uranusGameApiClient.GetGameLaunchUrlAsync(
                             baseUrl,
-                            apiRequest,
+                            apiApiRequest,
                             cancellationToken: cancellationToken);
 
-                    if (CheckUranusApiResponse(apiResponse))
+                    if (IsInvalidUranusApiResponse(apiResponse))
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     launchUrl = apiResponse.Data.Data.Data.Url.ToString();
-
                     break;
                 }
 
@@ -564,9 +565,9 @@ public sealed record LogInRequest(
                 : _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString())!;
         }
 
-        private static bool CheckUranusApiResponse(dynamic apiResponse)
+        private static bool IsInvalidUranusApiResponse(IBaseResult? apiResponse)
         {
-            return apiResponse.IsFailure || apiResponse.Data?.Data?.Data.Url is null;
+            return apiResponse is not null && apiResponse.IsFailure;
         }
     }
 

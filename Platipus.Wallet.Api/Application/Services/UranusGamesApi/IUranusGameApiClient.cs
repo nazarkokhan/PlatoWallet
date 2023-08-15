@@ -1,7 +1,9 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 
+using Abstaction;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
+using External;
 using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
 using Requests;
 
@@ -9,7 +11,7 @@ public interface IUranusGameApiClient
 {
     Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetGameLaunchUrlAsync(
         Uri baseUrl,
-        UranusGetLaunchUrlGameApiRequest apiRequest,
+        IUranusCommonGetLaunchUrlApiRequest apiApiRequest,
         CancellationToken cancellationToken = default);
     
     Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusAvailableGamesData>, UranusFailureResponse>>> GetAvailableGamesAsync(
@@ -19,6 +21,6 @@ public interface IUranusGameApiClient
     
     Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>> GetDemoLaunchUrlAsync(
         Uri baseUrl,
-        UranusGetDemoLaunchUrlGameApiRequest apiRequest,
+        IUranusCommonGetLaunchUrlApiRequest apiApiRequest,
         CancellationToken cancellationToken = default);
 }

@@ -271,18 +271,6 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                 case IUranusResult<object> { IsSuccess: true } uranusResult:
                 {
-                    if (ResultAsJavaScript(uranusResult))
-                    {
-                        context.Result = new ContentResult
-                        {
-                            ContentType = "text/html",
-                            StatusCode = (int)HttpStatusCode.OK,
-                            Content = uranusResult.Data.ToString()
-                        };
-
-                        return;
-                    }
-                    
                     context.Result = new OkObjectResult(uranusResult.Data);
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, uranusResult.Data);
                     return;

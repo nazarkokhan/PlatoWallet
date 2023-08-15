@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi.Requests;
 
+using Abstaction;
 using Newtonsoft.Json;
 
 public sealed record UranusGetLaunchUrlGameApiRequest(
@@ -13,4 +14,4 @@ public sealed record UranusGetLaunchUrlGameApiRequest(
     [property: JsonProperty("countryCode")] string CountryCode = "",
     [property: JsonProperty("depositUrl")] string DepositUrl = "",
     [property: JsonProperty("lobbyUrl")] string LobbyUrl = "",
-    [property: JsonProperty("playerIp")] string PlayerIp = "");
+    [property: JsonProperty("playerIp")] string PlayerIp = "") : IUranusCommonGetLaunchUrlApiRequest;

@@ -2,13 +2,13 @@
 
 using System.Text;
 using System.Text.Json;
+using Abstaction;
 using Api.Extensions.SecuritySign.Uranus;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Requests;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
@@ -35,13 +35,13 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
     public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>>
         GetGameLaunchUrlAsync(
             Uri baseUrl,
-            UranusGetLaunchUrlGameApiRequest apiRequest,
+            IUranusCommonGetLaunchUrlApiRequest apiApiRequest,
             CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetLaunchUrlGameApiRequest>(
             baseUrl,
             "game/launch",
-            apiRequest,
+            (UranusGetLaunchUrlGameApiRequest)apiApiRequest,
             cancellationToken);
     }
 
@@ -61,13 +61,13 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
     public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>>
         GetDemoLaunchUrlAsync(
             Uri baseUrl,
-            UranusGetDemoLaunchUrlGameApiRequest apiRequest,
+            IUranusCommonGetLaunchUrlApiRequest apiApiRequest,
             CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetDemoLaunchUrlGameApiRequest>(
             baseUrl,
             "game/demo",
-            apiRequest,
+            (UranusGetDemoLaunchUrlGameApiRequest)apiApiRequest,
             cancellationToken);
     }
 
@@ -114,7 +114,7 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
                 return httpResponse.Failure<TSuccess, UranusFailureResponse>();
             }
 
-            var responseJson = JsonDocument.Parse(responseBody!).RootElement;
+            var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
             if (responseJson.TryGetProperty("error", out var error) && !error.ValueKind.Equals(JsonValueKind.Null))
             {

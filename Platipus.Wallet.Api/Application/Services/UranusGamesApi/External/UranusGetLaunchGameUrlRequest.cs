@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi.External;
 
+using System.Text.RegularExpressions;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
 using Newtonsoft.Json;
@@ -11,7 +12,7 @@ using Wallet;
 
 public sealed record UranusGetLaunchGameUrlRequest(
         [property: JsonProperty("environment")] string Environment,
-        [property: JsonProperty("apiRequest")] UranusGetLaunchUrlGameApiRequest ApiRequest)
+        [property: JsonProperty("apiRequest")] UranusGetLaunchUrlGameApiRequest GameApiRequest)
     : IRequest<IUranusResult<UranusSuccessResponse<UranusGameUrlData>>>
 
 {
@@ -37,21 +38,16 @@ public sealed record UranusGetLaunchGameUrlRequest(
                 request.Environment,
                 cancellationToken);
 
-            if (walletResponse.Data is null)
-            {
-                return walletResponse.ToUranusFailureResult<UranusSuccessResponse<UranusGameUrlData>>();
-            }
-
             var clientResponse = await _gameApiClient.GetGameLaunchUrlAsync(
                 walletResponse.Data.BaseUrl,
-                request.ApiRequest,
+                request.GameApiRequest,
                 cancellationToken);
 
             if (clientResponse.IsFailure)
                 return clientResponse.ToUranusFailureResult<UranusSuccessResponse<UranusGameUrlData>>();
 
-            var response =
-                new UranusSuccessResponse<UranusGameUrlData>(new UranusGameUrlData(clientResponse.Data?.Data?.Data.Url!));
+            var response = new UranusSuccessResponse<UranusGameUrlData>(
+                    new UranusGameUrlData(clientResponse.Data.Data.Data.Url));
 
             return UranusResultFactory.Success(response);
         }
