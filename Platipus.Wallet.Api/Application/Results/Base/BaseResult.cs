@@ -1,5 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Results.Base;
 
+using System.Text.Json.Serialization;
+
 public record BaseResult<TError> : IBaseResult<TError>
 {
     public BaseResult()
@@ -18,6 +20,7 @@ public record BaseResult<TError> : IBaseResult<TError>
 
     public bool IsSuccess { get; }
 
+    [JsonIgnore]
     public bool IsFailure => !IsSuccess;
 
     public TError Error { get; }

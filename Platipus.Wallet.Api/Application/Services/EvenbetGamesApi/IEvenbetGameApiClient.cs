@@ -1,7 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
 
 using Application.Requests.Wallets.Evenbet.Models;
-using External;
 using Requests;
 using Responses.Evenbet.Base;
 using Results.HttpClient.WithData;

@@ -1,18 +1,15 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.AnakatechGamesApi;
 
-using System.Text;
 using System.Text.Json;
 using Api.Extensions;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Requests;
 using Responses.Anakatech.Base;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
 {

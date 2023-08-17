@@ -1,6 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi.External;
 
-using System.Text.RegularExpressions;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
 using Newtonsoft.Json;

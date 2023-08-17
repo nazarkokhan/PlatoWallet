@@ -1,5 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Results.Base.WithData;
 
+using System.Text.Json.Serialization;
+
 public record BaseResult<TError, TData> : BaseResult<TError>, IBaseResult<TError, TData>
 {
     private readonly TData _data;

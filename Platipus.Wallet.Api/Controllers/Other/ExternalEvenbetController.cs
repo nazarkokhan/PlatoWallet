@@ -8,7 +8,6 @@ using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
-using StartupSettings.Filters.Security.Evenbet;
 
 [Route("external/evenbet/game")]
 [JsonSettingsName(WalletProvider.Evenbet)]

@@ -3,7 +3,6 @@
 using Abstaction;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
-using External;
 using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
 using Requests;
 

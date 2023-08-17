@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.DTOs.Requests;
 
-public record PswGetGameLinkGamesApiRequest(
+public record PswGameSessionGameApiRequest(
     string CasinoId,
     string SessionId,
     string User,
@@ -9,4 +9,4 @@ public record PswGetGameLinkGamesApiRequest(
     string Locale,
     string Lobby,
     string LaunchMode,
-    int Rci) : IPswGamesApiBaseRequest;
+    int Rci) : IPswGameApiBaseRequest;

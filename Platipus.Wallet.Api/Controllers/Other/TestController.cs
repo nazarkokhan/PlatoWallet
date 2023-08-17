@@ -1,7 +1,6 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Abstract;
 using Microsoft.AspNetCore.Mvc;
 

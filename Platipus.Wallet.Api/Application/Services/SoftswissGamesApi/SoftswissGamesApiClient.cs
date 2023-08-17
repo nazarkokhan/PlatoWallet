@@ -7,13 +7,13 @@ using Api.Extensions;
 using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
+using DTOs;
 using DTOs.Requests;
 using DTOs.Responses;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using PswGamesApi.DTOs.Requests;
 using StartupSettings.Options;
 
 public class SoftswissGamesApiClient : ISoftswissGamesApiClient
@@ -119,7 +119,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
         Uri baseUrl,
         TRequest request,
         CancellationToken cancellationToken)
-        where TRequest : IPswGamesApiBaseRequest where TResponse : class
+        where TRequest : ISoftswissGameApiBaseRequest where TResponse : class
     {
         try
         {
@@ -187,7 +187,7 @@ public class SoftswissGamesApiClient : ISoftswissGamesApiClient
     // }
 
     private async Task<JsonContent> CreateSignedContentAsync<T>(T request, CancellationToken cancellationToken)
-        where T : IPswGamesApiBaseRequest
+        where T : ISoftswissGameApiBaseRequest
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<WalletDbContext>();

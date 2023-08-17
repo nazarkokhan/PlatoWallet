@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using System.ComponentModel;
 using System.Text;
-using System.Text.Json.Serialization;
 using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
@@ -12,8 +11,8 @@ using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Results.Base;
+using Services;
 using Services.AnakatechGamesApi;
 using Services.AnakatechGamesApi.Requests;
 using Services.AtlasGamesApi;
@@ -64,7 +63,7 @@ public sealed record LogInRequest(
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
     {
         private readonly WalletDbContext _context;
-        private readonly IPswAndBetflagGameApiClient _pswAndBetflagGameApiClient;
+        private readonly IPswGameApiClient _pswGameApiClient;
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
@@ -79,7 +78,7 @@ public sealed record LogInRequest(
 
         public Handler(
             WalletDbContext context,
-            IPswAndBetflagGameApiClient pswAndBetflagGameApiClient,
+            IPswGameApiClient pswGameApiClient,
             IHub88GamesApiClient hub88GamesApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
             IGamesGlobalGamesApiClient globalGamesApiClient,
@@ -93,7 +92,7 @@ public sealed record LogInRequest(
             IAnakatechGameApiClient anakatechGameApiClient)
         {
             _context = context;
-            _pswAndBetflagGameApiClient = pswAndBetflagGameApiClient;
+            _pswGameApiClient = pswGameApiClient;
             _hub88GamesApiClient = hub88GamesApiClient;
             _softswissGamesApiClient = softswissGamesApiClient;
             _globalGamesApiClient = globalGamesApiClient;
@@ -348,9 +347,8 @@ public sealed record LogInRequest(
 
                 case WalletProvider.Psw or WalletProvider.Betflag:
                 {
-                    var getGameLinkResult = await _pswAndBetflagGameApiClient.GetLaunchUrlAsync(
+                    var getGameLinkResult = await _pswGameApiClient.GameSessionAsync(
                         baseUrl,
-                        user.Casino.Provider,
                         user.Casino.Id,
                         session.Id,
                         user.Username,
@@ -358,9 +356,10 @@ public sealed record LogInRequest(
                         request.Game,
                         request.LaunchMode,
                         request.PswRealityCheck,
+                        casino.Provider is WalletProvider.Betflag,
                         cancellationToken: cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.LaunchUrl ?? "";
+                    launchUrl = getGameLinkResult.Data?.Data.LaunchUrl ?? "";
                     break;
                 }
 

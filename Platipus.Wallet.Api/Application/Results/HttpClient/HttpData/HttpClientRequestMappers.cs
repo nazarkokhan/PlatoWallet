@@ -17,9 +17,9 @@ public static class HttpClientRequestMappers
 
         var requestDto = new HttpClientRequestData(
             requestMsg.RequestUri!,
-            requestMsg.Method,
+            requestMsg.Method.Method,
             requestBody,
-            requestMsg.Headers.NonValidated);
+            requestMsg.Headers.NonValidated.ToDictionary(x => x.Key, x => x.Value.ToString()));
 
         var responseMsgContent = responseMsg.Content;
         var responseBody = await responseMsgContent.ReadAsStringAsync(cancellationToken);
@@ -27,7 +27,7 @@ public static class HttpClientRequestMappers
         var responseDto = new HttpClientResponseData(
             responseMsg.StatusCode,
             responseBody,
-            responseMsg.Headers.NonValidated);
+            responseMsg.Headers.NonValidated.ToDictionary(x => x.Key, x => x.Value.ToString()));
 
         return new HttpClientRequest(requestDto, responseDto);
     }

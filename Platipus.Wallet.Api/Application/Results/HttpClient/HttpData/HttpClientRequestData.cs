@@ -4,6 +4,6 @@ using System.Net.Http.Headers;
 
 public record HttpClientRequestData(
     Uri RequestUri,
-    HttpMethod Method,
+    string Method,
     string? Body,
-    HttpHeadersNonValidated Headers);
+    Dictionary<string, string> Headers);

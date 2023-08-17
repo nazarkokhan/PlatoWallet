@@ -143,8 +143,8 @@ try
 
     // GameServer APIs
     services
-       .AddSingleton<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>()
-       .AddHttpClient<IPswAndBetflagGameApiClient, PswAndBetflagGameApiClient>(
+       .AddSingleton<IPswGameApiClient, PswGameApiClient>()
+       .AddHttpClient<IPswGameApiClient, PswGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}psw/");

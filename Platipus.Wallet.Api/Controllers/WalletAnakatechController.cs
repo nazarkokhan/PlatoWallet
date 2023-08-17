@@ -1,7 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Wallets;
 using Application.Requests.Wallets.Anakatech;
 using Application.Responses.Anakatech;
 using Application.Responses.Anakatech.Base;

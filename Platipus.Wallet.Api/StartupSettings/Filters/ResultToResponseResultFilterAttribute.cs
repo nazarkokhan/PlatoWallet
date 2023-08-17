@@ -29,11 +29,12 @@ using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
 using Application.Results.Anakatech.WithData;
 using Application.Results.Atlas.WithData;
-using Application.Results.Base;
 using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Evenbet.WithData;
 using Application.Results.Everymatrix.WithData;
+using Application.Results.HttpClient;
+using Application.Results.HttpClient.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
@@ -275,7 +276,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, uranusResult.Data);
                     return;
                 }
-                
+
                 case IUranusResult<object> uranusResult:
                 {
                     var errorCode = uranusResult.Error;
@@ -290,7 +291,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
                 }
-                
+
                 case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
                 {
                     if (ResultAsJavaScript(evenbetResult))
@@ -502,7 +503,21 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 if (externalActionResult.Result is not IResult<object> objectResult)
                     return;
 
-                context.Result = new OkObjectResult(objectResult.Data);
+                if (objectResult.Data is not IHttpClientResult<object, object> httpClientResult)
+                {
+                    context.Result = new OkObjectResult(objectResult.Data);
+                    return;
+                }
+
+                var httpResponseObject = new
+                {
+                    httpClientResult.IsSuccess,
+                    ResponseData = httpClientResult.IsSuccess ? httpClientResult.Data : httpClientResult.Error,
+                    HttpRequestContext = httpClientResult.HttpRequest,
+                    httpClientResult.Error,
+                    httpClientResult.Exception
+                };
+                context.Result = new OkObjectResult(httpResponseObject);
                 return;
             }
 

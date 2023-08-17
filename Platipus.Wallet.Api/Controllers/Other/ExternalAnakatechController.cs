@@ -1,6 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Controllers.Other;
 
-using System.Net;
 using Abstract;
 using Application.Responses.Anakatech.Base;
 using Application.Services.AnakatechGamesApi.External;

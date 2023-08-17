@@ -6,4 +6,4 @@ using System.Net.Http.Headers;
 public record HttpClientResponseData(
     HttpStatusCode StatusCode,
     string? Body,
-    HttpHeadersNonValidated Headers);
+    Dictionary<string, string> Headers);

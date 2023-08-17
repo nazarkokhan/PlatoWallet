@@ -13,17 +13,25 @@ public class ExternalPswController : RestApiController
 
     public ExternalPswController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("freebet/award")]
-    public async Task<IActionResult> CreateAward(PswCreateAwardRequest request, CancellationToken cancellationToken)
+    [HttpPost("game/session")]
+    [ProducesResponseType(typeof(PswGameSessionGameApiResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GameSession(
+        [FromQuery] PswGameSessionRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpGet("game/list")]
-    [ProducesResponseType(typeof(PswGetCasinoGamesListGamesApiResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PswGames([FromQuery] GetPswCasinoGamesRequest request, CancellationToken cancellationToken)
+    [HttpPost("game/list")]
+    [ProducesResponseType(typeof(PswGameListGameApiResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GameList([FromBody] PswGameListRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("freebet/award")]
+    [ProducesResponseType(typeof(PswFreebetAwardGameApiResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FreebetAward(PswFreebetAwardRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("game/buy")]
-    [ProducesResponseType(typeof(PswGameBuyGamesApiResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PswGameBuyGameApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GameBuy([FromBody] PswGameBuyRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
