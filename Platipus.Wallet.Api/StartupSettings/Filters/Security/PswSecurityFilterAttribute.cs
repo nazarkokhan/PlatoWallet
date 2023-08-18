@@ -38,11 +38,12 @@ public class PswSecurityFilterAttribute : ActionFilterAttribute
                     {
                         s.User.IsDisabled,
                         CasinoSignatureKey = s.User.Casino.SignatureKey
-                    }
+                    },
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync(httpContext.RequestAborted);
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = PswResultFactory.Failure(PswErrorCode.SessionExpired).ToActionResult();
             return;

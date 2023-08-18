@@ -37,11 +37,12 @@ public sealed class UranusSecurityFilter : IAsyncActionFilter
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
                     UsedId = s.User.Id,
                     UserPassword = s.User.Password,
-                    CasinoProvider = s.User.Casino.Params.UranusProvider
+                    CasinoProvider = s.User.Casino.Params.UranusProvider,
+                    IsTemporary = s.IsTemporaryToken
                 })
            .FirstOrDefaultAsync();
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = UranusResultFactory
                .Failure<UranusFailureResponse>(UranusErrorCode.E_SESSION_TOKEN_INVALID_OR_EXPIRED)

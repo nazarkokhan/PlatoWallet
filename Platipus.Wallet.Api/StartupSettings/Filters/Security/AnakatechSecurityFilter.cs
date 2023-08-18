@@ -36,11 +36,12 @@ public sealed class AnakatechSecurityFilter : IAsyncActionFilter
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
                     UsedId = s.User.Id,
                     UserPassword = s.User.Password,
-                    CasinoProvider = s.User.Casino.Params.AnakatechProvider
+                    CasinoProvider = s.User.Casino.Params.AnakatechProvider,
+                    IsTemporary = s.IsTemporaryToken
                 })
            .FirstOrDefaultAsync();
 
-        if (session?.CasinoProvider is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session?.CasinoProvider is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = AnakatechResultFactory
                .Failure<AnakatechErrorResponse>(AnakatechErrorCode.InvalidPlayerIdOrSessionId)

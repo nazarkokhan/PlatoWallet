@@ -36,11 +36,12 @@ public sealed class EmaraPlaySecurityFilter : IAsyncActionFilter
                 {
                     s.ExpirationDate,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
-                    CasinoProvider = s.User.Casino.Params.EmaraPlayProvider
+                    CasinoProvider = s.User.Casino.Params.EmaraPlayProvider,
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync();
         
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = EmaraPlayResultFactory
                 .Failure<EmaraPlayErrorResponse>(EmaraPlayErrorCode.PlayerAuthenticationFailed)
