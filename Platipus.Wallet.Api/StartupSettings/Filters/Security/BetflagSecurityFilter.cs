@@ -33,13 +33,14 @@ public class BetflagSecurityFilter : IAsyncActionFilter
                 {
                     s.Id,
                     s.ExpirationDate,
-                    s.User.Casino.SignatureKey
+                    s.User.Casino.SignatureKey,
+                    IsTemporary = s.IsTemporaryToken
                 })
            .FirstOrDefaultAsync();
 
         context.HttpContext.Items.Add(HttpContextItems.BetflagCasinoSecretKey, session?.SignatureKey);
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = BetflagResultFactory.Failure<BetflagErrorResponse>(BetflagErrorCode.SessionExpired)
                .ToActionResult();

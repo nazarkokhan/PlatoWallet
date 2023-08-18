@@ -48,7 +48,8 @@ public class Hub88SecurityFilterAttribute : ActionFilterAttribute
                     s.ExpirationDate,
                     UserId = s.User.Id,
                     UserIsDisabled = s.User.IsDisabled,
-                    UserCasinoSignatureKey = s.User.Casino.SignatureKey
+                    UserCasinoSignatureKey = s.User.Casino.SignatureKey,
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync(httpContext.RequestAborted);
 
@@ -58,7 +59,7 @@ public class Hub88SecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        if (session.ExpirationDate < DateTime.UtcNow)
+        if (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = Hub88ResultFactory.Failure(Hub88ErrorCode.RS_ERROR_TOKEN_EXPIRED).ToActionResult();
             return;
