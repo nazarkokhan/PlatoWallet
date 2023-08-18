@@ -33,11 +33,12 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
                     {
                         s.User.IsDisabled,
                         CasinoSignatureKey = s.User.Casino.SignatureKey
-                    }
+                    },
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync(httpContext.RequestAborted);
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = SwResultFactory.Failure(SwErrorCode.ExpiredToken).ToActionResult();
             return;

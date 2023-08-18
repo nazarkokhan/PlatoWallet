@@ -36,10 +36,11 @@ public class BetconstructSecurityFilter : IAsyncActionFilter
                 {
                     s.ExpirationDate,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync();
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = BetconstructResultFactory.Failure<BetconstructErrorResponse>(BetconstructErrorCode.TokenNotFound)
                 .ToActionResult();

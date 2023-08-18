@@ -39,10 +39,11 @@ public class EverymatrixSecurityFilterAttribute : ActionFilterAttribute
                     s.ExpirationDate,
                     s.IsTemporaryToken,
                     CasinoSignatureKey = s.User.Casino.SignatureKey,
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync();
 
-        if (session is null || session.ExpirationDate < DateTime.UtcNow || session.IsTemporaryToken)
+        if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {
             context.Result = EverymatrixResultFactory.Failure<EverymatrixBalanceResponse>(EverymatrixErrorCode.TokenNotFound)
                 .ToActionResult();

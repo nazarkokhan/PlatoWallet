@@ -32,7 +32,8 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
                         s.User.Casino.SignatureKey,
                         CallerId = s.User.Casino.Params.ReevoCallerId!,
                         CallerPassword = s.User.Casino.Params.ReevoCallerPassword
-                    }
+                    },
+                    IsTemporary = s.IsTemporaryToken
                 })
             .FirstOrDefaultAsync();
 
@@ -42,7 +43,7 @@ public class ReevoSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        if (session.ExpirationDate < DateTime.UtcNow)
+        if (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = ReevoResultFactory.Failure<ReevoErrorResponse>(ReevoErrorCode.InternalError).ToActionResult();
             return;

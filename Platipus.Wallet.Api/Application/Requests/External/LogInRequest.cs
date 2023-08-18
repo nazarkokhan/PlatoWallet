@@ -155,7 +155,7 @@ public sealed record LogInRequest(
             if (game is null)
                 return ResultFactory.Failure<Response>(ErrorCode.GameNotFound);
 
-            var environmentName = request.Environment ?? "test";
+            var environmentName = request.Environment;
             var environment = await _context.Set<GameEnvironment>()
                .Where(e => e.Id == environmentName)
                .Select(
@@ -195,7 +195,7 @@ public sealed record LogInRequest(
                         user.Currency.Id,
                         request.Language,
                         request.Country!,
-                        request.Lobby ?? "default_lobby",
+                        request.Lobby,
                         request.Jurisdiction!,
                         request.OriginUrl!,
                         request.RealityCheckInterval);
