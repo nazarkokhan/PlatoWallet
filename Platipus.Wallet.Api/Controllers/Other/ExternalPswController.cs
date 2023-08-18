@@ -16,7 +16,7 @@ public class ExternalPswController : RestApiController
     [HttpPost("game/session")]
     [ProducesResponseType(typeof(PswGameSessionGameApiResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GameSession(
-        [FromQuery] PswGameSessionRequest request,
+        [FromBody] PswGameSessionRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
@@ -27,7 +27,9 @@ public class ExternalPswController : RestApiController
 
     [HttpPost("freebet/award")]
     [ProducesResponseType(typeof(PswFreebetAwardGameApiResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> FreebetAward(PswFreebetAwardRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> FreebetAward(
+        [FromBody] PswFreebetAwardRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("game/buy")]
