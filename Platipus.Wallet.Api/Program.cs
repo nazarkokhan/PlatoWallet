@@ -11,12 +11,14 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
+using Platipus.Wallet.Api;
 using Platipus.Wallet.Api.Application.Services.AnakatechGamesApi;
 using Platipus.Wallet.Api.Application.Services.AtlasGamesApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
 using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
+using Platipus.Wallet.Api.Application.Services.NemesisGamesApi;
 using Platipus.Wallet.Api.Application.Services.PswGamesApi;
 using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
@@ -130,7 +132,7 @@ try
        .AddLocalization()
        .AddLazyCache()
        .AddDbContext<WalletDbContext>(
-            (optionsBuilder) =>
+            optionsBuilder =>
             {
                 optionsBuilder
                    .UseNpgsql(builderConfiguration.GetConnectionString(nameof(WalletDbContext)))
@@ -143,59 +145,63 @@ try
 
     // GameServer APIs
     services
-       .AddSingleton<IPswGameApiClient, PswGameApiClient>()
+       .AddTransient<IPswGameApiClient, PswGameApiClient>()
        .AddHttpClient<IPswGameApiClient, PswGameApiClient>(
             options =>
             {
+                //TODO need to remove base urls after refactoring old game clients
                 options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
             })
        .Services
-       .AddSingleton<IHub88GamesApiClient, Hub88GamesApiClient>()
+       .AddTransient<IHub88GamesApiClient, Hub88GamesApiClient>()
        .AddHttpClient<IHub88GamesApiClient, Hub88GamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}hub88/");
             })
        .Services
-       .AddSingleton<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
+       .AddTransient<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
        .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
        .Services
-       .AddSingleton<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
+       .AddTransient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
        .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
             })
        .Services
-       .AddSingleton<IReevoGameApiClient, ReevoGameApiClient>()
+       .AddTransient<IReevoGameApiClient, ReevoGameApiClient>()
        .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
             })
        .Services
-       .AddSingleton<IUisGameApiClient, UisGameApiClient>()
+       .AddTransient<IUisGameApiClient, UisGameApiClient>()
        .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
        .Services
-       .AddSingleton<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+       .AddTransient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
        .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
-       .AddSingleton<IAtlasGameApiClient, AtlasGameApiClient>()
+       .AddTransient<IAtlasGameApiClient, AtlasGameApiClient>()
        .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>()
        .Services
-       .AddSingleton<IUranusGameApiClient, UranusGameApiClient>()
+       .AddTransient<IUranusGameApiClient, UranusGameApiClient>()
        .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>()
        .Services
-       .AddSingleton<IEvenbetGameApiClient, EvenbetGameApiClient>()
+       .AddTransient<IEvenbetGameApiClient, EvenbetGameApiClient>()
        .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>()
        .Services
-       .AddSingleton<IAnakatechGameApiClient, AnakatechGameApiClient>()
-       .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>();
+       .AddTransient<IAnakatechGameApiClient, AnakatechGameApiClient>()
+       .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>()
+       .Services
+       .AddTransient<INemesisGameApiClient, NemesisGameApiClient>()
+       .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>();
 
     services
        .AddHealthChecks()
@@ -225,6 +231,7 @@ try
     app.MapConfigname();
     app.MapConfig();
     app.MapHealth();
+    app.MapVersionTest();
 
     app.MapControllers();
 

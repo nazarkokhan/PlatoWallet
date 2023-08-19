@@ -1,18 +1,17 @@
 namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
-using DTOs.Requests;
-using DTOs.Responses;
+using Requests;
+using Responses;
 using Results.HttpClient.WithData;
 
 public interface IPswGameApiClient
 {
-    Task<IResult<IHttpClientResult<PswGameSessionGameApiResponse, PswErrorGameApiResponse>>>
-        GameSessionAsync(
-            Uri baseUrl,
-            PswGameSessionGameApiRequest request,
-            LaunchMode launchModeType,
-            bool isBetflag = false,
-            CancellationToken cancellationToken = default);
+    Task<IResult<IHttpClientResult<PswGameSessionGameApiResponse, PswErrorGameApiResponse>>> GameSessionAsync(
+        Uri baseUrl,
+        PswGameSessionGameApiRequest request,
+        LaunchMode launchModeType,
+        bool isBetflag = false,
+        CancellationToken cancellationToken = default);
 
     Task<IResult<IHttpClientResult<PswGameListGameApiResponse, PswErrorGameApiResponse>>> GameListAsync(
         Uri baseUrl,

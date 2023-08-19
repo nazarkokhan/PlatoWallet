@@ -25,6 +25,8 @@ using Services.GamesGlobalGamesApi;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
+using Services.NemesisGamesApi;
+using Services.NemesisGamesApi.Requests;
 using Services.PswGamesApi;
 using Services.ReevoGamesApi;
 using Services.ReevoGamesApi.DTO;
@@ -35,6 +37,7 @@ using Services.UranusGamesApi.Requests;
 using StartupSettings.Factories;
 using StartupSettings.Options;
 using Wallets.Anakatech.Enums;
+using Wallets.Nemesis.Base;
 using Wallets.Psw.Base.Response;
 
 public sealed record LogInRequest(
@@ -75,6 +78,7 @@ public sealed record LogInRequest(
         private readonly IUranusGameApiClient _uranusGameApiClient;
         private readonly IEvenbetGameApiClient _evenbetGameApiClient;
         private readonly IAnakatechGameApiClient _anakatechGameApiClient;
+        private readonly INemesisGameApiClient _nemesisGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -89,7 +93,8 @@ public sealed record LogInRequest(
             IAtlasGameApiClient atlasGameApiClient,
             IUranusGameApiClient uranusGameApiClient,
             IEvenbetGameApiClient evenbetGameApiClient,
-            IAnakatechGameApiClient anakatechGameApiClient)
+            IAnakatechGameApiClient anakatechGameApiClient,
+            INemesisGameApiClient nemesisGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -103,6 +108,7 @@ public sealed record LogInRequest(
             _uranusGameApiClient = uranusGameApiClient;
             _evenbetGameApiClient = evenbetGameApiClient;
             _anakatechGameApiClient = anakatechGameApiClient;
+            _nemesisGameApiClient = nemesisGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -176,6 +182,33 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case WalletProvider.Nemesis:
+                {
+                    var launcherRequest = new NemesisLauncherGameApiRequest(
+                        session.Id,
+                        game.LaunchName,
+                        request.Language,
+                        user.Username,
+                        user.CurrencyId,
+                        casino.Id,
+                        request.Device,
+                        request.Lobby);
+                    var launcherResult = await _nemesisGameApiClient.LauncherAsync(
+                        baseUrl,
+                        launcherRequest,
+                        casino.SignatureKey,
+                        cancellationToken);
+
+                    if (launcherResult.IsFailure || launcherResult.Data.IsFailure)
+                    {
+                        launchUrl = string.Empty;
+                        break;
+                    }
+
+                    launchUrl = launcherResult.Data.Data.Url;
+                    break;
+                }
+
                 case WalletProvider.Anakatech:
                 {
                     var playMode = request.LaunchMode is LaunchMode.Real
@@ -635,6 +668,7 @@ public sealed record LogInRequest(
             { "userid", userId },
             { "gameconfig", game },
             { "lang", "en" },
+
             // { "lobby", "" },
             { "token", token },
         };
@@ -670,6 +704,7 @@ public sealed record LogInRequest(
             { "country", "CN" },
             { "language", "en" },
             { nameof(currency), currency },
+
             // {"backurl", "zero"},
             // {"backUri", "zero"},
         };
@@ -740,6 +775,7 @@ public sealed record LogInRequest(
             { "mode", "real" },
             { "launchercode", "26" },
             { "language", "en" },
+
             // { "lobbyurl", "" },
             { "extra", "multi" },
         };
@@ -879,6 +915,7 @@ public sealed record LogInRequest(
             { nameof(productId), productId },
             { nameof(sessionToken), sessionToken },
             { nameof(lang), lang },
+
             // { nameof(lobbyUrl), lobbyUrl },
             { nameof(targetChannel), targetChannel },
             { nameof(providerId), providerId },

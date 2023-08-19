@@ -16,6 +16,7 @@ using Application.Requests.Wallets.Betflag.Base;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
+using Application.Requests.Wallets.Nemesis.Responses;
 using Application.Requests.Wallets.Openbox.Base.Response;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Application.Requests.Wallets.Reevo.Base;
@@ -33,12 +34,13 @@ using Application.Results.BetConstruct.WithData;
 using Application.Results.Betflag.WithData;
 using Application.Results.Evenbet.WithData;
 using Application.Results.Everymatrix.WithData;
-using Application.Results.HttpClient;
 using Application.Results.HttpClient.WithData;
 using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
+using Application.Results.Nemesis;
+using Application.Results.Nemesis.WithData;
 using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
@@ -354,6 +356,43 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.Result = new OkObjectResult(errorResponse);
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
                     break;
+                }
+
+                case INemesisResult nemesisResult:
+                {
+                    if (nemesisResult.IsSuccess)
+                    {
+                        if (nemesisResult is not INemesisResult<object> objectResult)
+                            return;
+
+                        context.Result = new OkObjectResult(objectResult.Data);
+                        context.HttpContext.Items.Add(HttpContextItems.ResponseObject, objectResult.Data);
+                        return;
+                    }
+
+                    var errorCode = nemesisResult.Error;
+
+                    var errorResponse = new NemesisErrorResponse(errorCode);
+
+                    context.Result = new ObjectResult(errorResponse)
+                    {
+                        StatusCode = errorCode switch
+                        {
+                            NemesisErrorCode.SessionExpired
+                             or NemesisErrorCode.SessionNotFound
+                             or NemesisErrorCode.SessionNotActivated
+                             or NemesisErrorCode.SessionIsDeactivated
+                             or NemesisErrorCode.TokenIsInvalid
+                             or NemesisErrorCode.IpAddressUnknown => 401,
+                            NemesisErrorCode.ApiDeprecated => 410,
+                            NemesisErrorCode.Internal => 500,
+                            NemesisErrorCode.NotImplemented => 501,
+                            _ => 400
+                        }
+                    };
+
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
+                    return;
                 }
             }
         }

@@ -3,7 +3,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-public ref struct ScriptHelper
+public ref struct ScriptHelper //TODO why ref struct?
 {
     public static string ExtractUrlFromScript(string jsScript, string environment)
     {

@@ -2,15 +2,15 @@ namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
 
 using System.Text;
 using System.Text.Json;
-using DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
 using Domain.Entities;
-using DTOs.Requests;
 using Infrastructure.Persistence;
+using Requests;
+using Responses;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
@@ -34,13 +34,12 @@ public class PswGameApiClient : IPswGameApiClient
         _jsonSerializerOptions = jsonOptions.CurrentValue.JsonSerializerOptions;
     }
 
-    public async Task<IResult<IHttpClientResult<PswGameSessionGameApiResponse, PswErrorGameApiResponse>>>
-        GameSessionAsync(
-            Uri baseUrl,
-            PswGameSessionGameApiRequest request,
-            LaunchMode launchModeType,
-            bool isBetflag,
-            CancellationToken cancellationToken = default)
+    public async Task<IResult<IHttpClientResult<PswGameSessionGameApiResponse, PswErrorGameApiResponse>>> GameSessionAsync(
+        Uri baseUrl,
+        PswGameSessionGameApiRequest request,
+        LaunchMode launchModeType,
+        bool isBetflag,
+        CancellationToken cancellationToken = default)
     {
         var launchModePath = launchModeType is LaunchMode.Real ? "session" : "demo";
 
@@ -54,12 +53,11 @@ public class PswGameApiClient : IPswGameApiClient
         return response;
     }
 
-    public async Task<IResult<IHttpClientResult<PswGameListGameApiResponse, PswErrorGameApiResponse>>>
-        GameListAsync(
-            Uri baseUrl,
-            PswGameListGameApiRequest request,
-            bool isBetflag,
-            CancellationToken cancellationToken = default)
+    public async Task<IResult<IHttpClientResult<PswGameListGameApiResponse, PswErrorGameApiResponse>>> GameListAsync(
+        Uri baseUrl,
+        PswGameListGameApiRequest request,
+        bool isBetflag,
+        CancellationToken cancellationToken = default)
     {
         var response =
             await PostSignedRequestAsync<PswGameListGameApiRequest, PswGameListGameApiResponse>(
