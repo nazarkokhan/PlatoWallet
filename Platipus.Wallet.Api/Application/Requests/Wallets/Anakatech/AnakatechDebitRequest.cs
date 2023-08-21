@@ -105,7 +105,6 @@ public sealed record AnakatechDebitRequest(
                .Length(3);
 
             RuleFor(x => x.Amount)
-               .NotEmpty()
                .Must(x => x.ToString().Length <= 32);
 
             RuleFor(x => x.SecondaryRoundId)
