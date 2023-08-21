@@ -1,6 +1,6 @@
-namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.DTOs.Responses;
+namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.Responses;
 
-using Application.Requests.Wallets.Psw.Base.Response;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Psw.Base.Response;
 
 public record PswGameListGameApiResponse(List<PswGameListGameApiResponse.GameItemDto> Data) : PswBaseResponse
 {

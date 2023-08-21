@@ -5,7 +5,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Services.PswGamesApi;
-using Services.PswGamesApi.DTOs.Requests;
+using Services.PswGamesApi.Requests;
 
 public record PswFreebetAwardRequest(
     [property: DefaultValue("test")] string Environment,

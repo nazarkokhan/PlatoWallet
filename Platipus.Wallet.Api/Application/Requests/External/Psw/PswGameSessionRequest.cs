@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Services.PswGamesApi;
-using Services.PswGamesApi.DTOs.Requests;
+using Services.PswGamesApi.Requests;
 
 public record PswGameSessionRequest(
     [property: DefaultValue("test")] string Environment,
@@ -35,9 +35,34 @@ public record PswGameSessionRequest(
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
+            var apiRequest = request.ApiRequest;
+
+            var session = await _context.Set<Session>()
+               .Where(e => e.Id == apiRequest.SessionId)
+               .FirstOrDefaultAsync(cancellationToken);
+
+            if (session is not null)
+                return ResultFactory.Failure(ErrorCode.SessionAlreadyExists);
+
+            var user = await _context.Set<User>()
+               .Where(e => e.Username == apiRequest.User)
+               .FirstOrDefaultAsync(cancellationToken);
+
+            if (user is null)
+                return ResultFactory.Failure(ErrorCode.UserNotFound);
+
+            session = new Session
+            {
+                User = user,
+                IsTemporaryToken = true,
+                Id = apiRequest.SessionId,
+            };
+            _context.Add(session);
+            await _context.SaveChangesAsync(cancellationToken);
+
             var response = await _gameApiClient.GameSessionAsync(
                 environment.BaseUrl,
-                request.ApiRequest,
+                apiRequest,
                 request.LaunchModeType,
                 request.IsBetflag,
                 cancellationToken);

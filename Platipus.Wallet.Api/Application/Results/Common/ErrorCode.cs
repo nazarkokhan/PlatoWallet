@@ -12,6 +12,7 @@ public enum ErrorCode
 
     SessionNotFound,
     SessionExpired,
+    SessionAlreadyExists,
 
     SecurityParameterIsInvalid,
     SecurityParameterIsEmpty,

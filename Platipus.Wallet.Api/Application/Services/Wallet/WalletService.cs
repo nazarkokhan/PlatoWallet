@@ -25,12 +25,12 @@ public sealed class WalletService : IWalletService
         try
         {
             var user = await _context.Set<User>()
-                .TagWith("GetBalance")
-                .Where(
+               .TagWith("GetBalance")
+               .Where(
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Select(
+               .Select(
                     u => new WalletGetBalanceResponse(
                         u.Id,
                         u.Username,
@@ -38,14 +38,14 @@ public sealed class WalletService : IWalletService
                         u.CurrencyId,
                         u.CasinoId,
                         u.IsDisabled))
-                .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserNotFound);
 
-            return user.IsDisabled ? 
-                ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserIsDisabled) : 
-                ResultFactory.Success(user);
+            return user.IsDisabled
+                ? ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserIsDisabled)
+                : ResultFactory.Success(user);
         }
         catch (Exception e)
         {
@@ -62,7 +62,7 @@ public sealed class WalletService : IWalletService
         string? currency = null,
         bool roundFinished = false,
         bool searchByUsername = false,
-        string? provider = null,
+        string? provider = null, //TODO ???
         CancellationToken cancellationToken = default)
     {
         try
@@ -70,21 +70,21 @@ public sealed class WalletService : IWalletService
             // await using var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var transactionAlreadyExists = await _context.Set<Transaction>()
-                .TagWith("Bet")
-                .Where(t => t.Id == transactionId)
-                .AnyAsync(cancellationToken);
+               .TagWith("Bet")
+               .Where(t => t.Id == transactionId)
+               .AnyAsync(cancellationToken);
 
             if (transactionAlreadyExists)
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.TransactionAlreadyExists);
 
             var user = await _context.Set<User>()
-                .TagWith("Bet")
-                .Where(
+               .TagWith("Bet")
+               .Where(
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Include(u => u.Rounds.Where(r => r.Id == roundId))
-                .FirstOrDefaultAsync(cancellationToken);
+               .Include(u => u.Rounds.Where(r => r.Id == roundId))
+               .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
 
@@ -96,9 +96,9 @@ public sealed class WalletService : IWalletService
             if (round is null)
             {
                 var roundAlreadyExists = await _context.Set<Round>()
-                    .TagWith("Bet")
-                    .Where(t => t.Id == roundId)
-                    .AnyAsync(cancellationToken);
+                   .TagWith("Bet")
+                   .Where(t => t.Id == roundId)
+                   .AnyAsync(cancellationToken);
 
                 if (roundAlreadyExists)
                     return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.RoundAlreadyExists);
@@ -114,6 +114,9 @@ public sealed class WalletService : IWalletService
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.InvalidCurrency);
 
             user.Balance -= amount;
+            if (user.Balance < 0)
+                return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.InsufficientFunds);
+
             if (roundFinished)
             {
                 round.Finish();
@@ -133,8 +136,14 @@ public sealed class WalletService : IWalletService
                 user.Username,
                 user.Balance,
                 user.CurrencyId,
-                new WalletBetWinRollbackResponse.TransactionDto(transaction.Id, transaction.InternalId, transaction.CreatedDate),
-                new WalletBetWinRollbackResponse.RoundDto(round.Id, round.InternalId, round.CreatedDate));
+                new WalletBetWinRollbackResponse.TransactionDto(
+                    transaction.Id,
+                    transaction.InternalId,
+                    transaction.CreatedDate),
+                new WalletBetWinRollbackResponse.RoundDto(
+                    round.Id,
+                    round.InternalId,
+                    round.CreatedDate));
 
             return ResultFactory.Success(response);
         }
@@ -160,21 +169,21 @@ public sealed class WalletService : IWalletService
             // var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var transactionAlreadyExists = await _context.Set<Transaction>()
-                .TagWith("Win")
-                .Where(t => t.Id == transactionId)
-                .AnyAsync(cancellationToken);
+               .TagWith("Win")
+               .Where(t => t.Id == transactionId)
+               .AnyAsync(cancellationToken);
 
             if (transactionAlreadyExists)
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.TransactionAlreadyExists);
 
             var user = await _context.Set<User>()
-                .TagWith("Win")
-                .Where(
+               .TagWith("Win")
+               .Where(
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Include(u => u.Rounds.Where(r => r.Id == roundId))
-                .FirstOrDefaultAsync(cancellationToken);
+               .Include(u => u.Rounds.Where(r => r.Id == roundId))
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
@@ -208,7 +217,10 @@ public sealed class WalletService : IWalletService
                 user.Username,
                 user.Balance,
                 user.CurrencyId,
-                new WalletBetWinRollbackResponse.TransactionDto(transaction.Id, transaction.InternalId, transaction.CreatedDate),
+                new WalletBetWinRollbackResponse.TransactionDto(
+                    transaction.Id,
+                    transaction.InternalId,
+                    transaction.CreatedDate),
                 new WalletBetWinRollbackResponse.RoundDto(round.Id, round.InternalId, round.CreatedDate));
 
             return ResultFactory.Success(response);
@@ -226,7 +238,7 @@ public sealed class WalletService : IWalletService
         string? roundId = null,
         bool searchByUsername = false,
         decimal? amount = null,
-        string? clientId = null,
+        string? clientId = null, //TODO why?
         CancellationToken cancellationToken = default)
     {
         try
@@ -234,19 +246,19 @@ public sealed class WalletService : IWalletService
             // var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var user = await _context.Set<User>()
-                .TagWith("Rollback")
-                .Where(
+               .TagWith("Rollback")
+               .Where(
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Include(
+               .Include(
                     u => u.Rounds.Where(
                         r => roundId != null
                             ? r.Id == roundId
                             : r.Transactions.Any(t => t.Id == transactionId)))
-                .ThenInclude(r => r.Transactions.Where(t => t.Id == transactionId))
-                .AsSingleQuery()
-                .FirstOrDefaultAsync(cancellationToken);
+               .ThenInclude(r => r.Transactions.Where(t => t.Id == transactionId))
+               .AsSingleQuery()
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure<WalletBetWinRollbackResponse>(ErrorCode.UserNotFound);
@@ -287,7 +299,10 @@ public sealed class WalletService : IWalletService
                 user.Username,
                 user.Balance,
                 user.CurrencyId,
-                new WalletBetWinRollbackResponse.TransactionDto(transaction.Id, transaction.InternalId, transaction.CreatedDate),
+                new WalletBetWinRollbackResponse.TransactionDto(
+                    transaction.Id,
+                    transaction.InternalId,
+                    transaction.CreatedDate),
                 new WalletBetWinRollbackResponse.RoundDto(round.Id, round.InternalId, round.CreatedDate));
 
             return ResultFactory.Success(response);
@@ -314,30 +329,30 @@ public sealed class WalletService : IWalletService
             // var dbTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var transactionAlreadyExists = await _context.Set<Transaction>()
-                .TagWith("Award")
-                .Where(t => t.Id == transactionId)
-                .AnyAsync(cancellationToken);
+               .TagWith("Award")
+               .Where(t => t.Id == transactionId)
+               .AnyAsync(cancellationToken);
 
             if (transactionAlreadyExists)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.TransactionAlreadyExists);
 
             var roundAlreadyExists = await _context.Set<Round>()
-                .TagWith("Award")
-                .Where(t => t.Id == roundId)
-                .AnyAsync(cancellationToken);
+               .TagWith("Award")
+               .Where(t => t.Id == roundId)
+               .AnyAsync(cancellationToken);
 
             if (roundAlreadyExists)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.RoundAlreadyExists);
 
             var user = await _context.Set<User>()
-                .TagWith("Award")
-                .Where(
+               .TagWith("Award")
+               .Where(
                     u => searchByUsername
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
-                .Include(u => u.Awards.Where(r => r.Id == awardId))
-                .ThenInclude(r => r.AwardRound)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Include(u => u.Awards.Where(r => r.Id == awardId))
+               .ThenInclude(r => r.AwardRound)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.UserNotFound);
@@ -372,6 +387,7 @@ public sealed class WalletService : IWalletService
             _context.Update(user);
 
             await _context.SaveChangesAsync(cancellationToken);
+
             // await dbTransaction.CommitAsync(cancellationToken);
 
             var response = new WalletGetBalanceResponse(
@@ -392,18 +408,18 @@ public sealed class WalletService : IWalletService
     }
 
     public async Task<IResult<WalletGetEnvironmentResponse>> GetEnvironmentAsync(
-        string environment, CancellationToken cancellationToken = default)
+        string environment,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var contextResponse = await _context.Set<GameEnvironment>()
-                .Where(e => e.Id == environment)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(e => e.Id == environment)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (contextResponse is null)
-                return ResultFactory.Failure<WalletGetEnvironmentResponse>(
-                    ErrorCode.EnvironmentNotFound);
-            
+                return ResultFactory.Failure<WalletGetEnvironmentResponse>(ErrorCode.EnvironmentNotFound);
+
             var finalResponse = new WalletGetEnvironmentResponse(contextResponse.BaseUrl);
 
             return ResultFactory.Success(finalResponse);

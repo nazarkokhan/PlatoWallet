@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.DTOs.Requests;
+namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.Requests;
 
 public record PswFreebetAwardGameApiRequest(
     string CasinoId,

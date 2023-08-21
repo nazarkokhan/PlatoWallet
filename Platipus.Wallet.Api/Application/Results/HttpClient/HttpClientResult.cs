@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.Application.Results.HttpClient;
 
-using System.Text.Json.Serialization;
 using HttpData;
 using Base;
 

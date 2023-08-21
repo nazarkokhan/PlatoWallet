@@ -158,6 +158,14 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                })
+           .AddJsonOptions(
+                nameof(WalletProvider.Nemesis),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString
+                                                                 | JsonNumberHandling.WriteAsString;
                 });
 
         return builder.Services;

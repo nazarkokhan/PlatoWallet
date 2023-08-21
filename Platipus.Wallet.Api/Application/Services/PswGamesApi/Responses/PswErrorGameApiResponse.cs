@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.DTOs.Responses;
+namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.Responses;
 
 public record PswErrorGameApiResponse(
     string Status,

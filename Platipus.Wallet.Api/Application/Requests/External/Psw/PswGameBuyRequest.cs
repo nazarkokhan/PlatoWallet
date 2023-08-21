@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Services.PswGamesApi;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Services.PswGamesApi.DTOs.Requests;
+using Services.PswGamesApi.Requests;
 
 public record PswGameBuyRequest(
     [property: DefaultValue("test")] string Environment,

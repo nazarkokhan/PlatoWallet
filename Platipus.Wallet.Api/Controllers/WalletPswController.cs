@@ -1,5 +1,3 @@
-// ReSharper disable UnusedParameter.Global
-
 namespace Platipus.Wallet.Api.Controllers;
 
 using System.Text.Json;
@@ -11,6 +9,7 @@ using Domain.Entities.Enums;
 using Extensions;
 using Extensions.SecuritySign;
 using Infrastructure.Persistence;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StartupSettings;
@@ -32,7 +31,7 @@ public class WalletPswController : RestApiController
     [HttpPost("balance")]
     [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Balance(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        [PublicAPI, FromHeader(Name = PswHeaders.XRequestSign)] string sign,
         PswGetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -40,7 +39,7 @@ public class WalletPswController : RestApiController
     [HttpPost("bet")]
     [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        [PublicAPI, FromHeader(Name = PswHeaders.XRequestSign)] string sign,
         PswBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -48,7 +47,7 @@ public class WalletPswController : RestApiController
     [HttpPost("win")]
     [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        [PublicAPI, FromHeader(Name = PswHeaders.XRequestSign)] string sign,
         PswWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -56,7 +55,7 @@ public class WalletPswController : RestApiController
     [HttpPost("rollback")]
     [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        [PublicAPI, FromHeader(Name = PswHeaders.XRequestSign)] string sign,
         PswRollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -64,12 +63,17 @@ public class WalletPswController : RestApiController
     [HttpPost("award")]
     [ProducesResponseType(typeof(PswBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Award(
-        [FromHeader(Name = PswHeaders.XRequestSign)] string sign,
+        [PublicAPI, FromHeader(Name = PswHeaders.XRequestSign)] string sign,
         PswAwardRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}
 
-    [HttpPost("private/test/get-security-value")]
+[Route("wallet/private/psw")]
+[JsonSettingsName(WalletProvider.Psw)]
+public class WalletPswTestController : RestApiController
+{
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
         [FromBody] JsonDocument request,
@@ -77,9 +81,9 @@ public class WalletPswController : RestApiController
         CancellationToken cancellationToken)
     {
         var casino = await dbContext.Set<Casino>()
-            .Where(c => c.Id == casinoId)
-            .Select(c => new { c.SignatureKey })
-            .FirstOrDefaultAsync(cancellationToken);
+           .Where(c => c.Id == casinoId)
+           .Select(c => new { c.SignatureKey })
+           .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
