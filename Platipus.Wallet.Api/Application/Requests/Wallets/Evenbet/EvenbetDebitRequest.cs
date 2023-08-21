@@ -81,7 +81,7 @@ public sealed record EvenbetDebitRequest(
             RuleFor(x => x.Amount)
                .NotEmpty()
                .WithMessage("Amount is required.")
-               .GreaterThan(0)
+               .GreaterThanOrEqualTo(0)
                .WithMessage("Amount must be greater than or equal 0.");
         }
     }
