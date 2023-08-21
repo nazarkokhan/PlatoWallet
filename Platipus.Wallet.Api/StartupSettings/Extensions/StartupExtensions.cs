@@ -40,7 +40,8 @@ public static class StartupExtensions
            .AddScoped<UranusExternalSecurityFilter>()
            .AddSingleton<EvenbetMockedErrorActionFilter>()
            .AddScoped<EvenbetSecurityFilter>()
-           .AddScoped<AnakatechSecurityFilter>();
+           .AddScoped<AnakatechSecurityFilter>()
+           .AddSingleton<AnakatechMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

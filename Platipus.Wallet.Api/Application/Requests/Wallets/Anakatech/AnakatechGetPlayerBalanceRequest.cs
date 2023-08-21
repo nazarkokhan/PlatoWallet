@@ -37,7 +37,7 @@ public sealed record AnakatechGetPlayerBalanceRequest(
                 request.SessionId,
                 cancellationToken: cancellationToken);
 
-            if (walletResult.IsFailure || walletResult.Data is null)
+            if (walletResult.IsFailure)
             {
                 return walletResult.ToAnakatechFailureResult<AnakatechGetPlayerBalanceResponse>();
             }

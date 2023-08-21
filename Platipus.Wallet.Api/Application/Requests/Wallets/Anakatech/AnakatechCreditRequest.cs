@@ -48,7 +48,7 @@ public sealed record AnakatechCreditRequest(
                 roundFinished: request.CloseRound,
                 cancellationToken: cancellationToken);
 
-            if (walletResult.IsFailure || walletResult.Data is null)
+            if (walletResult.IsFailure)
             {
                 return walletResult.ToAnakatechFailureResult<AnakatechCreditResponse>();
             }
@@ -64,8 +64,7 @@ public sealed record AnakatechCreditRequest(
             return walletResult.ToAnakatechResult(response);
         }
     }
-
-    //TODO how do you convert it to acceptable response that replicates real wallet behaviour?
+    
     public sealed class AnakatechCreditRequestValidator : AbstractValidator<AnakatechCreditRequest>
     {
         public AnakatechCreditRequestValidator()

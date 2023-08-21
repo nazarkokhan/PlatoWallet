@@ -48,7 +48,7 @@ public sealed record AnakatechDebitRequest(
                 roundFinished: request.CloseRound,
                 cancellationToken: cancellationToken);
 
-            if (walletResult.IsFailure || walletResult.Data is null)
+            if (walletResult.IsFailure)
             {
                 return walletResult.ToAnakatechFailureResult<AnakatechDebitResponse>();
             }

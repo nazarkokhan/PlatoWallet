@@ -45,7 +45,7 @@ public sealed record AnakatechRollbackRequest(
                 amount: MoneyHelper.ConvertFromCents(request.Amount),
                 cancellationToken: cancellationToken);
 
-            if (walletResult.IsFailure || walletResult.Data is null)
+            if (walletResult.IsFailure)
             {
                 return walletResult.ToAnakatechFailureResult<AnakatechRollbackResponse>();
             }
