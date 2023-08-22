@@ -27,6 +27,7 @@ public class BetflagMockedErrorActionFilter : AbstractMockedErrorActionFilter
             BetflagBetRequest => MockedErrorMethod.Bet,
             BetflagWinRequest => MockedErrorMethod.Win,
             BetflagCancelRequest => MockedErrorMethod.Rollback,
+            BetflagAuthenticateRequest => MockedErrorMethod.Authenticate,
             _ => throw new ArgumentOutOfRangeException()
         };
 
