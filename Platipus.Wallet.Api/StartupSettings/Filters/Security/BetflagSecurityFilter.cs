@@ -26,8 +26,7 @@ public class BetflagSecurityFilter : IAsyncActionFilter
 
         var session = await _dbContext.Set<Session>()
            .Where(
-                s => s.Id == request.Key
-                  && s.User.CasinoId == request.ApiName)
+                s => s.Id == request.Key)
            .Select(
                 s => new
                 {
