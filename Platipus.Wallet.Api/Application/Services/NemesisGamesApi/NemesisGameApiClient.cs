@@ -24,7 +24,7 @@ public class NemesisGameApiClient : INemesisGameApiClient
         _jsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Nemesis)).JsonSerializerOptions;
     }
 
-    public async Task<IResult<IHttpClientResult<NemesisLauncherGameApiResponse, NemesisErrorGameApiResponse>>>
+    public async Task<IResult<IHttpClientResult<string, NemesisErrorGameApiResponse>>>
         LauncherAsync(
             Uri baseUrl,
             NemesisLauncherGameApiRequest request,
@@ -35,7 +35,7 @@ public class NemesisGameApiClient : INemesisGameApiClient
         {
             var queryParameters = ObjectToDictionaryConverter.ConvertToDictionary(request);
             var queryString = QueryString.Create(queryParameters);
-            baseUrl = new Uri(baseUrl, "launcher" + queryString);
+            baseUrl = new Uri(baseUrl, "nemesis/launcher" + queryString);
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, baseUrl)
             {
                 Headers =
@@ -48,13 +48,13 @@ public class NemesisGameApiClient : INemesisGameApiClient
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            var httpResult = GetHttpResultAsync<NemesisLauncherGameApiResponse>(httpResponse);
+            var httpResult = GetHttpResultAsync(httpResponse);
 
             return ResultFactory.Success(httpResult);
         }
         catch (Exception e)
         {
-            return ResultFactory.Failure<IHttpClientResult<NemesisLauncherGameApiResponse, NemesisErrorGameApiResponse>>(
+            return ResultFactory.Failure<IHttpClientResult<string, NemesisErrorGameApiResponse>>(
                 ErrorCode.UnknownHttpClientError,
                 e);
         }
@@ -137,7 +137,7 @@ public class NemesisGameApiClient : INemesisGameApiClient
             if (xIntegrationToken is not null)
                 jsonContent.Headers.Add(NemesisHeaders.XIntegrationToken, xIntegrationToken);
 
-            baseUrl = new Uri(baseUrl, method);
+            baseUrl = new Uri(baseUrl, $"nemesis/{method}");
 
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 
@@ -182,6 +182,39 @@ public class NemesisGameApiClient : INemesisGameApiClient
         catch (Exception e)
         {
             return httpResponse.Failure<TSuccess, NemesisErrorGameApiResponse>(e);
+        }
+    }
+
+    private IHttpClientResult<string, NemesisErrorGameApiResponse> GetHttpResultAsync(HttpClientRequest httpResponse)
+    {
+        try
+        {
+            var responseBody = httpResponse.ResponseData.Body;
+            if (responseBody is null)
+                return httpResponse.Failure<string, NemesisErrorGameApiResponse>();
+
+            JsonElement? responseJson;
+            try
+            {
+                responseJson = JsonDocument.Parse(responseBody).RootElement;
+            }
+            catch
+            {
+                responseJson = null;
+            }
+
+            var isError = responseJson?.TryGetProperty("error", out var errorCode) ?? false;
+            if (isError)
+            {
+                var error = responseJson!.Value.Deserialize<NemesisErrorGameApiResponse>(_jsonSerializerOptions);
+                return httpResponse.Failure<string, NemesisErrorGameApiResponse>(error!);
+            }
+
+            return httpResponse.Success<string, NemesisErrorGameApiResponse>(responseBody);
+        }
+        catch (Exception e)
+        {
+            return httpResponse.Failure<string, NemesisErrorGameApiResponse>(e);
         }
     }
 }

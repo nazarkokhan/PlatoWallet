@@ -37,7 +37,6 @@ using Services.UranusGamesApi.Requests;
 using StartupSettings.Factories;
 using StartupSettings.Options;
 using Wallets.Anakatech.Enums;
-using Wallets.Nemesis.Base;
 using Wallets.Psw.Base.Response;
 
 public sealed record LogInRequest(
@@ -204,8 +203,7 @@ public sealed record LogInRequest(
                         launchUrl = string.Empty;
                         break;
                     }
-
-                    launchUrl = launcherResult.Data.Data.Url;
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
                     break;
                 }
 

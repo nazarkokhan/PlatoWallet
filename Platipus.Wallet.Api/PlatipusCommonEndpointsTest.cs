@@ -12,8 +12,7 @@ public static class PlatipusCommonEndpointsTest
             () =>
             {
                 var entryAssembly = Assembly.GetEntryAssembly()!;
-                // var fileVersionInfo = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
-                // var fileVersion = fileVersionInfo.In;
-                return entryAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+                var informationalVersion = entryAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+                return informationalVersion!.InformationalVersion;
             });
 }

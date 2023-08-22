@@ -6,7 +6,7 @@ using Results.HttpClient.WithData;
 
 public interface INemesisGameApiClient
 {
-    Task<IResult<IHttpClientResult<NemesisLauncherGameApiResponse, NemesisErrorGameApiResponse>>> LauncherAsync(
+    Task<IResult<IHttpClientResult<string, NemesisErrorGameApiResponse>>> LauncherAsync(
         Uri baseUrl,
         NemesisLauncherGameApiRequest request,
         string xIntegrationToken,

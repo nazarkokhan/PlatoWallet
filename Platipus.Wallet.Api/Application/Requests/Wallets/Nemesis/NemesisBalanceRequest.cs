@@ -38,8 +38,9 @@ public sealed record NemesisBalanceRequest([property: JsonProperty("session_toke
             var data = walletResult.Data;
 
             var response = new NemesisBalanceResponse(
-                NemesisMoneyHelper.FromBalance(data.Balance, data.Currency),
-                data.Currency);
+                NemesisMoneyHelper.FromBalance(data.Balance, data.Currency, out var multiplier),
+                data.Currency,
+                multiplier);
 
             return NemesisResultFactory.Success(response);
         }

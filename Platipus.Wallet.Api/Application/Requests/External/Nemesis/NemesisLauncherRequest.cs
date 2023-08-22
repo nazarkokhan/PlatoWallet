@@ -1,19 +1,16 @@
 namespace Platipus.Wallet.Api.Application.Requests.External.Nemesis;
 
-using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Platipus.Wallet.Api.Application.Services.PswGamesApi;
-using Platipus.Wallet.Api.Application.Services.PswGamesApi.Requests;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
-using Psw;
+using Domain.Entities;
+using Infrastructure.Persistence;
+using JetBrains.Annotations;
 using Services.NemesisGamesApi;
 using Services.NemesisGamesApi.Requests;
 
+[PublicAPI]
 public record NemesisLauncherRequest(
-    [property: DefaultValue("test")] string Environment,
-    [property: JsonIgnore] NemesisLauncherGameApiRequest ApiRequest) : IRequest<IResult>
+    string Environment,
+    NemesisLauncherGameApiRequest ApiRequest) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<NemesisLauncherRequest, IResult>
     {
@@ -37,36 +34,50 @@ public record NemesisLauncherRequest(
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var apiRequest = request.ApiRequest;
-
-            var session = await _context.Set<Session>()
-               .Where(e => e.Id == apiRequest.SessionToken)
-               .FirstOrDefaultAsync(cancellationToken);
-            if (session is not null)
-                return ResultFactory.Failure(ErrorCode.SessionAlreadyExists);
-
-            var user = await _context.Set<User>()
-               .Where(e => e.Username == apiRequest.UserId)
-               .Include(u => u.Casino)
-               .FirstOrDefaultAsync(cancellationToken);
-            if (user is null)
-                return ResultFactory.Failure(ErrorCode.UserNotFound);
-
-            session = new Session
+            try
             {
-                User = user,
-                IsTemporaryToken = true,
-                Id = apiRequest.SessionToken,
-            };
-            _context.Add(session);
-            await _context.SaveChangesAsync(cancellationToken);
+                await _context.Database.BeginTransactionAsync(cancellationToken);
 
-            var response = await _gameApiClient.LauncherAsync(
-                environment.BaseUrl,
-                apiRequest,
-                user.Casino.SignatureKey,
-                cancellationToken);
+                var session = await _context.Set<Session>()
+                   .Where(e => e.Id == apiRequest.SessionToken)
+                   .FirstOrDefaultAsync(cancellationToken);
+                if (session is not null)
+                    return ResultFactory.Failure(ErrorCode.SessionAlreadyExists);
 
-            return response;
+                var user = await _context.Set<User>()
+                   .Where(e => e.Username == apiRequest.UserId)
+                   .Include(u => u.Casino)
+                   .FirstOrDefaultAsync(cancellationToken);
+                if (user is null)
+                    return ResultFactory.Failure(ErrorCode.UserNotFound);
+
+                session = new Session
+                {
+                    User = user,
+                    IsTemporaryToken = true,
+                    Id = apiRequest.SessionToken,
+                };
+                _context.Add(session);
+                await _context.SaveChangesAsync(cancellationToken);
+
+                var response = await _gameApiClient.LauncherAsync(
+                    environment.BaseUrl,
+                    apiRequest,
+                    user.Casino.SignatureKey,
+                    cancellationToken);
+
+                if (response is { IsSuccess: true, Data.IsSuccess: true })
+                    await _context.Database.CommitTransactionAsync(cancellationToken);
+                else
+                    await _context.Database.RollbackTransactionAsync(cancellationToken);
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                await _context.Database.RollbackTransactionAsync(cancellationToken);
+                return ResultFactory.Failure(ErrorCode.Unknown);
+            }
         }
     }
 }

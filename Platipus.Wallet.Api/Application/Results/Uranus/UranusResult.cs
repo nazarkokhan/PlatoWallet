@@ -1,6 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Results.Uranus;
 
-using Platipus.Wallet.Api.Application.Results.Base;
+using Base;
 
 public sealed record UranusResult : BaseResult<UranusErrorCode>, IUranusResult
 {

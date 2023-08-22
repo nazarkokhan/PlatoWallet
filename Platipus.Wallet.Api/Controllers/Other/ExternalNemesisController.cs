@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.External.Nemesis;
-using Application.Services.NemesisGamesApi.Requests;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +18,8 @@ public class ExternalNemesisController : RestApiController
     [HttpPost("launcher")]
     public async Task<IActionResult> Launcher(
         [FromBody] NemesisLauncherRequest request,
-        [FromQuery] NemesisLauncherGameApiRequest apiRequest,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(request with { ApiRequest = apiRequest }, cancellationToken)).ToActionResult();
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("award")]
     public async Task<IActionResult> CreateAward(

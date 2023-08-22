@@ -365,7 +365,20 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         if (nemesisResult is not INemesisResult<object> objectResult)
                             return;
 
-                        context.Result = new OkObjectResult(objectResult.Data);
+                        var objectResultData = objectResult.Data;
+
+                        if (objectResultData is string objectResultDataHtml)
+                        {
+                            context.Result = new ContentResult
+                            {
+                                ContentType = "text/html",
+                                StatusCode = (int)HttpStatusCode.OK,
+                                Content = objectResultDataHtml
+                            };
+                            return;
+                        }
+
+                        context.Result = new OkObjectResult(objectResultData);
                         context.HttpContext.Items.Add(HttpContextItems.ResponseObject, objectResult.Data);
                         return;
                     }

@@ -16,7 +16,7 @@ using Services.Wallet;
 public sealed record NemesisBetRequest(
         [property: JsonProperty("session_token")] string SessionToken,
         [property: JsonProperty("player_id")] string PlayerId,
-        [property: JsonProperty("game_id")] bool GameId,
+        [property: JsonProperty("game_id")] string GameId,
         [property: JsonProperty("transaction_id")] string TransactionId,
         [property: JsonProperty("round_id")] string RoundId,
         [property: JsonProperty("round_closed")] bool RoundClosed,
@@ -68,8 +68,9 @@ public sealed record NemesisBetRequest(
             var response = new NemesisBetWinRollbackResponse(
                 data.Transaction.InternalId,
                 data.Transaction.Id,
-                NemesisMoneyHelper.FromBalance(data.Balance, data.Currency),
-                data.Currency);
+                NemesisMoneyHelper.FromBalance(data.Balance, data.Currency, out var multiplier),
+                data.Currency,
+                multiplier);
 
             return NemesisResultFactory.Success(response);
         }

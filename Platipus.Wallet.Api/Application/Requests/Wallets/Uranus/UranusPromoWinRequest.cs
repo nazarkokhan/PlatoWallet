@@ -2,7 +2,7 @@
 
 using Base;
 using Data;
-using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
+using Results.ResultToResultMappers;
 using Platipus.Wallet.Api.Application.Results.Uranus;
 using Platipus.Wallet.Api.Application.Results.Uranus.WithData;
 using Platipus.Wallet.Api.Application.Services.Wallet;

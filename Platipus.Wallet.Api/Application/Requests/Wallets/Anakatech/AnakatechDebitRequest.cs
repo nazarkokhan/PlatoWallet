@@ -2,12 +2,12 @@
 
 using FluentValidation;
 using Newtonsoft.Json;
-using Platipus.Wallet.Api.Application.Helpers.Common;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Anakatech.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Anakatech.Enums;
+using Helpers.Common;
+using Base;
+using Enums;
 using Platipus.Wallet.Api.Application.Responses.Anakatech;
 using Platipus.Wallet.Api.Application.Results.Anakatech.WithData;
-using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
+using Results.ResultToResultMappers;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 
 public sealed record AnakatechDebitRequest(
