@@ -94,13 +94,14 @@ public class NemesisGameApiClient : INemesisGameApiClient
         return response;
     }
 
-    public async Task<IResult<IHttpClientResult<NemesisCurrencyGameApiResponse, NemesisErrorGameApiResponse>>> Currency(
-        Uri baseUrl,
-        CancellationToken cancellationToken = default)
+    public async Task<IResult<IHttpClientResult<NemesisCurrenciesGameApiResponse[], NemesisErrorGameApiResponse>>>
+        Currencies(
+            Uri baseUrl,
+            CancellationToken cancellationToken = default)
     {
-        var response = await PostSignedRequestAsync<NemesisCurrencyGameApiResponse>(
+        var response = await PostSignedRequestAsync<NemesisCurrenciesGameApiResponse[]>(
             baseUrl,
-            "currency",
+            "currencies",
             null,
             null,
             cancellationToken);
@@ -108,14 +109,14 @@ public class NemesisGameApiClient : INemesisGameApiClient
         return response;
     }
 
-    public async Task<IResult<IHttpClientResult<NemesisRoundGameApiResponse, NemesisErrorGameApiResponse>>> RoundGame(
+    public async Task<IResult<IHttpClientResult<NemesisRoundGameApiResponse, NemesisErrorGameApiResponse>>> Round(
         Uri baseUrl,
         NemesisRoundGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<NemesisRoundGameApiResponse>(
             baseUrl,
-            "currency",
+            "round",
             request,
             null,
             cancellationToken);
@@ -166,7 +167,8 @@ public class NemesisGameApiClient : INemesisGameApiClient
 
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
-            var isError = responseJson.TryGetProperty("error", out var errorCode);
+            var isError = responseJson.ValueKind is JsonValueKind.Object
+                       && responseJson.TryGetProperty("error", out _);
             if (isError)
             {
                 var error = responseJson.Deserialize<NemesisErrorGameApiResponse>(_jsonSerializerOptions);
@@ -203,7 +205,8 @@ public class NemesisGameApiClient : INemesisGameApiClient
                 responseJson = null;
             }
 
-            var isError = responseJson?.TryGetProperty("error", out var errorCode) ?? false;
+            var isError = responseJson?.ValueKind is JsonValueKind.Object
+                       && responseJson.Value.TryGetProperty("error", out _);
             if (isError)
             {
                 var error = responseJson!.Value.Deserialize<NemesisErrorGameApiResponse>(_jsonSerializerOptions);

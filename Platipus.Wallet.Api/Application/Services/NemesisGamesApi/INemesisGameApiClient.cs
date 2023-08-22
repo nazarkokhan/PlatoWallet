@@ -23,11 +23,11 @@ public interface INemesisGameApiClient
         NemesisCancelAwardGameApiRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<IHttpClientResult<NemesisCurrencyGameApiResponse, NemesisErrorGameApiResponse>>> Currency(
+    Task<IResult<IHttpClientResult<NemesisCurrenciesGameApiResponse[], NemesisErrorGameApiResponse>>> Currencies(
         Uri baseUrl,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<IHttpClientResult<NemesisRoundGameApiResponse, NemesisErrorGameApiResponse>>> RoundGame(
+    Task<IResult<IHttpClientResult<NemesisRoundGameApiResponse, NemesisErrorGameApiResponse>>> Round(
         Uri baseUrl,
         NemesisRoundGameApiRequest request,
         CancellationToken cancellationToken = default);

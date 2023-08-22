@@ -35,7 +35,7 @@ public class ExternalNemesisController : RestApiController
 
     [HttpPost("currencies")]
     public async Task<IActionResult> Currencies(
-        [FromBody] NemesisCurrencyRequest request,
+        [FromBody] NemesisCurrenciesRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 

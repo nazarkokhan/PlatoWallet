@@ -53,13 +53,13 @@ public sealed record NemesisWinRequest(
                        .Failure<NemesisBetWinRollbackResponse>(NemesisErrorCode.InappropriateArgument);
             }
 
-            var walletResult = await _walletService.BetAsync(
+            var walletResult = await _walletService.WinAsync(
                 request.SessionToken,
                 request.RoundId,
                 request.TransactionId,
                 NemesisMoneyHelper.ToBalance(request.Amount, request.Currency),
-                request.Currency,
                 request.RoundClosed,
+                request.Currency,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

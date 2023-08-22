@@ -6,9 +6,9 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Services.NemesisGamesApi;
 
-public record NemesisCurrencyRequest([property: DefaultValue("test")] string Environment) : IRequest<IResult>
+public record NemesisCurrenciesRequest([property: DefaultValue("test")] string Environment) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<NemesisCurrencyRequest, IResult>
+    public class Handler : IRequestHandler<NemesisCurrenciesRequest, IResult>
     {
         private readonly WalletDbContext _context;
         private readonly INemesisGameApiClient _gameApiClient;
@@ -20,7 +20,7 @@ public record NemesisCurrencyRequest([property: DefaultValue("test")] string Env
         }
 
         public async Task<IResult> Handle(
-            NemesisCurrencyRequest request,
+            NemesisCurrenciesRequest request,
             CancellationToken cancellationToken)
         {
             var environment = await _context.Set<GameEnvironment>()
@@ -29,7 +29,7 @@ public record NemesisCurrencyRequest([property: DefaultValue("test")] string Env
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
-            var response = await _gameApiClient.Currency(
+            var response = await _gameApiClient.Currencies(
                 environment.BaseUrl,
                 cancellationToken);
 

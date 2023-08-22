@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 
 [PublicAPI]
-public record NemesisCurrencyGameApiResponse(
+public record NemesisCurrenciesGameApiResponse(
     string Iso,
     string Symbol,
     string Multiplier,

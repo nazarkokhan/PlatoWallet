@@ -34,7 +34,7 @@ public record NemesisRoundGameRequest(
 
             var apiRequest = request.ApiRequest;
 
-            var response = await _gameApiClient.RoundGame(
+            var response = await _gameApiClient.Round(
                 environment.BaseUrl,
                 apiRequest,
                 cancellationToken);
