@@ -2,6 +2,7 @@ using Platipus.Wallet.Api.StartupSettings.Filters.Security.AtlasPlatform;
 
 namespace Platipus.Wallet.Api.StartupSettings.Extensions;
 
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -59,6 +60,7 @@ public static class StartupExtensions
                 nameof(WalletProvider.Openbox),
                 options =>
                 {
+                    options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
