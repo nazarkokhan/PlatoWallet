@@ -3,14 +3,14 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-public ref struct ScriptHelper //TODO why ref struct?
+public ref struct ScriptHelper
 {
     public static string ExtractUrlFromScript(string jsScript, string environment)
     {
         return environment switch
         {
             "local" => ParseLocal(jsScript),
-            "wbg" => ParseWbg(jsScript),
+            "wbg" or "gameserver-test" => ParseWbg(jsScript),
             "test" => ParseTest(jsScript),
             _ => string.Empty
         };
