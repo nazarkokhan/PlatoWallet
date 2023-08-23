@@ -42,7 +42,7 @@ public record SignUpRequest(
                 return ResultFactory.Failure(ErrorCode.CasinoNotFound);
 
             var user = await _context.Set<User>()
-                .Where(u => u.Username == request.Username && u.CasinoId == request.CasinoId)
+                .Where(u => u.Username == request.Username)
                 .Include(u => u.Casino.CasinoCurrencies)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -50,7 +50,7 @@ public record SignUpRequest(
                 return ResultFactory.Failure(ErrorCode.UserAlreadyExists);
 
             var casinoCurrency = await _context.Set<CasinoCurrencies>()
-                .Where(c => c.CasinoId == request.CasinoId && c.Currency.Id == request.Currency)
+                .Where(c => c.CasinoId == request.CasinoId && c.CurrencyId == request.Currency)
                 .Select(c => c.Currency)
                 .FirstOrDefaultAsync(cancellationToken);
 

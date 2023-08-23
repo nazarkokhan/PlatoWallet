@@ -13,6 +13,6 @@ public class ExternalUisController : RestApiController
     public ExternalUisController(IMediator mediator) => _mediator = mediator;
 
     [HttpPost("award")]
-    public async Task<IActionResult> CreateAward(UisCreateAwardRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateAward(UisAwardBonusRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

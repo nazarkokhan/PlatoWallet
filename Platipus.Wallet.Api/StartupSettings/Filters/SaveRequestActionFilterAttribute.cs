@@ -9,7 +9,7 @@ public class SaveRequestDataFilterAttribute : ActionFilterAttribute
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         var request = context.ActionArguments.Values
-           .OfType<IRequest>()
+           .OfType<IBaseRequest>()
            .SingleOrDefault();
         context.HttpContext.Items.Add(HttpContextItems.RequestObject, request);
 

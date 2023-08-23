@@ -21,32 +21,33 @@ public class UisGameApiClient : IUisGameApiClient
         _jsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Uis)).JsonSerializerOptions;
     }
 
-    public async Task<IResult<IHttpClientResult<UisGameApiCreateAwardResponse, UisGameApiErrorResponse>>> CreateAwardAsync(
+    //TODO wrong api. It is our wallet api, but should go directly to gameserver AwardBonus
+    public async Task<IResult<IHttpClientResult<UisAwardBonusGameApiResponse, UisGameApiErrorResponse>>> AwardBonusAsync(
         Uri baseUrl,
-        UisCreateAwardGameApiRequest request,
+        UisAwardBonusGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         var queryParameters = new Dictionary<string, string?>
         {
             { "login", request.Login },
             { "password", request.Password },
-            { "games", request.GameId },
+            { "games", request.Games },
             { "fsquantity", request.Quantity },
             { "validUntil", request.ValidUntil },
             { "requestSign", request.RequestSign },
             { "env", request.Env }
         };
 
-        return await GetAsync<UisGameApiCreateAwardResponse>(
+        return await GetAsync<UisAwardBonusGameApiResponse>(
             baseUrl,
             "award",
             queryParameters,
             cancellationToken);
     }
 
-    public async Task<IResult<IHttpClientResult<UisGameApiDeleteAwardResponse, UisGameApiErrorResponse>>> CancelBonusAsync(
+    public async Task<IResult<IHttpClientResult<UisCancelBonusGameApiResponse, UisGameApiErrorResponse>>> CancelBonusAsync(
         Uri baseUrl,
-        UisDeleteAwardGameApiRequest request,
+        UisCancelBonusGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
         var queryParameters = new Dictionary<string, string?>
@@ -58,7 +59,7 @@ public class UisGameApiClient : IUisGameApiClient
             { "env", request.Env }
         };
 
-        return await GetAsync<UisGameApiDeleteAwardResponse>(
+        return await GetAsync<UisCancelBonusGameApiResponse>(
             baseUrl,
             "bonus/cancel",
             queryParameters,
@@ -73,7 +74,7 @@ public class UisGameApiClient : IUisGameApiClient
     {
         try
         {
-            baseUrl = new Uri(baseUrl, "uis/" + method + QueryString.Create(request));
+            baseUrl = new Uri(baseUrl, $"uis/{method}{QueryString.Create(request)}");
 
             var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
@@ -85,7 +86,9 @@ public class UisGameApiClient : IUisGameApiClient
         }
         catch (Exception e)
         {
-            return ResultFactory.Failure<IHttpClientResult<TSuccess, UisGameApiErrorResponse>>(ErrorCode.UnknownHttpClientError, e);
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, UisGameApiErrorResponse>>(
+                ErrorCode.UnknownHttpClientError,
+                e);
         }
     }
 

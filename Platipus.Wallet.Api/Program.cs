@@ -79,7 +79,7 @@ try
                 options.OutputFormatters.Add(new CustomXmlSerializerOutputFormatter());
 
                 // Action
-                options.Filters.Add<SaveRequestDataFilterAttribute>(-5000);
+                options.Filters.Add<SaveRequestDataFilterAttribute>(-50000);
 
                 // Result
                 options.Filters.Add<ResultToResponseResultFilterAttribute>(1);

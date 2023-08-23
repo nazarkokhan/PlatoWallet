@@ -6,13 +6,13 @@ using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
 
 public interface IUisGameApiClient
 {
-    Task<IResult<IHttpClientResult<UisGameApiCreateAwardResponse, UisGameApiErrorResponse>>> CreateAwardAsync(
+    Task<IResult<IHttpClientResult<UisAwardBonusGameApiResponse, UisGameApiErrorResponse>>> AwardBonusAsync(
         Uri baseUrl,
-        UisCreateAwardGameApiRequest request,
+        UisAwardBonusGameApiRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<IHttpClientResult<UisGameApiDeleteAwardResponse, UisGameApiErrorResponse>>> CancelBonusAsync(
+    Task<IResult<IHttpClientResult<UisCancelBonusGameApiResponse, UisGameApiErrorResponse>>> CancelBonusAsync(
         Uri baseUrl,
-        UisDeleteAwardGameApiRequest request,
+        UisCancelBonusGameApiRequest request,
         CancellationToken cancellationToken = default);
 }

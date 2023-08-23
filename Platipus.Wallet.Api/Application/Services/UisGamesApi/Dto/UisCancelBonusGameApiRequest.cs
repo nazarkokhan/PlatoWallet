@@ -1,10 +1,8 @@
 namespace Platipus.Wallet.Api.Application.Services.UisGamesApi.Dto;
 
-public record UisCreateAwardGameApiRequest(
+public record UisCancelBonusGameApiRequest(
     string Login,
     string Password,
-    string GameId,
-    string Quantity,
-    string ValidUntil,
+    string BonusId,
     string RequestSign,
     string Env);

@@ -122,17 +122,13 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     if (uisResult.IsSuccess)
                     {
                         responseObject = uisResult.Data;
-                        context.Result = new OkObjectResult(responseObject)
-                        {
-                            ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
-                        };
                     }
                     else
                     {
                         var requestObject = httpContext.Items[HttpContextItems.RequestObject]!;
                         var errorResponse = new UisErrorResponse(uisResult.Error);
 
-                        object container = requestObject switch
+                        responseObject = requestObject switch
                         {
                             UisAuthenticateRequest uisRequest
                                 => new UisResponseContainer<UisAuthenticateRequest, UisErrorResponse>(
@@ -150,14 +146,12 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                                 => new UisResponseContainer<UisStatusRequest, UisErrorResponse>(uisRequest, errorResponse),
                             _ => throw new ArgumentOutOfRangeException()
                         };
-
-                        context.Result = new OkObjectResult(container)
-                        {
-                            ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
-                        };
-
-                        responseObject = container;
                     }
+
+                    context.Result = new OkObjectResult(responseObject)
+                    {
+                        ContentTypes = new MediaTypeCollection { MediaTypeNames.Application.Xml }
+                    };
 
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     break;
@@ -360,14 +354,15 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                 case INemesisResult nemesisResult:
                 {
+                    object responseObject;
                     if (nemesisResult.IsSuccess)
                     {
                         if (nemesisResult is not INemesisResult<object> objectResult)
                             return;
 
-                        var objectResultData = objectResult.Data;
+                        responseObject = objectResult.Data;
 
-                        if (objectResultData is string objectResultDataHtml)
+                        if (responseObject is string objectResultDataHtml)
                         {
                             context.Result = new ContentResult
                             {
@@ -378,60 +373,87 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                             return;
                         }
 
-                        context.Result = new OkObjectResult(objectResultData);
-                        context.HttpContext.Items.Add(HttpContextItems.ResponseObject, objectResult.Data);
-                        return;
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var errorCode = nemesisResult.Error;
+
+                        responseObject = new NemesisErrorResponse(errorCode);
+
+                        context.Result = new ObjectResult(responseObject)
+                        {
+                            StatusCode = errorCode switch
+                            {
+                                NemesisErrorCode.SessionExpired
+                                 or NemesisErrorCode.SessionNotFound
+                                 or NemesisErrorCode.SessionNotActivated
+                                 or NemesisErrorCode.SessionIsDeactivated
+                                 or NemesisErrorCode.TokenIsInvalid
+                                 or NemesisErrorCode.IpAddressUnknown => 401,
+                                NemesisErrorCode.ApiDeprecated => 410,
+                                NemesisErrorCode.Internal => 500,
+                                NemesisErrorCode.NotImplemented => 501,
+                                _ => 400
+                            }
+                        };
                     }
 
-                    var errorCode = nemesisResult.Error;
-
-                    var errorResponse = new NemesisErrorResponse(errorCode);
-
-                    context.Result = new ObjectResult(errorResponse)
-                    {
-                        StatusCode = errorCode switch
-                        {
-                            NemesisErrorCode.SessionExpired
-                             or NemesisErrorCode.SessionNotFound
-                             or NemesisErrorCode.SessionNotActivated
-                             or NemesisErrorCode.SessionIsDeactivated
-                             or NemesisErrorCode.TokenIsInvalid
-                             or NemesisErrorCode.IpAddressUnknown => 401,
-                            NemesisErrorCode.ApiDeprecated => 410,
-                            NemesisErrorCode.Internal => 500,
-                            NemesisErrorCode.NotImplemented => 501,
-                            _ => 400
-                        }
-                    };
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
-            }
-        }
 
-        if (context.Result is PswExternalActionResult { Result: { } pswActionResult })
-        {
-            if (pswActionResult.IsSuccess)
-            {
-                if (pswActionResult is IPswResult<object> objectResult)
+                case ISoftswissResult<object> softswissResult:
                 {
-                    context.Result = new OkObjectResult(objectResult.Data);
+                    object responseObject;
+                    if (softswissResult.IsSuccess)
+                    {
+                        responseObject = softswissResult.Data;
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var errorCode = softswissResult.Error;
+
+                        var statusCode = (int)errorCode;
+                        var balance = softswissResult.Balance;
+
+                        if (statusCode is not (>= 400 and <= 599))
+                        {
+                            statusCode = 400;
+                            if (balance is null)
+                                logger.LogWarning("Balance has to be present");
+                        }
+
+                        responseObject = new SoftswissErrorResponse(errorCode, balance);
+                        context.Result = new ObjectResult(responseObject) { StatusCode = statusCode };
+                    }
+
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
 
-                var baseResponse = new PswBaseResponse(PswStatus.OK);
-                context.Result = new OkObjectResult(baseResponse);
-                return;
+                case IPswResult pswResult:
+                {
+                    object responseObject;
+                    if (pswResult.IsSuccess)
+                    {
+                        if (pswResult is IPswResult<object> objectResult)
+                            responseObject = objectResult.Data;
+                        else
+                            responseObject = new PswBaseResponse(PswStatus.OK);
+                    }
+                    else
+                    {
+                        var errorCode = pswResult.Error;
+                        responseObject = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
+                    }
+
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
             }
-
-            var errorCode = pswActionResult.Error;
-
-            var errorResponse = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
-
-            context.Result = new OkObjectResult(errorResponse);
-
-            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
 
         if (context.Result is DafabetExternalActionResult dafabetActionResult)
@@ -509,39 +531,6 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
             var errorResponse = new Hub88ErrorResponse(errorCode);
 
             context.Result = new OkObjectResult(errorResponse);
-
-            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-        }
-
-        if (context.Result is SoftswissExternalActionResult softswissActionResult)
-        {
-            if (softswissActionResult.Result.IsSuccess)
-            {
-                if (softswissActionResult.Result is ISoftswissResult<object> objectResult)
-                {
-                    context.Result = new OkObjectResult(objectResult.Data);
-                    return;
-                }
-
-                context.Result = new OkResult();
-                return;
-            }
-
-            var errorCode = softswissActionResult.Result.Error;
-
-            var statusCode = (int)errorCode;
-            var balance = softswissActionResult.Result.Balance;
-
-            if (statusCode is not (>= 400 and <= 599))
-            {
-                statusCode = 400;
-                if (balance is null)
-                    logger.LogWarning("Balance has to be present");
-            }
-
-            var errorResponse = new SoftswissErrorResponse(errorCode, balance);
-
-            context.Result = new BadRequestObjectResult(errorResponse) { StatusCode = statusCode };
 
             context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }
