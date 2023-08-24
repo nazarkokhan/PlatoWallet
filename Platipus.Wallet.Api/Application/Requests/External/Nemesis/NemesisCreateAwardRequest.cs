@@ -28,6 +28,8 @@ public record NemesisCreateAwardRequest(
             NemesisCreateAwardRequest request,
             CancellationToken cancellationToken)
         {
+            await _context.Database.BeginTransactionAsync(cancellationToken);
+
             var environment = await _context.Set<GameEnvironment>()
                .Where(e => e.Id == request.Environment)
                .FirstOrDefaultAsync(cancellationToken);
@@ -35,53 +37,45 @@ public record NemesisCreateAwardRequest(
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var apiRequest = request.ApiRequest;
-            try
-            {
-                await _context.Database.BeginTransactionAsync(cancellationToken);
 
-                var user = await _context.Set<User>()
-                   .Where(u => u.Username == apiRequest.UserId)
-                   .Include(
-                        u => u.Awards
-                           .Where(a => a.Id == apiRequest.BonusCode))
-                   .Include(u => u.Currency)
-                   .Include(u => u.Casino)
-                   .FirstOrDefaultAsync(cancellationToken);
-                if (user is null)
-                    return ResultFactory.Failure(ErrorCode.UserNotFound);
-                if (user.Awards.Any(a => a.Id == apiRequest.BonusCode))
-                    return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
+            var user = await _context.Set<User>()
+               .Where(u => u.Username == apiRequest.UserId)
+               .Include(u => u.Casino)
+               .FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+                return ResultFactory.Failure(ErrorCode.UserNotFound);
 
-                var expirationTime = DateTimeOffset.FromUnixTimeSeconds(apiRequest.ExpirationTimestamp)
-                   .DateTime
-                   .ToUniversalTime();
-                var award = new Award(
-                    apiRequest.BonusCode,
-                    expirationTime);
+            var award = await _context.Set<Award>()
+               .Where(a => a.Id == apiRequest.BonusCode)
+               .FirstOrDefaultAsync(cancellationToken);
+            if (award is not null)
+                return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 
-                user.Awards.Add(award);
-                _context.Update(user);
+            var expirationTime = DateTimeOffset.FromUnixTimeSeconds(apiRequest.ExpirationTimestamp)
+               .DateTime
+               .ToUniversalTime();
 
-                await _context.SaveChangesAsync(cancellationToken);
+            award = new Award(
+                apiRequest.BonusCode,
+                expirationTime);
 
-                var response = await _gameApiClient.CreateAwardAsync(
-                    environment.BaseUrl,
-                    apiRequest,
-                    user.Casino.SignatureKey,
-                    cancellationToken);
+            user.Awards.Add(award);
+            _context.Update(user);
 
-                if (response is { IsSuccess: true, Data.IsSuccess: true })
-                    await _context.Database.CommitTransactionAsync(cancellationToken);
-                else
-                    await _context.Database.RollbackTransactionAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
-                return response;
-            }
-            catch
-            {
+            var response = await _gameApiClient.CreateAwardAsync(
+                environment.BaseUrl,
+                apiRequest,
+                user.Casino.SignatureKey,
+                cancellationToken);
+
+            if (response is { IsSuccess: true, Data.IsSuccess: true })
+                await _context.Database.CommitTransactionAsync(cancellationToken);
+            else
                 await _context.Database.RollbackTransactionAsync(cancellationToken);
-                return ResultFactory.Failure(ErrorCode.Unknown);
-            }
+
+            return response;
         }
     }
 }

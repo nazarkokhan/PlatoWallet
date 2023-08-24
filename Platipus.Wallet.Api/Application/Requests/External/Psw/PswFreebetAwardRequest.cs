@@ -27,6 +27,8 @@ public record PswFreebetAwardRequest(
             PswFreebetAwardRequest request,
             CancellationToken cancellationToken)
         {
+            await _context.Database.BeginTransactionAsync(cancellationToken);
+
             var environment = await _context.Set<GameEnvironment>()
                .Where(e => e.Id == request.Environment)
                .FirstOrDefaultAsync(cancellationToken);
@@ -38,19 +40,18 @@ public record PswFreebetAwardRequest(
 
             var user = await _context.Set<User>()
                .Where(u => u.Username == apiRequest.User)
-               .Include(
-                    u => u.Awards
-                       .Where(a => a.Id == apiRequest.AwardId))
-               .Include(u => u.Currency)
                .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure(ErrorCode.UserNotFound);
 
-            if (user.Awards.Any(a => a.Id == apiRequest.AwardId))
+            var award = await _context.Set<Award>()
+               .Where(a => a.Id == apiRequest.AwardId)
+               .FirstOrDefaultAsync(cancellationToken);
+            if (award is not null)
                 return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 
-            var award = new Award(apiRequest.AwardId, apiRequest.ValidUntil);
+            award = new Award(apiRequest.AwardId, apiRequest.ValidUntil);
 
             user.Awards.Add(award);
             _context.Update(user);
@@ -62,6 +63,11 @@ public record PswFreebetAwardRequest(
                 apiRequest,
                 request.IsBetflag,
                 cancellationToken);
+
+            if (response is { IsSuccess: true, Data.IsSuccess: true })
+                await _context.Database.CommitTransactionAsync(cancellationToken);
+            else
+                await _context.Database.RollbackTransactionAsync(cancellationToken);
 
             return response;
         }

@@ -26,6 +26,8 @@ public record NemesisCancelAwardRequest(
             NemesisCancelAwardRequest request,
             CancellationToken cancellationToken)
         {
+            await _context.Database.BeginTransactionAsync(cancellationToken);
+
             var environment = await _context.Set<GameEnvironment>()
                .Where(e => e.Id == request.Environment)
                .FirstOrDefaultAsync(cancellationToken);
@@ -47,6 +49,11 @@ public record NemesisCancelAwardRequest(
                 environment.BaseUrl,
                 apiRequest,
                 cancellationToken);
+
+            if (response is { IsSuccess: true, Data.IsSuccess: true })
+                await _context.Database.CommitTransactionAsync(cancellationToken);
+            else
+                await _context.Database.RollbackTransactionAsync(cancellationToken);
 
             return response;
         }
