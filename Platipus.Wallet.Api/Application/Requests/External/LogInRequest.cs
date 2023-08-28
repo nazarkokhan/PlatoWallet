@@ -29,7 +29,7 @@ using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Requests;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
 using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
-using Services.PswGamesApi;
+using Services.PswGameApi;
 using Services.UranusGamesApi;
 using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;

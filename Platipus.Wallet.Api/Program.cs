@@ -19,7 +19,8 @@ using Platipus.Wallet.Api.Application.Services.NemesisGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
-using Platipus.Wallet.Api.Application.Services.PswGamesApi;
+using Platipus.Wallet.Api.Application.Services.PswGameApi;
+using Platipus.Wallet.Api.Application.Services.SwGameApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
@@ -192,7 +193,10 @@ try
        .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>()
        .Services
        .AddTransient<INemesisGameApiClient, NemesisGameApiClient>()
-       .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>();
+       .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>()
+       .Services
+       .AddTransient<ISwGameApiClient, SwGameApiClient>()
+       .AddHttpClient<ISwGameApiClient, SwGameApiClient>();
 
     services
        .AddHealthChecks()

@@ -1,30 +1,29 @@
-namespace Platipus.Wallet.Api.Application.Requests.External.Psw;
+namespace Platipus.Wallet.Api.Application.Requests.External.Sw;
 
 using System.ComponentModel;
+using Microsoft.EntityFrameworkCore;
+using Platipus.Wallet.Api.Application.Services.SwGameApi.Requests;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Services.PswGameApi;
-using Services.PswGameApi.Requests;
+using Services.SwGameApi;
 
-public record PswFreebetAwardRequest(
+public record SwDeleteFreespinRequest(
     [property: DefaultValue("test")] string Environment,
-    bool IsBetflag,
-    PswFreebetAwardGameApiRequest ApiRequest) : IRequest<IResult>
+    SwDeleteFreespinGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<PswFreebetAwardRequest, IResult>
+    public class Handler : IRequestHandler<SwDeleteFreespinRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly IPswGameApiClient _gameApiClient;
+        private readonly ISwGameApiClient _gameApiClient;
 
-        public Handler(WalletDbContext context, IPswGameApiClient gameApiClient)
+        public Handler(WalletDbContext context, ISwGameApiClient gameApiClient)
         {
             _context = context;
             _gameApiClient = gameApiClient;
         }
 
         public async Task<IResult> Handle(
-            PswFreebetAwardRequest request,
+            SwDeleteFreespinRequest request,
             CancellationToken cancellationToken)
         {
             await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -32,36 +31,31 @@ public record PswFreebetAwardRequest(
             var environment = await _context.Set<GameEnvironment>()
                .Where(e => e.Id == request.Environment)
                .FirstOrDefaultAsync(cancellationToken);
-
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var apiRequest = request.ApiRequest;
 
-            var user = await _context.Set<User>()
-               .Where(u => u.Username == apiRequest.User)
-               .FirstOrDefaultAsync(cancellationToken);
-
-            if (user is null)
-                return ResultFactory.Failure(ErrorCode.UserNotFound);
-
             var award = await _context.Set<Award>()
-               .Where(a => a.Id == apiRequest.AwardId)
+               .Where(a => a.Id == apiRequest.FreespinId)
+               .Include(a => a.User)
                .FirstOrDefaultAsync(cancellationToken);
-            if (award is not null)
-                return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
+            if (award is null)
+                return ResultFactory.Failure(ErrorCode.AwardNotFound);
 
-            award = new Award(apiRequest.AwardId, apiRequest.ValidUntil);
+            var keyValid = SwKeyData.TryParse(apiRequest.Key, out var keyData);
+            if (!keyValid)
+                return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
 
-            user.Awards.Add(award);
-            _context.Update(user);
+            if (award.User.CasinoId != keyData!.CasinoId)
+                return ResultFactory.Failure(ErrorCode.AwardDoesNotBelongToThisUser);
 
+            _context.Remove(award);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = await _gameApiClient.FreebetAwardAsync(
+            var response = await _gameApiClient.DeleteFreespin(
                 environment.BaseUrl,
                 apiRequest,
-                request.IsBetflag,
                 cancellationToken);
 
             if (response is { IsSuccess: true, Data.IsSuccess: true })

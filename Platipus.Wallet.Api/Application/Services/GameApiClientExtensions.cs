@@ -1,9 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Services;
 
 using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
-using PswGamesApi;
-using PswGamesApi.Requests;
-using PswGamesApi.Responses;
+using PswGameApi;
+using PswGameApi.Requests;
+using PswGameApi.Responses;
 
 public static class GameApiClientExtensions
 {

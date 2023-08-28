@@ -7,11 +7,11 @@ using DTOs.Requests;
 using DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Platipus.Wallet.Api.Application.Results.Hub88;
-using Platipus.Wallet.Api.Application.Results.Hub88.WithData;
+using Results.Hub88;
+using Results.Hub88.WithData;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
-using Platipus.Wallet.Domain.Entities.Enums;
+using Domain.Entities.Enums;
 
 public class Hub88GamesApiClient : IHub88GamesApiClient
 {

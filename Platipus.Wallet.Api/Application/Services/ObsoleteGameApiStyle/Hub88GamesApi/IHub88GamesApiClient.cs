@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88Gam
 
 using DTOs.Requests;
 using DTOs.Responses;
-using Platipus.Wallet.Api.Application.Results.Hub88.WithData;
+using Results.Hub88.WithData;
 
 public interface IHub88GamesApiClient
 {

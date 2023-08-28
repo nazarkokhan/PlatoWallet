@@ -1,4 +1,4 @@
-namespace Platipus.Wallet.Api.Application.Services.PswGamesApi.Responses;
+namespace Platipus.Wallet.Api.Application.Services.PswGameApi.Responses;
 
 using Platipus.Wallet.Api.Application.Requests.Wallets.Psw.Base.Response;
 

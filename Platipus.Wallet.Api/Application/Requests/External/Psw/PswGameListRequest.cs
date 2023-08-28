@@ -4,8 +4,8 @@ using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.PswGamesApi;
-using Services.PswGamesApi.Requests;
+using Services.PswGameApi;
+using Services.PswGameApi.Requests;
 
 public record PswGameListRequest(
     [property: DefaultValue("test")] string Environment,

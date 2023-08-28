@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Platipus.Wallet.Domain.Entities.Enums;
+using Domain.Entities.Enums;
 
 public class ReevoGameApiClient : IReevoGameApiClient
 {

@@ -1,19 +1,19 @@
-namespace Platipus.Wallet.Api.Application.Services.PswGamesApi;
+namespace Platipus.Wallet.Api.Application.Services.PswGameApi;
 
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Platipus.Wallet.Api.Application.Results.HttpClient;
+using Platipus.Wallet.Api.Application.Results.HttpClient.HttpData;
+using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Requests;
 using Responses;
-using Results.HttpClient;
-using Results.HttpClient.HttpData;
-using Results.HttpClient.WithData;
 
 public class PswGameApiClient : IPswGameApiClient
 {

@@ -11,10 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign;
-using Platipus.Wallet.Api.StartupSettings.Options;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Domain.Entities.Enums;
-using Platipus.Wallet.Infrastructure.Persistence;
+using StartupSettings.Options;
+using Domain.Entities;
+using Domain.Entities.Enums;
+using Infrastructure.Persistence;
 
 public class SoftswissGamesApiClient : ISoftswissGamesApiClient
 {
