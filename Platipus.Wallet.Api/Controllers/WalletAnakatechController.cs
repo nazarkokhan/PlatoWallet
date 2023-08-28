@@ -25,9 +25,9 @@ public sealed class WalletAnakatechController : RestApiController
         _mediator = mediator;
     }
 
-    [HttpPost("balance")]
+    [HttpPost("initGame")]
     [ProducesResponseType(typeof(AnakatechGetPlayerBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPlayerBalance(
+    public async Task<IActionResult> InitGame(
         [FromBody] AnakatechGetPlayerBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
