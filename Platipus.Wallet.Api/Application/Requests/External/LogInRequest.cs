@@ -21,16 +21,15 @@ using Services.EmaraPlayGamesApi;
 using Services.EmaraPlayGamesApi.Requests;
 using Services.EvenbetGamesApi;
 using Services.EvenbetGamesApi.Requests;
-using Services.GamesGlobalGamesApi;
-using Services.Hub88GamesApi;
-using Services.Hub88GamesApi.DTOs;
-using Services.Hub88GamesApi.DTOs.Requests;
 using Services.NemesisGamesApi;
 using Services.NemesisGamesApi.Requests;
+using Services.ObsoleteGameApiStyle.Hub88GamesApi;
+using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs;
+using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Requests;
+using Services.ObsoleteGameApiStyle.ReevoGamesApi;
+using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
+using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Services.PswGamesApi;
-using Services.ReevoGamesApi;
-using Services.ReevoGamesApi.DTO;
-using Services.SoftswissGamesApi;
 using Services.UranusGamesApi;
 using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;
@@ -68,7 +67,6 @@ public sealed record LogInRequest(
         private readonly IPswGameApiClient _pswGameApiClient;
         private readonly IHub88GamesApiClient _hub88GamesApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
-        private readonly IGamesGlobalGamesApiClient _globalGamesApiClient;
         private readonly IEmaraPlayGameApiClient _emaraPlayGameApiClient;
         private readonly IReevoGameApiClient _reevoGameApiClient;
         private readonly SoftswissCurrenciesOptions _currencyMultipliers;
@@ -84,7 +82,6 @@ public sealed record LogInRequest(
             IPswGameApiClient pswGameApiClient,
             IHub88GamesApiClient hub88GamesApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
-            IGamesGlobalGamesApiClient globalGamesApiClient,
             IReevoGameApiClient reevoGameApiClient,
             IOptions<SoftswissCurrenciesOptions> currencyMultipliers,
             IHttpContextAccessor httpContextAccessor,
@@ -99,7 +96,6 @@ public sealed record LogInRequest(
             _pswGameApiClient = pswGameApiClient;
             _hub88GamesApiClient = hub88GamesApiClient;
             _softswissGamesApiClient = softswissGamesApiClient;
-            _globalGamesApiClient = globalGamesApiClient;
             _reevoGameApiClient = reevoGameApiClient;
             _httpContextAccessor = httpContextAccessor;
             _emaraPlayGameApiClient = emaraPlayGameApiClient;
@@ -511,16 +507,6 @@ public sealed record LogInRequest(
                         user.Currency.Id,
                         casino.InternalId);
 
-                    break;
-
-                case WalletProvider.GamesGlobal:
-                    var getLaunchUrlResult = await _globalGamesApiClient.GetLaunchUrlAsync(
-                        baseUrl,
-                        session.Id,
-                        game.LaunchName,
-                        cancellationToken);
-
-                    launchUrl = getLaunchUrlResult.Data ?? "";
                     break;
 
                 case WalletProvider.Uis:

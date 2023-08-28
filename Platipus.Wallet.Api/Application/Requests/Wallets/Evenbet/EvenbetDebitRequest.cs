@@ -1,21 +1,21 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evenbet;
 
+using System.Text.Json.Serialization;
 using Base;
 using FluentValidation;
 using Helpers.Common;
-using Newtonsoft.Json;
 using Responses.Evenbet;
 using Results.Evenbet.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
 public sealed record EvenbetDebitRequest(
-        [property: JsonProperty("token")] string Token,
-        [property: JsonProperty("gameId")] string GameId,
-        [property: JsonProperty("endRound")] bool EndRound,
-        [property: JsonProperty("roundId")] string RoundId,
-        [property: JsonProperty("transactionId")] string TransactionId,
-        [property: JsonProperty("amount")] int Amount)
+        [property: JsonPropertyName("token")] string Token,
+        [property: JsonPropertyName("gameId")] string GameId,
+        [property: JsonPropertyName("endRound")] bool EndRound,
+        [property: JsonPropertyName("roundId")] string RoundId,
+        [property: JsonPropertyName("transactionId")] string TransactionId,
+        [property: JsonPropertyName("amount")] int Amount)
     : IEvenbetRequest, IRequest<IEvenbetResult<EvenbetDebitResponse>>
 {
     public sealed class Handler : IRequestHandler<EvenbetDebitRequest, IEvenbetResult<EvenbetDebitResponse>>

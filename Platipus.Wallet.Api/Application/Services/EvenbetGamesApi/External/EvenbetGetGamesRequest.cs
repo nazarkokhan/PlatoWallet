@@ -1,12 +1,12 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi.External;
 
+using System.Text.Json.Serialization;
 using Application.Requests.Wallets.Evenbet.Models;
-using Newtonsoft.Json;
 using Results.Evenbet.WithData;
 using Results.ResultToResultMappers;
 using Wallet;
 
-public sealed record EvenbetGetGamesRequest([property: JsonProperty("environment")] string Environment)
+public sealed record EvenbetGetGamesRequest([property: JsonPropertyName("environment")] string Environment)
     : IRequest<IEvenbetResult<List<EvenbetGameModel>>>
 {
     public sealed class Handler : IRequestHandler<EvenbetGetGamesRequest, IEvenbetResult<List<EvenbetGameModel>>>

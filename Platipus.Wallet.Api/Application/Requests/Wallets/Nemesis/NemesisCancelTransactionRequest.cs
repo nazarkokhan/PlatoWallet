@@ -1,9 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Nemesis;
 
+using System.Text.Json.Serialization;
 using Base;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 using Responses;
 using Results.Nemesis;
 using Results.Nemesis.WithData;
@@ -12,13 +12,13 @@ using Services.Wallet;
 
 [PublicAPI]
 public sealed record NemesisCancelTransactionRequest(
-        [property: JsonProperty("session_token")] string SessionToken,
-        [property: JsonProperty("player_id")] string PlayerId,
-        [property: JsonProperty("game_id")] string GameId,
-        [property: JsonProperty("round_id")] string RoundId,
-        [property: JsonProperty("reference_transaction_id")] string ReferenceTransactionId,
-        [property: JsonProperty("amount")] decimal Amount,
-        [property: JsonProperty("currency")] string Currency)
+        [property: JsonPropertyName("session_token")] string SessionToken,
+        [property: JsonPropertyName("player_id")] string PlayerId,
+        [property: JsonPropertyName("game_id")] string GameId,
+        [property: JsonPropertyName("round_id")] string RoundId,
+        [property: JsonPropertyName("reference_transaction_id")] string ReferenceTransactionId,
+        [property: JsonPropertyName("amount")] decimal Amount,
+        [property: JsonPropertyName("currency")] string Currency)
     : INemesisRequest, IRequest<INemesisResult<NemesisBetWinRollbackResponse>>
 {
     public sealed class

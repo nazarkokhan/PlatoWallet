@@ -6,9 +6,9 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Results.Hub88;
 using Results.Hub88.WithData;
-using Services.Hub88GamesApi;
-using Services.Hub88GamesApi.DTOs.Requests;
-using Services.Hub88GamesApi.DTOs.Responses;
+using Services.ObsoleteGameApiStyle.Hub88GamesApi;
+using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Requests;
+using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Responses;
 
 public record ExternalHub88GetCasinoGamesRequest(string CasinoId) : IRequest<IHub88Result<List<Hub88GetGameDto>>>
 {

@@ -1,12 +1,12 @@
 ﻿namespace Platipus.Wallet.Api.Application.Responses.Evenbet;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 public sealed record EvenbetLoginResponse(
-    [property: JsonProperty("token")] string Token,
-    [property: JsonProperty("balance")] int Balance,
-    [property: JsonProperty("currency")] string Currency,
-    [property: JsonProperty("nickname")] string Nickname,
-    [property: JsonProperty("timestamp")] string Timestamp,
-    [property: JsonProperty("userId")] int UserId,
-    [property: JsonProperty("country")] string? Country = null);
+    [property: JsonPropertyName("token")] string Token,
+    [property: JsonPropertyName("balance")] int Balance,
+    [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("nickname")] string Nickname,
+    [property: JsonPropertyName("timestamp")] string Timestamp,
+    [property: JsonPropertyName("userId")] int UserId,
+    [property: JsonPropertyName("country")] string? Country = null);

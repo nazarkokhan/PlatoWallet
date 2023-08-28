@@ -1,12 +1,12 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.EvenbetGamesApi.Requests;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 public sealed record EvenbetGetLaunchGameUrlGameApiRequest(
-    [property: JsonProperty("gameId")] string GameId,
-    [property: JsonProperty("mode")] bool Mode,
-    [property: JsonProperty("casinoId")] string CasinoId,
-    [property: JsonProperty("language")] string Language,
-    [property: JsonProperty("platform")] string Platform,
-    [property: JsonProperty("currency")] string Currency = "",
-    [property: JsonProperty("token")] string Token = "");
+    [property: JsonPropertyName("gameId")] string GameId,
+    [property: JsonPropertyName("mode")] bool Mode,
+    [property: JsonPropertyName("casinoId")] string CasinoId,
+    [property: JsonPropertyName("language")] string Language,
+    [property: JsonPropertyName("platform")] string Platform,
+    [property: JsonPropertyName("currency")] string Currency = "",
+    [property: JsonPropertyName("token")] string Token = "");

@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Horizon.XmlRpc.AspNetCore.Extensions;
 using Humanizer;
 using JorgeSerrano.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +15,11 @@ using Platipus.Wallet.Api.Application.Services.AnakatechGamesApi;
 using Platipus.Wallet.Api.Application.Services.AtlasGamesApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
-using Platipus.Wallet.Api.Application.Services.GamesGlobalGamesApi;
-using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.NemesisGamesApi;
+using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi;
+using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
+using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.PswGamesApi;
-using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
-using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
@@ -167,13 +165,6 @@ try
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
             })
        .Services
-       .AddTransient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>()
-       .AddHttpClient<IGamesGlobalGamesApiClient, GamesGlobalGamesApiClient>(
-            options =>
-            {
-                options.BaseAddress = new Uri($"{gamesApiUrl}gameglobal/");
-            })
-       .Services
        .AddTransient<IReevoGameApiClient, ReevoGameApiClient>()
        .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
@@ -207,7 +198,6 @@ try
        .AddHealthChecks()
        .AddNpgSql(builderConfiguration.GetConnectionString(nameof(WalletDbContext))!, name: nameof(WalletDbContext));
 
-    services.AddXmlRpc(); //TODO remove with gg provider code
     services.AddHttpContextAccessor();
 
     var app = builder.Build();

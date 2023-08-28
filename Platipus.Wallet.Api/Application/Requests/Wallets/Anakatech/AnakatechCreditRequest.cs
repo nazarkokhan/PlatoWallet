@@ -1,28 +1,28 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Anakatech;
 
+using System.Text.Json.Serialization;
 using Base;
 using Enums;
 using FluentValidation;
 using Helpers.Common;
-using Newtonsoft.Json;
 using Responses.Anakatech;
 using Results.Anakatech.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
 public sealed record AnakatechCreditRequest(
-        [property: JsonProperty("secret")] string Secret,
-        [property: JsonProperty("sessionId")] string SessionId,
-        [property: JsonProperty("securityToken")] string SecurityToken,
-        [property: JsonProperty("playerId")] string PlayerId,
-        [property: JsonProperty("providerGameId")] string ProviderGameId,
-        [property: JsonProperty("playMode")] int PlayMode,
-        [property: JsonProperty("roundId")] string RoundId,
-        [property: JsonProperty("transactionId")] string TransactionId,
-        [property: JsonProperty("currency")] string Currency,
-        [property: JsonProperty("amount")] long Amount,
-        [property: JsonProperty("closeRound")] bool CloseRound,
-        [property: JsonProperty("secondaryRoundId")] string? SecondaryRoundId = null)
+        [property: JsonPropertyName("secret")] string Secret,
+        [property: JsonPropertyName("sessionId")] string SessionId,
+        [property: JsonPropertyName("securityToken")] string SecurityToken,
+        [property: JsonPropertyName("playerId")] string PlayerId,
+        [property: JsonPropertyName("providerGameId")] string ProviderGameId,
+        [property: JsonPropertyName("playMode")] int PlayMode,
+        [property: JsonPropertyName("roundId")] string RoundId,
+        [property: JsonPropertyName("transactionId")] string TransactionId,
+        [property: JsonPropertyName("currency")] string Currency,
+        [property: JsonPropertyName("amount")] long Amount,
+        [property: JsonPropertyName("closeRound")] bool CloseRound,
+        [property: JsonPropertyName("secondaryRoundId")] string? SecondaryRoundId = null)
     : IAnakatechChargeRequest,
       IRequest<IAnakatechResult<AnakatechCreditResponse>>
 {

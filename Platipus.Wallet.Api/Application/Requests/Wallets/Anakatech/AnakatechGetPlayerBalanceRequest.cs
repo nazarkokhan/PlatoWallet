@@ -1,22 +1,22 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Anakatech;
 
+using System.Text.Json.Serialization;
 using Base;
 using Enums;
 using FluentValidation;
 using Helpers.Common;
-using Newtonsoft.Json;
 using Responses.Anakatech;
 using Results.Anakatech.WithData;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
 public sealed record AnakatechGetPlayerBalanceRequest(
-        [property: JsonProperty("secret")] string Secret,
-        [property: JsonProperty("sessionId")] string SessionId,
-        [property: JsonProperty("securityToken")] string SecurityToken,
-        [property: JsonProperty("playerId")] string PlayerId,
-        [property: JsonProperty("providerGameId")] string ProviderGameId,
-        [property: JsonProperty("playMode")] int PlayMode)
+        [property: JsonPropertyName("secret")] string Secret,
+        [property: JsonPropertyName("sessionId")] string SessionId,
+        [property: JsonPropertyName("securityToken")] string SecurityToken,
+        [property: JsonPropertyName("playerId")] string PlayerId,
+        [property: JsonPropertyName("providerGameId")] string ProviderGameId,
+        [property: JsonPropertyName("playMode")] int PlayMode)
     : IAnakatechBaseRequest, IRequest<IAnakatechResult<AnakatechGetPlayerBalanceResponse>>
 {
     public sealed class Handler

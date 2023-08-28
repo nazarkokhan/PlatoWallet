@@ -4,8 +4,8 @@ using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.ReevoGamesApi;
-using Services.ReevoGamesApi.DTO;
+using Services.ObsoleteGameApiStyle.ReevoGamesApi;
+using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
 
 public record ReevoRemoveFreeRoundsRequest(
     [property: DefaultValue("test")] string Environment,

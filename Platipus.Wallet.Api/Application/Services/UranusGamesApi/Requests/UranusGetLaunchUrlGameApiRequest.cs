@@ -1,17 +1,17 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi.Requests;
 
+using System.Text.Json.Serialization;
 using Abstaction;
-using Newtonsoft.Json;
 
 public sealed record UranusGetLaunchUrlGameApiRequest(
-    [property: JsonProperty("gameId")] string GameId,
-    [property: JsonProperty("sessionToken")] string SessionToken,
-    [property: JsonProperty("language")] string Language,
-    [property: JsonProperty("currency")] string Currency,
-    [property: JsonProperty("playerId")] string PlayerId,
-    [property: JsonProperty("casinoId")] string CasinoId = "",
-    [property: JsonProperty("platformType")] string PlatformType = "",
-    [property: JsonProperty("countryCode")] string CountryCode = "",
-    [property: JsonProperty("depositUrl")] string DepositUrl = "",
-    [property: JsonProperty("lobbyUrl")] string LobbyUrl = "",
-    [property: JsonProperty("playerIp")] string PlayerIp = "") : IUranusCommonGetLaunchUrlApiRequest;
+    [property: JsonPropertyName("gameId")] string GameId,
+    [property: JsonPropertyName("sessionToken")] string SessionToken,
+    [property: JsonPropertyName("language")] string Language,
+    [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("playerId")] string PlayerId,
+    [property: JsonPropertyName("casinoId")] string CasinoId = "",
+    [property: JsonPropertyName("platformType")] string PlatformType = "",
+    [property: JsonPropertyName("countryCode")] string CountryCode = "",
+    [property: JsonPropertyName("depositUrl")] string DepositUrl = "",
+    [property: JsonPropertyName("lobbyUrl")] string LobbyUrl = "",
+    [property: JsonPropertyName("playerIp")] string PlayerIp = "") : IUranusCommonGetLaunchUrlApiRequest;

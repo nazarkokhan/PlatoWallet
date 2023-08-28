@@ -1,0 +1,13 @@
+namespace Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Responses;
+
+public record Hub88GameApiCancelRewardResponseDto(
+    string? User,
+    DateTime? StartTime,
+    string? RewardUuid,
+    string? PrepaidUuid,
+    int? GameId,
+    string? GameCode,
+    DateTime? EndTime,
+    string? Currency,
+    int? BetValue,
+    int? BetCount);

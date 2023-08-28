@@ -1,11 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Nemesis;
 
+using System.Text.Json.Serialization;
 using Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Responses;
 using Results.Nemesis;
 using Results.Nemesis.WithData;
@@ -14,16 +14,16 @@ using Services.Wallet;
 
 [PublicAPI]
 public sealed record NemesisWinRequest(
-        [property: JsonProperty("session_token")] string SessionToken,
-        [property: JsonProperty("player_id")] string PlayerId,
-        [property: JsonProperty("game_id")] string GameId,
-        [property: JsonProperty("transaction_id")] string TransactionId,
-        [property: JsonProperty("round_id")] string RoundId,
-        [property: JsonProperty("round_closed")] bool RoundClosed,
-        [property: JsonProperty("amount")] decimal Amount,
-        [property: JsonProperty("kind")] string? Kind,
-        [property: JsonProperty("bonus_code")] string? BonusCode,
-        [property: JsonProperty("currency")] string Currency)
+        [property: JsonPropertyName("session_token")] string SessionToken,
+        [property: JsonPropertyName("player_id")] string PlayerId,
+        [property: JsonPropertyName("game_id")] string GameId,
+        [property: JsonPropertyName("transaction_id")] string TransactionId,
+        [property: JsonPropertyName("round_id")] string RoundId,
+        [property: JsonPropertyName("round_closed")] bool RoundClosed,
+        [property: JsonPropertyName("amount")] decimal Amount,
+        [property: JsonPropertyName("kind")] string? Kind,
+        [property: JsonPropertyName("bonus_code")] string? BonusCode,
+        [property: JsonPropertyName("currency")] string Currency)
     : INemesisRequest, IRequest<INemesisResult<NemesisBetWinRollbackResponse>>
 {
     public sealed class Handler : IRequestHandler<NemesisWinRequest, INemesisResult<NemesisBetWinRollbackResponse>>

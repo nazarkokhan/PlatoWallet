@@ -1,5 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi.Requests;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
-public sealed record UranusGetAvailableGamesGameApiRequest([property: JsonProperty("casinoId")] string? CasinoId);
+public sealed record UranusGetAvailableGamesGameApiRequest([property: JsonPropertyName("casinoId")] string? CasinoId);

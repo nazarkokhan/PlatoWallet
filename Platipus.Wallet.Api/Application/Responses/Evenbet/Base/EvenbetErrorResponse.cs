@@ -1,7 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Responses.Evenbet.Base;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 public sealed record EvenbetErrorResponse(
-    [property: JsonProperty("code")] int Code,
-    [property: JsonProperty("message")] string Message);
+    [property: JsonPropertyName("code")] int Code,
+    [property: JsonPropertyName("message")] string Message);

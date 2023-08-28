@@ -4,8 +4,8 @@ using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.SoftswissGamesApi;
-using Services.SoftswissGamesApi.DTOs.Requests;
+using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
+using Services.ObsoleteGameApiStyle.SoftswissGamesApi.DTOs.Requests;
 
 public record ExternalSoftswissIssueFreespinsRequest(
         [property: DefaultValue("test")] string Environment,

@@ -1,8 +1,8 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.UranusGamesApi.External;
 
+using System.Text.Json.Serialization;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
-using Newtonsoft.Json;
 using Requests;
 using Results.ResultToResultMappers;
 using Results.Uranus;
@@ -10,8 +10,8 @@ using Results.Uranus.WithData;
 using Wallet;
 
 public sealed record UranusGetDemoLaunchGameUrlRequest(
-        [property: JsonProperty("environment")] string Environment,
-        [property: JsonProperty("apiRequest")] UranusGetDemoLaunchUrlGameApiRequest GameApiRequest)
+        [property: JsonPropertyName("environment")] string Environment,
+        [property: JsonPropertyName("apiRequest")] UranusGetDemoLaunchUrlGameApiRequest GameApiRequest)
     : IRequest<IUranusResult<UranusSuccessResponse<UranusGameUrlData>>>
 {
     public sealed class Handler : IRequestHandler<UranusGetDemoLaunchGameUrlRequest,

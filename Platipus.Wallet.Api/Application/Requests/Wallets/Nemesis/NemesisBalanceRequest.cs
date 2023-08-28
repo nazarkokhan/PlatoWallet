@@ -1,9 +1,9 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Nemesis;
 
+using System.Text.Json.Serialization;
 using Base;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 using Responses;
 using Results.Nemesis;
 using Results.Nemesis.WithData;
@@ -11,7 +11,7 @@ using Results.ResultToResultMappers;
 using Services.Wallet;
 
 [PublicAPI]
-public sealed record NemesisBalanceRequest([property: JsonProperty("session_token")] string SessionToken)
+public sealed record NemesisBalanceRequest([property: JsonPropertyName("session_token")] string SessionToken)
     : INemesisRequest, IRequest<INemesisResult<NemesisBalanceResponse>>
 {
     public sealed class Handler : IRequestHandler<NemesisBalanceRequest, INemesisResult<NemesisBalanceResponse>>

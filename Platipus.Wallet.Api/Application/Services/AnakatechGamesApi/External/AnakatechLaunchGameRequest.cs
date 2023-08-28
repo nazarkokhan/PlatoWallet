@@ -1,15 +1,15 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.AnakatechGamesApi.External;
 
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using Requests;
 using Results.Anakatech.WithData;
 using Results.ResultToResultMappers;
 using Wallet;
 
 public sealed record AnakatechLaunchGameRequest(
-    [property: JsonProperty("environment")] string Environment,
-    [property: JsonProperty("apiRequest")] AnakatechLaunchGameApiRequest ApiRequest) : IRequest<IAnakatechResult<string>>
+    [property: JsonPropertyName("environment")] string Environment,
+    [property: JsonPropertyName("apiRequest")] AnakatechLaunchGameApiRequest ApiRequest) : IRequest<IAnakatechResult<string>>
 {
     public sealed class Handler : IRequestHandler<AnakatechLaunchGameRequest, IAnakatechResult<string>>
     {
@@ -37,10 +37,10 @@ public sealed record AnakatechLaunchGameRequest(
 
             if (clientResponse.IsFailure)
                 return clientResponse.ToAnakatechFailureResult<string>();
-            
+
             var gameLaunchScript = clientResponse.Data.Data;
             var processedScript = Regex.Unescape(gameLaunchScript);
-            
+
             return clientResponse.ToAnakatechResult(processedScript);
         }
     }

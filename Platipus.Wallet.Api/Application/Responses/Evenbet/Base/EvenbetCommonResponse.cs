@@ -1,7 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Responses.Evenbet.Base;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 public abstract record EvenbetCommonResponse(
-    [property: JsonProperty("balance")] int Balance,
-    [property: JsonProperty("timestamp")] string Timestamp);
+    [property: JsonPropertyName("balance")] int Balance,
+    [property: JsonPropertyName("timestamp")] string Timestamp);

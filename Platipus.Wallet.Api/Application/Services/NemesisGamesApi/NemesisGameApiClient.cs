@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Services.NemesisGamesApi;
 
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Web;
 using Microsoft.AspNetCore.Mvc;

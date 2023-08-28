@@ -1,11 +1,11 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Evenbet.Models;
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 public sealed record EvenbetGameModel(
-    [property: JsonProperty("name")] string Name,
-    [property: JsonProperty("gameId")] string GameId,
-    [property: JsonProperty("platform")] string Platform,
-    [property: JsonProperty("languages")] string Languages,
-    [property: JsonProperty("category")] string Category,
-    [property: JsonProperty("image")] string Image);
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("gameId")] string GameId,
+    [property: JsonPropertyName("platform")] string Platform,
+    [property: JsonPropertyName("languages")] string Languages,
+    [property: JsonPropertyName("category")] string Category,
+    [property: JsonPropertyName("image")] string Image);

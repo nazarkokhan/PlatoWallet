@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.External.Hub88;
-using Application.Services.Hub88GamesApi.DTOs.Responses;
+using Application.Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Responses;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
