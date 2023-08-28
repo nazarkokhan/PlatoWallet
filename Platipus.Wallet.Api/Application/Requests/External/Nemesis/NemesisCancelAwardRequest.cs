@@ -42,12 +42,25 @@ public record NemesisCancelAwardRequest(
             if (award is null)
                 return ResultFactory.Failure(ErrorCode.AwardNotFound);
 
+            var user = await _context.Set<User>()
+               .Where(
+                    u => u.Username == apiRequest.UserId
+                      && u.CasinoId == apiRequest.PartnerId)
+               .Include(u => u.Casino)
+               .FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+                return ResultFactory.Failure(ErrorCode.UserNotFound);
+
+            if (award.UserId != user.Id)
+                return ResultFactory.Failure(ErrorCode.AwardDoesNotBelongToThisUser);
+
             _context.Remove(award);
             await _context.SaveChangesAsync(cancellationToken);
 
             var response = await _gameApiClient.CancelAwardAsync(
                 environment.BaseUrl,
                 apiRequest,
+                user.Casino.SignatureKey,
                 cancellationToken);
 
             if (response is { IsSuccess: true, Data.IsSuccess: true })

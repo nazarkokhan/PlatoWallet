@@ -21,6 +21,7 @@ public interface INemesisGameApiClient
     Task<IResult<IHttpClientResult<NemesisCancelAwardGameApiResponse, NemesisErrorGameApiResponse>>> CancelAwardAsync(
         Uri baseUrl,
         NemesisCancelAwardGameApiRequest request,
+        string xIntegrationToken,
         CancellationToken cancellationToken = default);
 
     Task<IResult<IHttpClientResult<NemesisCurrenciesGameApiResponse[], NemesisErrorGameApiResponse>>> Currencies(

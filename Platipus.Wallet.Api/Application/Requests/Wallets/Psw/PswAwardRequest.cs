@@ -3,9 +3,11 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Psw;
 using Base;
 using Base.Response;
 using FluentValidation;
+using JetBrains.Annotations;
 using Results.ResultToResultMappers;
 using Services.Wallet;
 
+[PublicAPI]
 public record PswAwardRequest(
     string SessionId,
     string User,
@@ -14,7 +16,8 @@ public record PswAwardRequest(
     string RoundId,
     string TransactionId,
     decimal Amount,
-    string AwardId) : IPswBaseRequest, IRequest<IPswResult<PswBalanceResponse>>
+    string AwardId,
+    bool Finished) : IPswBaseRequest, IRequest<IPswResult<PswBalanceResponse>>
 {
     public class Handler : IRequestHandler<PswAwardRequest, IPswResult<PswBalanceResponse>>
     {
@@ -36,6 +39,7 @@ public record PswAwardRequest(
                 request.Amount,
                 request.AwardId,
                 request.Currency,
+                request.Finished,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

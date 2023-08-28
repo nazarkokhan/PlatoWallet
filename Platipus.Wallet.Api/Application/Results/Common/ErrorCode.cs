@@ -29,6 +29,7 @@ public enum ErrorCode
 
     InsufficientFunds,
 
+    AwardDoesNotBelongToThisUser,
     AwardNotFound,
     AwardIsAlreadyUsed,
     AwardExpired,

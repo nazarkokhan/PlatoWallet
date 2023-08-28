@@ -321,6 +321,7 @@ public sealed class WalletService : IWalletService
         decimal amount,
         string awardId,
         string? currency = null,
+        bool roundFinished = true,
         bool searchByUsername = false,
         CancellationToken cancellationToken = default)
     {
@@ -336,14 +337,6 @@ public sealed class WalletService : IWalletService
             if (transactionAlreadyExists)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.TransactionAlreadyExists);
 
-            var roundAlreadyExists = await _context.Set<Round>()
-               .TagWith("Award")
-               .Where(t => t.Id == roundId)
-               .AnyAsync(cancellationToken);
-
-            if (roundAlreadyExists)
-                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.RoundAlreadyExists);
-
             var user = await _context.Set<User>()
                .TagWith("Award")
                .Where(
@@ -351,7 +344,6 @@ public sealed class WalletService : IWalletService
                         ? u.Username == sessionId
                         : u.Sessions.Any(s => s.Id == sessionId))
                .Include(u => u.Awards.Where(r => r.Id == awardId))
-               .ThenInclude(r => r.AwardRound)
                .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
@@ -365,23 +357,37 @@ public sealed class WalletService : IWalletService
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardNotFound);
             if (award.ValidUntil < DateTime.UtcNow)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardExpired);
-            if (award.AwardRound is not null)
-                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardIsAlreadyUsed);
 
-            var transaction = new Transaction(transactionId, amount, TransactionType.Award);
-            _context.Add(transaction);
 
-            var awardRound = new AwardRound { AwardId = awardId };
-            _context.Add(awardRound);
 
-            var round = new Round(roundId)
+            var round = await _context.Set<Round>()
+               .TagWith("Award")
+               .Where(t => t.Id == roundId)
+               .Include(t => t.AwardRound)
+               .FirstOrDefaultAsync(cancellationToken);
+
+            if (round is null)
             {
-                Finished = true,
-                Transactions = new List<Transaction> { transaction },
-                AwardRound = awardRound,
-                UserId = user.Id
+                var awardRound = new AwardRound { AwardId = awardId };
+                _context.Add(awardRound);
+
+                round = new Round(roundId)
+                {
+                    Finished = roundFinished,
+                    AwardRound = awardRound,
+                    UserId = user.Id
+                };
+
+                _context.Add(round);
+            }
+            else if (round.Finished)
+                return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.RoundAlreadyFinished);
+
+            var transaction = new Transaction(transactionId, amount, TransactionType.Award)
+            {
+                Round = round
             };
-            _context.Add(round);
+            _context.Add(transaction);
 
             user.Balance += amount;
             _context.Update(user);

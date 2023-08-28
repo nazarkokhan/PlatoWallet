@@ -1,6 +1,10 @@
 namespace Platipus.Wallet.Api.Application.Services.NemesisGamesApi;
 
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Platipus.Wallet.Api.Application.Results.HttpClient;
@@ -33,16 +37,20 @@ public class NemesisGameApiClient : INemesisGameApiClient
     {
         try
         {
-            var queryParameters = ObjectToDictionaryConverter.ConvertToDictionary(request);
-            var queryString = QueryString.Create(queryParameters);
+            var queryParamsCollection = ObjectToDictionaryConverter.ConvertToDictionary(request);
+
+            var orderedQueryParams = queryParamsCollection
+               .OrderBy(x => x.Key)
+               .Select(x => x.Key + HttpUtility.UrlEncode(x.Value));
+            var stringToHash = xIntegrationToken[..4] + string.Concat(orderedQueryParams);
+            var bytesToHash = Encoding.UTF8.GetBytes(stringToHash);
+            var hashBytes = SHA1.HashData(bytesToHash);
+            var hash = Convert.ToHexString(hashBytes).ToLower();
+            queryParamsCollection.Add("qsig", hash);
+
+            var queryString = QueryString.Create(queryParamsCollection);
             baseUrl = new Uri(baseUrl, "nemesis/launcher" + queryString);
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, baseUrl)
-            {
-                Headers =
-                {
-                    { NemesisHeaders.XIntegrationToken, xIntegrationToken }
-                }
-            };
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
             var httpResponseOriginal = await _httpClient.SendAsync(httpRequestMessage, cancellationToken);
 
@@ -82,13 +90,14 @@ public class NemesisGameApiClient : INemesisGameApiClient
         CancelAwardAsync(
             Uri baseUrl,
             NemesisCancelAwardGameApiRequest request,
+            string xIntegrationToken,
             CancellationToken cancellationToken = default)
     {
         var response = await PostSignedRequestAsync<NemesisCancelAwardGameApiResponse>(
             baseUrl,
             "cancel",
             request,
-            null,
+            xIntegrationToken,
             cancellationToken);
 
         return response;

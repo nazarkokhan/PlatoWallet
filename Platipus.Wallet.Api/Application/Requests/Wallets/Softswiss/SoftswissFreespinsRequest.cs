@@ -3,6 +3,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Softswiss;
 using Base.Response;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Requests.Base;
@@ -10,6 +11,7 @@ using Results.ResultToResultMappers;
 using Services.Wallet;
 using StartupSettings.Options;
 
+[PublicAPI]
 public record SoftswissFreespinsRequest(
         string IssueId,
         string Status,
@@ -22,7 +24,10 @@ public record SoftswissFreespinsRequest(
         private readonly WalletDbContext _context;
         private readonly SoftswissCurrenciesOptions _currencyMultipliers;
 
-        public Handler(IWalletService wallet, WalletDbContext context, IOptions<SoftswissCurrenciesOptions> currencyMultipliers)
+        public Handler(
+            IWalletService wallet,
+            WalletDbContext context,
+            IOptions<SoftswissCurrenciesOptions> currencyMultipliers)
         {
             _wallet = wallet;
             _context = context;
@@ -34,18 +39,18 @@ public record SoftswissFreespinsRequest(
             CancellationToken cancellationToken)
         {
             var award = await _context.Set<Award>()
-                .Where(a => a.Id == request.IssueId)
-                .Select(
+               .Where(a => a.Id == request.IssueId)
+               .Select(
                     a => new
                     {
                         a.ValidUntil,
                         a.Currency,
                         UserSession = a.User.Sessions
-                            .OrderByDescending(x => x.CreatedDate)
-                            .Select(s => new { s.Id })
-                            .FirstOrDefault()
+                           .OrderByDescending(x => x.CreatedDate)
+                           .Select(s => new { s.Id })
+                           .FirstOrDefault()
                     })
-                .FirstOrDefaultAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (award?.UserSession is null)
                 return SoftswissResultFactory.Failure<SoftswissBalanceResponse>(SoftswissErrorCode.InvalidFreeSpinsIssue);
@@ -54,8 +59,7 @@ public record SoftswissFreespinsRequest(
                 award.UserSession.Id,
                 Guid.NewGuid().ToString(),
                 Guid.NewGuid().ToString(),
-                //TODO remove usd hardcode
-                _currencyMultipliers.GetSumIn(award.Currency ?? "USD", request.TotalAmount),
+                _currencyMultipliers.GetSumIn(award.Currency ?? "USD", request.TotalAmount), //TODO remove usd hardcode
                 request.IssueId,
                 cancellationToken: cancellationToken);
 

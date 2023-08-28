@@ -30,14 +30,14 @@ public sealed record UranusPromoWinRequest(
         {
             var walletResult = await _walletService.AwardAsync(
                 sessionId: request.PlayerId,
-                amount: decimal.Parse(request.Amount),
-                transactionId: request.TransactionId,
-                currency: request.Currency,
                 roundId: "0",
+                transactionId: request.TransactionId,
+                amount: decimal.Parse(request.Amount),
                 awardId: "some award id",
+                currency: request.Currency,
                 cancellationToken: cancellationToken);
 
-            if (walletResult.IsFailure || walletResult.Data is null)
+            if (walletResult.IsFailure)
                 return walletResult.ToUranusFailureResult<UranusSuccessResponse<UranusCommonDataWithTransaction>>();
             var response = new UranusSuccessResponse<UranusCommonDataWithTransaction>(
                 new UranusCommonDataWithTransaction(

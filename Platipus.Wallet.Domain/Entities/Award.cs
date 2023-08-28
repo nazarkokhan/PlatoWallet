@@ -14,7 +14,7 @@ public class Award : Entity<string>
 
     public string? Currency { get; set; }
 
-    public AwardRound? AwardRound { get; set; }
+    public List<AwardRound> AwardRound { get; set; } = new();
 
     public int UserId { get; set; }
     public User User { get; set; } = null!;

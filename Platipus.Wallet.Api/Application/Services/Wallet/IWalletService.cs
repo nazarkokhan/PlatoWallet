@@ -46,6 +46,7 @@ public interface IWalletService
         decimal amount,
         string awardId,
         string? currency = null,
+        bool roundFinished = true,
         bool searchByUsername = false,
         CancellationToken cancellationToken = default);
 
