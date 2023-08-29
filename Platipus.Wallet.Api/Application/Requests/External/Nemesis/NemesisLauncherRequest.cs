@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
-using Services.NemesisGamesApi;
-using Services.NemesisGamesApi.Requests;
+using Services.NemesisGameApi;
+using Services.NemesisGameApi.Requests;
 
 [PublicAPI]
 public record NemesisLauncherRequest(

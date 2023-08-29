@@ -11,11 +11,12 @@ using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
 using Platipus.Wallet.Api;
-using Platipus.Wallet.Api.Application.Services.AnakatechGamesApi;
-using Platipus.Wallet.Api.Application.Services.AtlasGamesApi;
-using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
-using Platipus.Wallet.Api.Application.Services.EvenbetGamesApi;
-using Platipus.Wallet.Api.Application.Services.NemesisGamesApi;
+using Platipus.Wallet.Api.Application.Services.AnakatechGameApi;
+using Platipus.Wallet.Api.Application.Services.AtlasGameApi;
+using Platipus.Wallet.Api.Application.Services.EmaraPlayGameApi;
+using Platipus.Wallet.Api.Application.Services.EvenbetGameApi;
+using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi;
+using Platipus.Wallet.Api.Application.Services.NemesisGameApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
@@ -196,7 +197,10 @@ try
        .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>()
        .Services
        .AddTransient<ISwGameApiClient, SwGameApiClient>()
-       .AddHttpClient<ISwGameApiClient, SwGameApiClient>();
+       .AddHttpClient<ISwGameApiClient, SwGameApiClient>()
+       .Services
+       .AddTransient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
+       .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>();
 
     services
        .AddHealthChecks()

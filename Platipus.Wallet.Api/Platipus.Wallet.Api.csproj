@@ -64,7 +64,6 @@
 
     <ItemGroup>
       <Folder Include="Application\Services\ObsoleteGameApiStyle\" />
-      <Folder Include="Application\Services\SwGameApi\Responses\" />
     </ItemGroup>
 
 </Project>

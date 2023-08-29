@@ -2,13 +2,13 @@
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Results;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
-using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 using System.ComponentModel;
-using Services.EmaraPlayGamesApi.Requests;
+using Services.EmaraPlayGameApi;
+using Services.EmaraPlayGameApi.Requests;
 
 public sealed record EmaraPlayGetLauncherUrlRequest(
     [property: DefaultValue("local")]string Environment,

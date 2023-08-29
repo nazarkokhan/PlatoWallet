@@ -4,7 +4,7 @@ using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.NemesisGamesApi;
+using Services.NemesisGameApi;
 
 public record NemesisCurrenciesRequest([property: DefaultValue("test")] string Environment) : IRequest<IResult>
 {

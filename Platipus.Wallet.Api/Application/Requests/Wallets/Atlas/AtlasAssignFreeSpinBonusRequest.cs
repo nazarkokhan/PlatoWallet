@@ -5,8 +5,8 @@ using Base;
 using FluentValidation;
 using Results.Atlas;
 using Results.ResultToResultMappers;
-using Services.AtlasGamesApi;
-using Services.AtlasGamesApi.Requests;
+using Services.AtlasGameApi;
+using Services.AtlasGameApi.Requests;
 using Services.Wallet;
 
 public sealed record AtlasAssignFreeSpinBonusRequest(

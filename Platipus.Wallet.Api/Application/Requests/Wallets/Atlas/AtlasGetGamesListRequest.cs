@@ -6,8 +6,8 @@ using Responses.AtlasPlatform;
 using Results.Atlas;
 using Results.Atlas.WithData;
 using Results.ResultToResultMappers;
-using Services.AtlasGamesApi;
-using Services.AtlasGamesApi.Requests;
+using Services.AtlasGameApi;
+using Services.AtlasGameApi.Requests;
 using Services.Wallet;
 
 public sealed record AtlasGetGamesListRequest(

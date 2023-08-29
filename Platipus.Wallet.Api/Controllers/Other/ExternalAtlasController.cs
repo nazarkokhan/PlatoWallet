@@ -3,7 +3,7 @@
 using Abstract;
 using Application.Requests.Wallets.Atlas;
 using Application.Responses.AtlasPlatform;
-using Application.Services.AtlasGamesApi.Requests;
+using Application.Services.AtlasGameApi.Requests;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;

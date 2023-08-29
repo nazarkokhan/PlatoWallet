@@ -3,7 +3,7 @@
 using Abstract;
 using Application.Requests.Wallets.Evenbet.Models;
 using Application.Responses.Evenbet.Base;
-using Application.Services.EvenbetGamesApi.External;
+using Application.Services.EvenbetGameApi.External;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;

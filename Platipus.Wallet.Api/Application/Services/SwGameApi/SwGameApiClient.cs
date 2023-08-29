@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Services.SwGameApi;
 
 using System.Text.Json;
+using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Platipus.Wallet.Api.Application.Results.HttpClient;
@@ -8,6 +9,7 @@ using Platipus.Wallet.Api.Application.Results.HttpClient.HttpData;
 using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
 using Platipus.Wallet.Api.Extensions;
 using Requests;
+using Responses;
 
 public class SwGameApiClient : ISwGameApiClient
 {
@@ -19,7 +21,7 @@ public class SwGameApiClient : ISwGameApiClient
         IOptionsMonitor<JsonOptions> jsonOptions)
     {
         _httpClient = httpClient;
-        _jsonSerializerOptions = jsonOptions.CurrentValue.JsonSerializerOptions;
+        _jsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Sw)).JsonSerializerOptions;
     }
 
     public async Task<IResult<IHttpClientResult<SwAwardGameApiResponse, SwErrorGameApiResponse>>> CreateFreespin(
@@ -94,8 +96,8 @@ public class SwGameApiClient : ISwGameApiClient
 
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
-            var isError = responseJson.TryGetProperty("error", out var errorCode);
-            if (isError)
+            var isError = responseJson.TryGetProperty("result", out var resultStatus);
+            if (isError && resultStatus.GetString() == "ERROR")
             {
                 var error = responseJson.Deserialize<SwErrorGameApiResponse>(_jsonSerializerOptions);
                 return httpResponse.Failure<TSuccess, SwErrorGameApiResponse>(error!);

@@ -2,14 +2,14 @@
 using Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay.Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
-using Platipus.Wallet.Api.Application.Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.EmaraPlay;
 
 using Application.Results.ResultToResultMappers;
 using FluentValidation;
-using Services.EmaraPlayGamesApi.Requests;
+using Services.EmaraPlayGameApi;
+using Services.EmaraPlayGameApi.Requests;
 
 public sealed record EmaraPlayGetRoundDetailsRequest(
     string Environment, 

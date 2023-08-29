@@ -5,9 +5,9 @@ using FluentValidation;
 using Responses;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay;
 using Platipus.Wallet.Api.Application.Results.EmaraPlay.WithData;
-using Services.EmaraPlayGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
-using Services.EmaraPlayGamesApi.Requests;
+using Services.EmaraPlayGameApi;
+using Services.EmaraPlayGameApi.Requests;
 
 public sealed record EmaraPlayCancelRequest(
     string Environment,

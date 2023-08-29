@@ -2,7 +2,7 @@
 
 using Abstract;
 using Application.Responses.Anakatech.Base;
-using Application.Services.AnakatechGamesApi.External;
+using Application.Services.AnakatechGameApi.External;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;

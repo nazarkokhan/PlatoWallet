@@ -4,8 +4,8 @@ using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.NemesisGamesApi;
-using Services.NemesisGamesApi.Requests;
+using Services.NemesisGameApi;
+using Services.NemesisGameApi.Requests;
 
 public record NemesisRoundGameRequest(
     [property: DefaultValue("test")] string Environment,
