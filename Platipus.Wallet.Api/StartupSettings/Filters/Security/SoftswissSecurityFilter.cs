@@ -2,15 +2,23 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
+using Application.Requests.Wallets.Softswiss;
 using Application.Requests.Wallets.Softswiss.Base;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
-public class SoftswissSecurityFilterAttribute : ActionFilterAttribute
+public class SoftswissSecurityFilter : IAsyncActionFilter
 {
-    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    private readonly WalletDbContext _dbContext;
+
+    public SoftswissSecurityFilter(WalletDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var httpContext = context.HttpContext;
 
@@ -21,21 +29,27 @@ public class SoftswissSecurityFilterAttribute : ActionFilterAttribute
             return;
         }
 
-        var request = context.ActionArguments.Values
-            .OfType<ISoftswissBaseRequest>()
-            .FirstOrDefault();
+        var baseRequest = context.HttpContext.GetRequestObject();
 
-        if (request is null)
+        var sessionQuery = _dbContext.Set<Session>()
+           .AsQueryable();
+
+        if (baseRequest is SoftswissFreespinsRequest freespinsRequest)
         {
-            await next();
-            return;
+            var awardId = freespinsRequest.IssueId;
+            httpContext.Items.Add(HttpContextItems.SoftswissAwardSessionId, awardId);
+            sessionQuery = sessionQuery
+               .Where(q => q.User.Awards.Any(a => a.Id == awardId));
         }
-
-        var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
-
-        var session = await dbContext.Set<Session>()
-            .Where(s => s.Id == request.SessionId)
-            .Select(
+        else
+        {
+            var request = (ISoftswissBaseRequest)baseRequest;
+            sessionQuery = sessionQuery
+               .Where(s => s.Id == request.SessionId);
+        }
+        var session = await sessionQuery
+           .OrderByDescending(s => s.ExpirationDate)
+           .Select(
                 s => new
                 {
                     s.Id,
@@ -47,7 +61,7 @@ public class SoftswissSecurityFilterAttribute : ActionFilterAttribute
                     },
                     IsTemporary = s.IsTemporaryToken
                 })
-            .FirstOrDefaultAsync(httpContext.RequestAborted);
+           .FirstOrDefaultAsync(httpContext.RequestAborted);
 
         if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {

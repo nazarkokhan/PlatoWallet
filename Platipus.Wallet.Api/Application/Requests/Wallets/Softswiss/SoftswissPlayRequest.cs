@@ -46,7 +46,7 @@ public record SoftswissPlayRequest(
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.GameId!,
+                        request.Game,
                         null);
 
                     break;
@@ -71,7 +71,7 @@ public record SoftswissPlayRequest(
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.GameId,
+                        request.Game,
                         new List<PlayTransaction>
                         {
                             new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)
@@ -96,7 +96,7 @@ public record SoftswissPlayRequest(
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.GameId,
+                        request.Game,
                         new List<PlayTransaction>
                         {
                             new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)

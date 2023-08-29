@@ -13,9 +13,15 @@ public static class HttpContextItems
     public const string RequestQueryString = nameof(RequestQueryString);
 
     public const string BetflagCasinoSecretKey = nameof(BetflagCasinoSecretKey);
+    public const string SoftswissAwardSessionId = nameof(SoftswissAwardSessionId);
 
     public const string OpenboxDecryptedPayloadJsonString = nameof(OpenboxDecryptedPayloadJsonString);
     public const string OpenboxDecryptedPayloadRequestObject = nameof(OpenboxDecryptedPayloadRequestObject);
+
+    public static IBaseRequest GetRequestObject(this HttpContext httpContext)
+    {
+        return (IBaseRequest)httpContext.Items[RequestObject]!;
+    }
 
     public static byte[] GetRequestBodyBytesItem(this HttpContext httpContext)
     {

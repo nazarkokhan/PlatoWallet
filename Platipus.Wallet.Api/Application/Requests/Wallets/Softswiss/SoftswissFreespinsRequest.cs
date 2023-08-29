@@ -43,7 +43,6 @@ public record SoftswissFreespinsRequest(
                .Select(
                     a => new
                     {
-                        a.ValidUntil,
                         a.Currency,
                         UserSession = a.User.Sessions
                            .OrderByDescending(x => x.CreatedDate)

@@ -26,6 +26,7 @@ public static class StartupExtensions
     {
         return services
            .AddSingleton<SoftswissMockedErrorActionFilter>()
+           .AddScoped<SoftswissSecurityFilter>()
            .AddSingleton<BetflagMockedErrorActionFilter>()
            .AddScoped<BetflagSecurityFilter>()
            .AddSingleton<BetconstructMockedErrorActionFilter>()

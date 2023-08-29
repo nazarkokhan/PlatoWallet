@@ -19,7 +19,7 @@ using StartupSettings.Filters.Security;
 
 [Route("wallet/softswiss")]
 [ServiceFilter(typeof(SoftswissMockedErrorActionFilter), Order = 1)]
-[SoftswissSecurityFilter(Order = 2)]
+[ServiceFilter(typeof(SoftswissSecurityFilter), Order = 2)]
 [JsonSettingsName(WalletProvider.Softswiss)]
 [ProducesResponseType(typeof(SoftswissErrorResponse), StatusCodes.Status400BadRequest)]
 public class WalletSoftswissController : RestApiController
