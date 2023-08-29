@@ -26,22 +26,31 @@ public record ExternalSoftswissCancelFreespinsRequest(
             ExternalSoftswissCancelFreespinsRequest request,
             CancellationToken cancellationToken)
         {
+            await _context.Database.BeginTransactionAsync(cancellationToken);
+
             var environment = await _context.Set<GameEnvironment>()
-                .Where(e => e.Id == request.Environment)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(e => e.Id == request.Environment)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
-            var response = await _gamesApiClient.CancelFreespinsAsync(environment.BaseUrl, request.ApiRequest, cancellationToken);
+            var award = await _context.Set<Award>()
+               .Where(e => e.Id == request.ApiRequest.IssueId)
+               .FirstOrDefaultAsync(cancellationToken);
 
-            var data = response.Data;
-            if (data.Content is null)
-                return response;
+            if (award is null)
+                return ResultFactory.Failure(ErrorCode.AwardNotFound);
 
-            await _context.Set<Award>()
-                .Where(e => e.Id == request.ApiRequest.IssueId)
-                .ExecuteDeleteAsync(cancellationToken);
+            var response = await _gamesApiClient.CancelFreespinsAsync(
+                environment.BaseUrl,
+                request.ApiRequest,
+                cancellationToken);
+
+            if (response is { IsSuccess: true, Data: not null })
+                await _context.Database.CommitTransactionAsync(cancellationToken);
+            else
+                await _context.Database.RollbackTransactionAsync(cancellationToken);
 
             return response;
         }

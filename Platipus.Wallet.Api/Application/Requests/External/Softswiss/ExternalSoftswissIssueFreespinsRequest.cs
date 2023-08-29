@@ -27,29 +27,27 @@ public record ExternalSoftswissIssueFreespinsRequest(
             ExternalSoftswissIssueFreespinsRequest request,
             CancellationToken cancellationToken)
         {
+            await _context.Database.BeginTransactionAsync(cancellationToken);
+
             var environment = await _context.Set<GameEnvironment>()
-                .Where(e => e.Id == request.Environment)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(e => e.Id == request.Environment)
+               .FirstOrDefaultAsync(cancellationToken);
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var apiRequest = request.ApiRequest;
 
             var award = await _context.Set<Award>()
-                .Where(a => a.Id == apiRequest.IssueId)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(a => a.Id == apiRequest.IssueId)
+               .FirstOrDefaultAsync(cancellationToken);
             if (award is not null)
                 return ResultFactory.Failure<object>(ErrorCode.AwardIsAlreadyUsed);
 
             var user = await _context.Set<User>()
-                .Where(e => e.Username == apiRequest.User.Id)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(e => e.Username == apiRequest.User.Id)
+               .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
                 return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
-
-            var response = await _gamesApiClient.IssueFreespinsAsync(environment.BaseUrl, apiRequest, cancellationToken);
-            if (response.IsFailure)
-                return response;
 
             award = new Award(apiRequest.IssueId, apiRequest.ValidUntil)
             {
@@ -58,6 +56,13 @@ public record ExternalSoftswissIssueFreespinsRequest(
             };
             _context.Add(award);
             await _context.SaveChangesAsync(cancellationToken);
+
+            var response = await _gamesApiClient.IssueFreespinsAsync(environment.BaseUrl, apiRequest, cancellationToken);
+
+            if (response.IsSuccess)
+                await _context.Database.CommitTransactionAsync(cancellationToken);
+            else
+                await _context.Database.RollbackTransactionAsync(cancellationToken);
 
             return response;
         }
