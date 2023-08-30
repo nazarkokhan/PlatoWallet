@@ -39,7 +39,7 @@ public sealed class WalletNemesisController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
-    [ProducesResponseType(typeof(NemesisBetWinRollbackResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NemesisBetWinResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
         [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
         [FromBody] NemesisBetRequest request,
@@ -47,7 +47,7 @@ public sealed class WalletNemesisController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("win")]
-    [ProducesResponseType(typeof(NemesisBetWinRollbackResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NemesisBetWinResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
         [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
         [FromBody] NemesisWinRequest request,
@@ -55,7 +55,7 @@ public sealed class WalletNemesisController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("cancel-transaction")]
-    [ProducesResponseType(typeof(NemesisBetWinRollbackResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NemesisCancelTransactionResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelTransaction(
         [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
         [FromBody] NemesisCancelTransactionRequest request,

@@ -24,9 +24,9 @@ public sealed record NemesisBetRequest(
         [property: JsonPropertyName("kind")] string? Kind,
         [property: JsonPropertyName("bonus_code")] string? BonusCode,
         [property: JsonPropertyName("currency")] string Currency)
-    : INemesisRequest, IRequest<INemesisResult<NemesisBetWinRollbackResponse>>
+    : INemesisRequest, IRequest<INemesisResult<NemesisBetWinResponse>>
 {
-    public sealed class Handler : IRequestHandler<NemesisBetRequest, INemesisResult<NemesisBetWinRollbackResponse>>
+    public sealed class Handler : IRequestHandler<NemesisBetRequest, INemesisResult<NemesisBetWinResponse>>
     {
         private readonly IWalletService _walletService;
         private readonly WalletDbContext _context;
@@ -37,7 +37,7 @@ public sealed record NemesisBetRequest(
             _context = context;
         }
 
-        public async Task<INemesisResult<NemesisBetWinRollbackResponse>> Handle(
+        public async Task<INemesisResult<NemesisBetWinResponse>> Handle(
             NemesisBetRequest request,
             CancellationToken cancellationToken)
         {
@@ -49,7 +49,7 @@ public sealed record NemesisBetRequest(
 
                 if (award is null || award.ValidUntil < DateTime.UtcNow)
                     return NemesisResultFactory
-                       .Failure<NemesisBetWinRollbackResponse>(NemesisErrorCode.InappropriateArgument);
+                       .Failure<NemesisBetWinResponse>(NemesisErrorCode.InappropriateArgument);
             }
 
             var walletResult = await _walletService.BetAsync(
@@ -62,10 +62,10 @@ public sealed record NemesisBetRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToNemesisFailureResult<NemesisBetWinRollbackResponse>();
+                return walletResult.ToNemesisFailureResult<NemesisBetWinResponse>();
             var data = walletResult.Data;
 
-            var response = new NemesisBetWinRollbackResponse(
+            var response = new NemesisBetWinResponse(
                 data.Transaction.InternalId,
                 data.Transaction.Id,
                 NemesisMoneyHelper.FromBalance(data.Balance, data.Currency, out var multiplier),

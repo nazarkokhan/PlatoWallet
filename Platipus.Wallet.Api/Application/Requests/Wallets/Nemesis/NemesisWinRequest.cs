@@ -24,9 +24,9 @@ public sealed record NemesisWinRequest(
         [property: JsonPropertyName("kind")] string? Kind,
         [property: JsonPropertyName("bonus_code")] string? BonusCode,
         [property: JsonPropertyName("currency")] string Currency)
-    : INemesisRequest, IRequest<INemesisResult<NemesisBetWinRollbackResponse>>
+    : INemesisRequest, IRequest<INemesisResult<NemesisBetWinResponse>>
 {
-    public sealed class Handler : IRequestHandler<NemesisWinRequest, INemesisResult<NemesisBetWinRollbackResponse>>
+    public sealed class Handler : IRequestHandler<NemesisWinRequest, INemesisResult<NemesisBetWinResponse>>
     {
         private readonly IWalletService _walletService;
         private readonly WalletDbContext _context;
@@ -37,7 +37,7 @@ public sealed record NemesisWinRequest(
             _context = context;
         }
 
-        public async Task<INemesisResult<NemesisBetWinRollbackResponse>> Handle(
+        public async Task<INemesisResult<NemesisBetWinResponse>> Handle(
             NemesisWinRequest request,
             CancellationToken cancellationToken)
         {
@@ -50,7 +50,7 @@ public sealed record NemesisWinRequest(
 
                 if (award is null || award.ValidUntil < DateTime.UtcNow)
                     return NemesisResultFactory
-                       .Failure<NemesisBetWinRollbackResponse>(NemesisErrorCode.InappropriateArgument);
+                       .Failure<NemesisBetWinResponse>(NemesisErrorCode.InappropriateArgument);
             }
 
             var walletResult = await _walletService.WinAsync(
@@ -63,7 +63,7 @@ public sealed record NemesisWinRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToNemesisFailureResult<NemesisBetWinRollbackResponse>();
+                return walletResult.ToNemesisFailureResult<NemesisBetWinResponse>();
             var data = walletResult.Data;
 
             if (isAward)
@@ -77,7 +77,7 @@ public sealed record NemesisWinRequest(
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
-            var response = new NemesisBetWinRollbackResponse(
+            var response = new NemesisBetWinResponse(
                 data.Transaction.InternalId,
                 data.Transaction.Id,
                 NemesisMoneyHelper.FromBalance(data.Balance, data.Currency, out var multiplier),

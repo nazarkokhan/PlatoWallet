@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Nemesis;
 
 using System.Text.Json.Serialization;
 using Base;
-using Infrastructure.Persistence;
 using JetBrains.Annotations;
 using Responses;
 using Results.Nemesis;
@@ -19,21 +18,19 @@ public sealed record NemesisCancelTransactionRequest(
         [property: JsonPropertyName("reference_transaction_id")] string ReferenceTransactionId,
         [property: JsonPropertyName("amount")] decimal Amount,
         [property: JsonPropertyName("currency")] string Currency)
-    : INemesisRequest, IRequest<INemesisResult<NemesisBetWinRollbackResponse>>
+    : INemesisRequest, IRequest<INemesisResult<NemesisCancelTransactionResponse>>
 {
     public sealed class
-        Handler : IRequestHandler<NemesisCancelTransactionRequest, INemesisResult<NemesisBetWinRollbackResponse>>
+        Handler : IRequestHandler<NemesisCancelTransactionRequest, INemesisResult<NemesisCancelTransactionResponse>>
     {
         private readonly IWalletService _walletService;
-        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService walletService, WalletDbContext context)
+        public Handler(IWalletService walletService)
         {
             _walletService = walletService;
-            _context = context;
         }
 
-        public async Task<INemesisResult<NemesisBetWinRollbackResponse>> Handle(
+        public async Task<INemesisResult<NemesisCancelTransactionResponse>> Handle(
             NemesisCancelTransactionRequest request,
             CancellationToken cancellationToken)
         {
@@ -45,12 +42,12 @@ public sealed record NemesisCancelTransactionRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToNemesisFailureResult<NemesisBetWinRollbackResponse>();
+                return walletResult.ToNemesisFailureResult<NemesisCancelTransactionResponse>();
             var data = walletResult.Data;
 
-            var response = new NemesisBetWinRollbackResponse(
-                data.Transaction.InternalId,
+            var response = new NemesisCancelTransactionResponse(
                 data.Transaction.Id,
+                data.Transaction.InternalId,
                 NemesisMoneyHelper.FromBalance(data.Balance, data.Currency, out var multiplier),
                 data.Currency,
                 multiplier);

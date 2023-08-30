@@ -2,10 +2,12 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Softswiss;
 
 using Domain.Entities;
 using Infrastructure.Persistence;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Services.ObsoleteGameApiStyle.SoftswissGamesApi.DTOs.Requests;
 
+[PublicAPI]
 public record ExternalSoftswissCancelFreespinsRequest(
         string Environment,
         SoftswissCancelFreespinsGameApiRequest ApiRequest)
