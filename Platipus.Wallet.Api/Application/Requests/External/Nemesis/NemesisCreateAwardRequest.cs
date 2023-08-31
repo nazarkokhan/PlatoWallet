@@ -54,6 +54,10 @@ public record NemesisCreateAwardRequest(
             var expirationTime = DateTimeOffset.FromUnixTimeSeconds(apiRequest.ExpirationTimestamp)
                .DateTime
                .ToUniversalTime();
+            var now = DateTime.UtcNow;
+
+            if (expirationTime < now)
+                expirationTime = now + TimeSpan.FromDays(30);
 
             award = new Award(
                 apiRequest.BonusCode,
