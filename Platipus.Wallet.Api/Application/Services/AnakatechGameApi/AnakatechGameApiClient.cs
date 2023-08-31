@@ -51,9 +51,10 @@ public sealed class AnakatechGameApiClient : IAnakatechGameApiClient
             { nameof(apiRequest.PlayMode).ToCamelCase(), apiRequest.PlayMode.ToString() },
             { nameof(apiRequest.SecurityToken).ToCamelCase(), apiRequest.SecurityToken },
             { nameof(apiRequest.Balance).ToCamelCase(), apiRequest.Balance.ToString() },
-            { nameof(apiRequest.RealityCheckInterval).ToCamelCase(), apiRequest.RealityCheckInterval.ToString() }
+            { nameof(apiRequest.RealityCheckInterval).ToCamelCase(), apiRequest.RealityCheckInterval.ToString() },
+            { nameof(apiRequest.SessionId).ToCamelCase(), apiRequest.SessionId }
         };
-
+        
         if (apiRequest.Audio is not null)
         {
             requestToSend.Add(nameof(apiRequest.Audio).ToCamelCase(), apiRequest.Audio.ToString());
