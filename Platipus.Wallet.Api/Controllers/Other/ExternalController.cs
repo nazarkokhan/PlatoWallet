@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
+using System.Xml.Schema;
 using Abstract;
 using Application.Requests.External;
 using Application.Requests.Test;
@@ -29,6 +30,19 @@ public class ExternalController : RestApiController
     [HttpPut("balance")]
     [ProducesResponseType(typeof(LogInRequest.Response), StatusCodes.Status200OK)]
     public async Task<IActionResult> AddBalance(ChangeBalanceRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpGet("session")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSessionByUser(
+        [FromQuery] GetSessionByUserRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPut("session")]
+    public async Task<IActionResult> UpdateSessionLifetime(
+        [FromQuery] UpdateSessionLifetimeRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpGet("error-mock")]
