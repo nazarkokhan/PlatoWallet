@@ -1,17 +1,16 @@
-﻿namespace Platipus.Wallet.Api.Application.Results.PariMatch.WithData;
+namespace Platipus.Wallet.Api.Application.Results.Parimatch.WithData;
 
 using Platipus.Wallet.Api.Application.Results.Base.WithData;
-using PariMatch;
 
-public record PariMatchResult<TData> : BaseResult<PariMatchErrorCode, TData>, IPariMatchResult<TData>
+public record ParimatchResult<TData> : BaseResult<ParimatchErrorCode, TData>, IParimatchResult<TData>
 {
-    public PariMatchResult(TData data)
+    public ParimatchResult(TData data)
         : base(data)
     {
     }
 
-    public PariMatchResult(
-        PariMatchErrorCode errorCode,
+    public ParimatchResult(
+        ParimatchErrorCode errorCode,
         Exception? exception = null)
         : base(errorCode, exception)
     {

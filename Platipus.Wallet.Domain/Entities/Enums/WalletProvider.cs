@@ -15,7 +15,7 @@ public enum WalletProvider
     Reevo,
     Everymatrix,
     BetConstruct,
-    PariMatch,
+    Parimatch,
     EmaraPlay,
     Atlas,
     Uranus,

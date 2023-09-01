@@ -882,7 +882,7 @@ public sealed record LogInRequest(
     }
 
 
-    private static string GetPariMatchLaunchUrl(
+    private static string GetParimatchLaunchUrl(
         Uri baseUrl,
         string cid,
         string? productId,

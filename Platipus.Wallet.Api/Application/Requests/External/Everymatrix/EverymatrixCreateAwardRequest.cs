@@ -3,10 +3,10 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Everymatrix;
 using System.ComponentModel;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi;
+using Services.EverymatrixGameApi;
 using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi.Requests;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 [PublicAPI]
 public record EverymatrixCreateAwardRequest(

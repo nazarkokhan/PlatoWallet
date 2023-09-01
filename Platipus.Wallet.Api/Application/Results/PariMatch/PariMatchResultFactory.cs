@@ -1,24 +1,24 @@
-namespace Platipus.Wallet.Api.Application.Results.PariMatch;
+namespace Platipus.Wallet.Api.Application.Results.Parimatch;
 
 using WithData;
 
-public static class PariMatchResultFactory
+public static class ParimatchResultFactory
 {
-    public static PariMatchResult Success()
+    public static ParimatchResult Success()
         => new();
 
-    public static PariMatchResult<TData> Success<TData>(TData data)
+    public static ParimatchResult<TData> Success<TData>(TData data)
         => new(data);
 
-    public static PariMatchResult Failure(PariMatchErrorCode errorCode, Exception? exception = null)
+    public static ParimatchResult Failure(ParimatchErrorCode errorCode, Exception? exception = null)
         => new(errorCode, exception);
 
-    public static PariMatchResult<TData> Failure<TData>(
-        PariMatchErrorCode errorCode,
+    public static ParimatchResult<TData> Failure<TData>(
+        ParimatchErrorCode errorCode,
         Exception? exception = null)
         => new(errorCode, exception);
 
-    public static PariMatchResult<TData> Failure<TData, TSourceData>(IPariMatchResult<TSourceData> result)
+    public static ParimatchResult<TData> Failure<TData, TSourceData>(IParimatchResult<TSourceData> result)
         => result.IsFailure
             ? Failure<TData>(result.Error, result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
