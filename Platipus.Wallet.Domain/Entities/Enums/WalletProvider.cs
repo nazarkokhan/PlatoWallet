@@ -9,17 +9,16 @@ public enum WalletProvider
     Softswiss,
     Sw,
     SoftBet,
-    GamesGlobal,
     Uis,
     Betflag,
     Reevo,
     Everymatrix,
     BetConstruct,
-    Parimatch,
     EmaraPlay,
     Atlas,
     Uranus,
     Evenbet,
     Anakatech,
-    Nemesis
+    Nemesis,
+    Parimatch
 }
