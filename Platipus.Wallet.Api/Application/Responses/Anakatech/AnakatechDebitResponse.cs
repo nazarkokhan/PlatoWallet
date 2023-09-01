@@ -12,7 +12,7 @@ public sealed record AnakatechDebitResponse(
     double BonusBalance = 0) : AnakatechSuccessResponse(
     Success,
     Balance,
-    ErrorCode,
     Currency,
+    ErrorCode,
     CashBalance,
     BonusBalance);
