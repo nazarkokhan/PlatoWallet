@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Parimatch;
 
 using Base;
+using Helpers.Common;
 using JetBrains.Annotations;
 using Responses;
 using Results.Parimatch;
@@ -9,12 +10,12 @@ using Results.ResultToResultMappers;
 using Services.Wallet;
 
 [PublicAPI]
-public sealed record ParimatchBalanceRequest(
+public sealed record ParimatchPlayerInfoRequest(
         string Cid,
         string SessionToken)
-    : IParimatchRequest, IRequest<IParimatchResult<ParimatchCommonResponse>>
+    : IRequest<IParimatchResult<ParimatchCommonResponse>>, IParimatchSessionRequest
 {
-    public sealed class Handler : IRequestHandler<ParimatchBalanceRequest, IParimatchResult<ParimatchCommonResponse>>
+    public sealed class Handler : IRequestHandler<ParimatchPlayerInfoRequest, IParimatchResult<ParimatchCommonResponse>>
     {
         private readonly IWalletService _walletService;
 
@@ -25,7 +26,7 @@ public sealed record ParimatchBalanceRequest(
 
 
         public async Task<IParimatchResult<ParimatchCommonResponse>> Handle(
-            ParimatchBalanceRequest request,
+            ParimatchPlayerInfoRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _walletService.GetBalanceAsync(
@@ -38,9 +39,8 @@ public sealed record ParimatchBalanceRequest(
 
             var response = new ParimatchCommonResponse(
                 data.Username,
+                MoneyHelper.ConvertToCents(data.Balance),
                 data.Currency,
-                data.Balance,
-                data.Username,
                 data.Username);
 
             return ParimatchResultFactory.Success(response);

@@ -1,6 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Helpers.Common;
 
-public ref struct MoneyHelper //TODO why not static class?
+public static class MoneyHelper
 {
     public static decimal ConvertFromCents(long amount)
     {

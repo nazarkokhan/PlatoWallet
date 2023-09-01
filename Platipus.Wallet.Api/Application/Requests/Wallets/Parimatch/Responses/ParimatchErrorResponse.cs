@@ -9,21 +9,13 @@ public class ParimatchErrorResponse
 {
     public ParimatchErrorResponse(NemesisErrorCode errorCode)
     {
-        Id = $"{Guid.NewGuid()}.{Guid.NewGuid()}";
-        Code = errorCode.ToString().Dasherize().ToUpper();
-        Messages = new[] { errorCode.Humanize() };
+        Code = errorCode.Humanize();
+        Message = errorCode.ToString().Underscore().Replace('_', '.');
+        At = DateTimeOffset.UtcNow;
     }
 
-    public string Id { get; init; }
     public string Code { get; init; }
-    public string[] Messages { get; init; }
+
+    public string Message { get; init; }
+    public DateTimeOffset At { get; init; }
 }
-
-public record ParimatchCommonResponse(
-    string Country,
-    string Currency,
-    decimal Balance,
-    string DisplayName,
-    string PlayerId
-);
-

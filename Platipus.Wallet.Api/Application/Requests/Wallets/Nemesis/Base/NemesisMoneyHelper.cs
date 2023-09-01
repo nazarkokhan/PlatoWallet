@@ -7,12 +7,12 @@ using JetBrains.Annotations;
 
 public static class NemesisMoneyHelper
 {
-    private static readonly Dictionary<string, (decimal Multiplier, decimal Converter)> Convertors;
+    private static readonly Dictionary<string, Currency> Convertors;
 
     static NemesisMoneyHelper()
     {
         const string nemesisCurrenciesJson = "Application/Requests/Wallets/Nemesis/Base/nemesis_currencies.json";
-        Convertors = new Dictionary<string, (decimal Multiplier, decimal Converter)>();
+        Convertors = new Dictionary<string, Currency>();
 
         if (!File.Exists(nemesisCurrenciesJson))
         {
@@ -27,20 +27,19 @@ public static class NemesisMoneyHelper
             return;
         }
 
-        var currencies = JsonSerializer.Deserialize<List<Currency>>(json, new JsonSerializerOptions()
-        {
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
-        });
+        var currencies = JsonSerializer.Deserialize<List<Currency>>(
+            json,
+            new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            });
         if (currencies is null)
         {
             Log.Fatal("Nemesis Could not deserialize currencies file {NemesisCurrenciesFile}", nemesisCurrenciesJson);
             return;
         }
-        currencies = currencies
-           .Select(c => c.Convertor is null ? c with { Convertor = 1 } : c)
-           .ToList();
 
-        Convertors = currencies.ToDictionary(x => x.Iso, x => (x.Multiplier, x.Convertor!.Value));
+        Convertors = currencies.ToDictionary(c => c.Iso, c => c);
     }
 
     public static decimal ToBalance(decimal amount, string currency)
@@ -82,5 +81,5 @@ public static class NemesisMoneyHelper
         [property: JsonPropertyName("symbol")] string Symbol,
         [property: JsonPropertyName("multiplier")] decimal Multiplier,
         [property: JsonPropertyName("crypto")] bool Crypto,
-        [property: JsonPropertyName("convertor")] decimal? Convertor);
+        [property: JsonPropertyName("converter")] decimal Converter);
 }

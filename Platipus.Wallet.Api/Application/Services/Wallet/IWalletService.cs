@@ -17,7 +17,6 @@ public interface IWalletService
         string? currency = null,
         bool roundFinished = false,
         bool searchByUsername = false,
-        string? provider = null,
         CancellationToken cancellationToken = default);
 
     Task<IResult<WalletBetWinRollbackResponse>> WinAsync(
@@ -36,7 +35,6 @@ public interface IWalletService
         string? roundId = null,
         bool searchByUsername = false,
         decimal? amount = null,
-        string? clientId = null,
         CancellationToken cancellationToken = default);
 
     Task<IResult<WalletGetBalanceResponse>> AwardAsync(
