@@ -105,9 +105,7 @@ public sealed record AnakatechCreditRequest(
                .Length(3);
 
             RuleFor(x => x.Amount)
-               .NotEmpty()
-               .Must(x => x.ToString().Length <= 32)
-               .Must(x => x >= 0);
+               .Must(x => x.ToString().Length <= 32);
 
             RuleFor(x => x.SecondaryRoundId)
                .Length(1, 256)
