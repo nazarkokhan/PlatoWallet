@@ -55,7 +55,7 @@ public record PswGameSessionRequest(
             {
                 User = user,
                 IsTemporaryToken = true,
-                Id = apiRequest.SessionId,
+                Id = apiRequest.SessionId
             };
             _context.Add(session);
             await _context.SaveChangesAsync(cancellationToken);
@@ -66,6 +66,12 @@ public record PswGameSessionRequest(
                 request.LaunchModeType,
                 request.IsBetflag,
                 cancellationToken);
+
+            if (response is not { IsSuccess: true, Data.IsSuccess: true })
+            {
+                _context.Remove(session);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
             return response;
         }

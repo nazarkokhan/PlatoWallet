@@ -43,6 +43,8 @@ public class PswGameApiClient : IPswGameApiClient
     {
         var launchModePath = launchModeType is LaunchMode.Real ? "session" : "demo";
 
+        if (request.LaunchMode is not "url")
+            request = request with { LaunchMode = "url" };
         var response = await PostSignedRequestAsync<PswGameSessionGameApiRequest, PswGameSessionGameApiResponse>(
             baseUrl,
             $"game/{launchModePath}",

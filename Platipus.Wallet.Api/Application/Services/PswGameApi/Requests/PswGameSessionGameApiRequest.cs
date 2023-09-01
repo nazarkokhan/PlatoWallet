@@ -1,5 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Services.PswGameApi.Requests;
 
+using System.ComponentModel;
+
 public record PswGameSessionGameApiRequest(
     string CasinoId,
     string SessionId,
@@ -8,5 +10,5 @@ public record PswGameSessionGameApiRequest(
     string Game,
     string Locale,
     string Lobby,
-    string LaunchMode,
+    [property: DefaultValue("url")] string LaunchMode,
     int Rci) : IPswGameApiBaseRequest;
