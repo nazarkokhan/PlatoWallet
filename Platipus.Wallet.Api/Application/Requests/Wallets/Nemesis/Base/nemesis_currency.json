@@ -1,0 +1,79 @@
+[
+    {
+        "iso": "BRL",
+        "symbol": "R$",
+        "multiplier": "100",
+        "converter": "1",
+        "crypto": false
+    },
+    {
+        "iso": "EUR",
+        "symbol": "€",
+        "multiplier": "100",
+        "converter": "1",
+        "crypto": false
+    },
+    {
+        "iso": "USD",
+        "symbol": "$",
+        "multiplier": "100",
+        "converter": "1",
+        "crypto": false
+    },
+    {
+        "iso": "BNB",
+        "symbol": "mBNB",
+        "multiplier": "1000000",
+        "converter": "1000",
+        "crypto": true
+    },
+    {
+        "iso": "BTC",
+        "symbol": "uBTC",
+        "multiplier": "100000000",
+        "converter": "1000000",
+        "crypto": true
+    },
+    {
+        "iso": "DOGE",
+        "symbol": "DOGE",
+        "multiplier": "1000",
+        "converter": "1",
+        "crypto": true
+    },
+    {
+        "iso": "ETH",
+        "symbol": "uETH",
+        "multiplier": "10000000",
+        "converter": "1000000",
+        "crypto": true
+    },
+    {
+        "iso": "XMR",
+        "symbol": "mXMR",
+        "multiplier": "1000000",
+        "converter": "1000",
+        "crypto": true
+    },
+    {
+        "iso": "XRP",
+        "symbol": "XRP",
+        "multiplier": "1000",
+        "converter": "1",
+        "crypto": true
+    },
+    {
+        "iso": "USDT",
+        "symbol": "USDT",
+        "multiplier": "1000",
+        "converter": "1",
+        "crypto": true
+    },
+    {
+        "iso": "TRX",
+        "symbol": "TRX",
+        "multiplier": "100",
+        "converter": "1",
+        "crypto": true
+    }
+]
