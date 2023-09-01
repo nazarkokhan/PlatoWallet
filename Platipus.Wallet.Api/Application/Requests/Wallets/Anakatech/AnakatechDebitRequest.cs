@@ -57,7 +57,7 @@ public sealed record AnakatechDebitRequest(
 
             var response = new AnakatechDebitResponse(
                 true,
-                data.Transaction.InternalId,
+                data.Transaction.Id,
                 MoneyHelper.ConvertToCents(data.Balance),
                 data.Currency);
 
