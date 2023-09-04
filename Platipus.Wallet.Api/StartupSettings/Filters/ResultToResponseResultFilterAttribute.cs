@@ -18,6 +18,7 @@ using Application.Requests.Wallets.Everymatrix.Base.Response;
 using Application.Requests.Wallets.Hub88.Base.Response;
 using Application.Requests.Wallets.Nemesis.Responses;
 using Application.Requests.Wallets.Openbox.Base.Response;
+using Application.Requests.Wallets.Parimatch.Responses;
 using Application.Requests.Wallets.Psw.Base.Response;
 using Application.Requests.Wallets.Reevo.Base;
 using Application.Requests.Wallets.SoftBet.Base.Response;
@@ -41,6 +42,8 @@ using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
 using Application.Results.Nemesis;
 using Application.Results.Nemesis.WithData;
+using Application.Results.Parimatch;
+using Application.Results.Parimatch.WithData;
 using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
@@ -447,6 +450,27 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     {
                         var errorCode = pswResult.Error;
                         responseObject = new PswErrorResponse(PswStatus.ERROR, (int)errorCode, errorCode.ToString());
+                    }
+
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+
+                case IParimatchResult parimatchResult:
+                {
+                    object responseObject;
+                    if (parimatchResult.IsSuccess)
+                    {
+                        if (parimatchResult is IParimatchResult<object> objectResult)
+                            responseObject = objectResult.Data;
+                        else
+                            break;
+                    }
+                    else
+                    {
+                        var errorCode = parimatchResult.Error;
+                        responseObject = new ParimatchErrorResponse(errorCode);
                     }
 
                     context.Result = new OkObjectResult(responseObject);

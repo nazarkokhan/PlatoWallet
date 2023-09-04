@@ -19,7 +19,7 @@ public record ParimatchWinRequest(
         bool RoundClosed,
         long Amount,
         string Currency)
-    : IRequest<IParimatchResult<ParimatchBetWinCancelResponse>>, IParimatchRequest
+    : IRequest<IParimatchResult<ParimatchBetWinCancelResponse>>, IParimatchPlayerIdRequest
 {
     public sealed class Handler : IRequestHandler<ParimatchWinRequest, IParimatchResult<ParimatchBetWinCancelResponse>>
     {
@@ -29,7 +29,6 @@ public record ParimatchWinRequest(
         {
             _walletService = walletService;
         }
-
 
         public async Task<IParimatchResult<ParimatchBetWinCancelResponse>> Handle(
             ParimatchWinRequest request,

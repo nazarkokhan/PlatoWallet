@@ -31,7 +31,6 @@ public record ParimatchBetRequest(
             _walletService = walletService;
         }
 
-
         public async Task<IParimatchResult<ParimatchBetWinCancelResponse>> Handle(
             ParimatchBetRequest request,
             CancellationToken cancellationToken)

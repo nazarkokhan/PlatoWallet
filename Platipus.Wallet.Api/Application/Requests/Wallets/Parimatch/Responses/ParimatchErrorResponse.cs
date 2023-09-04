@@ -2,12 +2,12 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Parimatch.Responses;
 
 using Humanizer;
 using JetBrains.Annotations;
-using Platipus.Wallet.Api.Application.Results.Nemesis;
+using Platipus.Wallet.Api.Application.Results.Parimatch;
 
 [PublicAPI]
 public class ParimatchErrorResponse
 {
-    public ParimatchErrorResponse(NemesisErrorCode errorCode)
+    public ParimatchErrorResponse(ParimatchErrorCode errorCode)
     {
         Code = errorCode.Humanize();
         Message = errorCode.ToString().Underscore().Replace('_', '.');

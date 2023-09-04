@@ -16,7 +16,12 @@ public static class CommonResultToParimatchMappers
     {
         return source switch
         {
-            _ => ParimatchErrorCode.ErrorInternal
+            ErrorCode.SessionNotFound or ErrorCode.SessionExpired => ParimatchErrorCode.InvalidSessionKey,
+            ErrorCode.InsufficientFunds => ParimatchErrorCode.InsufficientBalance,
+            ErrorCode.UserIsDisabled => ParimatchErrorCode.LockedPlayer,
+            ErrorCode.TransactionNotFound => ParimatchErrorCode.InvalidTransactionId,
+            ErrorCode.Unknown => ParimatchErrorCode.ErrorInternal,
+            _ => ParimatchErrorCode.InvalidCasinoLogic
         };
     }
 }

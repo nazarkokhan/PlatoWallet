@@ -356,8 +356,6 @@ public sealed class WalletService : IWalletService
             if (award.ValidUntil < DateTime.UtcNow)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardExpired);
 
-
-
             var round = await _context.Set<Round>()
                .TagWith("Award")
                .Where(t => t.Id == roundId)

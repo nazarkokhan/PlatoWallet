@@ -1,8 +1,8 @@
 namespace Platipus.Wallet.Api.Controllers;
 
 using Abstract;
-using Application.Requests.Wallets.Nemesis;
-using Application.Requests.Wallets.Nemesis.Responses;
+using Application.Requests.Wallets.Parimatch;
+using Application.Requests.Wallets.Parimatch.Responses;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
@@ -15,10 +15,10 @@ using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security;
 
 [Route("wallet/parimatch")]
-[ServiceFilter(typeof(NemesisMockedErrorActionFilter), Order = 1)]
-[ServiceFilter(typeof(NemesisSecurityFilter), Order = 2)]
-[JsonSettingsName(WalletProvider.Nemesis)]
-[ProducesResponseType(typeof(NemesisErrorResponse), StatusCodes.Status400BadRequest)]
+[ServiceFilter(typeof(ParimatchMockedErrorActionFilter), Order = 1)]
+[ServiceFilter(typeof(ParimatchSecurityFilter), Order = 2)]
+[JsonSettingsName(WalletProvider.Parimatch)]
+[ProducesResponseType(typeof(ParimatchErrorResponse), StatusCodes.Status200OK)]
 public sealed class WalletParimatchController : RestApiController
 {
     private readonly IMediator _mediator;
@@ -28,35 +28,43 @@ public sealed class WalletParimatchController : RestApiController
         _mediator = mediator;
     }
 
-    [HttpPost("balance")]
-    [ProducesResponseType(typeof(NemesisBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Balance(
-        [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
-        [FromBody] NemesisBalanceRequest request,
+    [HttpPost("playerInfo")]
+    [ProducesResponseType(typeof(ParimatchPlayerInfoResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PlayerInfo(
+        [PublicAPI, FromHeader(Name = ParimatchHeaders.XHubConsumer)] string sign,
+        [FromBody] ParimatchPlayerInfoRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("bet")]
-    [ProducesResponseType(typeof(NemesisBetWinResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ParimatchBetWinCancelResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
-        [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
-        [FromBody] NemesisBetRequest request,
+        [PublicAPI, FromHeader(Name = ParimatchHeaders.XHubConsumer)] string sign,
+        [FromBody] ParimatchBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("win")]
-    [ProducesResponseType(typeof(NemesisBetWinResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ParimatchBetWinCancelResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
-        [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
-        [FromBody] NemesisWinRequest request,
+        [PublicAPI, FromHeader(Name = ParimatchHeaders.XHubConsumer)] string sign,
+        [FromBody] ParimatchWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("cancel-transaction")]
-    [ProducesResponseType(typeof(NemesisCancelTransactionResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CancelTransaction(
-        [PublicAPI, FromHeader(Name = NemesisHeaders.XIntegrationToken)] string sign,
-        [FromBody] NemesisCancelTransactionRequest request,
+    [HttpPost("cancel")]
+    [ProducesResponseType(typeof(ParimatchBetWinCancelResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Cancel(
+        [PublicAPI, FromHeader(Name = ParimatchHeaders.XHubConsumer)] string sign,
+        [FromBody] ParimatchCancelRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("promoWin")]
+    [ProducesResponseType(typeof(ParimatchBetWinCancelResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PromoWin(
+        [PublicAPI, FromHeader(Name = ParimatchHeaders.XHubConsumer)] string sign,
+        [FromBody] ParimatchPromoWinRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
@@ -73,12 +81,12 @@ public class WalletParimatchTestController : RestApiController
     {
         var casino = await dbContext.Set<Casino>()
            .Where(c => c.Id == casinoId)
-           .Select(c => new { c.SignatureKey })
+           .Select(c => new { c.InternalId })
            .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
 
-        return Ok(casino.SignatureKey);
+        return Ok(casino.InternalId);
     }
 }

@@ -1,8 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Parimatch.Base;
 
-using Requests.Base;
-
-public interface IParimatchSessionRequest : IBaseWalletRequest
+public interface IParimatchSessionRequest : IParimatchRequest
 {
     public string SessionToken { get; init; }
 }

@@ -13,9 +13,9 @@ using Services.Wallet;
 public sealed record ParimatchPlayerInfoRequest(
         string Cid,
         string SessionToken)
-    : IRequest<IParimatchResult<ParimatchCommonResponse>>, IParimatchSessionRequest
+    : IRequest<IParimatchResult<ParimatchPlayerInfoResponse>>, IParimatchSessionRequest
 {
-    public sealed class Handler : IRequestHandler<ParimatchPlayerInfoRequest, IParimatchResult<ParimatchCommonResponse>>
+    public sealed class Handler : IRequestHandler<ParimatchPlayerInfoRequest, IParimatchResult<ParimatchPlayerInfoResponse>>
     {
         private readonly IWalletService _walletService;
 
@@ -25,7 +25,7 @@ public sealed record ParimatchPlayerInfoRequest(
         }
 
 
-        public async Task<IParimatchResult<ParimatchCommonResponse>> Handle(
+        public async Task<IParimatchResult<ParimatchPlayerInfoResponse>> Handle(
             ParimatchPlayerInfoRequest request,
             CancellationToken cancellationToken)
         {
@@ -34,10 +34,10 @@ public sealed record ParimatchPlayerInfoRequest(
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToParimatchFailureResult<ParimatchCommonResponse>();
+                return walletResult.ToParimatchFailureResult<ParimatchPlayerInfoResponse>();
             var data = walletResult.Data;
 
-            var response = new ParimatchCommonResponse(
+            var response = new ParimatchPlayerInfoResponse(
                 data.Username,
                 MoneyHelper.ConvertToCents(data.Balance),
                 data.Currency,

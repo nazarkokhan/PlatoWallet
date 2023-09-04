@@ -45,7 +45,9 @@ public static class StartupExtensions
            .AddScoped<AnakatechSecurityFilter>()
            .AddSingleton<AnakatechMockedErrorActionFilter>()
            .AddSingleton<NemesisMockedErrorActionFilter>()
-           .AddScoped<NemesisSecurityFilter>();
+           .AddScoped<NemesisSecurityFilter>()
+           .AddSingleton<ParimatchMockedErrorActionFilter>()
+           .AddScoped<ParimatchSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -172,6 +174,12 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString
                                                                  | JsonNumberHandling.WriteAsString;
+                })
+           .AddJsonOptions(
+                nameof(WalletProvider.Parimatch),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
 
         return builder.Services;

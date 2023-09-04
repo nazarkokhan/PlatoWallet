@@ -18,9 +18,9 @@ public record ParimatchCancelRequest(
         string RoundId,
         long Amount,
         string Currency)
-    : IRequest<IParimatchResult<ParimatchBetWinCancelResponse>>, IParimatchRequest
+    : IRequest<IParimatchResult<ParimatchBetWinCancelResponse>>, IParimatchPlayerIdRequest
 {
-    public sealed class Handler : IRequestHandler<ParimatchWinRequest, IParimatchResult<ParimatchBetWinCancelResponse>>
+    public sealed class Handler : IRequestHandler<ParimatchCancelRequest, IParimatchResult<ParimatchBetWinCancelResponse>>
     {
         private readonly IWalletService _walletService;
 
@@ -29,9 +29,8 @@ public record ParimatchCancelRequest(
             _walletService = walletService;
         }
 
-
         public async Task<IParimatchResult<ParimatchBetWinCancelResponse>> Handle(
-            ParimatchWinRequest request,
+            ParimatchCancelRequest request,
             CancellationToken cancellationToken)
         {
             var walletResult = await _walletService.RollbackAsync(
