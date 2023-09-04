@@ -1,10 +1,11 @@
 namespace Platipus.Wallet.Api.Application.Services.EverymatrixGameApi.Requests;
 
+using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 
 [PublicAPI]
 public record EverymatrixCreateAwardGameApiRequest(
-    string Brand,
+    [property: JsonPropertyName("brand")] string Brand,
     string UserId,
     string BonusId,
     string[] GameIds,
