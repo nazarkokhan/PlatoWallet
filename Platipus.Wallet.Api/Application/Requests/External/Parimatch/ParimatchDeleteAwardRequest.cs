@@ -1,29 +1,29 @@
-namespace Platipus.Wallet.Api.Application.Requests.External.Everymatrix;
+namespace Platipus.Wallet.Api.Application.Requests.External.Parimatch;
 
 using System.ComponentModel;
-using Microsoft.EntityFrameworkCore;
-using Services.EverymatrixGameApi;
-using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi.Requests;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Services.ParimatchGameApi;
+using Services.ParimatchGameApi.Requests;
 
-public record EverymatrixDeleteFreespinRequest(
+public record ParimatchDeleteAwardRequest(
     [property: DefaultValue("test")] string Environment,
-    EverymatrixDeleteAwardGameApiRequest ApiRequest) : IRequest<IResult>
+    ParimatchDeleteAwardGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<EverymatrixDeleteFreespinRequest, IResult>
+    public class Handler : IRequestHandler<ParimatchDeleteAwardRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly IEverymatrixGameApiClient _gameApiClient;
+        private readonly IParimatchGameApiClient _gameApiClient;
 
-        public Handler(WalletDbContext context, IEverymatrixGameApiClient gameApiClient)
+        public Handler(WalletDbContext context, IParimatchGameApiClient gameApiClient)
         {
             _context = context;
             _gameApiClient = gameApiClient;
         }
 
         public async Task<IResult> Handle(
-            EverymatrixDeleteFreespinRequest request,
+            ParimatchDeleteAwardRequest request,
             CancellationToken cancellationToken)
         {
             await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -37,14 +37,10 @@ public record EverymatrixDeleteFreespinRequest(
             var apiRequest = request.ApiRequest;
 
             var award = await _context.Set<Award>()
-               .Where(a => a.Id == apiRequest.BonusId)
-               .Include(a => a.User)
+               .Where(a => a.Id == apiRequest.GiftId)
                .FirstOrDefaultAsync(cancellationToken);
             if (award is null)
                 return ResultFactory.Failure(ErrorCode.AwardNotFound);
-
-            if (award.User.Username != apiRequest.UserId)
-                return ResultFactory.Failure(ErrorCode.AwardDoesNotBelongToThisUser);
 
             _context.Remove(award);
             await _context.SaveChangesAsync(cancellationToken);

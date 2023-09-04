@@ -62,7 +62,6 @@ public sealed class WalletService : IWalletService
         string? currency = null,
         bool roundFinished = false,
         bool searchByUsername = false,
-        string? provider = null, //TODO ???
         CancellationToken cancellationToken = default)
     {
         try
@@ -238,7 +237,6 @@ public sealed class WalletService : IWalletService
         string? roundId = null,
         bool searchByUsername = false,
         decimal? amount = null,
-        string? clientId = null, //TODO why?
         CancellationToken cancellationToken = default)
     {
         try
@@ -357,8 +355,6 @@ public sealed class WalletService : IWalletService
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardNotFound);
             if (award.ValidUntil < DateTime.UtcNow)
                 return ResultFactory.Failure<WalletGetBalanceResponse>(ErrorCode.AwardExpired);
-
-
 
             var round = await _context.Set<Round>()
                .TagWith("Award")

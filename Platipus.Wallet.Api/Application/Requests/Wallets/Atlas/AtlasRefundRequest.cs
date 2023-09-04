@@ -33,7 +33,6 @@ public sealed record AtlasRefundRequest(
                 request.RefundTransactionId,
                 request.RoundId,
                 amount: validAmount,
-                clientId: request.ClientId,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

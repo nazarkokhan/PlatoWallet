@@ -20,6 +20,7 @@ using Platipus.Wallet.Api.Application.Services.NemesisGameApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
+using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
 using Platipus.Wallet.Api.Application.Services.PswGameApi;
 using Platipus.Wallet.Api.Application.Services.SwGameApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
@@ -32,7 +33,6 @@ using Platipus.Wallet.Api.StartupSettings.Filters;
 using Platipus.Wallet.Api.StartupSettings.JsonConverters;
 using Platipus.Wallet.Api.StartupSettings.Logging;
 using Platipus.Wallet.Api.StartupSettings.Middlewares;
-using Platipus.Wallet.Api.StartupSettings.ServicesRegistrations;
 using Platipus.Wallet.Api.StartupSettings.Xml;
 using Platipus.Wallet.Infrastructure.Persistence;
 using Serilog;
@@ -126,9 +126,17 @@ try
        .AddEndpointsApiExplorer()
        .AddFluentValidationAutoValidation()
        .AddSwaggerWithConfig()
-       .AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(Program).Assembly))
+       .AddMediatR(
+            configuration =>
+            {
+                configuration.RegisterServicesFromAssembly(typeof(Program).Assembly);
+
+                // configuration.AddBehavior( //TODO is ok? Add filter ITransactionRequest
+                //     typeof(IPipelineBehavior<,>),
+                //     typeof(TransactionBehavior<,>),
+                //     ServiceLifetime.Scoped);
+            })
        .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
-       .AddAllBehaviors()
        .AddLocalization()
        .AddLazyCache()
        .AddDbContext<WalletDbContext>(
@@ -200,7 +208,10 @@ try
        .AddHttpClient<ISwGameApiClient, SwGameApiClient>()
        .Services
        .AddTransient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
-       .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>();
+       .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
+       .Services
+       .AddTransient<IParimatchGameApiClient, ParimatchGameApiClient>()
+       .AddHttpClient<IParimatchGameApiClient, ParimatchGameApiClient>();
 
     services
        .AddHealthChecks()

@@ -1,9 +1,9 @@
-namespace Platipus.Wallet.Api.Application.Results.PariMatch;
+namespace Platipus.Wallet.Api.Application.Results.Parimatch;
 
 using System.Diagnostics.CodeAnalysis;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public enum PariMatchErrorCode
+public enum ParimatchErrorCode
 {
     InvalidSessionKey,
     InsufficientBalance,

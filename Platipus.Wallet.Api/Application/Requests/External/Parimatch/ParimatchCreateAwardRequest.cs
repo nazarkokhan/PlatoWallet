@@ -1,31 +1,31 @@
-namespace Platipus.Wallet.Api.Application.Requests.External.Everymatrix;
+namespace Platipus.Wallet.Api.Application.Requests.External.Parimatch;
 
 using System.ComponentModel;
-using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
-using Services.EverymatrixGameApi;
-using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi.Requests;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
+using Services.ParimatchGameApi;
+using Services.ParimatchGameApi.Requests;
 
 [PublicAPI]
-public record EverymatrixCreateAwardRequest(
+public record ParimatchCreateAwardRequest(
     [property: DefaultValue("test")] string Environment,
-    EverymatrixCreateAwardGameApiRequest ApiRequest) : IRequest<IResult>
+    ParimatchCreateAwardGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<EverymatrixCreateAwardRequest, IResult>
+    public class Handler : IRequestHandler<ParimatchCreateAwardRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly IEverymatrixGameApiClient _gameApiClient;
+        private readonly IParimatchGameApiClient _gameApiClient;
 
-        public Handler(WalletDbContext context, IEverymatrixGameApiClient gameApiClient)
+        public Handler(WalletDbContext context, IParimatchGameApiClient gameApiClient)
         {
             _context = context;
             _gameApiClient = gameApiClient;
         }
 
         public async Task<IResult> Handle(
-            EverymatrixCreateAwardRequest request,
+            ParimatchCreateAwardRequest request,
             CancellationToken cancellationToken)
         {
             await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -39,26 +39,19 @@ public record EverymatrixCreateAwardRequest(
             var apiRequest = request.ApiRequest;
 
             var user = await _context.Set<User>()
-               .Where(u => u.Username == apiRequest.UserId)
+               .Where(u => u.Username == apiRequest.PlayerId)
                .Include(u => u.Casino)
                .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
                 return ResultFactory.Failure(ErrorCode.UserNotFound);
 
-            var award = await _context.Set<Award>()
-               .Where(a => a.Id == apiRequest.BonusId)
-               .FirstOrDefaultAsync(cancellationToken);
-            if (award is not null)
-                return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
+            var expirationTime = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(apiRequest.EndDate))
+               .DateTime
+               .ToUniversalTime();
+            var now = DateTime.UtcNow;
 
-            award = new Award(
-                apiRequest.BonusId,
-                apiRequest.FreeRoundsEndDate);
-
-            user.Awards.Add(award);
-            _context.Update(user);
-
-            await _context.SaveChangesAsync(cancellationToken);
+            if (expirationTime < now)
+                expirationTime = now + TimeSpan.FromDays(30);
 
             var response = await _gameApiClient.CreateAwardAsync(
                 environment.BaseUrl,
@@ -66,7 +59,18 @@ public record EverymatrixCreateAwardRequest(
                 cancellationToken);
 
             if (response is { IsSuccess: true, Data.IsSuccess: true })
+            {
+                var award = new Award(
+                    response.Data.Data.GiftId,
+                    expirationTime);
+
+                user.Awards.Add(award);
+                _context.Update(user);
+
+                await _context.SaveChangesAsync(cancellationToken);
+
                 await _context.Database.CommitTransactionAsync(cancellationToken);
+            }
             else
                 await _context.Database.RollbackTransactionAsync(cancellationToken);
 

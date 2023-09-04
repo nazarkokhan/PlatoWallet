@@ -1,7 +1,7 @@
-﻿namespace Platipus.Wallet.Api.Application.Results.PariMatch;
+namespace Platipus.Wallet.Api.Application.Results.Parimatch;
 
 using Base;
 
-public interface IPariMatchResult : IBaseResult<PariMatchErrorCode>
+public interface IParimatchResult : IBaseResult<ParimatchErrorCode>
 {
 }

@@ -29,6 +29,8 @@ using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Requests;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
 using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
+using Services.ParimatchGameApi;
+using Services.ParimatchGameApi.Requests;
 using Services.PswGameApi;
 using Services.UranusGamesApi;
 using Services.UranusGamesApi.Abstaction;
@@ -76,6 +78,7 @@ public sealed record LogInRequest(
         private readonly IEvenbetGameApiClient _evenbetGameApiClient;
         private readonly IAnakatechGameApiClient _anakatechGameApiClient;
         private readonly INemesisGameApiClient _nemesisGameApiClient;
+        private readonly IParimatchGameApiClient _parimatchGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -90,7 +93,8 @@ public sealed record LogInRequest(
             IUranusGameApiClient uranusGameApiClient,
             IEvenbetGameApiClient evenbetGameApiClient,
             IAnakatechGameApiClient anakatechGameApiClient,
-            INemesisGameApiClient nemesisGameApiClient)
+            INemesisGameApiClient nemesisGameApiClient,
+            IParimatchGameApiClient parimatchGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -104,6 +108,7 @@ public sealed record LogInRequest(
             _evenbetGameApiClient = evenbetGameApiClient;
             _anakatechGameApiClient = anakatechGameApiClient;
             _nemesisGameApiClient = nemesisGameApiClient;
+            _parimatchGameApiClient = parimatchGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -177,6 +182,31 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case WalletProvider.Parimatch:
+                {
+                    var launcherRequest = new ParimatchLauncherGameApiRequest(
+                        casino.Id,
+                        game.LaunchName,
+                        session.Id,
+                        request.Language,
+                        request.Lobby,
+                        user.Username,
+                        casino.InternalId.ToString(),
+                        casino.InternalId.ToString());
+                    var launcherResult = await _parimatchGameApiClient.LauncherAsync(
+                        baseUrl,
+                        launcherRequest,
+                        cancellationToken);
+
+                    if (launcherResult.IsFailure || launcherResult.Data.IsFailure)
+                    {
+                        launchUrl = string.Empty;
+                        break;
+                    }
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    break;
+                }
+
                 case WalletProvider.Nemesis:
                 {
                     var launcherRequest = new NemesisLauncherGameApiRequest(
@@ -881,8 +911,7 @@ public sealed record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-
-    private static string GetPariMatchLaunchUrl(
+    private static string GetParimatchLaunchUrl(
         Uri baseUrl,
         string cid,
         string? productId,

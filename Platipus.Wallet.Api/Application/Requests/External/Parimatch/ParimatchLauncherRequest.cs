@@ -1,30 +1,30 @@
-namespace Platipus.Wallet.Api.Application.Requests.External.Nemesis;
+namespace Platipus.Wallet.Api.Application.Requests.External.Parimatch;
 
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
-using Services.NemesisGameApi;
-using Services.NemesisGameApi.Requests;
+using Services.ParimatchGameApi;
+using Services.ParimatchGameApi.Requests;
 
 [PublicAPI]
-public record NemesisLauncherRequest(
+public record ParimatchLauncherRequest(
     string Environment,
-    NemesisLauncherGameApiRequest ApiRequest) : IRequest<IResult>
+    ParimatchLauncherGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<NemesisLauncherRequest, IResult>
+    public class Handler : IRequestHandler<ParimatchLauncherRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly INemesisGameApiClient _gameApiClient;
+        private readonly IParimatchGameApiClient _gameApiClient;
 
-        public Handler(WalletDbContext context, INemesisGameApiClient gameApiClient)
+        public Handler(WalletDbContext context, IParimatchGameApiClient gameApiClient)
         {
             _context = context;
             _gameApiClient = gameApiClient;
         }
 
         public async Task<IResult> Handle(
-            NemesisLauncherRequest request,
+            ParimatchLauncherRequest request,
             CancellationToken cancellationToken)
         {
             var environment = await _context.Set<GameEnvironment>()
@@ -45,7 +45,7 @@ public record NemesisLauncherRequest(
                     return ResultFactory.Failure(ErrorCode.SessionAlreadyExists);
 
                 var user = await _context.Set<User>()
-                   .Where(e => e.Username == apiRequest.UserId)
+                   .Where(e => e.Sessions.Any(s => s.Id == apiRequest.SessionToken))
                    .Include(u => u.Casino)
                    .FirstOrDefaultAsync(cancellationToken);
                 if (user is null)
@@ -63,7 +63,6 @@ public record NemesisLauncherRequest(
                 var response = await _gameApiClient.LauncherAsync(
                     environment.BaseUrl,
                     apiRequest,
-                    user.Casino.SignatureKey,
                     cancellationToken);
 
                 if (response is { IsSuccess: true, Data.IsSuccess: true })

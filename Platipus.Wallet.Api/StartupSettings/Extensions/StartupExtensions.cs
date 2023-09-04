@@ -45,7 +45,9 @@ public static class StartupExtensions
            .AddScoped<AnakatechSecurityFilter>()
            .AddSingleton<AnakatechMockedErrorActionFilter>()
            .AddSingleton<NemesisMockedErrorActionFilter>()
-           .AddScoped<NemesisSecurityFilter>();
+           .AddScoped<NemesisSecurityFilter>()
+           .AddSingleton<ParimatchMockedErrorActionFilter>()
+           .AddScoped<ParimatchSecurityFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -61,10 +63,10 @@ public static class StartupExtensions
                 nameof(WalletProvider.Openbox),
                 options =>
                 {
-                    options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonUnixDateTimeConverter());
+                    options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
                 })
            .AddJsonOptions(
                 nameof(WalletProvider.Hub88),
@@ -163,6 +165,7 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
                 })
            .AddJsonOptions(
                 nameof(WalletProvider.Nemesis),
@@ -171,6 +174,12 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
                     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString
                                                                  | JsonNumberHandling.WriteAsString;
+                })
+           .AddJsonOptions(
+                nameof(WalletProvider.Parimatch),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
 
         return builder.Services;
