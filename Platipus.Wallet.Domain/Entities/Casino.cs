@@ -63,5 +63,9 @@ public class Casino : Entity<string>
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
         string? EvenbetProvider = null!,
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
-        string? AnakatechProvider = null!);
+        string? AnakatechProvider = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? SynotProvider = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? SynotApiKey = null!);
 }

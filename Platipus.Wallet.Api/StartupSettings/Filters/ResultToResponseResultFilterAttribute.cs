@@ -29,6 +29,7 @@ using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
+using Application.Responses.Synot.Base;
 using Application.Results.Anakatech.WithData;
 using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
@@ -47,6 +48,8 @@ using Application.Results.Parimatch.WithData;
 using Application.Results.Reevo.WithData;
 using Application.Results.Sw;
 using Application.Results.Sw.WithData;
+using Application.Results.Synot;
+using Application.Results.Synot.WithData;
 using Application.Results.Uis.WithData;
 using Application.Results.Uranus.WithData;
 using Domain.Entities.Enums;
@@ -304,6 +307,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                         return;
                     }
+
                     context.Result = new OkObjectResult(evenbetResult.Data);
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, evenbetResult.Data);
                     return;
@@ -373,6 +377,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                                 StatusCode = (int)HttpStatusCode.OK,
                                 Content = objectResultDataHtml
                             };
+
                             return;
                         }
 
@@ -474,6 +479,50 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     }
 
                     context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+
+                case ISynotResult synotResult:
+                {
+                    object responseObject;
+                    if (synotResult.IsSuccess)
+                    {
+                        if (synotResult is not ISynotResult<object> objectResult)
+                            return;
+
+                        responseObject = objectResult.Data;
+
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var error = synotResult.Error;
+                        responseObject = new SynotErrorResponse(error.ToString(), error.Humanize());
+
+                        context.Result = new OkObjectResult(responseObject)
+                        {
+                            StatusCode = error switch
+                            {
+                                SynotError.INVALID_API_KEY
+                                 or SynotError.INVALID_TOKEN
+                                 or SynotError.TOKEN_EXPIRED
+                                 or SynotError.BAD_SIGNATURE => 403,
+                                SynotError.CASINO_CLOSED => 503,
+                                SynotError.UNSPECIFIED => 500,
+                                SynotError.GAME_CLOSED
+                                 or SynotError.INSUFFICIENT_FUNDS
+                                 or SynotError.RESPONSIBLE_GAMING_LIMIT_REACHED
+                                 or SynotError.INVALID_GAME_ROUND
+                                 or SynotError.GAME_ROUND_CLOSED
+                                 or SynotError.INVALID_STAKE
+                                 or SynotError.FREEGAMES_INVALID_OFFER
+                                 or SynotError.FREEGAMES_INVALID_PLAYER => 400,
+                                _ => 400
+                            }
+                        };
+                    }
+
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
@@ -582,6 +631,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     httpClientResult.Error,
                     httpClientResult.Exception
                 };
+
                 context.Result = new OkObjectResult(httpResponseObject);
                 return;
             }
