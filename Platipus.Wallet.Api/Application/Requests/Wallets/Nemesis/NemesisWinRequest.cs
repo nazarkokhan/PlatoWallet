@@ -78,8 +78,8 @@ public sealed record NemesisWinRequest(
             }
 
             var response = new NemesisBetWinResponse(
-                data.Transaction.InternalId,
                 data.Transaction.Id,
+                data.Transaction.InternalId,
                 NemesisMoneyHelper.FromBalance(data.Balance, data.Currency, out var multiplier),
                 data.Currency,
                 multiplier);
