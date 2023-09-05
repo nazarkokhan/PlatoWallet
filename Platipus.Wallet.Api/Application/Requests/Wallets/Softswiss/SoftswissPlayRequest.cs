@@ -44,11 +44,20 @@ public record SoftswissPlayRequest(
                         return walletResult.ToSoftswissResult<Response>();
 
                     var data = walletResult.Data;
-
-                    response = new Response(
-                        _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        null,
-                        null);
+                    if (request.GameId is null)
+                    {
+                        response = new Response(
+                            _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
+                            null,
+                            null);
+                    }
+                    else
+                    {
+                        response = new Response(
+                            _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
+                            request.GameId,
+                            null);
+                    }
 
                     break;
                 }
