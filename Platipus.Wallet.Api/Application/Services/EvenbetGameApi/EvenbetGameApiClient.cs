@@ -50,7 +50,7 @@ internal sealed class EvenbetGameApiClient : IEvenbetGameApiClient
         {
             { nameof(request.Token).ToCamelCase(), request.Token },
             { nameof(request.Currency).ToCamelCase(), request.Currency },
-            { nameof(request.CasinoId).ToCamelCase(), request.CasinoId },
+            { nameof(request.OperatorId).ToSnakeCase(), request.OperatorId },
             { nameof(request.Language).ToCamelCase(), request.Language },
             { nameof(request.GameId).ToCamelCase(), request.GameId },
             { nameof(request.Platform).ToCamelCase(), request.Platform },
