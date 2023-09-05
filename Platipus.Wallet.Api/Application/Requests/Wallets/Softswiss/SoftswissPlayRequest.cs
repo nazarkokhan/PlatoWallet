@@ -39,14 +39,20 @@ public record SoftswissPlayRequest(
             {
                 case null:
                 {
+                    if (request.GameId is null)
+                    {
+                        return SoftswissResultFactory.Failure<Response>(SoftswissErrorCode.BadRequest);
+                    }
+
                     var walletResult = await _wallet.GetBalanceAsync(request.SessionId, cancellationToken: cancellationToken);
                     if (walletResult.IsFailure)
                         return walletResult.ToSoftswissResult<Response>();
+
                     var data = walletResult.Data;
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.Game,
+                        request.GameId,
                         null);
 
                     break;
@@ -65,13 +71,15 @@ public record SoftswissPlayRequest(
                         request.Currency,
                         request.Finished ?? false,
                         cancellationToken: cancellationToken);
+
                     if (walletResult.IsFailure)
                         return walletResult.ToSoftswissResult<Response>();
+
                     var data = walletResult.Data;
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.Game,
+                        request.GameId,
                         new List<PlayTransaction>
                         {
                             new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)
@@ -90,13 +98,15 @@ public record SoftswissPlayRequest(
                         request.Finished ?? false,
                         request.Currency,
                         cancellationToken: cancellationToken);
+
                     if (walletResult.IsFailure)
                         return walletResult.ToSoftswissResult<Response>();
+
                     var data = walletResult.Data;
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.Game,
+                        request.GameId,
                         new List<PlayTransaction>
                         {
                             new(action.ActionId, data.Transaction.InternalId, data.Transaction.CreatedDate)
