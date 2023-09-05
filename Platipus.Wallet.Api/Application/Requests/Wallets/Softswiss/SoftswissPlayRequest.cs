@@ -47,7 +47,7 @@ public record SoftswissPlayRequest(
 
                     response = new Response(
                         _currencyMultipliers.GetSumOut(request.Currency, data.Balance),
-                        request.Game,
+                        null,
                         null);
 
                     break;
@@ -120,7 +120,7 @@ public record SoftswissPlayRequest(
 
     public record Response(
         long Balance,
-        string GameId,
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? GameId,
         [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] List<PlayTransaction>? Transactions);
 
     public record PlayTransaction(
