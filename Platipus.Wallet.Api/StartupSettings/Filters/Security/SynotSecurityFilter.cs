@@ -59,10 +59,18 @@ public sealed class SynotSecurityFilter : IAsyncActionFilter
                 })
            .FirstOrDefaultAsync();
 
-        if (session?.ApiKey is null)
+        if (session is null)
         {
             context.Result = SynotResultFactory
-               .Failure<SynotErrorResponse>(SynotError.UNSPECIFIED)
+               .Failure<SynotErrorResponse>(SynotError.INVALID_TOKEN)
+               .ToActionResult();
+
+            return;
+        }
+        if (session.ApiKey is null)
+        {
+            context.Result = SynotResultFactory
+               .Failure<SynotErrorResponse>(SynotError.INVALID_API_KEY)
                .ToActionResult();
 
             return;
@@ -105,14 +113,26 @@ public sealed class SynotSecurityFilter : IAsyncActionFilter
             return;
         }
 
+        bool isSignatureValid;
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
-        var jsonBody = Encoding.UTF8.GetString(requestBytesToValidate);
+        if (requestBytesToValidate.Length is 0)
+        {
+            isSignatureValid = SynotSecurityHash.IsValid(
+                xEasSignature!,
+                null,
+                session.CasinoSignatureKey,
+                xEasToken!);
+        }
+        else
+        {
+            var jsonBody = Encoding.UTF8.GetString(requestBytesToValidate);
 
-        var isSignatureValid = SynotSecurityHash.IsValid(
-            xEasSignature!,
-            jsonBody,
-            session.CasinoSignatureKey,
-            xEasToken!);
+            isSignatureValid = SynotSecurityHash.IsValid(
+                xEasSignature!,
+                jsonBody,
+                session.CasinoSignatureKey,
+                xEasToken!);
+        }
 
         if (!isSignatureValid)
         {

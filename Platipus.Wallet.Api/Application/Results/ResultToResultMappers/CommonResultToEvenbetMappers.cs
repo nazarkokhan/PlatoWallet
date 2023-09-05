@@ -10,16 +10,6 @@ public static class CommonResultToEvenbetMappers
             ? EvenbetResultFactory.Failure<TData>(result.Error.ToEvenbetErrorCode(), exception: result.Exception)
             : throw new ArgumentException("Can not create failure result from success result", nameof(result));
 
-    //TODO??
-    public static IEvenbetResult ToEvenbetResult(this IResult result)
-        => result.IsSuccess
-            ? EvenbetResultFactory.Success()
-            : EvenbetResultFactory.Failure(
-                result.Error.ToEvenbetErrorCode(),
-                0,
-                DateTimeOffset.Now.ToUnixTimeSeconds().ToString(),
-                exception: result.Exception);
-
     public static IEvenbetResult<TData> ToEvenbetResult<TData>(this IResult result, TData response)
         => result.IsSuccess
             ? EvenbetResultFactory.Success(response)

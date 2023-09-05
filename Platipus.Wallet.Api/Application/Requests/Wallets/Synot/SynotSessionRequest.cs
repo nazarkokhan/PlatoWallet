@@ -8,7 +8,7 @@ using Responses.Synot;
 using Results.Synot;
 using Results.Synot.WithData;
 
-public sealed record SynotSessionRequest(string Token) : ISynotRequest, IRequest<ISynotResult<SynotSessionResponse>>
+public sealed record SynotSessionRequest(string? Token) : ISynotBaseRequest, IRequest<ISynotResult<SynotSessionResponse>>
 {
     public sealed class Handler : IRequestHandler<SynotSessionRequest, ISynotResult<SynotSessionResponse>>
     {
@@ -25,7 +25,8 @@ public sealed record SynotSessionRequest(string Token) : ISynotRequest, IRequest
         {
             var sessionData = await _walletDbContext.Set<Session>()
                .TagWith("Session")
-               .Where(s => s.Id == request.Token)
+               .Include(u => u.User.Currency)
+               .Where(s => s.Id == request.Token!)
                .FirstOrDefaultAsync(cancellationToken);
 
             if (sessionData is null)
@@ -37,6 +38,7 @@ public sealed record SynotSessionRequest(string Token) : ISynotRequest, IRequest
 
             var newSession = new Session
             {
+                Id = newToken,
                 UserId = sessionData.UserId,
                 IsTemporaryToken = true
             };

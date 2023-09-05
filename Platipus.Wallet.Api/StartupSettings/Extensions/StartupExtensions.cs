@@ -48,7 +48,8 @@ public static class StartupExtensions
            .AddScoped<NemesisSecurityFilter>()
            .AddSingleton<ParimatchMockedErrorActionFilter>()
            .AddScoped<ParimatchSecurityFilter>()
-           .AddScoped<SynotSecurityFilter>();
+           .AddScoped<SynotSecurityFilter>()
+           .AddSingleton<SynotMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

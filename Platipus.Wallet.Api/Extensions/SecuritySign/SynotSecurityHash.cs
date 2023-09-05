@@ -8,7 +8,7 @@ public static class SynotSecurityHash
 {
     public static bool IsValid(
         string externalHash,
-        string bodyJson,
+        string? bodyJson,
         string privateKey,
         string xEasToken)
     {
@@ -19,7 +19,7 @@ public static class SynotSecurityHash
         return isValid;
     }
 
-    private static string Compute(string input, string privateKey, string xEasToken)
+    private static string Compute(string? input, string privateKey, string xEasToken)
     {
         var inputString = ExtractStringFromInput(input);
         string finalInput;
