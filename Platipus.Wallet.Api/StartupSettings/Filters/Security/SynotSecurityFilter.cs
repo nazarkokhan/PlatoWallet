@@ -3,7 +3,6 @@
 using System.Text;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
-using Application.Requests.Wallets.Synot.Base;
 using Application.Responses.Synot.Base;
 using Application.Results.Synot;
 using Constants.Synot;
@@ -99,7 +98,7 @@ public sealed class SynotSecurityFilter : IAsyncActionFilter
         if (!string.Equals(session.CasinoProvider, synotProviderId.ToString()))
         {
             context.Result = SynotResultFactory
-               .Failure<SynotErrorResponse>(SynotError.BAD_SIGNATURE)
+               .Failure<SynotErrorResponse>(SynotError.INVALID_REQUEST)
                .ToActionResult();
 
             return;
