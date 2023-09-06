@@ -59,12 +59,12 @@ public sealed class SynotGameApiClient : ISynotGameApiClient
     {
         var requestToServer = new Dictionary<string, string?>
         {
-            { nameof(request.Token), request.Token },
-            { nameof(request.Currency), request.Currency },
+            { nameof(request.Token).ToLowerInvariant(), request.Token },
+            { nameof(request.Currency).ToLowerInvariant(), request.Currency },
             { nameof(request.LobbyUrl).ToCamelCase(), request.LobbyUrl },
-            { nameof(request.Language), request.Language },
-            { nameof(request.Game), request.Game },
-            { nameof(request.Real), request.Real.ToString() },
+            { nameof(request.Language).ToLowerInvariant(), request.Language },
+            { nameof(request.Game).ToLowerInvariant(), request.Game },
+            { nameof(request.Real).ToLowerInvariant(), request.Real.ToString() },
         };
 
         return GetAsync<string>(
