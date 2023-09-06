@@ -19,7 +19,7 @@ public static class SynotSecurityHash
         return isValid;
     }
 
-    private static string Compute(string? input, string privateKey, string xEasToken)
+    public static string Compute(object? input, string privateKey, string xEasToken)
     {
         var inputString = ExtractStringFromInput(input);
         string finalInput;

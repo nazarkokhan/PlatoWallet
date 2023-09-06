@@ -32,6 +32,8 @@ using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Services.ParimatchGameApi;
 using Services.ParimatchGameApi.Requests;
 using Services.PswGameApi;
+using Services.SynotGameApi;
+using Services.SynotGameApi.Requests;
 using Services.UranusGamesApi;
 using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;
@@ -79,6 +81,7 @@ public sealed record LogInRequest(
         private readonly IAnakatechGameApiClient _anakatechGameApiClient;
         private readonly INemesisGameApiClient _nemesisGameApiClient;
         private readonly IParimatchGameApiClient _parimatchGameApiClient;
+        private readonly ISynotGameApiClient _synotGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -94,7 +97,8 @@ public sealed record LogInRequest(
             IEvenbetGameApiClient evenbetGameApiClient,
             IAnakatechGameApiClient anakatechGameApiClient,
             INemesisGameApiClient nemesisGameApiClient,
-            IParimatchGameApiClient parimatchGameApiClient)
+            IParimatchGameApiClient parimatchGameApiClient,
+            ISynotGameApiClient synotGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -109,6 +113,7 @@ public sealed record LogInRequest(
             _anakatechGameApiClient = anakatechGameApiClient;
             _nemesisGameApiClient = nemesisGameApiClient;
             _parimatchGameApiClient = parimatchGameApiClient;
+            _synotGameApiClient = synotGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -182,6 +187,48 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case WalletProvider.Synot:
+                {
+                    var real = request.LaunchMode is LaunchMode.Real;
+                    
+                    var launchGame = new SynotGetGameLaunchScriptGameApiRequest(
+                        request.Game,
+                        session.Id,
+                        user.CurrencyId,
+                        request.Language,
+                        real,
+                        request.Lobby);
+
+                    var launcherResult = await _synotGameApiClient.GetGameLaunchScriptAsync(
+                        casino.Id,
+                        baseUrl,
+                        launchGame,
+                        cancellationToken);
+
+                    if (launcherResult.IsFailure || launcherResult.Data.IsFailure)
+                    {
+                        launchUrl = string.Empty;
+                        break;
+                    }
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    
+                    var lastUsersSession = await _context.Set<Session>()
+                       .Include(u => u.User)
+                       .Where(s => s.UserId == user.Id)
+                       .Select(s => new
+                        {
+                            s.Id,
+                            s.CreatedDate
+                        })
+                       .OrderByDescending(x => x.CreatedDate)
+                       .FirstOrDefaultAsync(cancellationToken);
+
+                    session.Id = lastUsersSession?.Id!;
+                    
+                    break;
+                } 
+                
                 case WalletProvider.Parimatch:
                 {
                     var launcherRequest = new ParimatchLauncherGameApiRequest(
@@ -193,6 +240,7 @@ public sealed record LogInRequest(
                         user.Username,
                         casino.InternalId.ToString(),
                         casino.InternalId.ToString());
+
                     var launcherResult = await _parimatchGameApiClient.LauncherAsync(
                         baseUrl,
                         launcherRequest,
@@ -203,6 +251,7 @@ public sealed record LogInRequest(
                         launchUrl = string.Empty;
                         break;
                     }
+
                     launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
                     break;
                 }
@@ -218,6 +267,7 @@ public sealed record LogInRequest(
                         casino.Id,
                         request.Device,
                         request.Lobby);
+
                     var launcherResult = await _nemesisGameApiClient.LauncherAsync(
                         baseUrl,
                         launcherRequest,
@@ -229,6 +279,7 @@ public sealed record LogInRequest(
                         launchUrl = string.Empty;
                         break;
                     }
+
                     launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
                     break;
                 }
@@ -618,7 +669,7 @@ public sealed record LogInRequest(
 
                 launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             }
-
+            
             var result = new Response(
                 session.Id,
                 user.Balance,

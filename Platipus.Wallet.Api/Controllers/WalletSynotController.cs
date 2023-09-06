@@ -27,29 +27,33 @@ public sealed class WalletSynotController : RestApiController
 
     [HttpGet("session")]
     [ProducesResponseType(typeof(SynotSessionResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Session(CancellationToken cancellationToken)
+    public async Task<IActionResult> Session(
+        [FromQuery] SynotSessionRequest request,
+        CancellationToken cancellationToken)
     {
         if (!HttpContext.Request.Headers.TryGetValue(SynotConstants.XEasToken, out var token))
         {
             return SynotResultFactory.Failure(SynotError.INVALID_TOKEN).ToActionResult();
         }
 
-        var request = new SynotSessionRequest(token!);
-        var result = await _mediator.Send(request, cancellationToken);
+        var requestToProcess = request with { Token = token! };
+        var result = await _mediator.Send(requestToProcess, cancellationToken);
         return result.ToActionResult();
     }
 
     [HttpGet("balance")]
     [ProducesResponseType(typeof(SynotGetBalanceResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Balance(CancellationToken cancellationToken)
+    public async Task<IActionResult> Balance(
+        [FromQuery] SynotGetBalanceRequest request,
+        CancellationToken cancellationToken)
     {
         if (!HttpContext.Request.Headers.TryGetValue(SynotConstants.XEasToken, out var token))
         {
             return SynotResultFactory.Failure(SynotError.INVALID_TOKEN).ToActionResult();
         }
 
-        var request = new SynotGetBalanceRequest(token!);
-        var result = await _mediator.Send(request, cancellationToken);
+        var requestToProcess = request with { Token = token! };
+        var result = await _mediator.Send(requestToProcess, cancellationToken);
         return result.ToActionResult();
     }
 

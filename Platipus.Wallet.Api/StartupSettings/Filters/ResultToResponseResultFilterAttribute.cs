@@ -492,6 +492,18 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                             return;
 
                         responseObject = objectResult.Data;
+                        
+                        if (ResultAsJavaScript(synotResult))
+                        {
+                            context.Result = new ContentResult
+                            {
+                                ContentType = "text/html",
+                                StatusCode = (int)HttpStatusCode.OK,
+                                Content = responseObject.ToString()
+                            };
+
+                            return;
+                        }
 
                         context.Result = new OkObjectResult(responseObject);
                     }
