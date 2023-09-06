@@ -47,7 +47,9 @@ public static class StartupExtensions
            .AddSingleton<NemesisMockedErrorActionFilter>()
            .AddScoped<NemesisSecurityFilter>()
            .AddSingleton<ParimatchMockedErrorActionFilter>()
-           .AddScoped<ParimatchSecurityFilter>();
+           .AddScoped<ParimatchSecurityFilter>()
+           .AddScoped<SynotSecurityFilter>()
+           .AddSingleton<SynotMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -180,6 +182,14 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                })
+           .AddJsonOptions(
+                nameof(WalletProvider.Synot),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 });
 
         return builder.Services;

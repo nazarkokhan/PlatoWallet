@@ -23,6 +23,7 @@ using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGam
 using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
 using Platipus.Wallet.Api.Application.Services.PswGameApi;
 using Platipus.Wallet.Api.Application.Services.SwGameApi;
+using Platipus.Wallet.Api.Application.Services.SynotGameApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.UranusGamesApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
@@ -211,7 +212,10 @@ try
        .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
        .Services
        .AddTransient<IParimatchGameApiClient, ParimatchGameApiClient>()
-       .AddHttpClient<IParimatchGameApiClient, ParimatchGameApiClient>();
+       .AddHttpClient<IParimatchGameApiClient, ParimatchGameApiClient>()
+       .Services
+       .AddTransient<ISynotGameApiClient, SynotGameApiClient>()
+       .AddHttpClient<ISynotGameApiClient, SynotGameApiClient>();
 
     services
        .AddHealthChecks()

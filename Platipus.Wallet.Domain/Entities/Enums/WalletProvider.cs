@@ -21,5 +21,6 @@ public enum WalletProvider
     Uranus,
     Evenbet,
     Anakatech,
-    Nemesis
+    Nemesis,
+    Synot
 }

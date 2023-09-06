@@ -25,6 +25,10 @@ public static class HttpContextItems
 
     public static byte[] GetRequestBodyBytesItem(this HttpContext httpContext)
     {
+        if (httpContext.Items[RequestBodyBytes] is null)
+        {
+            return Array.Empty<byte>();
+        }
         return (byte[])httpContext.Items[RequestBodyBytes]!;
     }
 }
