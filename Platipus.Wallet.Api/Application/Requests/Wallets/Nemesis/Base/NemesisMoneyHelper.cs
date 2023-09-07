@@ -11,7 +11,10 @@ public static class NemesisMoneyHelper
 
     static NemesisMoneyHelper()
     {
-        const string nemesisCurrenciesJson = "Application/Requests/Wallets/Nemesis/Base/nemesis_currencies.json";
+        var nemesisCurrenciesJson = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "Application/Requests/Wallets/Nemesis/Base/nemesis_currency.json");
+
         Convertors = new Dictionary<string, Currency>();
 
         if (!File.Exists(nemesisCurrenciesJson))
@@ -33,6 +36,7 @@ public static class NemesisMoneyHelper
             {
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             });
+
         if (currencies is null)
         {
             Log.Fatal("Nemesis Could not deserialize currencies file {NemesisCurrenciesFile}", nemesisCurrenciesJson);
@@ -56,6 +60,7 @@ public static class NemesisMoneyHelper
             multiplier = 1;
             converter = 1;
         }
+
         return amount * converter / multiplier;
     }
 
@@ -72,11 +77,12 @@ public static class NemesisMoneyHelper
             multiplier = 1;
             converter = 1;
         }
+
         return (long)(multiplier * balance / converter);
     }
 
     [UsedImplicitly]
-    private record Currency(
+    private sealed record Currency(
         [property: JsonPropertyName("iso")] string Iso,
         [property: JsonPropertyName("symbol")] string Symbol,
         [property: JsonPropertyName("multiplier")] decimal Multiplier,

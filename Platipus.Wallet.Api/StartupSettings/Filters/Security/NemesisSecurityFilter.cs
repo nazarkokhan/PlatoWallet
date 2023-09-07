@@ -59,7 +59,7 @@ public sealed class NemesisSecurityFilter : IAsyncActionFilter
             context.Result = NemesisResultFactory.Failure(NemesisErrorCode.SessionNotFound).ToActionResult();
             return;
         }
-        if (session.ExpirationDate < DateTime.UtcNow)
+        if (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow)
         {
             context.Result = NemesisResultFactory.Failure(NemesisErrorCode.SessionExpired).ToActionResult();
             return;
