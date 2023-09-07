@@ -32,7 +32,8 @@ public sealed record SynotGetGameLaunchScriptRequest(
             {
                 "local" => "synot_local",
                 "test" or "gameserver-test" => "synot_platipus",
-                _ => "synot_stage"
+                "wbg" => "synot_stage",
+                _ => "synot_platipus"
             };
             
             var clientResponse = await _synotGameApiClient.GetGameLaunchScriptAsync(
