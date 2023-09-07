@@ -31,7 +31,7 @@ public sealed record SynotGetGameLaunchScriptRequest(
             var casinoId = request.Environment switch
             {
                 "local" => "synot_local",
-                "test" or "gameserver-test" or "wbg" => "synot_platipus",
+                "test" or "gameserver-test" => "synot_platipus",
                 _ => "synot_stage"
             };
             
