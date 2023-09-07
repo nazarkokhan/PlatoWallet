@@ -48,7 +48,7 @@ public record ParimatchCancelRequest(
             var response = new ParimatchBetWinCancelResponse(
                 data.Transaction.Id,
                 data.Transaction.InternalId,
-                data.Transaction.CreatedDate,
+                data.Transaction.CreatedDate.ToUniversalTime(),
                 MoneyHelper.ConvertToCents(data.Balance));
 
             return ParimatchResultFactory.Success(response);
