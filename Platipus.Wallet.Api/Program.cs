@@ -61,6 +61,19 @@ try
 
     const string gamesApiUrl = "https://test.platipusgaming.com/"; //TODO now it is dynamic from config, remove
 
+    services.AddCors(
+        options =>
+        {
+            options.AddDefaultPolicy(
+                policy =>
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+                });
+        });
+
     // Middlewares
     services
        .AddSingleton<BufferResponseBodyMiddleware>()
@@ -234,6 +247,8 @@ try
     app.UseMiddleware<LoggingMiddleware>();
 
     app.UseRouting();
+
+    app.UseCors();
 
     app.BufferRequestBody();
     app.BufferResponseBody();
