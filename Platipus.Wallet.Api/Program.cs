@@ -64,13 +64,12 @@ try
     services.AddCors(
         options =>
         {
-            options.AddDefaultPolicy(
+            options.AddPolicy("MyDefault",
                 policy =>
                 {
                     policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowCredentials();
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
                 });
         });
 
@@ -248,7 +247,7 @@ try
 
     app.UseRouting();
 
-    app.UseCors();
+    app.UseCors("MyDefault");
 
     app.BufferRequestBody();
     app.BufferResponseBody();
