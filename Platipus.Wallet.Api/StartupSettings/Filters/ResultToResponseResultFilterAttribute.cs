@@ -73,6 +73,45 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
         {
             switch (baseExternalActionResult.Result)
             {
+                case IResult commonResult:
+                {
+                    object responseObject;
+
+                    if (commonResult.IsSuccess)
+                    {
+                        if (commonResult is not IResult<object> commonObjectResult)
+                        {
+                            context.Result = new OkResult();
+                            return;
+                        }
+
+                        if (commonObjectResult.Data is not IHttpClientResult<object, object> httpClientResult)
+                            responseObject = commonObjectResult.Data;
+                        else
+                            responseObject = new
+                            {
+                                httpClientResult.IsSuccess,
+                                ResponseData = httpClientResult.IsSuccess ? httpClientResult.Data : httpClientResult.Error,
+                                HttpRequestContext = httpClientResult.HttpRequest,
+                                httpClientResult.Error,
+                                httpClientResult.Exception
+                            };
+
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var errorCode = commonResult.Error;
+
+                        responseObject = new CommonErrorResponse(errorCode);
+
+                        context.Result = new BadRequestObjectResult(responseObject);
+                    }
+
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+
                 case ISwResult<object> swResult:
                 {
                     object responseObject;
@@ -618,43 +657,6 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
             var errorResponse = new Hub88ErrorResponse(errorCode);
 
             context.Result = new OkObjectResult(errorResponse);
-
-            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-        }
-
-        if (context.Result is not ExternalActionResult externalActionResult)
-            return;
-
-        {
-            if (externalActionResult.Result.IsSuccess)
-            {
-                if (externalActionResult.Result is not IResult<object> objectResult)
-                    return;
-
-                if (objectResult.Data is not IHttpClientResult<object, object> httpClientResult)
-                {
-                    context.Result = new OkObjectResult(objectResult.Data);
-                    return;
-                }
-
-                var httpResponseObject = new
-                {
-                    httpClientResult.IsSuccess,
-                    ResponseData = httpClientResult.IsSuccess ? httpClientResult.Data : httpClientResult.Error,
-                    HttpRequestContext = httpClientResult.HttpRequest,
-                    httpClientResult.Error,
-                    httpClientResult.Exception
-                };
-
-                context.Result = new OkObjectResult(httpResponseObject);
-                return;
-            }
-
-            var errorCode = externalActionResult.Result.Error;
-
-            var errorResponse = new CommonErrorResponse(errorCode);
-
-            context.Result = new BadRequestObjectResult(errorResponse);
 
             context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
         }

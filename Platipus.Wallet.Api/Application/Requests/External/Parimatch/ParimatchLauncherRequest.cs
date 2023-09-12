@@ -10,6 +10,7 @@ using Services.ParimatchGameApi.Requests;
 [PublicAPI]
 public record ParimatchLauncherRequest(
     string Environment,
+    string Username,
     ParimatchLauncherGameApiRequest ApiRequest) : IRequest<IResult>
 {
     public class Handler : IRequestHandler<ParimatchLauncherRequest, IResult>
@@ -36,8 +37,6 @@ public record ParimatchLauncherRequest(
             var apiRequest = request.ApiRequest;
             try
             {
-                await _context.Database.BeginTransactionAsync(cancellationToken);
-
                 var session = await _context.Set<Session>()
                    .Where(e => e.Id == apiRequest.SessionToken)
                    .FirstOrDefaultAsync(cancellationToken);
@@ -45,7 +44,7 @@ public record ParimatchLauncherRequest(
                     return ResultFactory.Failure(ErrorCode.SessionAlreadyExists);
 
                 var user = await _context.Set<User>()
-                   .Where(e => e.Sessions.Any(s => s.Id == apiRequest.SessionToken))
+                   .Where(e => e.Username == request.Username)
                    .Include(u => u.Casino)
                    .FirstOrDefaultAsync(cancellationToken);
                 if (user is null)
@@ -53,9 +52,9 @@ public record ParimatchLauncherRequest(
 
                 session = new Session
                 {
-                    User = user,
-                    IsTemporaryToken = true,
                     Id = apiRequest.SessionToken,
+                    User = user,
+                    IsTemporaryToken = true
                 };
                 _context.Add(session);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -65,16 +64,16 @@ public record ParimatchLauncherRequest(
                     apiRequest,
                     cancellationToken);
 
-                if (response is { IsSuccess: true, Data.IsSuccess: true })
-                    await _context.Database.CommitTransactionAsync(cancellationToken);
-                else
-                    await _context.Database.RollbackTransactionAsync(cancellationToken);
+                if (response is not { IsSuccess: true, Data.IsSuccess: true })
+                {
+                    _context.Remove(session);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
 
                 return response;
             }
             catch (Exception e)
             {
-                await _context.Database.RollbackTransactionAsync(cancellationToken);
                 return ResultFactory.Failure(ErrorCode.Unknown, e);
             }
         }
