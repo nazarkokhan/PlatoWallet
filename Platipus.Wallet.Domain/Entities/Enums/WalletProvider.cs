@@ -9,6 +9,7 @@ public enum WalletProvider
     Softswiss,
     Sw,
     SoftBet,
+    GamesGlobal,
     Uis,
     Betflag,
     Reevo,
