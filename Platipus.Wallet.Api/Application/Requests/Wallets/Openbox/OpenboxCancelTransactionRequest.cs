@@ -27,7 +27,7 @@ public record OpenboxCancelTransactionRequest(
         {
             var walletResult = await _wallet.RollbackAsync(
                 request.Token,
-                request.OrderUid,
+                request.OrderUidCancel,
                 request.GameCycleUid,
                 cancellationToken: cancellationToken);
 
