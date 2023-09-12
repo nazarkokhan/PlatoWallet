@@ -1,5 +1,6 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Dafabet;
 
+using System.Globalization;
 using Base;
 using Base.Response;
 using Results.ResultToResultMappers;
@@ -49,6 +50,6 @@ public record DafabetBetResultRequest(
 
     public string GetSource()
     {
-        return PlayerId + Amount + GameCode + RoundId + TransactionId + EndRound.ToString().ToLower();
+        return PlayerId + Amount.ToString(CultureInfo.InvariantCulture) + GameCode + RoundId + TransactionId + EndRound.ToString().ToLower();
     }
 }

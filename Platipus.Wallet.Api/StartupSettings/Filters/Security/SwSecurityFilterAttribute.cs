@@ -3,6 +3,7 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
 using Application.Extensions;
+using Application.Requests.Wallets.Sw;
 using Application.Requests.Wallets.Sw.Base;
 using Application.Results.Sw;
 using Domain.Entities;
@@ -17,14 +18,14 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
         var httpContext = context.HttpContext;
 
         var request = context.ActionArguments.Values
-            .OfType<ISwBaseRequest>()
-            .Single();
+           .OfType<ISwBaseRequest>()
+           .Single();
 
         var dbContext = httpContext.RequestServices.GetRequiredService<WalletDbContext>();
 
         var session = await dbContext.Set<Session>()
-            .Where(s => s.Id == request.Token)
-            .Select(
+           .Where(s => s.Id == request.Token)
+           .Select(
                 s => new
                 {
                     s.Id,
@@ -36,7 +37,7 @@ public class SwSecurityFilterAttribute : ActionFilterAttribute
                     },
                     IsTemporary = s.IsTemporaryToken
                 })
-            .FirstOrDefaultAsync(httpContext.RequestAborted);
+           .FirstOrDefaultAsync(httpContext.RequestAborted);
 
         if (session is null || (session.IsTemporary && session.ExpirationDate < DateTime.UtcNow))
         {

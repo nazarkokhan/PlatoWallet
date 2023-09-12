@@ -39,7 +39,7 @@ public record SwCreateFreespinRequest(
             var apiRequest = request.ApiRequest;
 
             var user = await _context.Set<User>()
-               .Where(u => u.Username == apiRequest.UserId)
+               .Where(u => u.Id == Convert.ToInt32(apiRequest.UserId))
                .Include(u => u.Casino)
                .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
@@ -51,9 +51,10 @@ public record SwCreateFreespinRequest(
             if (award is not null)
                 return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 
+            var validUntil = DateTime.Parse(apiRequest.Expire).ToUniversalTime();
             award = new Award(
                 apiRequest.FreespinId,
-                DateTime.Parse(apiRequest.Expire));
+                validUntil);
 
             user.Awards.Add(award);
             _context.Update(user);

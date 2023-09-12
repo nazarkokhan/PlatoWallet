@@ -6,7 +6,7 @@ using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
-using Helpers.Common;
+using Helpers;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -190,7 +190,7 @@ public sealed record LogInRequest(
                 case WalletProvider.Synot:
                 {
                     var real = request.LaunchMode is LaunchMode.Real;
-                    
+
                     var launchGame = new SynotGetGameLaunchScriptGameApiRequest(
                         request.Game,
                         session.Id,
@@ -212,23 +212,24 @@ public sealed record LogInRequest(
                     }
 
                     launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
-                    
+
                     var lastUsersSession = await _context.Set<Session>()
                        .Include(u => u.User)
                        .Where(s => s.UserId == user.Id)
-                       .Select(s => new
-                        {
-                            s.Id,
-                            s.CreatedDate
-                        })
+                       .Select(
+                            s => new
+                            {
+                                s.Id,
+                                s.CreatedDate
+                            })
                        .OrderByDescending(x => x.CreatedDate)
                        .FirstOrDefaultAsync(cancellationToken);
 
                     session.Id = lastUsersSession?.Id!;
-                    
+
                     break;
-                } 
-                
+                }
+
                 case WalletProvider.Parimatch:
                 {
                     var launcherRequest = new ParimatchLauncherGameApiRequest(
@@ -669,7 +670,7 @@ public sealed record LogInRequest(
 
                 launchUrl = url.AbsoluteUri.Replace(url.Query, null) + QueryString.Create(queryParams);
             }
-            
+
             var result = new Response(
                 session.Id,
                 user.Balance,
@@ -799,11 +800,9 @@ public sealed record LogInRequest(
             { nameof(gameCode), gameCode },
             { nameof(playerId), playerId },
             { nameof(playerToken), playerToken },
-            { nameof(currency), currency }
+            { nameof(currency), currency },
+            { nameof(device), device ?? "desktop" }
         };
-
-        if (device is not null)
-            queryParameters.Add(nameof(device), device);
 
         if (language is not null)
             queryParameters.Add(nameof(language), language);

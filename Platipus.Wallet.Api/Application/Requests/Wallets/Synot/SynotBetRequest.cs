@@ -2,7 +2,7 @@
 
 using System.Text.Json.Serialization;
 using Base;
-using Helpers.Common;
+using Helpers;
 using Models;
 using Responses.Synot;
 using Results.ResultToResultMappers;

@@ -1,4 +1,4 @@
-﻿namespace Platipus.Wallet.Api.Application.Helpers.Common;
+﻿namespace Platipus.Wallet.Api.Application.Helpers;
 
 public static class MoneyHelper
 {

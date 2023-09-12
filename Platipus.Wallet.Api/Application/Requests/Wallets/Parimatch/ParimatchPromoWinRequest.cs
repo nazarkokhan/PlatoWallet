@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Parimatch;
 
 using Base;
 using Domain.Entities;
-using Helpers.Common;
+using Helpers;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;

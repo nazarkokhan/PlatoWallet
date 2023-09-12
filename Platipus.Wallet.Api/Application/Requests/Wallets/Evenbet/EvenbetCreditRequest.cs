@@ -3,7 +3,7 @@
 using System.Text.Json.Serialization;
 using Base;
 using FluentValidation;
-using Helpers.Common;
+using Helpers;
 using Responses.Evenbet;
 using Results.Evenbet.WithData;
 using Results.ResultToResultMappers;

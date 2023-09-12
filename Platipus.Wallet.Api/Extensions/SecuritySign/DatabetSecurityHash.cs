@@ -17,7 +17,9 @@ public static class DatabetSecurityHash
 
     public static string Compute(string requestRoute, string source, string secretKey)
     {
-        var requestHashBytes = Encoding.UTF8.GetBytes(requestRoute + source + secretKey);
+        var dataToHash = requestRoute + source + secretKey;
+
+        var requestHashBytes = Encoding.UTF8.GetBytes(dataToHash);
 
         using var crypt = SHA256.Create();
 

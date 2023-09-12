@@ -44,5 +44,5 @@ public record DafabetCancelBetRequest(
     }
 
     public string GetSource()
-        => PlayerId + Amount + GameCode + RoundId + OriginalTransactionId;
+        => PlayerId + RoundId + OriginalTransactionId;
 }

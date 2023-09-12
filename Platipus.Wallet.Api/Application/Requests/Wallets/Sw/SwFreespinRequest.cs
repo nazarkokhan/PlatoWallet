@@ -1,24 +1,50 @@
+#pragma warning disable CS8618
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sw;
 
+using System.Globalization;
 using Base;
 using Base.Response;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Results.ResultToResultMappers;
 using Results.Sw;
 using Results.Sw.WithData;
 using Services.Wallet;
 
-public record SwFreespinRequest(
-    [property: BindProperty(Name = "providerid")] int ProviderId,
-    [property: BindProperty(Name = "userid")] int UserId,
-    [property: BindProperty(Name = "md5")] string Md5,
-    [property: BindProperty(Name = "gameid")] int GameId,
-    [property: BindProperty(Name = "gameName")] string GameName,
-    [property: BindProperty(Name = "roundid")] string RoundId,
-    [property: BindProperty(Name = "freespin_id")] string FreespinId,
-    [property: BindProperty(Name = "token")] string Token) : ISwMd5Request, IRequest<ISwResult<SwBalanceResponse>>
+[PublicAPI]
+public class SwFreespinRequest : ISwMd5AmountRequest, IRequest<ISwResult<SwBetWinRefundFreespinResponse>>
 {
-    public class Handler : IRequestHandler<SwFreespinRequest, ISwResult<SwBalanceResponse>>
+    [FromForm(Name = "providerid")]
+    public int ProviderId { get; init; }
+
+    [FromForm(Name = "userid")]
+    public int UserId { get; init; }
+
+    [FromForm(Name = "md5")]
+    public string Md5 { get; init; }
+
+    [FromForm(Name = "amount")]
+    public string Amount { get; init; }
+
+    [FromForm(Name = "roundid")]
+    public string RoundId { get; init; }
+
+    [FromForm(Name = "roomid")]
+    public string RoomId { get; init; }
+
+    [FromForm(Name = "freespin_id")]
+    public string FreespinId { get; init; }
+
+    [FromForm(Name = "gameid")]
+    public int GameId { get; init; }
+
+    [FromForm(Name = "gameName")]
+    public string GameName { get; init; }
+
+    [FromForm(Name = "token")]
+    public string Token { get; init; }
+
+    public class Handler : IRequestHandler<SwFreespinRequest, ISwResult<SwBetWinRefundFreespinResponse>>
     {
         private readonly IWalletService _wallet;
 
@@ -27,25 +53,23 @@ public record SwFreespinRequest(
             _wallet = wallet;
         }
 
-        public async Task<ISwResult<SwBalanceResponse>> Handle(
+        public async Task<ISwResult<SwBetWinRefundFreespinResponse>> Handle(
             SwFreespinRequest request,
             CancellationToken cancellationToken)
         {
-            //TODO
             var walletResult = await _wallet.AwardAsync(
                 request.Token,
                 request.RoundId,
-                "",
-                // Guid.NewGuid().ToString(),
-                0, // request.Amount,
+                request.RoundId,
+                decimal.Parse(request.Amount, CultureInfo.InvariantCulture),
                 request.FreespinId,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToSwResult<SwBalanceResponse>();
+                return walletResult.ToSwResult<SwBetWinRefundFreespinResponse>();
             var data = walletResult.Data;
 
-            var response = new SwBalanceResponse(data.UserId, (int)data.Balance, data.Currency);
+            var response = new SwBetWinRefundFreespinResponse((int)data.Balance);
 
             return SwResultFactory.Success(response);
         }

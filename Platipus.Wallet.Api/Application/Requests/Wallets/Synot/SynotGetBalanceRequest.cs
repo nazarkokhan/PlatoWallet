@@ -1,7 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Synot;
 
 using Base;
-using Helpers.Common;
+using Helpers;
 using Responses.Synot;
 using Results.ResultToResultMappers;
 using Results.Synot.WithData;

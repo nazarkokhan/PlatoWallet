@@ -6,12 +6,12 @@ using Responses;
 
 public interface ISwGameApiClient
 {
-    Task<IResult<IHttpClientResult<SwAwardGameApiResponse, SwErrorGameApiResponse>>> CreateFreespin(
+    Task<IResult<IHttpClientResult<SwAwardGameApiResponse, object>>> CreateFreespin(
         Uri baseUrl,
         SwCreateAwardGameApiRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<IResult<IHttpClientResult<SwAwardGameApiResponse, SwErrorGameApiResponse>>> DeleteFreespin(
+    Task<IResult<IHttpClientResult<SwAwardGameApiResponse, object>>> DeleteFreespin(
         Uri baseUrl,
         SwDeleteFreespinGameApiRequest request,
         CancellationToken cancellationToken = default);

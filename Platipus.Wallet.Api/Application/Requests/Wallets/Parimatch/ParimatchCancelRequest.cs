@@ -1,7 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Parimatch;
 
 using Base;
-using Helpers.Common;
+using Helpers;
 using JetBrains.Annotations;
 using Responses;
 using Results.Parimatch;

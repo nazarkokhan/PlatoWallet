@@ -3,12 +3,12 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Helpers.Common;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Evenbet.Base;
 using Responses.Evenbet;
 using Results.Evenbet;
 using Results.Evenbet.WithData;
 using Domain.Entities;
+using Helpers;
 using Infrastructure.Persistence;
 
 public sealed record EvenbetLoginRequest

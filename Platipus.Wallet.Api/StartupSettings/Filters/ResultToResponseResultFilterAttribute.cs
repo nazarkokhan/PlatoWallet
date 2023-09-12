@@ -73,55 +73,46 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
         {
             switch (baseExternalActionResult.Result)
             {
-                case ISwResult { IsSuccess: true } swResult:
+                case ISwResult<object> swResult:
                 {
-                    if (swResult is not ISwResult<object> objectResult)
-                        return;
+                    object responseObject;
+                    if (swResult.IsSuccess)
+                    {
+                        responseObject = swResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = swResult.Error;
+                        responseObject = new SwErrorResponse(errorCode);
+                    }
 
-                    context.Result = new OkObjectResult(objectResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
 
-                case ISwResult swResult:
+                case ISoftBetResult<object> iSoftBetResult:
                 {
-                    var errorCode = swResult.Error;
+                    object responseObject;
+                    if (iSoftBetResult.IsSuccess)
+                    {
+                        responseObject = iSoftBetResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = iSoftBetResult.Error;
+                        responseObject = new SoftBetErrorResponse(
+                            errorCode.ToCode(),
+                            errorCode.ToString(),
+                            "action",
+                            true);
+                    }
 
-                    var errorResponse = new SwErrorResponse(errorCode);
-
-                    context.Result = new BadRequestObjectResult(errorResponse);
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                //TODO why ResponseObject not added?
-                //TODO why split on two switch cases?
-                case ISoftBetResult { IsSuccess: true } softBetResult:
-                {
-                    if (softBetResult is not ISoftBetResult<object> objectResult)
-                        return;
-
-                    context.Result = new OkObjectResult(objectResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
 
-                case ISoftBetResult softBetResult:
-                {
-                    var errorCode = softBetResult.Error;
-
-                    var errorResponse = new SoftBetErrorResponse(
-                        errorCode.ToCode(),
-                        errorCode.ToString(),
-                        "action",
-                        true);
-
-                    context.Result = new BadRequestObjectResult(errorResponse);
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                // TODO use one case for one provider everywhere as i made here!
                 case IUisResult<object> uisResult:
                 {
                     object responseObject;
@@ -193,170 +184,181 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     break;
                 }
 
-                case IReevoResult<object> { IsSuccess: true } reevoResult:
-                    context.Result = new OkObjectResult(reevoResult.Data);
-                    return;
-
                 case IReevoResult<object> reevoResult:
                 {
-                    var errorCode = reevoResult.Error;
+                    object responseObject;
+                    if (reevoResult.IsSuccess)
+                    {
+                        responseObject = reevoResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = reevoResult.Error;
+                        responseObject = new ReevoErrorResponse(errorCode);
+                    }
 
-                    var errorResponse = new ReevoErrorResponse(errorCode);
-
-                    context.Result = new OkObjectResult(errorResponse);
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                case IEverymatrixResult<object> { IsSuccess: true } everymatrixResult:
-                    context.Result = new OkObjectResult(everymatrixResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
+                }
 
                 case IEverymatrixResult<object> everymatrixResult:
                 {
-                    var errorCode = everymatrixResult.Error;
+                    object responseObject;
+                    if (everymatrixResult.IsSuccess)
+                    {
+                        responseObject = everymatrixResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = everymatrixResult.Error;
+                        responseObject = new EverymatrixErrorResponse(errorCode);
+                    }
 
-                    var errorResponse = new EverymatrixErrorResponse(errorCode);
-
-                    context.Result = new OkObjectResult(errorResponse);
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
                 }
 
-                //TODO fix
-                case IBetconstructResult<object> { IsSuccess: true } betConstructResult:
-                    context.Result = new OkObjectResult(betConstructResult.Data);
-                    return;
-
-                case IBetconstructResult<object> betConstructResult:
+                case IBetconstructResult<object> betconstructResult:
                 {
-                    var errorCode = betConstructResult.Error;
+                    object responseObject;
+                    if (betconstructResult.IsSuccess)
+                    {
+                        responseObject = betconstructResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = betconstructResult.Error;
+                        responseObject = new BetconstructErrorResponse(errorCode);
+                    }
 
-                    var errorResponse = new BetconstructErrorResponse(errorCode);
-
-                    context.Result = new OkObjectResult(errorResponse);
-
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                case IEmaraPlayResult<object> { IsSuccess: true } emaraPlayResult:
-                    context.Result = new OkObjectResult(emaraPlayResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
+                }
 
                 case IEmaraPlayResult<object> emaraPlayResult:
                 {
-                    var errorCode = emaraPlayResult.Error;
+                    object responseObject;
+                    if (emaraPlayResult.IsSuccess)
+                    {
+                        responseObject = emaraPlayResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = emaraPlayResult.Error;
+                        responseObject = new EmaraPlayErrorResponse(errorCode);
+                    }
 
-                    var errorResponse = new EmaraPlayErrorResponse(errorCode);
-
-                    context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                case IAtlasResult<object> { IsSuccess: true } atlasPlatformResult:
-                    context.Result = new OkObjectResult(atlasPlatformResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
-
-                case IAtlasResult<object> atlasPlatformResult:
-                {
-                    var errorCode = atlasPlatformResult.Error;
-
-                    var errorResponse = new AtlasErrorResponse(errorCode.Humanize(), (int)errorCode);
-
-                    context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
                 }
 
-                case IUranusResult<object> { IsSuccess: true } uranusResult:
+                case IAtlasResult<object> atlasResult:
                 {
-                    context.Result = new OkObjectResult(uranusResult.Data);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, uranusResult.Data);
+                    object responseObject;
+                    if (atlasResult.IsSuccess)
+                    {
+                        responseObject = atlasResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = atlasResult.Error;
+                        responseObject = new AtlasErrorResponse(errorCode.Humanize(), (int)errorCode);
+                    }
+
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
 
                 case IUranusResult<object> uranusResult:
                 {
-                    var errorCode = uranusResult.Error;
-
-                    var errorResponse = new UranusFailureResponse(
-                        new UranusCommonErrorResponse(
-                            errorCode.Humanize(),
-                            errorCode.ToString(),
-                            Array.Empty<object>()));
-
-                    context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                case IEvenbetResult<object> { IsSuccess: true } evenbetResult:
-                {
-                    if (ResultAsJavaScript(evenbetResult))
+                    object responseObject;
+                    if (uranusResult.IsSuccess)
                     {
-                        context.Result = new ContentResult
-                        {
-                            ContentType = "text/html",
-                            StatusCode = (int)HttpStatusCode.OK,
-                            Content = evenbetResult.Data.ToString()
-                        };
-
-                        return;
+                        responseObject = uranusResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = uranusResult.Error;
+                        responseObject = new UranusFailureResponse(
+                            new UranusCommonErrorResponse(
+                                errorCode.Humanize(),
+                                errorCode.ToString(),
+                                Array.Empty<object>()));
                     }
 
-                    context.Result = new OkObjectResult(evenbetResult.Data);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, evenbetResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
 
                 case IEvenbetResult<object> evenbetResult:
                 {
-                    var errorCode = evenbetResult.Error;
-
-                    var errorResponse = new EvenbetFailureResponse(
-                        new EvenbetErrorResponse(
-                            (int)errorCode,
-                            errorCode.Humanize()));
-
-                    context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
-                }
-
-                case IAnakatechResult<object> { IsSuccess: true } anakatechResult:
-                {
-                    if (ResultAsJavaScript(anakatechResult))
+                    object responseObject;
+                    if (evenbetResult.IsSuccess)
                     {
-                        context.Result = new ContentResult
+                        if (ResultAsJavaScript(evenbetResult))
                         {
-                            ContentType = "text/html",
-                            StatusCode = (int)HttpStatusCode.OK,
-                            Content = anakatechResult.Data.ToString()
-                        };
+                            context.Result = new ContentResult
+                            {
+                                ContentType = "text/html",
+                                StatusCode = (int)HttpStatusCode.OK,
+                                Content = evenbetResult.Data.ToString()
+                            };
 
-                        return;
+                            return;
+                        }
+                        responseObject = evenbetResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = evenbetResult.Error;
+                        responseObject = new EvenbetFailureResponse(
+                            new EvenbetErrorResponse(
+                                (int)errorCode,
+                                errorCode.Humanize()));
                     }
 
-                    context.Result = new OkObjectResult(anakatechResult.Data);
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
 
                 case IAnakatechResult<object> anakatechResult:
                 {
-                    var errorCode = anakatechResult.Error;
+                    object responseObject;
+                    if (anakatechResult.IsSuccess)
+                    {
+                        if (ResultAsJavaScript(anakatechResult))
+                        {
+                            context.Result = new ContentResult
+                            {
+                                ContentType = "text/html",
+                                StatusCode = (int)HttpStatusCode.OK,
+                                Content = anakatechResult.Data.ToString()
+                            };
 
-                    var errorResponse = new AnakatechErrorResponse(
-                        false,
-                        0,
-                        errorCode.ToString());
+                            return;
+                        }
 
-                    context.Result = new OkObjectResult(errorResponse);
-                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-                    break;
+                        responseObject = anakatechResult.Data;
+                    }
+                    else
+                    {
+                        var errorCode = anakatechResult.Error;
+                        responseObject = new AnakatechErrorResponse(
+                            false,
+                            0,
+                            errorCode.ToString());
+                    }
+
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
                 }
 
                 case INemesisResult nemesisResult:
@@ -492,7 +494,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                             return;
 
                         responseObject = objectResult.Data;
-                        
+
                         if (ResultAsJavaScript(synotResult))
                         {
                             context.Result = new ContentResult
