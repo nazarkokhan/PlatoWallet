@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Controllers.Other;
 
+using System.ComponentModel.DataAnnotations;
 using Abstract;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Requests.Wallets.Uranus.Data;
@@ -25,6 +26,7 @@ public sealed class ExternalUranusController : RestApiController
     [ProducesResponseType(typeof(UranusSuccessResponse<UranusAvailableGamesData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAvailableGames(
         [FromBody] UranusGetAvailableGamesRequest request,
+        [Required][FromHeader(Name = UranusHeaders.XSignature)] string xSignature,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
@@ -32,6 +34,7 @@ public sealed class ExternalUranusController : RestApiController
     [ProducesResponseType(typeof(UranusSuccessResponse<UranusGameUrlData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLaunchGameUrl(
         [FromBody] UranusGetLaunchGameUrlRequest request,
+        [Required][FromHeader(Name = UranusHeaders.XSignature)] string xSignature,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
@@ -39,6 +42,7 @@ public sealed class ExternalUranusController : RestApiController
     [ProducesResponseType(typeof(UranusSuccessResponse<UranusGameUrlData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDemoLaunchGameUrl(
         [FromBody] UranusGetDemoLaunchGameUrlRequest request,
+        [Required][FromHeader(Name = UranusHeaders.XSignature)] string xSignature,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

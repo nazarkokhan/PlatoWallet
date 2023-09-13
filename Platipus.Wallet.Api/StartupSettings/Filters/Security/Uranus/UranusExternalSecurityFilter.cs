@@ -18,8 +18,8 @@ public sealed class UranusExternalSecurityFilter : IAsyncActionFilter
         var requestBytesToValidate = context.HttpContext.GetRequestBodyBytesItem();
         var jsonString = Encoding.UTF8.GetString(requestBytesToValidate);
 
-        string? authHeaderValue = context.HttpContext.Request.Headers["X-Signature"];
-        if (authHeaderValue is null)
+        var xSignature = context.HttpContext.Request.Headers.GetXSignature();
+        if (xSignature is null)
         {
             context.Result = UranusResultFactory.Failure<UranusFailureResponse>(UranusErrorCode.E_PLAYER_SESSION_NOT_FOUND)
                .ToActionResult();
@@ -27,7 +27,7 @@ public sealed class UranusExternalSecurityFilter : IAsyncActionFilter
             return;
         }
 
-        var result = UranusSecurityHash.IsValid(authHeaderValue, jsonString, secretKey);
+        var result = UranusSecurityHash.IsValid(xSignature, jsonString, secretKey);
 
         if (!result)
         {
