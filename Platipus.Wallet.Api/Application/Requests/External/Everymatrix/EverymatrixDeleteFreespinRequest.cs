@@ -38,12 +38,15 @@ public record EverymatrixDeleteFreespinRequest(
 
             var award = await _context.Set<Award>()
                .Where(a => a.Id == apiRequest.BonusId)
-               .Include(a => a.User)
                .FirstOrDefaultAsync(cancellationToken);
             if (award is null)
                 return ResultFactory.Failure(ErrorCode.AwardNotFound);
 
-            if (award.User.Username != apiRequest.UserId)
+            var userIdValid = int.TryParse(apiRequest.UserId, out var userId);
+            if (!userIdValid)
+                return ResultFactory.Failure(ErrorCode.UserNotFound);
+
+            if (award.UserId != userId)
                 return ResultFactory.Failure(ErrorCode.AwardDoesNotBelongToThisUser);
 
             _context.Remove(award);

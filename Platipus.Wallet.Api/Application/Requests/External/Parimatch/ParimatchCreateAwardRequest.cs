@@ -51,7 +51,7 @@ public record ParimatchCreateAwardRequest(
             var now = DateTime.UtcNow;
 
             if (expirationTime < now)
-                expirationTime = now + TimeSpan.FromDays(30);
+                return ResultFactory.Failure(ErrorCode.AwardInvalidExpirationDate);
 
             var response = await _gameApiClient.CreateAwardAsync(
                 environment.BaseUrl,

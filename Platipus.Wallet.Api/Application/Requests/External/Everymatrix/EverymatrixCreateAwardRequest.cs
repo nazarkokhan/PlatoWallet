@@ -38,8 +38,12 @@ public record EverymatrixCreateAwardRequest(
 
             var apiRequest = request.ApiRequest;
 
+            var userIdValid = int.TryParse(apiRequest.UserId, out var userId);
+            if (!userIdValid)
+                return ResultFactory.Failure(ErrorCode.UserNotFound);
+
             var user = await _context.Set<User>()
-               .Where(u => u.Username == apiRequest.UserId)
+               .Where(u => u.Id == userId)
                .Include(u => u.Casino)
                .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
