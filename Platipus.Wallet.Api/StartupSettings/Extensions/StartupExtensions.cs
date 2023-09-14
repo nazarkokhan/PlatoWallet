@@ -2,6 +2,7 @@ using Platipus.Wallet.Api.StartupSettings.Filters.Security.AtlasPlatform;
 
 namespace Platipus.Wallet.Api.StartupSettings.Extensions;
 
+using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -221,13 +222,10 @@ public static class StartupExtensions
         services.AddSwaggerGen(
             options =>
             {
-                options.SwaggerDoc(
-                    "v1",
-                    new OpenApiInfo
-                    {
-                        Title = "JWTToken_Auth_API",
-                        Version = "v1"
-                    });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
 
                 options.MapType<TimeSpan>(
                     () => new OpenApiSchema

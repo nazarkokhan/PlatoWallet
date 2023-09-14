@@ -1,30 +1,29 @@
-namespace Platipus.Wallet.Api.Application.Requests.External.Psw;
+namespace Platipus.Wallet.Api.Application.Requests.External.Hub88;
 
 using System.ComponentModel;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.PswGameApi;
-using Services.PswGameApi.Requests;
+using Services.Hub88GamesApi;
+using Services.Hub88GamesApi.DTOs.Requests;
 
-public record PswFreebetAwardRequest(
+public record Hub88DeleteAwardRequest(
     [property: DefaultValue("test")] string Environment,
-    bool IsBetflag,
-    PswFreebetAwardGameApiRequest ApiRequest) : IRequest<IResult>
+    Hub88DeleteAwardGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<PswFreebetAwardRequest, IResult>
+    public class Handler : IRequestHandler<Hub88DeleteAwardRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly IPswGameApiClient _gameApiClient;
+        private readonly IHub88GameApiClient _gameApiClient;
 
-        public Handler(WalletDbContext context, IPswGameApiClient gameApiClient)
+        public Handler(WalletDbContext context, IHub88GameApiClient gameApiClient)
         {
             _context = context;
             _gameApiClient = gameApiClient;
         }
 
         public async Task<IResult> Handle(
-            PswFreebetAwardRequest request,
+            Hub88DeleteAwardRequest request,
             CancellationToken cancellationToken)
         {
             await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -37,29 +36,28 @@ public record PswFreebetAwardRequest(
 
             var apiRequest = request.ApiRequest;
 
-            var user = await _context.Set<User>()
-               .Where(u => u.Username == apiRequest.User)
+            var casino = await _context.Set<Casino>()
+               .Where(u => u.Id == apiRequest.OperatorId)
                .FirstOrDefaultAsync(cancellationToken);
-            if (user is null)
-                return ResultFactory.Failure(ErrorCode.UserNotFound);
+            if (casino is null)
+                return ResultFactory.Failure(ErrorCode.CasinoNotFound);
 
             var award = await _context.Set<Award>()
-               .Where(a => a.Id == apiRequest.AwardId)
+               .Where(a => a.Id == apiRequest.RewardUuid)
+               .Include(a => a.User)
                .FirstOrDefaultAsync(cancellationToken);
-            if (award is not null)
-                return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
+            if (award is null)
+                return ResultFactory.Failure(ErrorCode.AwardNotFound);
+            if (award.User.CasinoId != casino.Id)
+                return ResultFactory.Failure(ErrorCode.AwardDoesNotBelongToThisCasino);
 
-            award = new Award(apiRequest.AwardId, apiRequest.ValidUntil);
-
-            user.Awards.Add(award);
-            _context.Update(user);
-
+            _context.Remove(award);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = await _gameApiClient.FreebetAwardAsync(
+            var response = await _gameApiClient.DeleteAwardAsync(
                 environment.BaseUrl,
+                casino.Params.Hub88PrivateGameServiceSecuritySign,
                 apiRequest,
-                request.IsBetflag,
                 cancellationToken);
 
             if (response is { IsSuccess: true, Data.IsSuccess: true })

@@ -59,8 +59,13 @@ public class WalletHub88Controller : RestApiController
         Hub88RollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}
 
-    [HttpPost("private/test/get-security-value")]
+[Route("wallet/private/hub88")]
+[JsonSettingsName(WalletProvider.Hub88)]
+public class WalletHub88TestController : RestApiController
+{
+    [HttpPost("get-security-value")]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
         [FromBody] JsonDocument request,
@@ -68,14 +73,14 @@ public class WalletHub88Controller : RestApiController
         CancellationToken cancellationToken)
     {
         var casino = await dbContext.Set<Casino>()
-            .Where(c => c.Id == casinoId)
-            .Select(
+           .Where(c => c.Id == casinoId)
+           .Select(
                 c => new
                 {
                     c.SignatureKey,
                     PrivateWalletSecuritySign = c.Params.Hub88PrivateWalletSecuritySign
                 })
-            .FirstOrDefaultAsync(cancellationToken);
+           .FirstOrDefaultAsync(cancellationToken);
 
         if (casino is null)
             return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();

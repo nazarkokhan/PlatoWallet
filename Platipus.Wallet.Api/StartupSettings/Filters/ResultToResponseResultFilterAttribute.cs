@@ -37,7 +37,6 @@ using Application.Results.Betflag.WithData;
 using Application.Results.Evenbet.WithData;
 using Application.Results.Everymatrix.WithData;
 using Application.Results.HttpClient.WithData;
-using Application.Results.Hub88;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
@@ -46,7 +45,6 @@ using Application.Results.Nemesis.WithData;
 using Application.Results.Parimatch;
 using Application.Results.Parimatch.WithData;
 using Application.Results.Reevo.WithData;
-using Application.Results.Sw;
 using Application.Results.Sw.WithData;
 using Application.Results.Synot;
 using Application.Results.Synot.WithData;
@@ -524,15 +522,12 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     return;
                 }
 
-                case ISynotResult synotResult:
+                case ISynotResult<object> synotResult:
                 {
                     object responseObject;
                     if (synotResult.IsSuccess)
                     {
-                        if (synotResult is not ISynotResult<object> objectResult)
-                            return;
-
-                        responseObject = objectResult.Data;
+                        responseObject = synotResult.Data;
 
                         if (ResultAsJavaScript(synotResult))
                         {
@@ -576,6 +571,25 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         };
                     }
 
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+
+                case IHub88Result<object> hub88Result:
+                {
+                    object responseObject;
+
+                    if (hub88Result.IsSuccess)
+                    {
+                        responseObject = hub88Result.Data;
+                    }
+                    else
+                    {
+                        var errorCode = hub88Result.Error;
+                        responseObject = new Hub88ErrorResponse(errorCode);
+                    }
+
+                    context.Result = new OkObjectResult(responseObject);
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
@@ -631,30 +645,6 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
             var errorCode = openboxActionResult.Result.Error;
 
             var errorResponse = new OpenboxSingleResponse(errorCode);
-
-            context.Result = new OkObjectResult(errorResponse);
-
-            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, errorResponse);
-        }
-
-        if (context.Result is Hub88ExternalActionResult hub88ActionResult)
-        {
-            if (hub88ActionResult.Result.IsSuccess)
-            {
-                if (hub88ActionResult.Result is IHub88Result<object> objectResult)
-                {
-                    context.Result = new OkObjectResult(objectResult.Data);
-                    return;
-                }
-
-                logger.LogWarning("We should not get here");
-                context.Result = new OkObjectResult(new Hub88ErrorResponse(Hub88ErrorCode.RS_ERROR_UNKNOWN));
-                return;
-            }
-
-            var errorCode = hub88ActionResult.Result.Error;
-
-            var errorResponse = new Hub88ErrorResponse(errorCode);
 
             context.Result = new OkObjectResult(errorResponse);
 

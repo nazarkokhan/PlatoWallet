@@ -55,7 +55,6 @@ public record PswGameBuyRequest(
             var round = await _context.Set<Round>()
                .Where(r => r.Id == responseRoundId)
                .FirstOrDefaultAsync(cancellationToken);
-
             if (round is not null)
                 return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 

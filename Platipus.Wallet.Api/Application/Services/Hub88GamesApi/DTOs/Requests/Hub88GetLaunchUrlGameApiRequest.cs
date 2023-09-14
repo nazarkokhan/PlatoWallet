@@ -1,6 +1,6 @@
-namespace Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Requests;
+namespace Platipus.Wallet.Api.Application.Services.Hub88GamesApi.DTOs.Requests;
 
-public record Hub88GetGameLinkGamesApiRequestDto(
+public record Hub88GetLaunchUrlGameApiRequest(
     string User,
     string Token,
     string SubPartnerId,

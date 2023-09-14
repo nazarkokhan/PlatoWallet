@@ -16,8 +16,8 @@ using Platipus.Wallet.Api.Application.Services.AtlasGameApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGameApi;
 using Platipus.Wallet.Api.Application.Services.EvenbetGameApi;
 using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi;
+using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.NemesisGameApi;
-using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
@@ -64,7 +64,8 @@ try
     services.AddCors(
         options =>
         {
-            options.AddPolicy("MyDefault",
+            options.AddPolicy(
+                "MyDefault",
                 policy =>
                 {
                     policy.AllowAnyOrigin()
@@ -166,37 +167,33 @@ try
 
     // GameServer APIs
     services
-       .AddTransient<IPswGameApiClient, PswGameApiClient>()
-       .AddHttpClient<IPswGameApiClient, PswGameApiClient>(
-            options =>
-            {
-                //TODO need to remove base urls after refactoring old game clients
-                options.BaseAddress = new Uri($"{gamesApiUrl}psw/");
-            })
-       .Services
-       .AddTransient<IHub88GamesApiClient, Hub88GamesApiClient>()
-       .AddHttpClient<IHub88GamesApiClient, Hub88GamesApiClient>(
-            options =>
-            {
-                options.BaseAddress = new Uri($"{gamesApiUrl}hub88/");
-            })
-       .Services
        .AddTransient<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
        .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
             options =>
             {
-                options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/");
+                options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/"); //TODO remove after refactor
             })
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IReevoGameApiClient, ReevoGameApiClient>()
        .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
             {
-                options.BaseAddress = new Uri($"{gamesApiUrl}reevo/");
+                options.BaseAddress = new Uri($"{gamesApiUrl}reevo/"); //TODO remove after refactor
             })
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<IPswGameApiClient, PswGameApiClient>()
+       .AddHttpClient<IPswGameApiClient, PswGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<IHub88GameApiClient, Hub88GameApiClient>()
+       .AddHttpClient<IHub88GameApiClient, Hub88GameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IUisGameApiClient, UisGameApiClient>()
        .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
        .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
@@ -204,30 +201,39 @@ try
        .Services
        .AddTransient<IAtlasGameApiClient, AtlasGameApiClient>()
        .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IUranusGameApiClient, UranusGameApiClient>()
        .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IEvenbetGameApiClient, EvenbetGameApiClient>()
        .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IAnakatechGameApiClient, AnakatechGameApiClient>()
        .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<INemesisGameApiClient, NemesisGameApiClient>()
        .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<ISwGameApiClient, SwGameApiClient>()
        .AddHttpClient<ISwGameApiClient, SwGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
        .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<IParimatchGameApiClient, ParimatchGameApiClient>()
        .AddHttpClient<IParimatchGameApiClient, ParimatchGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
        .Services
        .AddTransient<ISynotGameApiClient, SynotGameApiClient>()
-       .AddHttpClient<ISynotGameApiClient, SynotGameApiClient>();
+       .AddHttpClient<ISynotGameApiClient, SynotGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services
        .AddHealthChecks()

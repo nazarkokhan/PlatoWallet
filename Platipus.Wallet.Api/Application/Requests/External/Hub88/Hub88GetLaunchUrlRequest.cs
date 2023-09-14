@@ -1,31 +1,29 @@
-namespace Platipus.Wallet.Api.Application.Requests.External.Psw;
+namespace Platipus.Wallet.Api.Application.Requests.External.Hub88;
 
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Services.PswGameApi;
-using Services.PswGameApi.Requests;
+using Services.Hub88GamesApi;
+using Services.Hub88GamesApi.DTOs.Requests;
 
-public record PswGameSessionRequest(
+public record Hub88GetLaunchUrlRequest(
     [property: DefaultValue("test")] string Environment,
-    LaunchMode LaunchModeType,
-    bool IsBetflag,
-    PswGameSessionGameApiRequest ApiRequest) : IRequest<IResult>
+    Hub88GetLaunchUrlGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<PswGameSessionRequest, IResult>
+    public class Handler : IRequestHandler<Hub88GetLaunchUrlRequest, IResult>
     {
         private readonly WalletDbContext _context;
-        private readonly IPswGameApiClient _gameApiClient;
+        private readonly IHub88GameApiClient _gameApiClient;
 
-        public Handler(WalletDbContext context, IPswGameApiClient gameApiClient)
+        public Handler(WalletDbContext context, IHub88GameApiClient gameApiClient)
         {
             _context = context;
             _gameApiClient = gameApiClient;
         }
 
         public async Task<IResult> Handle(
-            PswGameSessionRequest request,
+            Hub88GetLaunchUrlRequest request,
             CancellationToken cancellationToken)
         {
             var environment = await _context.Set<GameEnvironment>()
@@ -37,13 +35,14 @@ public record PswGameSessionRequest(
             var apiRequest = request.ApiRequest;
 
             var session = await _context.Set<Session>()
-               .Where(e => e.Id == apiRequest.SessionId)
+               .Where(e => e.Id == apiRequest.Token)
                .FirstOrDefaultAsync(cancellationToken);
             if (session is not null)
                 return ResultFactory.Failure(ErrorCode.SessionAlreadyExists);
 
             var user = await _context.Set<User>()
                .Where(e => e.Username == apiRequest.User)
+               .Include(e => e.Casino)
                .FirstOrDefaultAsync(cancellationToken);
             if (user is null)
                 return ResultFactory.Failure(ErrorCode.UserNotFound);
@@ -52,16 +51,15 @@ public record PswGameSessionRequest(
             {
                 User = user,
                 IsTemporaryToken = true,
-                Id = apiRequest.SessionId
+                Id = apiRequest.Token
             };
             _context.Add(session);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var response = await _gameApiClient.GameSessionAsync(
+            var response = await _gameApiClient.GetLaunchUrlAsync(
                 environment.BaseUrl,
+                user.Casino.Params.Hub88PrivateGameServiceSecuritySign,
                 apiRequest,
-                request.LaunchModeType,
-                request.IsBetflag,
                 cancellationToken);
 
             if (response is not { IsSuccess: true, Data.IsSuccess: true })

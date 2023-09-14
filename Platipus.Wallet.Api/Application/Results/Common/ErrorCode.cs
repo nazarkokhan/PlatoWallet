@@ -31,6 +31,7 @@ public enum ErrorCode
     InsufficientFunds,
 
     AwardDoesNotBelongToThisUser,
+    AwardDoesNotBelongToThisCasino,
     AwardNotFound,
     AwardIsAlreadyUsed,
     AwardExpired,

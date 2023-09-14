@@ -3,7 +3,6 @@ namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
 using Api.Extensions;
 using Api.Extensions.SecuritySign;
 using Application.Extensions;
-using Application.Requests.Wallets.Sw;
 using Application.Requests.Wallets.Sw.Base;
 using Application.Results.Sw;
 using Domain.Entities;

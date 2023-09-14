@@ -55,7 +55,7 @@ public class EverymatrixGameApiClient : IEverymatrixGameApiClient
 
     private async Task<IResult<IHttpClientResult<TSuccess, EverymatrixErrorGameApiResponse>>>
         PostSignedRequestAsync<TSuccess>(
-            Uri baseUrl,
+            Uri requestUrl,
             string method,
             object request,
             CancellationToken cancellationToken = default)
@@ -64,9 +64,9 @@ public class EverymatrixGameApiClient : IEverymatrixGameApiClient
         {
             var jsonContent = JsonContent.Create(request, options: _jsonSerializerOptions);
 
-            baseUrl = new Uri(baseUrl, $"everymatrix/{method}");
+            requestUrl = new Uri(requestUrl, $"everymatrix/{method}");
 
-            var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
+            var httpResponseOriginal = await _httpClient.PostAsync(requestUrl, jsonContent, cancellationToken);
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 

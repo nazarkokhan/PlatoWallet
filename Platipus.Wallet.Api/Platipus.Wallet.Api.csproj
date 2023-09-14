@@ -7,6 +7,12 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>10</LangVersion>
         <TargetFramework>net6.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>1701;1702;IL2121;CS1591</NoWarn>
+        <WarningLevel>6</WarningLevel>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,10 +30,7 @@
         <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
         <PackageReference Include="MediatR" Version="12.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.5" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -51,20 +54,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Application\Requests\Wallets\BetConstruct\Base\BetConstructBaseResponse.cs" />
-      <Compile Remove="logs\**" />
+        <Compile Remove="Application\Requests\Wallets\BetConstruct\Base\BetConstructBaseResponse.cs" />
+        <Compile Remove="logs\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Remove="logs\**" />
+        <EmbeddedResource Remove="logs\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="logs\**" />
+        <Content Remove="logs\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Application\Services\ObsoleteGameApiStyle\" />
+        <Folder Include="Application\Services\ObsoleteGameApiStyle\" />
     </ItemGroup>
 
 </Project>

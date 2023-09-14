@@ -21,11 +21,11 @@ using Services.EmaraPlayGameApi;
 using Services.EmaraPlayGameApi.Requests;
 using Services.EvenbetGameApi;
 using Services.EvenbetGameApi.Requests;
+using Services.Hub88GamesApi;
+using Services.Hub88GamesApi.DTOs;
+using Services.Hub88GamesApi.DTOs.Requests;
 using Services.NemesisGameApi;
 using Services.NemesisGameApi.Requests;
-using Services.ObsoleteGameApiStyle.Hub88GamesApi;
-using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs;
-using Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Requests;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
 using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
@@ -69,7 +69,7 @@ public sealed record LogInRequest(
     {
         private readonly WalletDbContext _context;
         private readonly IPswGameApiClient _pswGameApiClient;
-        private readonly IHub88GamesApiClient _hub88GamesApiClient;
+        private readonly IHub88GameApiClient _hub88GameApiClient;
         private readonly ISoftswissGamesApiClient _softswissGamesApiClient;
         private readonly IEmaraPlayGameApiClient _emaraPlayGameApiClient;
         private readonly IReevoGameApiClient _reevoGameApiClient;
@@ -86,7 +86,7 @@ public sealed record LogInRequest(
         public Handler(
             WalletDbContext context,
             IPswGameApiClient pswGameApiClient,
-            IHub88GamesApiClient hub88GamesApiClient,
+            IHub88GameApiClient hub88GameApiClient,
             ISoftswissGamesApiClient softswissGamesApiClient,
             IReevoGameApiClient reevoGameApiClient,
             IOptions<SoftswissCurrenciesOptions> currencyMultipliers,
@@ -102,7 +102,7 @@ public sealed record LogInRequest(
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
-            _hub88GamesApiClient = hub88GamesApiClient;
+            _hub88GameApiClient = hub88GameApiClient;
             _softswissGamesApiClient = softswissGamesApiClient;
             _reevoGameApiClient = reevoGameApiClient;
             _httpContextAccessor = httpContextAccessor;
@@ -502,7 +502,7 @@ public sealed record LogInRequest(
 
                 case WalletProvider.Hub88:
                 {
-                    var getHub88GameLinkRequestDto = new Hub88GetGameLinkGamesApiRequestDto(
+                    var getHub88GameLinkRequestDto = new Hub88GetLaunchUrlGameApiRequest(
                         user.Username,
                         session.Id,
                         user.CasinoId,
@@ -518,12 +518,16 @@ public sealed record LogInRequest(
                         user.Currency.Id,
                         "EE");
 
-                    var getGameLinkResult = await _hub88GamesApiClient.GetLaunchUrlAsync(
+                    var getGameLinkResult = await _hub88GameApiClient.GetLaunchUrlAsync(
                         baseUrl,
+                        casino.Params.Hub88PrivateGameServiceSecuritySign,
                         getHub88GameLinkRequestDto,
                         cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.Url ?? "";
+                    if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
+                        launchUrl = "";
+                    else
+                        launchUrl = getGameLinkResult.Data.Data.Url;
                     break;
                 }
 

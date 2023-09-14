@@ -2,6 +2,9 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Hub88;
 
 using Base;
 using Base.Response;
+using Domain.Entities;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Results.Hub88;
 using Results.Hub88.WithData;
 using Results.ResultToResultMappers;
@@ -26,16 +29,28 @@ public record Hub88BetRequest(
     public class Handler : IRequestHandler<Hub88BetRequest, IHub88Result<Hub88BalanceResponse>>
     {
         private readonly IWalletService _wallet;
+        private readonly WalletDbContext _context;
 
-        public Handler(IWalletService wallet)
+        public Handler(IWalletService wallet, WalletDbContext context)
         {
             _wallet = wallet;
+            _context = context;
         }
 
         public async Task<IHub88Result<Hub88BalanceResponse>> Handle(
             Hub88BetRequest request,
             CancellationToken cancellationToken)
         {
+            if (request.IsFree)
+            {
+                var award = await _context.Set<Award>()
+                   .Where(a => a.User.Username == request.SupplierUser)
+                   .FirstOrDefaultAsync(cancellationToken);
+
+                if (award is null)
+                    return Hub88ResultFactory.Failure<Hub88BalanceResponse>(Hub88ErrorCode.RS_ERROR_WRONG_SYNTAX);
+            }
+
             var walletResult = await _wallet.BetAsync(
                 request.Token,
                 request.Round,

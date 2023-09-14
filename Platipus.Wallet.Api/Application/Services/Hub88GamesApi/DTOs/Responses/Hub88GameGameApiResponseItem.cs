@@ -1,6 +1,6 @@
-namespace Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.Hub88GamesApi.DTOs.Responses;
+namespace Platipus.Wallet.Api.Application.Services.Hub88GamesApi.DTOs.Responses;
 
-public record Hub88GetGameDto(
+public record Hub88GameGameApiResponseItem(
     string UrlThumb,
     string UrlBackground,
     string Product,

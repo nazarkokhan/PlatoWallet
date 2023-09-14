@@ -1,6 +1,5 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
-using System.Xml.Schema;
 using Abstract;
 using Application.Requests.External;
 using Application.Requests.Test;
