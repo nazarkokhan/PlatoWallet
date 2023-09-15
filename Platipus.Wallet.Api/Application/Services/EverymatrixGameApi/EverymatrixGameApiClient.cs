@@ -46,7 +46,7 @@ public class EverymatrixGameApiClient : IEverymatrixGameApiClient
     {
         var response = await PostSignedRequestAsync<EverymatrixAwardGameApiResponse>(
             baseUrl,
-            "foreitbonus",
+            "forfeidtbonus",
             request,
             cancellationToken);
 
