@@ -37,6 +37,8 @@ using Services.SynotGameApi.Requests;
 using Services.UranusGamesApi;
 using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;
+using Services.VegangsterGameApi;
+using Services.VegangsterGameApi.External;
 using StartupSettings.Factories;
 using StartupSettings.Options;
 using Wallets.Anakatech.Enums;
@@ -62,7 +64,8 @@ public sealed record LogInRequest(
         [property: DefaultValue(null)] string? Country,
         [property: DefaultValue(null)] string? Jurisdiction,
         [property: DefaultValue(null)] string? OriginUrl,
-        [property: DefaultValue(null)] int? RealityCheckInterval)
+        [property: DefaultValue(null)] int? RealityCheckInterval,
+        [property: DefaultValue(null)] string? DepositUrl)
     : IRequest<IResult<LogInRequest.Response>>
 {
     public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
@@ -82,6 +85,7 @@ public sealed record LogInRequest(
         private readonly INemesisGameApiClient _nemesisGameApiClient;
         private readonly IParimatchGameApiClient _parimatchGameApiClient;
         private readonly ISynotGameApiClient _synotGameApiClient;
+        private readonly IVegangsterGameApiClient _vegangsterGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -98,7 +102,8 @@ public sealed record LogInRequest(
             IAnakatechGameApiClient anakatechGameApiClient,
             INemesisGameApiClient nemesisGameApiClient,
             IParimatchGameApiClient parimatchGameApiClient,
-            ISynotGameApiClient synotGameApiClient)
+            ISynotGameApiClient synotGameApiClient,
+            IVegangsterGameApiClient vegangsterGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -114,6 +119,7 @@ public sealed record LogInRequest(
             _nemesisGameApiClient = nemesisGameApiClient;
             _parimatchGameApiClient = parimatchGameApiClient;
             _synotGameApiClient = synotGameApiClient;
+            _vegangsterGameApiClient = vegangsterGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -187,6 +193,59 @@ public sealed record LogInRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case WalletProvider.Vegangster:
+                {
+                    var playerIp = GetPlayerIp();
+                    var isDemoLaunchMode = request.LaunchMode is LaunchMode.Demo;
+
+                    IVegangsterCommonGetLaunchUrlApiRequest getLaunchUrlApiRequest = isDemoLaunchMode
+                        ? new VegangsterGetDemoLaunchUrlGameApiRequest(
+                            request.BrandId!,
+                            request.Game,
+                            request.Device!,
+                            user.CurrencyId,
+                            LobbyUrl: request.Lobby,
+                            Lang: request.Language,
+                            Country: request.Country!,
+                            Ip: playerIp)
+                        : new VegangsterGetLaunchUrlGameApiRequest(
+                            request.BrandId!,
+                            user.Id.ToString(),
+                            session.Id,
+                            request.Game,
+                            request.Device!,
+                            user.CurrencyId,
+                            request.Language,
+                            request.Country!,
+                            playerIp,
+                            request.Lobby,
+                            request.DepositUrl!,
+                            request.Nickname!);
+
+                    var apiResponse = isDemoLaunchMode
+                        ? await _vegangsterGameApiClient.GetDemoLaunchUrlAsync(
+                            baseUrl,
+                            casino.Id,
+                            casino.Params.VegangsterPrivateWalletSecuritySign,
+                            getLaunchUrlApiRequest,
+                            cancellationToken: cancellationToken)
+                        : await _vegangsterGameApiClient.GetLaunchUrlAsync(
+                            baseUrl,
+                            casino.Id,
+                            casino.Params.VegangsterPrivateWalletSecuritySign,
+                            getLaunchUrlApiRequest,
+                            cancellationToken: cancellationToken);
+
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
+                    {
+                        launchUrl = string.Empty;
+                        break;
+                    }
+
+                    launchUrl = apiResponse.Data.Data.Url.ToString();
+                    break;
+                }
+
                 case WalletProvider.Synot:
                 {
                     var real = request.LaunchMode is LaunchMode.Real;
@@ -528,6 +587,7 @@ public sealed record LogInRequest(
                         launchUrl = "";
                     else
                         launchUrl = getGameLinkResult.Data.Data.Url;
+
                     break;
                 }
 
