@@ -18,7 +18,7 @@ public sealed class VegangsterMockedErrorActionFilter : AbstractMockedErrorActio
         IBaseWalletRequest baseRequest,
         ActionExecutedContext actionExecutedContext)
     {
-        var request = (IVegangsterRequest)baseRequest;
+        var request = (IVegangsterBaseRequest)baseRequest;
 
         var walletMethod = request switch
         {

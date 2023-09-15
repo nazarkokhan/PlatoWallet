@@ -28,7 +28,7 @@ public sealed class VegangsterSecurityFilter : IAsyncActionFilter
         }
 
         var request = context.ActionArguments.Values
-           .OfType<IVegangsterRequest>()
+           .OfType<IVegangsterBaseRequest>()
            .Single();
 
         var dbContext = context.HttpContext.RequestServices.GetRequiredService<WalletDbContext>();
