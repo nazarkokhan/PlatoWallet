@@ -21,5 +21,6 @@ public enum WalletProvider : short
     Evenbet = 17,
     Anakatech = 18,
     Nemesis = 19,
-    Synot = 20
+    Synot = 20,
+    Vegangster = 21
 }
