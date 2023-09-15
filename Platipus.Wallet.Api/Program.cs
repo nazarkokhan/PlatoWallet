@@ -26,6 +26,7 @@ using Platipus.Wallet.Api.Application.Services.SwGameApi;
 using Platipus.Wallet.Api.Application.Services.SynotGameApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
 using Platipus.Wallet.Api.Application.Services.UranusGamesApi;
+using Platipus.Wallet.Api.Application.Services.VegangsterGameApi;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.StartupSettings.Extensions;
@@ -233,6 +234,10 @@ try
        .Services
        .AddTransient<ISynotGameApiClient, SynotGameApiClient>()
        .AddHttpClient<ISynotGameApiClient, SynotGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<IVegangsterGameApiClient, VegangsterGameApiClient>()
+       .AddHttpClient<IVegangsterGameApiClient, VegangsterGameApiClient>()
        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services

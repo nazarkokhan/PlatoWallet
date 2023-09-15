@@ -30,6 +30,7 @@ using Application.Requests.Wallets.Uranus.Base;
 using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
 using Application.Responses.Synot.Base;
+using Application.Responses.Vegangster.Base;
 using Application.Results.Anakatech.WithData;
 using Application.Results.Atlas.WithData;
 using Application.Results.BetConstruct.WithData;
@@ -50,6 +51,7 @@ using Application.Results.Synot;
 using Application.Results.Synot.WithData;
 using Application.Results.Uis.WithData;
 using Application.Results.Uranus.WithData;
+using Application.Results.Vegangster.WithData;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -349,6 +351,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
 
                             return;
                         }
+
                         responseObject = evenbetResult.Data;
                     }
                     else
@@ -538,6 +541,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                                 Content = responseObject.ToString()
                             };
 
+                            context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                             return;
                         }
 
@@ -590,6 +594,28 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     }
 
                     context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+
+                case IVegangsterResult<object> vegangsterResult:
+                {
+                    object responseObject;
+
+                    if (vegangsterResult.IsSuccess)
+                    {
+                        responseObject = vegangsterResult.Data;
+
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var error = vegangsterResult.Error;
+                        responseObject = new VegangsterFailureResponse(error.ToString());
+
+                        context.Result = new BadRequestObjectResult(responseObject);
+                    }
+
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
