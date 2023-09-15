@@ -1,12 +1,18 @@
 ﻿namespace Platipus.Wallet.Api.Controllers;
 
+using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.Vegangster;
 using Application.Responses.Vegangster;
 using Application.Responses.Vegangster.Base;
+using Domain.Entities;
 using Domain.Entities.Enums;
 using Extensions;
+using Extensions.SecuritySign;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using StartupSettings;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.NewFilterStyle;
 using StartupSettings.Filters.Security;
@@ -56,4 +62,36 @@ public sealed class WalletVegangsterController : RestApiController
         VegangsterRollbackRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+}
+
+[Route("wallet/private/vegangster")]
+[JsonSettingsName(WalletProvider.Vegangster)]
+public sealed class WalletVegangsterTestController : RestApiController
+{
+    [HttpPost("get-security-value")]
+    public async Task<IActionResult> GetSecurityValue(
+        string casinoId,
+        [FromBody] JsonDocument request,
+        [FromServices] WalletDbContext dbContext,
+        CancellationToken cancellationToken)
+    {
+        var casino = await dbContext.Set<Casino>()
+           .Where(c => c.Id == casinoId)
+           .Select(
+                c => new
+                {
+                    c.SignatureKey,
+                    PrivateWalletSecuritySign = c.Params.VegangsterPrivateWalletSecuritySign
+                })
+           .FirstOrDefaultAsync(cancellationToken);
+
+        if (casino is null)
+            return ResultFactory.Failure(ErrorCode.CasinoNotFound).ToActionResult();
+
+        var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
+
+        var securityValue = VegangsterSecuritySign.Compute(rawRequestBytes, casino.PrivateWalletSecuritySign);
+
+        return Ok(securityValue);
+    }
 }
