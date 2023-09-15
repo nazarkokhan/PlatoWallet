@@ -18,7 +18,6 @@ using JorgeSerrano.Json;
 using JsonConverters;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
 using Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 

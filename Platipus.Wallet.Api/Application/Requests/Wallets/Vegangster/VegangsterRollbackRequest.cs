@@ -3,7 +3,6 @@
 using System.Text.Json.Serialization;
 using Base;
 using Helpers;
-using Humanizer;
 using Responses.Vegangster;
 using Results.ResultToResultMappers;
 using Results.Vegangster;
@@ -45,7 +44,7 @@ public sealed record VegangsterRollbackRequest(
             var data = walletResult.Data;
 
             var response = new VegangsterTransactionResponse(
-                VegangsterResponseStatus.OK.Humanize(),
+                VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
                 (int)MoneyHelper.ConvertToCents(data.Balance),
                 data.Transaction.Id);

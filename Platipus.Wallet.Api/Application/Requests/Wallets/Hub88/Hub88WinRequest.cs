@@ -2,9 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Hub88;
 
 using Base;
 using Base.Response;
-using Domain.Entities;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Results.Hub88;
 using Results.Hub88.WithData;
 using Results.ResultToResultMappers;

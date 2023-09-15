@@ -2,7 +2,6 @@
 
 using Base;
 using Helpers;
-using Humanizer;
 using Responses.Vegangster;
 using Results.ResultToResultMappers;
 using Results.Vegangster;
@@ -38,7 +37,7 @@ public sealed record VegangsterPlayerBalanceRequest(
             var data = walletResult.Data;
 
             var response = new VegangsterPlayerBalanceResponse(
-                VegangsterResponseStatus.OK.Humanize(),
+                VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
                 (int)MoneyHelper.ConvertToCents(data.Balance));
 

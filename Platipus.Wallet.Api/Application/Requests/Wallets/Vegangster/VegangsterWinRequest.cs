@@ -3,7 +3,6 @@
 using System.Text.Json.Serialization;
 using Base;
 using Helpers;
-using Humanizer;
 using Responses.Vegangster;
 using Results.ResultToResultMappers;
 using Results.Vegangster;
@@ -18,7 +17,7 @@ public sealed record VegangsterWinRequest(
         string RoundId,
         string Currency,
         int Amount,
-        [property: JsonPropertyName("freegames_reference")] string FreeGamesReference)
+        [property: JsonPropertyName("freegames_reference")] string? FreeGamesReference = null)
     : IVegangsterTransactionRequest, IRequest<IVegangsterResult<VegangsterTransactionResponse>>
 {
     public sealed class Handler : IRequestHandler<VegangsterWinRequest, IVegangsterResult<VegangsterTransactionResponse>>
@@ -48,7 +47,7 @@ public sealed record VegangsterWinRequest(
             var data = walletResult.Data;
 
             var response = new VegangsterTransactionResponse(
-                VegangsterResponseStatus.OK.Humanize(),
+                VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
                 (int)MoneyHelper.ConvertToCents(data.Balance),
                 data.Transaction.Id);

@@ -1,6 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
-using Atlas;
 using Vegangster;
 using Vegangster.WithData;
 
