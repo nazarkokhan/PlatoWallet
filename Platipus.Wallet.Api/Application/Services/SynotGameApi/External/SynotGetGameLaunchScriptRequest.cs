@@ -7,6 +7,7 @@ using Results.Synot.WithData;
 using Wallet;
 
 public sealed record SynotGetGameLaunchScriptRequest(
+        [property: JsonPropertyName("casinoId")] string CasinoId,
         string Environment,
         [property: JsonPropertyName("apiRequest")] SynotGetGameLaunchScriptGameApiRequest ApiRequest)
     : IRequest<ISynotResult<string>>
@@ -28,16 +29,8 @@ public sealed record SynotGetGameLaunchScriptRequest(
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(request.Environment, cancellationToken);
 
-            var casinoId = request.Environment switch
-            {
-                "local" => "synot_local",
-                "test" or "gameserver-test" => "synot_platipus",
-                "wbg" => "synot_stage",
-                _ => "synot_platipus"
-            };
-            
             var clientResponse = await _synotGameApiClient.GetGameLaunchScriptAsync(
-                casinoId,
+                request.CasinoId,
                 walletResponse.Data.BaseUrl,
                 request.ApiRequest,
                 cancellationToken);

@@ -1,10 +1,14 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.SynotGameApi.External;
 
- using Results.ResultToResultMappers;
+using System.Text.Json.Serialization;
+using Results.ResultToResultMappers;
 using Results.Synot.WithData;
 using Wallet;
 
-public sealed record SynotGetGamesRequest(string Environment) : IRequest<ISynotResult<SynotGetGamesResponse>>
+public sealed record SynotGetGamesRequest(
+        string Environment,
+        [property: JsonPropertyName("casinoId")] string CasinoId)
+    : IRequest<ISynotResult<SynotGetGamesResponse>>
 {
     public sealed class Handler : IRequestHandler<SynotGetGamesRequest, ISynotResult<SynotGetGamesResponse>>
     {
@@ -23,16 +27,8 @@ public sealed record SynotGetGamesRequest(string Environment) : IRequest<ISynotR
         {
             var walletResponse = await _walletService.GetEnvironmentAsync(request.Environment, cancellationToken);
 
-            var casinoId = request.Environment switch
-            {
-                "local" => "synot_local",
-                "test" or "gameserver-test" => "synot_platipus",
-                "wbg" => "synot_stage",
-                _ => "synot_platipus"
-            };
-
             var clientResponse = await _synotGameApiClient.GetGamesAsync(
-                casinoId,
+                request.CasinoId,
                 walletResponse.Data.BaseUrl,
                 cancellationToken);
 
