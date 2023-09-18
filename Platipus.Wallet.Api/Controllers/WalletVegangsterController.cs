@@ -1,5 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Controllers;
 
+using System.Net.Mime;
 using System.Text.Json;
 using Abstract;
 using Application.Requests.Wallets.Vegangster;
@@ -66,9 +67,12 @@ public sealed class WalletVegangsterController : RestApiController
 
 [Route("wallet/private/vegangster")]
 [JsonSettingsName(WalletProvider.Vegangster)]
-public sealed class WalletVegangsterTestController : RestApiController
+[Produces(MediaTypeNames.Text.Plain)]
+[Consumes(MediaTypeNames.Application.Json)]
+public sealed class WalletVegangsterTestController : ApiController
 {
     [HttpPost("get-security-value")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSecurityValue(
         string casinoId,
         [FromBody] JsonDocument request,
@@ -81,7 +85,7 @@ public sealed class WalletVegangsterTestController : RestApiController
                 c => new
                 {
                     c.SignatureKey,
-                    PrivateWalletSecuritySign = c.Params.VegangsterPrivateWalletSecuritySign
+                    PrivateGameServerSecuritySign = c.Params.VegangsterPrivateGameServerSecuritySign
                 })
            .FirstOrDefaultAsync(cancellationToken);
 
@@ -90,7 +94,7 @@ public sealed class WalletVegangsterTestController : RestApiController
 
         var rawRequestBytes = HttpContext.GetRequestBodyBytesItem();
 
-        var securityValue = VegangsterSecuritySign.Compute(rawRequestBytes, casino.PrivateWalletSecuritySign);
+        var securityValue = VegangsterSecuritySign.Compute(rawRequestBytes, casino.PrivateGameServerSecuritySign);
 
         return Ok(securityValue);
     }
