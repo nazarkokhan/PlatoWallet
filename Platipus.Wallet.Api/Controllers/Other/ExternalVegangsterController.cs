@@ -1,9 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
-using Application.Requests.Wallets.Uranus.Base;
-using Application.Requests.Wallets.Uranus.Data;
-using Application.Services.UranusGamesApi.External;
+using Application.Responses.Vegangster.Base;
 using Application.Services.VegangsterGameApi.External;
 using Application.Services.VegangsterGameApi.Requests;
 using Domain.Entities.Enums;
@@ -11,8 +9,9 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 
-[Route("wallet/external/vegangster")]
+[Route("external/vegangster")]
 [JsonSettingsName(WalletProvider.Vegangster)]
+[ProducesResponseType(typeof(VegangsterFailureResponse), StatusCodes.Status400BadRequest)]
 public sealed class ExternalVegangsterController : RestApiController
 {
     private readonly IMediator _mediator;

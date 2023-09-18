@@ -38,8 +38,8 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         const string methodRoute = "game/url";
         return await PostSignedRequestAsync<VegangsterGetLaunchUrlResponse>(
             baseUrl,
-            casinoId,
             xApiSignature,
+            casinoId,
             methodRoute,
             (VegangsterGetLaunchUrlGameApiRequest)apiRequest,
             cancellationToken);
@@ -56,22 +56,11 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         const string methodRoute = "game/demo/url";
         return await PostSignedRequestAsync<VegangsterGetLaunchUrlResponse>(
             baseUrl,
-            casinoId,
             xApiSignature,
+            casinoId,
             methodRoute,
             (VegangsterGetDemoLaunchUrlGameApiRequest)apiRequest,
             cancellationToken);
-    }
-
-    public Task<IResult<IHttpClientResult<VegangsterGetAvailableGamesResponse, VegangsterFailureResponse>>>
-        GetAvailableGamesAsync(
-            Uri baseUrl,
-            string casinoId,
-            string xApiSignature,
-            IVegangsterCommonGetLaunchUrlApiRequest apiRequest,
-            CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<IResult<IHttpClientResult<VegangsterGetAvailableGamesResponse, VegangsterFailureResponse>>>
@@ -85,8 +74,8 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         const string methodRoute = "game/list";
         return await PostSignedRequestAsync<VegangsterGetAvailableGamesResponse>(
             baseUrl,
-            casinoId,
             xApiSignature,
+            casinoId,
             methodRoute,
             apiRequest,
             cancellationToken);
@@ -102,8 +91,8 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         const string methodRoute = "freegames/grant";
         return await PostSignedRequestAsync<VegangsterGrantResponse>(
             baseUrl,
-            casinoId,
             xApiSignature,
+            casinoId,
             methodRoute,
             apiRequest,
             cancellationToken);
@@ -119,7 +108,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
     {
         try
         {
-            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{casinoId}{methodRoute}");
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{casinoId}/{methodRoute}");
 
             var jsonContent = JsonContent.Create(request, options: _jsonSerializerOptions);
             var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
