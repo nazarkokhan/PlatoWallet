@@ -38,6 +38,13 @@ public class ExternalController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
+    [HttpPost("session")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateSession(
+        [FromQuery] CreateSessionRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
     [HttpPut("session")]
     public async Task<IActionResult> UpdateSessionLifetime(
         [FromQuery] UpdateSessionLifetimeRequest request,
