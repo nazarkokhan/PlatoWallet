@@ -130,12 +130,14 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     return;
                 }
 
-                case ISoftBetResult<object> iSoftBetResult:
+                case ISoftBetResult iSoftBetResult:
                 {
                     object responseObject;
                     if (iSoftBetResult.IsSuccess)
                     {
-                        responseObject = iSoftBetResult.Data;
+                        if (iSoftBetResult is not ISoftBetResult<object> iSoftBetResultWithData)
+                            return;
+                        responseObject = iSoftBetResultWithData.Data;
                     }
                     else
                     {
