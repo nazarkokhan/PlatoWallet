@@ -6,7 +6,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("admin")]
-public class AdminController : RestApiController
+public sealed class AdminController : RestApiController
 {
     private readonly IMediator _mediator;
 
@@ -43,4 +43,9 @@ public class AdminController : RestApiController
         [FromQuery] GetUsersPageRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpGet("integrations/info")]
+    [ProducesResponseType(typeof(List<GetWalletProvidersInfoRequest.WalletProviderInfo>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetIntegrationsInfo(CancellationToken cancellationToken)
+        => (await _mediator.Send(new GetWalletProvidersInfoRequest(), cancellationToken)).ToActionResult();
 }
