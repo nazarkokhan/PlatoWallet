@@ -63,6 +63,7 @@ public record NemesisCreateAwardRequest(
             {
                 expirationTime = DateTimeOffset.FromUnixTimeSeconds(apiRequest.ExpirationTimestamp.Value)
                    .DateTime
+                   .ToLocalTime()
                    .ToUniversalTime();
             }
 
