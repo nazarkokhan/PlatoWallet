@@ -51,13 +51,20 @@ public record NemesisCreateAwardRequest(
             if (award is not null)
                 return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 
-            var expirationTime = DateTimeOffset.FromUnixTimeSeconds(apiRequest.ExpirationTimestamp)
-               .DateTime
-               .ToUniversalTime();
             var now = DateTime.UtcNow;
+            var maxAwardLifetime = TimeSpan.FromDays(30);
 
-            if (expirationTime < now)
-                expirationTime = now + TimeSpan.FromDays(30);
+            DateTime expirationTime;
+            if (apiRequest.ExpirationTimestamp is null)
+            {
+                expirationTime = now + maxAwardLifetime;
+            }
+            else
+            {
+                expirationTime = DateTimeOffset.FromUnixTimeSeconds(apiRequest.ExpirationTimestamp.Value)
+                   .DateTime
+                   .ToUniversalTime();
+            }
 
             award = new Award(
                 apiRequest.BonusCode,

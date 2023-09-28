@@ -10,7 +10,7 @@ public record NemesisCreateAwardGameApiRequest(
     NemesisCreateAwardGameApiRequest.GameItem[] Games,
     string BonusCode,
     int RoundsCount,
-    long ExpirationTimestamp,
+    long? ExpirationTimestamp,
     long StartTimestamp)
 {
     public record GameItem(string Id);
