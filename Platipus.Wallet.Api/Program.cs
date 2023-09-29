@@ -24,6 +24,7 @@ using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesAp
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
 using Platipus.Wallet.Api.Application.Services.PswGameApi;
+using Platipus.Wallet.Api.Application.Services.SoftBetGameApi;
 using Platipus.Wallet.Api.Application.Services.SwGameApi;
 using Platipus.Wallet.Api.Application.Services.SynotGameApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
@@ -240,6 +241,10 @@ try
        .Services
        .AddTransient<IVegangsterGameApiClient, VegangsterGameApiClient>()
        .AddHttpClient<IVegangsterGameApiClient, VegangsterGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<ISoftBetGameApiClient, SoftBetGameApiClient>()
+       .AddHttpClient<ISoftBetGameApiClient, SoftBetGameApiClient>()
        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services

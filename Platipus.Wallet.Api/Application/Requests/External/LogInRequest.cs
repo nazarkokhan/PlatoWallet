@@ -32,6 +32,8 @@ using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Services.ParimatchGameApi;
 using Services.ParimatchGameApi.Requests;
 using Services.PswGameApi;
+using Services.SoftBetGameApi;
+using Services.SoftBetGameApi.External;
 using Services.SynotGameApi;
 using Services.SynotGameApi.Requests;
 using Services.UranusGamesApi;
@@ -86,6 +88,7 @@ public sealed record LogInRequest(
         private readonly IParimatchGameApiClient _parimatchGameApiClient;
         private readonly ISynotGameApiClient _synotGameApiClient;
         private readonly IVegangsterGameApiClient _vegangsterGameApiClient;
+        private readonly ISoftBetGameApiClient _softBetGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -103,7 +106,8 @@ public sealed record LogInRequest(
             INemesisGameApiClient nemesisGameApiClient,
             IParimatchGameApiClient parimatchGameApiClient,
             ISynotGameApiClient synotGameApiClient,
-            IVegangsterGameApiClient vegangsterGameApiClient)
+            IVegangsterGameApiClient vegangsterGameApiClient,
+            ISoftBetGameApiClient softBetGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -120,6 +124,7 @@ public sealed record LogInRequest(
             _parimatchGameApiClient = parimatchGameApiClient;
             _synotGameApiClient = synotGameApiClient;
             _vegangsterGameApiClient = vegangsterGameApiClient;
+            _softBetGameApiClient = softBetGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -645,15 +650,35 @@ public sealed record LogInRequest(
                     break;
 
                 case WalletProvider.SoftBet:
-                    launchUrl = GetSoftBetLaunchUrlAsync(
-                        baseUrl,
+                {
+                    var launchMode = request.LaunchMode is LaunchMode.Real ? "real" : "fun";
+                    var softBetGetLaunchUrlGameApiRequest = new SoftBetGetLaunchUrlGameApiRequest(
                         game.GameServerId,
+                        casino.InternalId,
+                        string.Empty,
                         casino.SignatureKey,
                         user.Username,
                         user.Currency.Id,
-                        casino.InternalId);
+                        "ua",
+                        1,
+                        1,
+                        launchMode,
+                        "26",
+                        request.Language,
+                        "multi");
+
+                    var getLaunchScriptResult = await _softBetGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        softBetGetLaunchUrlGameApiRequest,
+                        cancellationToken);
+
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
 
                     break;
+                }
 
                 case WalletProvider.Uis:
                     launchUrl = GetUisLaunchUrl(

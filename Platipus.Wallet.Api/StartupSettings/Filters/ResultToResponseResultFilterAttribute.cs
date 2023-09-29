@@ -133,11 +133,25 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 case ISoftBetResult iSoftBetResult:
                 {
                     object responseObject;
+                    
                     if (iSoftBetResult.IsSuccess)
                     {
                         if (iSoftBetResult is not ISoftBetResult<object> iSoftBetResultWithData)
                             return;
+                        
                         responseObject = iSoftBetResultWithData.Data;
+                        
+                        if (ResultAsJavaScript(iSoftBetResultWithData))
+                        {
+                            context.Result = new ContentResult
+                            {
+                                ContentType = "text/html",
+                                StatusCode = (int)HttpStatusCode.OK,
+                                Content = responseObject.ToString()
+                            };
+
+                            return;
+                        }
                     }
                     else
                     {
