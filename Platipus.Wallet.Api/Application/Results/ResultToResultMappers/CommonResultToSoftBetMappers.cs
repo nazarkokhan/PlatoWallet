@@ -5,6 +5,13 @@ using ISoftBet.WithData;
 
 public static class CommonResultToSoftBetMappers
 {
+    public static ISoftBetResult<TData> ToSoftBetResult<TData>(this IResult result, TData response)
+        => result.IsSuccess
+            ? SoftBetResultFactory.Success(response)
+            : SoftBetResultFactory.Failure<TData>(
+                result.Error.ToSoftBetErrorCode(),
+                exception: result.Exception);
+    
     public static ISoftBetResult<TData> ToSoftBetResult<TData>(this IResult result)
         => result.IsFailure
             ? SoftBetResultFactory.Failure<TData>(result.Error.ToSoftBetErrorCode(), result.Exception)

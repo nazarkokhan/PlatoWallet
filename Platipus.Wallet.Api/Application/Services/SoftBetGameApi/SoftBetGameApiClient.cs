@@ -1,6 +1,7 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.SoftBetGameApi;
 
 using System.Text.Json;
+using Api.Extensions;
 using Domain.Entities.Enums;
 using External;
 using Microsoft.AspNetCore.Mvc;
@@ -31,18 +32,15 @@ public sealed class SoftBetGameApiClient : ISoftBetGameApiClient
         SoftBetGetLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
-        var requestToServer = new Dictionary<string, string?>
-        {
-            { nameof(apiRequest.Token).ToLowerInvariant(), apiRequest.Token }
-        };
+        var queryParamsCollection = ObjectToDictionaryConverter.ConvertToDictionary(apiRequest);
 
         return GetAsync<string>(
             baseUrl,
             "launch",
-            requestToServer,
+            queryParamsCollection,
             cancellationToken);
     }
-    
+
     private async Task<IResult<IHttpClientResult<TSuccess, SoftBetGsFailureResponse>>> GetAsync<TSuccess>(
         Uri baseUrl,
         string methodRoute,
@@ -68,7 +66,7 @@ public sealed class SoftBetGameApiClient : ISoftBetGameApiClient
             return ResultFactory.Failure<IHttpClientResult<TSuccess, SoftBetGsFailureResponse>>(ErrorCode.UnknownHttpClientError);
         }
     }
-    
+
     private IHttpClientResult<TSuccess, SoftBetGsFailureResponse> GetHttpResultAsync<TSuccess>(
         HttpClientRequest httpResponse,
         string methodRoute)

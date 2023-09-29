@@ -1,7 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.SoftBetGameApi.Requests;
 
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using External;
 using Helpers;
 using Results.ISoftBet.WithData;
@@ -39,8 +38,9 @@ public sealed record SoftBetGetLaunchUrlRequest(
                 return clientResponse.ToSoftBetResult<string>();
 
             var gameLaunchScript = clientResponse.Data.Data;
+            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
 
-            return clientResponse.ToSoftBetResult<string>(gameLaunchScript);
+            return clientResponse.ToSoftBetResult(launchUrl);
         }
     }
 }

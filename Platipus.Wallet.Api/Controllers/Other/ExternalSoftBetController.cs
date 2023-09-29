@@ -7,7 +7,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 
-[Route("wallet/isoftbet")]
+[Route("external/isoftbet")]
 [JsonSettingsName(WalletProvider.SoftBet)]
 public sealed class ExternalSoftBetController : ApiController
 {

@@ -655,6 +655,7 @@ public sealed record LogInRequest(
                     var softBetGetLaunchUrlGameApiRequest = new SoftBetGetLaunchUrlGameApiRequest(
                         game.GameServerId,
                         casino.InternalId,
+                        user.Username,
                         string.Empty,
                         casino.SignatureKey,
                         user.Username,
