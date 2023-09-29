@@ -140,18 +140,6 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                             return;
                         
                         responseObject = iSoftBetResultWithData.Data;
-                        
-                        if (ResultAsJavaScript(iSoftBetResultWithData))
-                        {
-                            context.Result = new ContentResult
-                            {
-                                ContentType = "text/html",
-                                StatusCode = (int)HttpStatusCode.OK,
-                                Content = responseObject.ToString()
-                            };
-
-                            return;
-                        }
                     }
                     else
                     {
