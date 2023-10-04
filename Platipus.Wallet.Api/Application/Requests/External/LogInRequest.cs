@@ -555,11 +555,6 @@ public sealed record LogInRequest(
 
                 case WalletProvider.Dafabet:
                 {
-                    var hash = DatabetSecurityHash.Compute(
-                        "launch",
-                        $"{request.Game}{user.Username}{session.Id}{user.Currency.Id}",
-                        casino.SignatureKey);
-
                     var getDafabetLaunchUrlGameApiRequest = new DafabetGetLaunchUrlGameApiRequest(
                         "dafabet",
                         request.Game,
@@ -568,11 +563,11 @@ public sealed record LogInRequest(
                         user.Currency.Id,
                         request.Device ?? "desktop",
                         request.Language,
-                        hash,
                         request.Lobby);
 
                     var getLaunchScriptResult = await _dafabetGameApiClient.GetLaunchScriptAsync(
                         baseUrl,
+                        casino.SignatureKey,
                         getDafabetLaunchUrlGameApiRequest,
                         cancellationToken);
 

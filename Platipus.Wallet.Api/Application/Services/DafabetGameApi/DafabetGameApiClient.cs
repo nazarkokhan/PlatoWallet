@@ -3,6 +3,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Api.Extensions;
+using Api.Extensions.SecuritySign;
 using Application.Requests.Wallets.Dafabet.Base.Response;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -27,21 +28,30 @@ public sealed class DafabetGameApiClient : IDafabetGameApiClient
         _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.Dafabet))
            .JsonSerializerOptions;
     }
-    
+
     public Task<IResult<IHttpClientResult<string, DafabetErrorResponse>>> GetLaunchScriptAsync(
         Uri baseUrl,
+        string signatureKey,
         DafabetGetLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
+        const string methodRoute = "launch";
+
+        var hashValue = DatabetSecurityHash.Compute(
+            methodRoute,
+            $"{apiRequest.GameCode}{apiRequest.PlayerId}{apiRequest.PlayerToken}{apiRequest.Currency}",
+            signatureKey);
+
         var queryParamsCollection = ObjectToDictionaryConverter.ConvertToDictionary(apiRequest);
+        queryParamsCollection.Add("hash", hashValue);
 
         return GetAsync<string>(
             baseUrl,
-            "launch",
+            methodRoute,
             queryParamsCollection,
             cancellationToken);
     }
-    
+
     private async Task<IResult<IHttpClientResult<TSuccess, DafabetErrorResponse>>> GetAsync<TSuccess>(
         Uri baseUrl,
         string methodRoute,
@@ -67,7 +77,7 @@ public sealed class DafabetGameApiClient : IDafabetGameApiClient
             return ResultFactory.Failure<IHttpClientResult<TSuccess, DafabetErrorResponse>>(ErrorCode.UnknownHttpClientError);
         }
     }
-    
+
     private IHttpClientResult<TSuccess, DafabetErrorResponse> GetHttpResultAsync<TSuccess>(
         HttpClientRequest httpResponse,
         string methodRoute)
@@ -85,7 +95,7 @@ public sealed class DafabetGameApiClient : IDafabetGameApiClient
         catch
         {
             var regex = new Regex("\"status\"\\s*:\\s*0");
-            if (methodRoute is "launch" && regex.IsMatch(responseBody))
+            if (methodRoute is "launch" && !regex.IsMatch(responseBody))
                 return httpResponse.Success<TSuccess, DafabetErrorResponse>((TSuccess)(object)responseBody);
 
             throw;
@@ -104,7 +114,7 @@ public sealed class DafabetGameApiClient : IDafabetGameApiClient
         HttpClientRequest httpResponse)
     {
         var statusValue = parsedJson.RootElement.TryGetProperty("status", out var status) ? status.GetInt32() : 0;
-        if (statusValue is not 0) 
+        if (statusValue is not 0)
             return httpResponse.Success<TSuccess, DafabetErrorResponse>((TSuccess)(object)responseBody);
 
         var errorResponse = parsedJson.RootElement.Deserialize<DafabetErrorResponse>(_jsonSerializerOptions);
@@ -120,7 +130,8 @@ public sealed class DafabetGameApiClient : IDafabetGameApiClient
         var root = parsedJson.RootElement;
         if (root.ValueKind == JsonValueKind.Object
          && root.TryGetProperty("status", out var status)
-         && status.ValueKind is not JsonValueKind.Null && status.GetInt32() is 0)
+         && status.ValueKind is not JsonValueKind.Null
+         && status.GetInt32() is 0)
         {
             var errorResponse = root.Deserialize<DafabetErrorResponse>(_jsonSerializerOptions);
             if (errorResponse is not null)

@@ -13,5 +13,4 @@ public sealed record DafabetGetLaunchUrlGameApiRequest(
     [property: JsonPropertyName("currency")] [property: BindProperty(Name = "currency")] string Currency,
     [property: JsonPropertyName("device")] [property: BindProperty(Name = "device")] string Device,
     [property: JsonPropertyName("language")] [property: BindProperty(Name = "language")] string Language,
-    [property: JsonPropertyName("hash")] [property: BindProperty(Name = "hash")] string Hash,
     [property: JsonPropertyName("lobbyUrl")] [property: BindProperty(Name = "lobbyUrl")] string LobbyUrl);

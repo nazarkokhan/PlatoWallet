@@ -1,14 +1,15 @@
 ﻿namespace Platipus.Wallet.Api.Controllers.Other;
 
+using Abstract;
 using Application.Services.DafabetGameApi.External;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 
-[Microsoft.AspNetCore.Components.Route("external/dafabet")]
+[Route("external/dafabet")]
 [JsonSettingsName(WalletProvider.Dafabet)]
-public sealed class ExternalDafabetController
+public sealed class ExternalDafabetController : ApiController
 {
     private readonly IMediator _mediator;
 

@@ -8,6 +8,7 @@ public interface IDafabetGameApiClient
 {
     Task<IResult<IHttpClientResult<string, DafabetErrorResponse>>> GetLaunchScriptAsync(
         Uri baseUrl,
+        string signatureKey,
         DafabetGetLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default);
 }
