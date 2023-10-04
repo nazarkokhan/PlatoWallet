@@ -560,7 +560,7 @@ public sealed record LogInRequest(
                 case WalletProvider.Dafabet:
                 {
                     var getDafabetLaunchUrlGameApiRequest = new DafabetGetLaunchUrlGameApiRequest(
-                        "dafabet",
+                        casino.Id,
                         request.Game,
                         user.Username,
                         session.Id,
