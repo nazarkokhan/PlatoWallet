@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.External.Everymatrix;
+using Application.Services.EverymatrixGameApi.Requests;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,12 @@ public class ExternalEverymatrixController : RestApiController
     [HttpPost("foreitbonus")]
     public async Task<IActionResult> DeleteAward(
         [FromBody] EverymatrixDeleteFreespinRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("launch")]
+    public async Task<IActionResult> GetLaunchUrl(
+        [FromBody] EverymatrixGetLaunchUrlRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

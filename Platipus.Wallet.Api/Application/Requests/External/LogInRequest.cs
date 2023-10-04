@@ -2,7 +2,6 @@ namespace Platipus.Wallet.Api.Application.Requests.External;
 
 using System.ComponentModel;
 using System.Text;
-using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
@@ -23,6 +22,8 @@ using Services.EmaraPlayGameApi;
 using Services.EmaraPlayGameApi.Requests;
 using Services.EvenbetGameApi;
 using Services.EvenbetGameApi.Requests;
+using Services.EverymatrixGameApi;
+using Services.EverymatrixGameApi.External;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
@@ -92,6 +93,7 @@ public sealed record LogInRequest(
         private readonly IVegangsterGameApiClient _vegangsterGameApiClient;
         private readonly ISoftBetGameApiClient _softBetGameApiClient;
         private readonly IDafabetGameApiClient _dafabetGameApiClient;
+        private readonly IEverymatrixGameApiClient _everymatrixGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -111,7 +113,8 @@ public sealed record LogInRequest(
             ISynotGameApiClient synotGameApiClient,
             IVegangsterGameApiClient vegangsterGameApiClient,
             ISoftBetGameApiClient softBetGameApiClient,
-            IDafabetGameApiClient dafabetGameApiClient)
+            IDafabetGameApiClient dafabetGameApiClient,
+            IEverymatrixGameApiClient everymatrixGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -130,6 +133,7 @@ public sealed record LogInRequest(
             _vegangsterGameApiClient = vegangsterGameApiClient;
             _softBetGameApiClient = softBetGameApiClient;
             _dafabetGameApiClient = dafabetGameApiClient;
+            _everymatrixGameApiClient = everymatrixGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -735,18 +739,32 @@ public sealed record LogInRequest(
                     break;
 
                 case WalletProvider.Everymatrix:
-                    launchUrl = GetEveryMatrixLaunchUrlAsync(
-                        baseUrl,
+                {
+                    var isFreePlay = request.LaunchMode is LaunchMode.Real;
+                    var isMobile = string.Equals(request.Device, "mobile", StringComparison.OrdinalIgnoreCase);
+                    var getLaunchUrlGameApiRequest = new EverymatrixGetLaunchUrlGameApiRequest(
                         casino.Id,
                         request.Game,
-                        "en",
-                        false,
-                        false,
+                        request.Language,
+                        isFreePlay,
+                        isMobile,
                         "dev",
                         session.Id,
+                        request.Lobby,
                         user.Currency.Id);
 
+                    var getLaunchScriptResult = await _everymatrixGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        getLaunchUrlGameApiRequest,
+                        cancellationToken);
+
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+
                     break;
+                }
 
                 case WalletProvider.BetConstruct:
                     launchUrl = GetBetConstructLaunchUrlAsync(
@@ -885,36 +903,6 @@ public sealed record LogInRequest(
         var uri = new Uri(
             baseUrl,
             $"onlinecasino/openbox/launcher{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
-    private static string GetEveryMatrixLaunchUrlAsync(
-        Uri baseUrl,
-        string brand,
-        string gameCode,
-        string? language,
-        bool freePlay,
-        bool mobile,
-        string mode,
-        string token,
-        string currency)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { nameof(brand), brand },
-            { nameof(gameCode), gameCode },
-            { nameof(language), language },
-            { nameof(freePlay), freePlay.ToString().ToLower() },
-            { nameof(mobile), mobile.ToString().ToLower() },
-            { nameof(mode), mode },
-            { nameof(token), token },
-            { nameof(currency), currency }
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUrl, $"everymatrix/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

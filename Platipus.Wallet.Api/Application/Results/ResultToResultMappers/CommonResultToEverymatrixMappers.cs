@@ -5,6 +5,13 @@ using Everymatrix.WithData;
 
 public static class CommonResultToEverymatrixMappers
 {
+    public static IEverymatrixResult<TData> ToEverymatrixResult<TData>(this IResult result, TData response)
+        => result.IsSuccess
+            ? EverymatrixResultFactory.Success(response)
+            : EverymatrixResultFactory.Failure<TData>(
+                result.Error.ToEverymatrixErrorCode(),
+                exception: result.Exception);
+
     public static IEverymatrixResult<TData> ToEverymatrixResult<TData>(this IResult result)
         => result.IsFailure
             ? EverymatrixResultFactory.Failure<TData>(result.Error.ToEverymatrixErrorCode(), result.Exception)
