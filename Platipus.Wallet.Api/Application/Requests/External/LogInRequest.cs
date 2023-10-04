@@ -16,6 +16,8 @@ using Services.AnakatechGameApi;
 using Services.AnakatechGameApi.Requests;
 using Services.AtlasGameApi;
 using Services.AtlasGameApi.Requests;
+using Services.BetconstructGameApi;
+using Services.BetconstructGameApi.External;
 using Services.DafabetGameApi;
 using Services.DafabetGameApi.Requests;
 using Services.EmaraPlayGameApi;
@@ -94,6 +96,7 @@ public sealed record LogInRequest(
         private readonly ISoftBetGameApiClient _softBetGameApiClient;
         private readonly IDafabetGameApiClient _dafabetGameApiClient;
         private readonly IEverymatrixGameApiClient _everymatrixGameApiClient;
+        private readonly IBetconstructGameApiClient _betconstructGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -114,7 +117,8 @@ public sealed record LogInRequest(
             IVegangsterGameApiClient vegangsterGameApiClient,
             ISoftBetGameApiClient softBetGameApiClient,
             IDafabetGameApiClient dafabetGameApiClient,
-            IEverymatrixGameApiClient everymatrixGameApiClient)
+            IEverymatrixGameApiClient everymatrixGameApiClient,
+            IBetconstructGameApiClient betconstructGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -134,6 +138,7 @@ public sealed record LogInRequest(
             _softBetGameApiClient = softBetGameApiClient;
             _dafabetGameApiClient = dafabetGameApiClient;
             _everymatrixGameApiClient = everymatrixGameApiClient;
+            _betconstructGameApiClient = betconstructGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -767,15 +772,27 @@ public sealed record LogInRequest(
                 }
 
                 case WalletProvider.BetConstruct:
-                    launchUrl = GetBetConstructLaunchUrlAsync(
-                        baseUrl,
+                {
+                    var mode = request.LaunchMode is LaunchMode.Real ? "real_play" : "demo";
+                    var getLaunchScriptGameApiRequest = new BetconstructGetLaunchScriptGameApiRequest(
                         game.GameServerId,
-                        "en",
-                        request.LaunchMode,
-                        session.Id,
+                        request.Language,
+                        mode,
+                        string.Equals(mode, "real_play", StringComparison.OrdinalIgnoreCase) ? session.Id : null,
                         casino.Id);
+                    
+                    var getLaunchScriptResult = await _betconstructGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        getLaunchScriptGameApiRequest,
+                        cancellationToken);
 
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    
                     break;
+                }
 
                 default:
                     launchUrl = "";
@@ -903,34 +920,6 @@ public sealed record LogInRequest(
         var uri = new Uri(
             baseUrl,
             $"onlinecasino/openbox/launcher{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
-    private static string GetBetConstructLaunchUrlAsync(
-        Uri baseUrl,
-        int gameId,
-        string language,
-        LaunchMode launchMode,
-        string session,
-        string casinoId)
-    {
-        var mode = launchMode is LaunchMode.Real ? "real_play" : "demo";
-
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { "mode", mode },
-            { "gameID", gameId.ToString() },
-            { "language", language },
-            { "partner", casinoId }
-        };
-
-        if (mode is "real_play")
-            queryParameters.Add("token", session);
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUrl, $"betconstruct{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

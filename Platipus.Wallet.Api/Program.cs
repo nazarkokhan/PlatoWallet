@@ -13,8 +13,10 @@ using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
 using Platipus.Wallet.Api;
+using Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct.Base;
 using Platipus.Wallet.Api.Application.Services.AnakatechGameApi;
 using Platipus.Wallet.Api.Application.Services.AtlasGameApi;
+using Platipus.Wallet.Api.Application.Services.BetconstructGameApi;
 using Platipus.Wallet.Api.Application.Services.DafabetGameApi;
 using Platipus.Wallet.Api.Application.Services.EmaraPlayGameApi;
 using Platipus.Wallet.Api.Application.Services.EvenbetGameApi;
@@ -250,6 +252,10 @@ try
        .Services
        .AddTransient<IDafabetGameApiClient, DafabetGameApiClient>()
        .AddHttpClient<IDafabetGameApiClient, DafabetGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<IBetconstructGameApiClient, BetconstructGameApiClient>()
+       .AddHttpClient<IBetconstructGameApiClient, BetconstructGameApiClient>()
        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services

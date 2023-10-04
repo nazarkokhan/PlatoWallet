@@ -5,6 +5,13 @@ using BetConstruct.WithData;
 
 public static class CommonResultToBetconstructMappers
 {
+    public static IBetconstructResult<TData> ToBetConstructResult<TData>(this IResult result, TData response)
+        => result.IsSuccess
+            ? BetconstructResultFactory.Success(response)
+            : BetconstructResultFactory.Failure<TData>(
+                result.Error.ToBetConstructErrorCode(),
+                exception: result.Exception);
+
     public static IBetconstructResult<TData> ToBetConstructResult<TData>(this IResult result)
         => result.IsFailure
             ? BetconstructResultFactory.Failure<TData>(result.Error.ToBetConstructErrorCode(), result.Exception)
