@@ -5,6 +5,13 @@ using Dafabet.WithData;
 
 public static class CommonResultToDafabetMappers
 {
+    public static IDafabetResult<TData> ToDafabetResult<TData>(this IResult result, TData response)
+        => result.IsSuccess
+            ? DafabetResultFactory.Success(response)
+            : DafabetResultFactory.Failure<TData>(
+                result.Error.ToDafabetErrorCode(),
+                exception: result.Exception);
+
     public static IDafabetResult<TData> ToDafabetResult<TData>(this IResult result)
         => result.IsFailure
             ? DafabetResultFactory.Failure<TData>(result.Error.ToDafabetErrorCode(), result.Exception)

@@ -17,6 +17,8 @@ using Services.AnakatechGameApi;
 using Services.AnakatechGameApi.Requests;
 using Services.AtlasGameApi;
 using Services.AtlasGameApi.Requests;
+using Services.DafabetGameApi;
+using Services.DafabetGameApi.Requests;
 using Services.EmaraPlayGameApi;
 using Services.EmaraPlayGameApi.Requests;
 using Services.EvenbetGameApi;
@@ -89,6 +91,7 @@ public sealed record LogInRequest(
         private readonly ISynotGameApiClient _synotGameApiClient;
         private readonly IVegangsterGameApiClient _vegangsterGameApiClient;
         private readonly ISoftBetGameApiClient _softBetGameApiClient;
+        private readonly IDafabetGameApiClient _dafabetGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -107,7 +110,8 @@ public sealed record LogInRequest(
             IParimatchGameApiClient parimatchGameApiClient,
             ISynotGameApiClient synotGameApiClient,
             IVegangsterGameApiClient vegangsterGameApiClient,
-            ISoftBetGameApiClient softBetGameApiClient)
+            ISoftBetGameApiClient softBetGameApiClient,
+            IDafabetGameApiClient dafabetGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -125,6 +129,7 @@ public sealed record LogInRequest(
             _synotGameApiClient = synotGameApiClient;
             _vegangsterGameApiClient = vegangsterGameApiClient;
             _softBetGameApiClient = softBetGameApiClient;
+            _dafabetGameApiClient = dafabetGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -549,20 +554,35 @@ public sealed record LogInRequest(
                     break;
 
                 case WalletProvider.Dafabet:
-                    launchUrl = GetDafabetLaunchUrlAsync(
-                        baseUrl,
+                {
+                    var hash = DatabetSecurityHash.Compute(
+                        "launch",
+                        $"{request.Game}{user.Username}{session.Id}{user.Currency.Id}",
+                        casino.SignatureKey);
+
+                    var getDafabetLaunchUrlGameApiRequest = new DafabetGetLaunchUrlGameApiRequest(
+                        "dafabet",
                         request.Game,
                         user.Username,
                         session.Id,
                         user.Currency.Id,
-                        request.Device,
-                        "en",
-                        DatabetSecurityHash.Compute(
-                            "launch",
-                            $"{request.Game}{user.Username}{session.Id}{user.Currency.Id}",
-                            casino.SignatureKey));
+                        request.Device ?? "desktop",
+                        request.Language,
+                        hash,
+                        request.Lobby);
+
+                    var getLaunchScriptResult = await _dafabetGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        getDafabetLaunchUrlGameApiRequest,
+                        cancellationToken);
+
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
 
                     break;
+                }
 
                 case WalletProvider.Hub88:
                 {
@@ -874,73 +894,6 @@ public sealed record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    private static string GetDafabetLaunchUrlAsync(
-        Uri baseUrl,
-        string gameCode,
-        string playerId,
-        string playerToken,
-        string currency,
-        string? device,
-        string? language,
-        string hash)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { "brand", "dafabet" },
-            { nameof(gameCode), gameCode },
-            { nameof(playerId), playerId },
-            { nameof(playerToken), playerToken },
-            { nameof(currency), currency },
-            { nameof(device), device ?? "desktop" }
-        };
-
-        if (language is not null)
-            queryParameters.Add(nameof(language), language);
-
-        queryParameters.Add(nameof(hash), hash);
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUrl, $"dafabet/launch{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
-    private static string GetSoftBetLaunchUrlAsync(
-        Uri baseUrl,
-        int gameId,
-        string token,
-        string username,
-        string currency,
-        int licenseeid)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { "providergameid", gameId.ToString() },
-            { "licenseeid", licenseeid.ToString() }, //provider
-            { "operator", "" },
-            { "playerid", username },
-            { "token", token },
-            { "username", username },
-            { "currency", currency },
-            { "country", "ua" },
-            { "ISBskinid", "1" },
-            { "ISBgameid", "1" },
-            { "mode", "real" },
-            { "launchercode", "26" },
-            { "language", "en" },
-
-            // { "lobbyurl", "" },
-            { "extra", "multi" },
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUrl, $"isoftbet/launch{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
     private static string GetEveryMatrixLaunchUrlAsync(
         Uri baseUrl,
         string brand,
@@ -971,58 +924,6 @@ public sealed record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    private static string GetEmaraPlayLaunchUrlAsync(
-        Uri baseUrl,
-        string gameId,
-        string token,
-        LaunchMode launchMode,
-        string lang,
-        string @operator,
-        string? channel,
-        string? jurisdiction,
-        string currency,
-        string? ip,
-        string user,
-        string? lobby = null,
-        string? cashier = null)
-    {
-        var mode = launchMode is LaunchMode.Real ? "real_play" : "demo";
-
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { nameof(mode), mode },
-            { "gameId", gameId },
-            { "lang", lang },
-            { "operator", @operator },
-            { nameof(channel), channel },
-            { nameof(jurisdiction), jurisdiction },
-            { nameof(ip), ip },
-            { nameof(currency), currency },
-        };
-
-        if (mode is "real_play")
-        {
-            queryParameters.Add(nameof(token), token);
-            queryParameters.Add(nameof(user), user);
-        }
-
-        if (lobby is not null)
-        {
-            queryParameters.Add(nameof(lobby), lobby);
-        }
-
-        if (cashier is not null)
-        {
-            queryParameters.Add(nameof(cashier), cashier);
-        }
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUrl, $"emara-play/launch{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
     private static string GetBetConstructLaunchUrlAsync(
         Uri baseUrl,
         int gameId,
@@ -1047,37 +948,6 @@ public sealed record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(baseUrl, $"betconstruct{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
-    private static string GetParimatchLaunchUrl(
-        Uri baseUrl,
-        string cid,
-        string? productId,
-        string sessionToken,
-        string lang,
-        string lobbyUrl,
-        string targetChannel,
-        string providerId,
-        string consumerId)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { nameof(cid), cid },
-            { nameof(productId), productId },
-            { nameof(sessionToken), sessionToken },
-            { nameof(lang), lang },
-
-            // { nameof(lobbyUrl), lobbyUrl },
-            { nameof(targetChannel), targetChannel },
-            { nameof(providerId), providerId },
-            { nameof(consumerId), consumerId }
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUrl, $"parimatch/launch{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }
