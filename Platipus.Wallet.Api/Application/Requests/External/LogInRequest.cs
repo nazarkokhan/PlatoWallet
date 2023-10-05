@@ -909,42 +909,6 @@ public sealed record LogInRequest(
         return uri.AbsoluteUri;
     }
 
-    //TODO launchmode
-    private static string GetOpenboxLaunchUrl(
-        Uri baseUrl,
-        string token,
-        string agencyUid,
-        string playerUid,
-        string playerId,
-        string gameId,
-        string currency)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            // { "brand", "openbox" },//TODO need?
-            { nameof(token), token },
-            { "agency-uid", agencyUid },
-            { "player-uid", playerUid },
-            { "player-type", "1" },
-            { "player-id", playerId },
-            { "game-id", gameId },
-            { "country", "CN" },
-            { "language", "en" },
-            { nameof(currency), currency },
-
-            // {"backurl", "zero"},
-            // {"backUri", "zero"},
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(
-            baseUrl,
-            $"onlinecasino/openbox/launcher{queryString.ToUriComponent()}");
-
-        return uri.AbsoluteUri;
-    }
-
     public record Response(
         string SessionId,
         decimal Balance,
