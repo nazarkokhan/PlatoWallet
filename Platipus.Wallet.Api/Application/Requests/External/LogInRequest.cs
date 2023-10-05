@@ -745,7 +745,7 @@ public sealed record LogInRequest(
 
                 case WalletProvider.Everymatrix:
                 {
-                    var isFreePlay = request.LaunchMode is LaunchMode.Real;
+                    var isFreePlay = request.LaunchMode is LaunchMode.Demo;
                     var isMobile = string.Equals(request.Device, "mobile", StringComparison.OrdinalIgnoreCase);
                     var getLaunchUrlGameApiRequest = new EverymatrixGetLaunchUrlGameApiRequest(
                         casino.Id,

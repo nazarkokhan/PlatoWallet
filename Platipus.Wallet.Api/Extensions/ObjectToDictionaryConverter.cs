@@ -16,10 +16,21 @@ public static class ObjectToDictionaryConverter
             var bindPropertyAttribute = property.Attributes.OfType<BindPropertyAttribute>().FirstOrDefault();
             key = bindPropertyAttribute?.Name ?? key;
 
-            var value = property.GetValue(obj)?.ToString();
+            var valueObj = property.GetValue(obj);
+            string? value;
+            if (valueObj is bool booleanValue)
+            {
+                value = booleanValue.ToString().ToLowerInvariant();
+            }
+            else
+            {
+                value = valueObj?.ToString();
+            }
+        
             result.Add(key, value);
         }
 
         return result;
     }
+
 }
