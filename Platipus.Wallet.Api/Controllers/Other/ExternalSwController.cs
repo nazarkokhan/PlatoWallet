@@ -9,7 +9,7 @@ using StartupSettings.ControllerSpecificJsonOptions;
 
 [Route("external/sw")]
 [JsonSettingsName(WalletProvider.Sw)]
-public class ExternalSwController : RestApiController
+public sealed class ExternalSwController : RestApiController
 {
     private readonly IMediator _mediator;
 
@@ -24,6 +24,13 @@ public class ExternalSwController : RestApiController
     [HttpPost("deletefreespin.do")]
     public async Task<IActionResult> DeleteFreespin(
         [FromBody] SwDeleteFreespinRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("connect.do")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetLaunchUrl(
+        [FromBody] SwGetLaunchUrlRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

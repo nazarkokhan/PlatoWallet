@@ -41,6 +41,8 @@ using Services.ParimatchGameApi.Requests;
 using Services.PswGameApi;
 using Services.SoftBetGameApi;
 using Services.SoftBetGameApi.External;
+using Services.SwGameApi;
+using Services.SwGameApi.Requests;
 using Services.SynotGameApi;
 using Services.SynotGameApi.Requests;
 using Services.UranusGamesApi;
@@ -100,6 +102,7 @@ public sealed record LogInRequest(
         private readonly IEverymatrixGameApiClient _everymatrixGameApiClient;
         private readonly IBetconstructGameApiClient _betconstructGameApiClient;
         private readonly IOpenboxGameApiClient _openboxGameApiClient;
+        private readonly ISwGameApiClient _swGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -122,7 +125,8 @@ public sealed record LogInRequest(
             IDafabetGameApiClient dafabetGameApiClient,
             IEverymatrixGameApiClient everymatrixGameApiClient,
             IBetconstructGameApiClient betconstructGameApiClient,
-            IOpenboxGameApiClient openboxGameApiClient)
+            IOpenboxGameApiClient openboxGameApiClient,
+            ISwGameApiClient swGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -144,6 +148,7 @@ public sealed record LogInRequest(
             _everymatrixGameApiClient = everymatrixGameApiClient;
             _betconstructGameApiClient = betconstructGameApiClient;
             _openboxGameApiClient = openboxGameApiClient;
+            _swGameApiClient = swGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -685,14 +690,27 @@ public sealed record LogInRequest(
                 }
 
                 case WalletProvider.Sw:
-                    launchUrl = GetSwLaunchUrl(
-                        baseUrl,
+                {
+                    var key = $"{casino.Id}-{user.Currency.Id}";
+                    var swGetLaunchUrlGameApiRequest = new SwGetLaunchUrlGameApiRequest(
                         session.Id,
-                        $"{casino.Id}-{user.Currency.Id}",
+                        key,
                         user.Id.ToString(),
-                        request.Game);
+                        request.Game,
+                        request.Language);
+
+                    var getLaunchScriptResult = await _swGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        swGetLaunchUrlGameApiRequest,
+                        cancellationToken);
+
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
 
                     break;
+                }
 
                 case WalletProvider.SoftBet:
                 {
@@ -878,33 +896,6 @@ public sealed record LogInRequest(
         var queryString = QueryString.Create(queryParameters);
 
         var uri = new Uri(baseUri, queryString.ToUriComponent());
-
-        return uri.AbsoluteUri;
-    }
-
-    private static string GetSwLaunchUrl(
-        Uri baseUrl,
-        string token,
-        string key,
-        string userId,
-        string game)
-    {
-        var queryParameters = new Dictionary<string, string?>
-        {
-            { "key", key },
-            { "userid", userId },
-            { "gameconfig", game },
-            { "lang", "en" },
-
-            // { "lobby", "" },
-            { "token", token },
-        };
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(
-            baseUrl,
-            $"BIGBOSS/connect.do{queryString.ToUriComponent()}");
 
         return uri.AbsoluteUri;
     }

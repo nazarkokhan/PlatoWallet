@@ -15,4 +15,9 @@ public interface ISwGameApiClient
         Uri baseUrl,
         SwDeleteFreespinGameApiRequest request,
         CancellationToken cancellationToken = default);
+    
+    Task<IResult<IHttpClientResult<string, object>>> GetLaunchScriptAsync(
+        Uri baseUrl,
+        SwGetLaunchUrlGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default);
 }

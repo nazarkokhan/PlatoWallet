@@ -11,7 +11,7 @@ using Platipus.Wallet.Api.Extensions;
 using Requests;
 using Responses;
 
-public class SwGameApiClient : ISwGameApiClient
+public sealed class SwGameApiClient : ISwGameApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -53,6 +53,46 @@ public class SwGameApiClient : ISwGameApiClient
         return response;
     }
 
+    public Task<IResult<IHttpClientResult<string, object>>> GetLaunchScriptAsync(
+        Uri baseUrl,
+        SwGetLaunchUrlGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default)
+    {
+        var queryParamsCollection = ObjectToDictionaryConverter.ConvertToDictionary(apiRequest);
+
+        return GetSignedRequestAsync<string>(
+            baseUrl,
+            "CONNECT.DO",
+            queryParamsCollection,
+            cancellationToken);
+    }
+
+    private async Task<IResult<IHttpClientResult<TSuccess, object>>> GetSignedRequestAsync<TSuccess>(
+        Uri baseUrl,
+        string method,
+        Dictionary<string, string?> request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            baseUrl = new Uri(baseUrl, $"BIGBOSS/{method}{QueryString.Create(request)}");
+
+            var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
+
+            var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
+
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
+
+            return httpResult.IsFailure
+                ? ResultFactory.Failure<IHttpClientResult<TSuccess, object>>(ErrorCode.Unknown)
+                : ResultFactory.Success(httpResult);
+        }
+        catch (Exception)
+        {
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, object>>(ErrorCode.UnknownHttpClientError);
+        }
+    }
+
     private async Task<IResult<IHttpClientResult<TSuccess, object>>>
         PostSignedRequestAsync<TRequest, TSuccess>(
             Uri baseUrl,
@@ -72,7 +112,7 @@ public class SwGameApiClient : ISwGameApiClient
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
 
             return ResultFactory.Success(httpResult);
         }
@@ -84,7 +124,9 @@ public class SwGameApiClient : ISwGameApiClient
         }
     }
 
-    private IHttpClientResult<TSuccess, object> GetHttpResultAsync<TSuccess>(HttpClientRequest httpResponse)
+    private IHttpClientResult<TSuccess, object> GetHttpResultAsync<TSuccess>(
+        HttpClientRequest httpResponse,
+        string method)
     {
         try
         {
@@ -92,6 +134,12 @@ public class SwGameApiClient : ISwGameApiClient
             if (responseBody is null)
                 return httpResponse.Failure<TSuccess, object>();
 
+            // Handle CONNECT.DO method differently.
+            if (method is "CONNECT.DO")
+            {
+                return (IHttpClientResult<TSuccess, object>)HandleConnectDoResponse(responseBody, httpResponse);
+            }
+            
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
             var isError = responseJson.TryGetProperty("result", out var resultStatus);
@@ -109,14 +157,22 @@ public class SwGameApiClient : ISwGameApiClient
             }
 
             var success = responseJson.Deserialize<TSuccess>(_jsonSerializerOptions);
-            if (success is null)
-                return httpResponse.Failure<TSuccess, object>();
-
-            return httpResponse.Success<TSuccess, object>(success);
+            return success is null
+                ? httpResponse.Failure<TSuccess, object>()
+                : httpResponse.Success<TSuccess, object>(success);
         }
         catch (Exception e)
         {
             return httpResponse.Failure<TSuccess, object>(e);
         }
+    }
+
+    private static IHttpClientResult<string, object> HandleConnectDoResponse(
+        string responseBody,
+        HttpClientRequest httpResponse)
+    {
+        return responseBody.Contains("Error", StringComparison.OrdinalIgnoreCase)
+            ? httpResponse.Failure<string, object>(responseBody)
+            : httpResponse.Success<string, object>(responseBody);
     }
 }
