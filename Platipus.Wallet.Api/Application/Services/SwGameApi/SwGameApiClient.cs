@@ -172,7 +172,7 @@ public sealed class SwGameApiClient : ISwGameApiClient
         HttpClientRequest httpResponse)
     {
         return responseBody.Contains("Error", StringComparison.OrdinalIgnoreCase)
-            ? httpResponse.Failure<string, object>(responseBody)
+            ? httpResponse.Failure<string, object>()
             : httpResponse.Success<string, object>(responseBody);
     }
 }

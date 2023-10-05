@@ -10,7 +10,7 @@ using Platipus.Wallet.Api.Application.Results.HttpClient.HttpData;
 using Platipus.Wallet.Api.Application.Results.HttpClient.WithData;
 using Domain.Entities.Enums;
 
-public class UisGameApiClient : IUisGameApiClient
+public sealed class UisGameApiClient : IUisGameApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -66,6 +66,32 @@ public class UisGameApiClient : IUisGameApiClient
             cancellationToken);
     }
 
+    public async Task<IResult<IHttpClientResult<string, UisGameApiErrorResponse>>> GetLaunchScriptAsync(
+        Uri baseUrl,
+        UisGetLaunchGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default)
+    {
+        var queryParameters = new Dictionary<string, string?>();
+        var launchType = apiRequest.LaunchType;
+
+        if (launchType is LaunchMode.Real or LaunchMode.Fun)
+        {
+            queryParameters.Add(nameof(apiRequest.Token).ToLowerInvariant(), apiRequest.Token);
+            queryParameters.Add("operatorID", apiRequest.OperatorId.ToString());
+        }
+
+        if (launchType is LaunchMode.Fun or LaunchMode.Demo)
+        {
+            queryParameters.Add("demo", bool.TrueString);
+        }
+
+        return await GetAsync<string>(
+            baseUrl,
+            "connect",
+            queryParameters,
+            cancellationToken);
+    }
+
     private async Task<IResult<IHttpClientResult<TSuccess, UisGameApiErrorResponse>>> GetAsync<TSuccess>(
         Uri baseUrl,
         string method,
@@ -74,13 +100,15 @@ public class UisGameApiClient : IUisGameApiClient
     {
         try
         {
-            baseUrl = new Uri(baseUrl, $"uis/{method}{QueryString.Create(request)}");
+            baseUrl = method is "connect"
+                ? new Uri(baseUrl, $"{QueryString.Create(request)}")
+                : new Uri(baseUrl, $"uis/{method}{QueryString.Create(request)}");
 
             var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
             var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
 
             return ResultFactory.Success(httpResult);
         }
@@ -92,13 +120,20 @@ public class UisGameApiClient : IUisGameApiClient
         }
     }
 
-    private IHttpClientResult<TSuccess, UisGameApiErrorResponse> GetHttpResultAsync<TSuccess>(HttpClientRequest httpResponse)
+    private IHttpClientResult<TSuccess, UisGameApiErrorResponse> GetHttpResultAsync<TSuccess>(
+        HttpClientRequest httpResponse,
+        string method)
     {
         try
         {
             var responseBody = httpResponse.ResponseData.Body;
             if (responseBody is null)
                 return httpResponse.Failure<TSuccess, UisGameApiErrorResponse>();
+
+            if (method is "connect")
+            {
+                return (IHttpClientResult<TSuccess, UisGameApiErrorResponse>)HandleConnectResponse(responseBody, httpResponse);
+            }
 
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
@@ -110,14 +145,22 @@ public class UisGameApiClient : IUisGameApiClient
             }
 
             var success = responseJson.Deserialize<TSuccess>(_jsonSerializerOptions);
-            if (success is null)
-                return httpResponse.Failure<TSuccess, UisGameApiErrorResponse>();
-
-            return httpResponse.Success<TSuccess, UisGameApiErrorResponse>(success!);
+            return success is null
+                ? httpResponse.Failure<TSuccess, UisGameApiErrorResponse>()
+                : httpResponse.Success<TSuccess, UisGameApiErrorResponse>(success);
         }
         catch (Exception e)
         {
             return httpResponse.Failure<TSuccess, UisGameApiErrorResponse>(e);
         }
+    }
+
+    private static IHttpClientResult<string, UisGameApiErrorResponse> HandleConnectResponse(
+        string responseBody,
+        HttpClientRequest httpResponse)
+    {
+        return responseBody.Contains("Error", StringComparison.Ordinal)
+            ? httpResponse.Failure<string, UisGameApiErrorResponse>()
+            : httpResponse.Success<string, UisGameApiErrorResponse>(responseBody);
     }
 }
