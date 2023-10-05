@@ -25,6 +25,7 @@ using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.NemesisGameApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
+using Platipus.Wallet.Api.Application.Services.OpenboxGameApi;
 using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
 using Platipus.Wallet.Api.Application.Services.PswGameApi;
 using Platipus.Wallet.Api.Application.Services.SoftBetGameApi;
@@ -256,6 +257,10 @@ try
        .Services
        .AddTransient<IBetconstructGameApiClient, BetconstructGameApiClient>()
        .AddHttpClient<IBetconstructGameApiClient, BetconstructGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<IOpenboxGameApiClient, OpenboxGameApiClient>()
+       .AddHttpClient<IOpenboxGameApiClient, OpenboxGameApiClient>()
        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services

@@ -2,6 +2,13 @@ namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
 public static class CommonResultToOpenboxMappers
 {
+    public static IOpenboxResult<TData> ToOpenboxResult<TData>(this IResult result, TData response)
+        => result.IsSuccess
+            ? OpenboxResultFactory.Success(response)
+            : OpenboxResultFactory.Failure<TData>(
+                result.Error.ToErrorCode(),
+                exception: result.Exception);
+
     public static IOpenboxResult<TData> ToOpenboxResult<TData>(this IResult result)
         => result.IsFailure
             ? OpenboxResultFactory.Failure<TData>(result.Error.ToErrorCode(), result.Exception)

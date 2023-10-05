@@ -34,6 +34,8 @@ using Services.NemesisGameApi.Requests;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
 using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
+using Services.OpenboxGameApi;
+using Services.OpenboxGameApi.External;
 using Services.ParimatchGameApi;
 using Services.ParimatchGameApi.Requests;
 using Services.PswGameApi;
@@ -97,6 +99,7 @@ public sealed record LogInRequest(
         private readonly IDafabetGameApiClient _dafabetGameApiClient;
         private readonly IEverymatrixGameApiClient _everymatrixGameApiClient;
         private readonly IBetconstructGameApiClient _betconstructGameApiClient;
+        private readonly IOpenboxGameApiClient _openboxGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -118,7 +121,8 @@ public sealed record LogInRequest(
             ISoftBetGameApiClient softBetGameApiClient,
             IDafabetGameApiClient dafabetGameApiClient,
             IEverymatrixGameApiClient everymatrixGameApiClient,
-            IBetconstructGameApiClient betconstructGameApiClient)
+            IBetconstructGameApiClient betconstructGameApiClient,
+            IOpenboxGameApiClient openboxGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -139,6 +143,7 @@ public sealed record LogInRequest(
             _dafabetGameApiClient = dafabetGameApiClient;
             _everymatrixGameApiClient = everymatrixGameApiClient;
             _betconstructGameApiClient = betconstructGameApiClient;
+            _openboxGameApiClient = openboxGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -551,16 +556,32 @@ public sealed record LogInRequest(
                 }
 
                 case WalletProvider.Openbox:
-                    launchUrl = GetOpenboxLaunchUrl(
-                        baseUrl,
+                {
+                    var playerType = request.LaunchMode is LaunchMode.Real ? 1 : 3;
+                    var getOpenboxLaunchScriptGameApiRequest = new OpenboxGetLaunchScriptGameApiRequest(
                         session.Id,
                         user.CasinoId,
                         user.Id.ToString(),
                         user.Username,
                         request.Game,
-                        user.CurrencyId);
+                        user.CurrencyId,
+                        playerType,
+                        request.Country ?? "CN",
+                        request.Language,
+                        request.Lobby);
+
+                    var getLaunchScriptResult = await _openboxGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        getOpenboxLaunchScriptGameApiRequest,
+                        cancellationToken);
+
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
 
                     break;
+                }
 
                 case WalletProvider.Dafabet:
                 {
@@ -780,7 +801,7 @@ public sealed record LogInRequest(
                         mode,
                         string.Equals(mode, "real_play", StringComparison.OrdinalIgnoreCase) ? session.Id : null,
                         casino.Id);
-                    
+
                     var getLaunchScriptResult = await _betconstructGameApiClient.GetLaunchScriptAsync(
                         baseUrl,
                         getLaunchScriptGameApiRequest,
@@ -790,7 +811,7 @@ public sealed record LogInRequest(
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
-                    
+
                     break;
                 }
 

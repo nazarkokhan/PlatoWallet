@@ -1,27 +1,27 @@
 ﻿namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
-using Application.Services.BetconstructGameApi.Requests;
+using Application.Services.OpenboxGameApi.Requests;
 using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 
-[Route("external/betconstruct")]
-[JsonSettingsName(WalletProvider.BetConstruct)]
-public sealed class ExternalBetconstructController : ApiController
+[Route("external/openbox")]
+[JsonSettingsName(WalletProvider.Openbox)]
+public sealed class ExternalOpenboxController : ApiController
 {
     private readonly IMediator _mediator;
 
-    public ExternalBetconstructController(IMediator mediator)
+    public ExternalOpenboxController(IMediator mediator)
     {
         _mediator = mediator;
     }
 
-    [HttpPost("launch")]
+    [HttpPost("launcher")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLaunchUrl(
-        BetconstructGetLaunchUrlRequest request,
+        OpenboxGetLaunchUrlRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
