@@ -10,7 +10,7 @@ public ref struct ScriptHelper
         return environment switch
         {
             "local" => ParseLocal(jsScript),
-            "wbg" or "gameserver-test" => ParseWbg(jsScript),
+            "wbg" or "gameserver-test" or "gs-everymatrix" => ParseWbg(jsScript),
             "test" => ParseTest(jsScript),
             _ => string.Empty
         };
