@@ -1,10 +1,9 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Admin;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Admin.Currencies;
 
 using System.Text.Json.Serialization;
-using Domain.Entities;
-using FluentValidation;
-using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public sealed record RemoveCurrenciesFromCasinoRequest(
     [property: JsonPropertyName("casinoId")] string CasinoId,
@@ -32,6 +31,15 @@ public sealed record RemoveCurrenciesFromCasinoRequest(
                 return ResultFactory.Failure<RemoveCurrenciesFromCasinoResponse>(ErrorCode.CasinoNotFound);
             }
 
+            var existingCurrencies = _walletDbContext.Set<Casino>()
+               .Where(c => c.Id == request.CasinoId)
+               .SelectMany(c => c.CasinoCurrencies)
+               .ToList();
+
+            var isExist = request.Currencies.Exists(currency => existingCurrencies.Exists(ec => ec.CurrencyId == currency));
+            if (!isExist)
+                return ResultFactory.Failure<RemoveCurrenciesFromCasinoResponse>(ErrorCode.InvalidCurrency);
+
             const string sqlToExecute = @"
                                 DELETE FROM casino_currencies 
                                 WHERE casino_id = {0} AND currency_id = {1};
@@ -56,30 +64,6 @@ public sealed record RemoveCurrenciesFromCasinoRequest(
             var response = new RemoveCurrenciesFromCasinoResponse(casino.Id, casinoCurrencies);
 
             return ResultFactory.Success(response);
-        }
-    }
-    
-    public sealed class Validator : AbstractValidator<RemoveCurrenciesFromCasinoRequest>
-    {
-        public Validator(WalletDbContext walletDbContext)
-        {
-            RuleFor(x => x.Currencies)
-               .NotEmpty()
-               .Must((request, currencies) => ValidateCurrencies(request.CasinoId, currencies, walletDbContext))
-               .WithMessage("One or more currencies does not exist for the specified casino.");
-        }
-
-        private static bool ValidateCurrencies(
-            string casinoId,
-            IEnumerable<string> currencies,
-            DbContext walletDbContext)
-        {
-            var existingCurrencies = walletDbContext.Set<Casino>()
-               .Where(c => c.Id == casinoId)
-               .SelectMany(c => c.CasinoCurrencies)
-               .ToList();
-
-            return currencies.Any(currency => existingCurrencies.Exists(ec => ec.CurrencyId == currency));
         }
     }
 

@@ -1,8 +1,8 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Admin;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Admin.Currencies;
 
+using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 public sealed record GetCurrenciesListRequest : IRequest<IResult<List<string>>>
 {

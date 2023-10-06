@@ -1,10 +1,9 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Admin;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Admin.Currencies;
 
 using System.Text.Json.Serialization;
-using Domain.Entities;
-using FluentValidation;
-using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
 public sealed record AddCurrenciesToCasinoRequest(
     [property: JsonPropertyName("casinoId")] string CasinoId,
@@ -30,6 +29,16 @@ public sealed record AddCurrenciesToCasinoRequest(
             {
                 return ResultFactory.Failure<AddCurrenciesToCasinoResponse>(ErrorCode.CasinoNotFound);
             }
+
+            var existingCurrencies = _walletDbContext.Set<Casino>()
+               .Where(c => c.Id == request.CasinoId)
+               .SelectMany(c => c.CasinoCurrencies)
+               .ToList();
+
+            var isExist = request.Currencies.Exists(currency => existingCurrencies.Exists(ec => ec.CurrencyId == currency));
+
+            if (isExist)
+                return ResultFactory.Failure<AddCurrenciesToCasinoResponse>(ErrorCode.InvalidCurrency);
 
             const string sqlToExecute = @"INSERT INTO casino_currencies (casino_id, currency_id, created_date)
                    SELECT {0}, {1}, {2}
@@ -59,35 +68,6 @@ public sealed record AddCurrenciesToCasinoRequest(
             var response = new AddCurrenciesToCasinoResponse(casino.Id, casinoCurrencies);
 
             return ResultFactory.Success(response);
-        }
-    }
-
-    public sealed class Validator : AbstractValidator<AddCurrenciesToCasinoRequest>
-    {
-        public Validator(WalletDbContext walletDbContext)
-        {
-            RuleFor(x => x.CasinoId)
-               .NotEmpty()
-               .Must(casinoId => walletDbContext.Set<Casino>().Any(c => c.Id == casinoId))
-               .WithMessage("Such casino does not exist!");
-
-            RuleFor(x => x.Currencies)
-               .NotEmpty()
-               .Must((request, currencies) => ValidateCurrencies(request.CasinoId, currencies, walletDbContext))
-               .WithMessage("One or more currencies are already present for the specified casino.");
-        }
-
-        private static bool ValidateCurrencies(
-            string casinoId,
-            IEnumerable<string> currencies,
-            DbContext walletDbContext)
-        {
-            var existingCurrencies = walletDbContext.Set<Casino>()
-               .Where(c => c.Id == casinoId)
-               .SelectMany(c => c.CasinoCurrencies)
-               .ToList();
-
-            return !currencies.Any(currency => existingCurrencies.Exists(ec => ec.CurrencyId == currency));
         }
     }
 

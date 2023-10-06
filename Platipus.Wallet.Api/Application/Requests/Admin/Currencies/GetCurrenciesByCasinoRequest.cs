@@ -1,20 +1,20 @@
-﻿namespace Platipus.Wallet.Api.Application.Requests.Admin;
+﻿namespace Platipus.Wallet.Api.Application.Requests.Admin.Currencies;
 
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 public sealed record GetCurrenciesByCasinoRequest(
-    [property: JsonPropertyName("casinoId")] string CasinoId) : IRequest<IResult<List<string>>>
+    [property: JsonPropertyName("casinoId")] string CasinoId) : IRequest<IResult<HashSet<string>>>
 {
-    public sealed class Handler : IRequestHandler<GetCurrenciesByCasinoRequest, IResult<List<string>>>
+    public sealed class Handler : IRequestHandler<GetCurrenciesByCasinoRequest, IResult<HashSet<string>>>
     {
         private readonly WalletDbContext _walletDbContext;
 
         public Handler(WalletDbContext walletDbContext) => _walletDbContext = walletDbContext;
 
-        public async Task<IResult<List<string>>> Handle(
+        public async Task<IResult<HashSet<string>>> Handle(
             GetCurrenciesByCasinoRequest request,
             CancellationToken cancellationToken)
         {
@@ -24,15 +24,15 @@ public sealed record GetCurrenciesByCasinoRequest(
 
             if (casino is null)
             {
-                return ResultFactory.Failure<List<string>>(ErrorCode.CasinoNotFound);
+                return ResultFactory.Failure<HashSet<string>>(ErrorCode.CasinoNotFound);
             }
 
-            var currenciesByCasino = await _walletDbContext.Set<Casino>()
+            var currenciesByCasino = _walletDbContext.Set<Casino>()
                .Include(cc => cc.CasinoCurrencies)
                .Where(c => c.Id == request.CasinoId)
                .SelectMany(x => x.CasinoCurrencies)
                .Select(c => c.CurrencyId)
-               .ToListAsync(cancellationToken);
+               .ToHashSet();
 
             return ResultFactory.Success(currenciesByCasino);
         }
