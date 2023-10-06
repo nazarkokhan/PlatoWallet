@@ -45,6 +45,8 @@ using Services.SwGameApi;
 using Services.SwGameApi.Requests;
 using Services.SynotGameApi;
 using Services.SynotGameApi.Requests;
+using Services.UisGamesApi;
+using Services.UisGamesApi.Dto;
 using Services.UranusGamesApi;
 using Services.UranusGamesApi.Abstaction;
 using Services.UranusGamesApi.Requests;
@@ -103,6 +105,7 @@ public sealed record LogInRequest(
         private readonly IBetconstructGameApiClient _betconstructGameApiClient;
         private readonly IOpenboxGameApiClient _openboxGameApiClient;
         private readonly ISwGameApiClient _swGameApiClient;
+        private readonly IUisGameApiClient _uisGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -126,7 +129,8 @@ public sealed record LogInRequest(
             IEverymatrixGameApiClient everymatrixGameApiClient,
             IBetconstructGameApiClient betconstructGameApiClient,
             IOpenboxGameApiClient openboxGameApiClient,
-            ISwGameApiClient swGameApiClient)
+            ISwGameApiClient swGameApiClient,
+            IUisGameApiClient uisGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -149,6 +153,7 @@ public sealed record LogInRequest(
             _betconstructGameApiClient = betconstructGameApiClient;
             _openboxGameApiClient = openboxGameApiClient;
             _swGameApiClient = swGameApiClient;
+            _uisGameApiClient = uisGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -215,7 +220,7 @@ public sealed record LogInRequest(
             if (environment is null)
                 return ResultFactory.Failure<Response>(ErrorCode.EnvironmentNotFound);
 
-            var baseUrl = casino.Provider is WalletProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
+            var baseUrl = environment.BaseUrl;
 
             string? httpRequestMessage = null;
             string? httpResponseMessage = null;
@@ -745,13 +750,29 @@ public sealed record LogInRequest(
                 }
 
                 case WalletProvider.Uis:
-                    launchUrl = GetUisLaunchUrl(
-                        environment.UisBaseUrl,
+                {
+                    var ip = GetPlayerIp();
+                    var uisGetLaunchUrlGameApiRequest = new UisGetLaunchGameApiRequest(
                         session.Id,
-                        casino.InternalId,
-                        request.LaunchMode);
+                        request.Game,
+                        string.Empty,
+                        "150550",
+                        ip,
+                        request.Lobby,
+                        request.Language);
+
+                    var getLaunchScriptResult = await _uisGameApiClient.GetLaunchScriptAsync(
+                        baseUrl,
+                        uisGetLaunchUrlGameApiRequest,
+                        cancellationToken);
+
+                    if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
 
                     break;
+                }
 
                 case WalletProvider.Reevo:
                     var reevoLaunchUrlResult = await _reevoGameApiClient.GetGameAsync(
@@ -872,32 +893,6 @@ public sealed record LogInRequest(
         {
             return apiResponse is not null && apiResponse.IsFailure;
         }
-    }
-
-    private static string GetUisLaunchUrl(
-        Uri baseUri,
-        string token,
-        int operatorId,
-        LaunchMode launchType)
-    {
-        var queryParameters = new Dictionary<string, string?>();
-
-        if (launchType is LaunchMode.Real or LaunchMode.Fun)
-        {
-            queryParameters.Add("token", token);
-            queryParameters.Add("operatorID", operatorId.ToString());
-        }
-
-        if (launchType is LaunchMode.Fun or LaunchMode.Demo)
-        {
-            queryParameters.Add("demo", bool.TrueString);
-        }
-
-        var queryString = QueryString.Create(queryParameters);
-
-        var uri = new Uri(baseUri, queryString.ToUriComponent());
-
-        return uri.AbsoluteUri;
     }
 
     public record Response(

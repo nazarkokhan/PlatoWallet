@@ -15,4 +15,9 @@ public interface IUisGameApiClient
         Uri baseUrl,
         UisCancelBonusGameApiRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<IResult<IHttpClientResult<string, UisGameApiErrorResponse>>> GetLaunchScriptAsync(
+        Uri baseUrl,
+        UisGetLaunchGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default);
 }
