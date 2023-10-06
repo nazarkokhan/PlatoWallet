@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using StartupSettings.Attributes.Swagger;
 
 [Route("external")]
-public class ExternalController : RestApiController
+public sealed class ExternalController : RestApiController
 {
     private readonly IMediator _mediator;
 
@@ -20,15 +20,11 @@ public class ExternalController : RestApiController
     public async Task<IActionResult> SignUp(SignUpRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("login")]
-    [ProducesResponseType(typeof(LogInRequest.Response), StatusCodes.Status200OK)]
-    [ApplyRemoveNullProperties]
-    public async Task<IActionResult> LogIn(LogInRequest request, CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-
-    [HttpPut("balance")]
-    [ProducesResponseType(typeof(LogInRequest.Response), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddBalance(ChangeBalanceRequest request, CancellationToken cancellationToken)
+    [HttpPost("session")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateSession(
+        [FromBody] CreateSessionRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpGet("session")]
@@ -37,19 +33,24 @@ public class ExternalController : RestApiController
         [FromQuery] GetSessionByUserRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
-    [HttpPost("session")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateSession(
-        [FromQuery] CreateSessionRequest request,
-        CancellationToken cancellationToken)
-        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpPut("session")]
     public async Task<IActionResult> UpdateSessionLifetime(
         [FromQuery] UpdateSessionLifetimeRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("launch")]
+    [ProducesResponseType(typeof(LaunchRequest.Response), StatusCodes.Status200OK)]
+    [ApplyRemoveNullProperties]
+    public async Task<IActionResult> Launch(LaunchRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPut("balance")]
+    [ProducesResponseType(typeof(LaunchRequest.Response), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AddBalance(ChangeBalanceRequest request, CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
 
     [HttpGet("error-mock")]
     public async Task<IActionResult> MockError([FromQuery] GetErrorMocksRequest request, CancellationToken cancellationToken)

@@ -57,9 +57,8 @@ using StartupSettings.Options;
 using Wallets.Anakatech.Enums;
 using Wallets.Psw.Base.Response;
 
-public sealed record LogInRequest(
-        [property: DefaultValue("openbox")] string UserName,
-        [property: DefaultValue("password")] string Password,
+public sealed record LaunchRequest(
+        [property: DefaultValue("753c57f7-234e-4112-925b-1f19b126682a")] string SessionToken,
         [property: DefaultValue("openbox")] string CasinoId,
         [property: DefaultValue("extragems")] string Game,
         [property: DefaultValue("test")] string Environment,
@@ -79,9 +78,9 @@ public sealed record LogInRequest(
         [property: DefaultValue(null)] string? OriginUrl,
         [property: DefaultValue(null)] int? RealityCheckInterval,
         [property: DefaultValue(null)] string? DepositUrl)
-    : IRequest<IResult<LogInRequest.Response>>
+    : IRequest<IResult<LaunchRequest.Response>>
 {
-    public class Handler : IRequestHandler<LogInRequest, IResult<Response>>
+    public class Handler : IRequestHandler<LaunchRequest, IResult<Response>>
     {
         private readonly WalletDbContext _context;
         private readonly IPswGameApiClient _pswGameApiClient;
@@ -157,7 +156,7 @@ public sealed record LogInRequest(
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
-        public async Task<IResult<Response>> Handle(LogInRequest request, CancellationToken cancellationToken)
+        public async Task<IResult<Response>> Handle(LaunchRequest request, CancellationToken cancellationToken)
         {
             var casino = await _context.Set<Casino>()
                .Where(c => c.Id == request.CasinoId)
@@ -166,8 +165,13 @@ public sealed record LogInRequest(
             if (casino is null)
                 return ResultFactory.Failure<Response>(ErrorCode.CasinoNotFound);
 
+            var userId = await _context.Set<Session>()
+               .Where(s => s.Id == request.SessionToken)
+               .Select(u => u.UserId)
+               .FirstOrDefaultAsync(cancellationToken);
+
             var user = await _context.Set<User>()
-               .Where(u => u.Username == request.UserName && u.CasinoId == request.CasinoId)
+               .Where(u => u.Id == userId && u.CasinoId == request.CasinoId)
                .Include(u => u.Casino)
                .Include(u => u.Currency)
                .FirstOrDefaultAsync(cancellationToken);
@@ -178,20 +182,15 @@ public sealed record LogInRequest(
             if (user.IsDisabled)
                 return ResultFactory.Failure<Response>(ErrorCode.UserIsDisabled);
 
-            if (user.Password != request.Password && request.Password != "password")
-                return ResultFactory.Failure<Response>(ErrorCode.InvalidPassword);
+            var session = await _context.Set<Session>()
+               .Where(s => s.Id == request.SessionToken)
+               .FirstOrDefaultAsync(cancellationToken);
 
-            var session = new Session
-            {
-                User = user,
-                IsTemporaryToken = true
-            };
+            if (session is null)
+                return ResultFactory.Failure<Response>(ErrorCode.SessionNotFound);
 
-            if (casino.Provider != WalletProvider.Reevo || casino.Provider != WalletProvider.Softswiss)
-            {
-                _context.Add(session);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
+            if (session.IsTemporaryToken && session.ExpirationDate < DateTime.UtcNow)
+                return ResultFactory.Failure<Response>(ErrorCode.SessionExpired);
 
             var game = await _context.Set<Game>()
                .Where(g => g.LaunchName == request.Game)
@@ -234,27 +233,27 @@ public sealed record LogInRequest(
 
                     IVegangsterCommonGetLaunchUrlApiRequest getLaunchUrlApiRequest = isDemoLaunchMode
                         ? new VegangsterGetDemoLaunchUrlGameApiRequest(
-                            request.BrandId!,
+                            request.BrandId ?? request.CasinoId,
                             request.Game,
-                            request.Device!,
+                            request.Device ?? "desktop",
                             user.CurrencyId,
                             LobbyUrl: request.Lobby,
                             Lang: request.Language,
-                            Country: request.Country!,
+                            Country: request.Country ?? "UA",
                             Ip: playerIp)
                         : new VegangsterGetLaunchUrlGameApiRequest(
-                            request.BrandId!,
+                            request.BrandId ?? request.CasinoId,
                             user.Id.ToString(),
                             session.Id,
                             request.Game,
-                            request.Device!,
+                            request.Device ?? "desktop",
                             user.CurrencyId,
                             request.Language,
-                            request.Country!,
+                            request.Country ?? "UA",
                             playerIp,
                             request.Lobby,
-                            request.DepositUrl!,
-                            request.Nickname!);
+                            request.DepositUrl ?? "some_deposit_url",
+                            request.Nickname ?? user.Username);
 
                     var apiResponse = isDemoLaunchMode
                         ? await _vegangsterGameApiClient.GetDemoLaunchUrlAsync(
@@ -530,7 +529,7 @@ public sealed record LogInRequest(
                         "someJurisdiction",
                         user.Currency.Id,
                         ip!,
-                        User: request.UserName,
+                        User: user.Username,
                         Lobby: request.Lobby,
                         Cashier: "someCashier",
                         Token: session.Id);
@@ -769,6 +768,8 @@ public sealed record LogInRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    httpRequestMessage = getLaunchScriptResult.Data.HttpRequest.RequestData.RequestUri.AbsoluteUri;
+
                     launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
 
                     break;
@@ -782,7 +783,7 @@ public sealed record LogInRequest(
                             casino.Params.ReevoCallerPassword,
                             user.Id.ToString(),
                             user.Username,
-                            request.Password,
+                            user.Password,
                             "en",
                             game.GameServerId.ToString(),
                             request.Lobby ?? "",
@@ -902,9 +903,9 @@ public sealed record LogInRequest(
         string? HttpRequestMessage,
         string? HttpResponseMessage) : PswBalanceResponse(Balance);
 
-    public class LoginRequestValidator : AbstractValidator<LogInRequest>
+    public class LaunchRequestValidator : AbstractValidator<LaunchRequest>
     {
-        public LoginRequestValidator()
+        public LaunchRequestValidator()
         {
         }
     }

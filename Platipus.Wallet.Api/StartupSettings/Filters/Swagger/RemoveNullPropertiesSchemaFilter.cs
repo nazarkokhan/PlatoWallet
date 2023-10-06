@@ -11,7 +11,7 @@ public sealed class RemoveNullPropertiesSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type != typeof(LogInRequest) || !HasCustomAttribute())
+        if (context.Type != typeof(LaunchRequest) || !HasCustomAttribute())
             return;
 
         var properties = schema.Properties.Where(p => p.Value.Nullable).ToList();
@@ -28,7 +28,7 @@ public sealed class RemoveNullPropertiesSchemaFilter : ISchemaFilter
                 where type.IsSubclassOf(typeof(ControllerBase))
                 from method in type.GetMethods()
                 let parameters = method.GetParameters()
-                where parameters.Any(p => p.ParameterType == typeof(LogInRequest))
+                where parameters.Any(p => p.ParameterType == typeof(LaunchRequest))
                    && method.GetCustomAttribute<ApplyRemoveNullPropertiesAttribute>() is not null
                 select method).Any();
     }
