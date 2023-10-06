@@ -43,9 +43,34 @@ public sealed class AdminController : RestApiController
         [FromQuery] GetUsersPageRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    
+
     [HttpGet("integrations/info")]
     [ProducesResponseType(typeof(List<GetWalletProvidersInfoRequest.WalletProviderInfo>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIntegrationsInfo(CancellationToken cancellationToken)
         => (await _mediator.Send(new GetWalletProvidersInfoRequest(), cancellationToken)).ToActionResult();
+
+    [HttpGet("currencies")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrenciesList(CancellationToken cancellationToken)
+        => (await _mediator.Send(new GetCurrenciesListRequest(), cancellationToken)).ToActionResult();
+
+    [HttpGet("currencies/{casinoId}")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrenciesByCasino(
+        [FromRoute] string casinoId,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(new GetCurrenciesByCasinoRequest(casinoId), cancellationToken)).ToActionResult();
+
+    [HttpPost("currencies")]
+    [ProducesResponseType(typeof(AddCurrenciesToCasinoRequest.AddCurrenciesToCasinoResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AddCurrenciesToCasino(
+        [FromBody] AddCurrenciesToCasinoRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpDelete("currencies")]
+    public async Task<IActionResult> RemoveCurrenciesFromCasino(
+        [FromBody] RemoveCurrenciesFromCasinoRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
