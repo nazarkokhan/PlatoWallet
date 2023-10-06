@@ -69,6 +69,7 @@ public sealed class AdminController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpDelete("currencies")]
+    [ProducesResponseType(typeof(RemoveCurrenciesFromCasinoRequest.RemoveCurrenciesFromCasinoResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> RemoveCurrenciesFromCasino(
         [FromBody] RemoveCurrenciesFromCasinoRequest request,
         CancellationToken cancellationToken)
