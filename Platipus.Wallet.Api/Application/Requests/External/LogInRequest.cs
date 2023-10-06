@@ -220,7 +220,7 @@ public sealed record LogInRequest(
             if (environment is null)
                 return ResultFactory.Failure<Response>(ErrorCode.EnvironmentNotFound);
 
-            var baseUrl = casino.Provider is WalletProvider.Uis ? environment.UisBaseUrl : environment.BaseUrl;
+            var baseUrl = environment.BaseUrl;
 
             string? httpRequestMessage = null;
             string? httpResponseMessage = null;
@@ -751,10 +751,15 @@ public sealed record LogInRequest(
 
                 case WalletProvider.Uis:
                 {
+                    var ip = GetPlayerIp();
                     var uisGetLaunchUrlGameApiRequest = new UisGetLaunchGameApiRequest(
                         session.Id,
-                        casino.InternalId,
-                        request.LaunchMode);
+                        request.Game,
+                        string.Empty,
+                        "150550",
+                        ip,
+                        request.Lobby,
+                        request.Language);
 
                     var getLaunchScriptResult = await _uisGameApiClient.GetLaunchScriptAsync(
                         baseUrl,

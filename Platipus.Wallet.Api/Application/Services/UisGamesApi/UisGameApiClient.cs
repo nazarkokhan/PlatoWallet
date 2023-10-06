@@ -1,6 +1,7 @@
 namespace Platipus.Wallet.Api.Application.Services.UisGamesApi;
 
 using System.Text.Json;
+using Api.Extensions;
 using Dto;
 using Dto.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -71,19 +72,7 @@ public sealed class UisGameApiClient : IUisGameApiClient
         UisGetLaunchGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
-        var queryParameters = new Dictionary<string, string?>();
-        var launchType = apiRequest.LaunchType;
-
-        if (launchType is LaunchMode.Real or LaunchMode.Fun)
-        {
-            queryParameters.Add(nameof(apiRequest.Token).ToLowerInvariant(), apiRequest.Token);
-            queryParameters.Add("operatorID", apiRequest.OperatorId.ToString());
-        }
-
-        if (launchType is LaunchMode.Fun or LaunchMode.Demo)
-        {
-            queryParameters.Add("demo", bool.TrueString);
-        }
+        var queryParameters = ObjectToDictionaryConverter.ConvertToDictionary(apiRequest);
 
         return await GetAsync<string>(
             baseUrl,
@@ -100,9 +89,7 @@ public sealed class UisGameApiClient : IUisGameApiClient
     {
         try
         {
-            baseUrl = method is "connect"
-                ? new Uri(baseUrl, $"{QueryString.Create(request)}")
-                : new Uri(baseUrl, $"uis/{method}{QueryString.Create(request)}");
+            baseUrl = new Uri(baseUrl, $"uis/{method}{QueryString.Create(request)}");
 
             var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
