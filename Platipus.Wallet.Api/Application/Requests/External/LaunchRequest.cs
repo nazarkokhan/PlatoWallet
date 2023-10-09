@@ -63,24 +63,11 @@ public sealed record LaunchRequest(
         [property: DefaultValue("extragems")] string Game,
         [property: DefaultValue("test")] string Environment,
         [property: DefaultValue("some_lobby_url")] string Lobby,
-        LaunchMode LaunchMode,
-        [property: DefaultValue(null)] int? PswRealityCheck,
-        [property: DefaultValue(null)] string? Device,
-        [property: DefaultValue("en")] string Language,
-        [property: DefaultValue("https://nashbet.test.k8s-hz.atlas-iac.com/account/payment/deposit")] string? Cashier,
-        [property: DefaultValue(null)] string? CustomerId,
-        [property: DefaultValue(null)] string? BrandId,
-        [property: DefaultValue(null)] string? SecurityToken,
-        [property: DefaultValue(null)] string? Nickname,
-        [property: DefaultValue(null)] int? Balance,
-        [property: DefaultValue(null)] string? Country,
-        [property: DefaultValue(null)] string? Jurisdiction,
-        [property: DefaultValue(null)] string? OriginUrl,
-        [property: DefaultValue(null)] int? RealityCheckInterval,
-        [property: DefaultValue(null)] string? DepositUrl)
+        [property: DefaultValue(LaunchMode.Demo)] LaunchMode LaunchMode,
+        [property: DefaultValue("en")] string Language)
     : IRequest<IResult<LaunchRequest.Response>>
 {
-    public class Handler : IRequestHandler<LaunchRequest, IResult<Response>>
+    public sealed class Handler : IRequestHandler<LaunchRequest, IResult<Response>>
     {
         private readonly WalletDbContext _context;
         private readonly IPswGameApiClient _pswGameApiClient;
@@ -158,6 +145,9 @@ public sealed record LaunchRequest(
 
         public async Task<IResult<Response>> Handle(LaunchRequest request, CancellationToken cancellationToken)
         {
+            const string defaultCountry = "UA";
+            const string defaultPlatform = "desktop";
+
             var casino = await _context.Set<Casino>()
                .Where(c => c.Id == request.CasinoId)
                .FirstOrDefaultAsync(cancellationToken);
@@ -233,27 +223,27 @@ public sealed record LaunchRequest(
 
                     IVegangsterCommonGetLaunchUrlApiRequest getLaunchUrlApiRequest = isDemoLaunchMode
                         ? new VegangsterGetDemoLaunchUrlGameApiRequest(
-                            request.BrandId ?? request.CasinoId,
+                            request.CasinoId,
                             request.Game,
-                            request.Device ?? "desktop",
+                            defaultPlatform,
                             user.CurrencyId,
                             LobbyUrl: request.Lobby,
                             Lang: request.Language,
-                            Country: request.Country ?? "UA",
+                            Country: defaultCountry,
                             Ip: playerIp)
                         : new VegangsterGetLaunchUrlGameApiRequest(
-                            request.BrandId ?? request.CasinoId,
+                            request.CasinoId,
                             user.Id.ToString(),
                             session.Id,
                             request.Game,
-                            request.Device ?? "desktop",
+                            defaultPlatform,
                             user.CurrencyId,
                             request.Language,
-                            request.Country ?? "UA",
+                            defaultCountry,
                             playerIp,
                             request.Lobby,
-                            request.DepositUrl ?? "some_deposit_url",
-                            request.Nickname ?? user.Username);
+                            "some_deposit_url",
+                            user.Username);
 
                     var apiResponse = isDemoLaunchMode
                         ? await _vegangsterGameApiClient.GetDemoLaunchUrlAsync(
@@ -358,7 +348,7 @@ public sealed record LaunchRequest(
                         user.Username,
                         user.CurrencyId,
                         casino.Id,
-                        request.Device,
+                        "desktop",
                         request.Lobby);
 
                     var launcherResult = await _nemesisGameApiClient.LauncherAsync(
@@ -384,22 +374,22 @@ public sealed record LaunchRequest(
                         : (int)AnakatechPlayMode.Anonymous;
 
                     var apiRequest = new AnakatechLaunchGameApiRequest(
-                        request.CustomerId!,
-                        request.BrandId!,
+                        user.Id.ToString(),
+                        casino.Id,
                         session.Id,
-                        request.SecurityToken!,
+                        "some securityToken",
                         user.Id.ToString(),
                         request.Game,
                         playMode,
-                        request.Nickname!,
-                        request.Balance,
+                        user.Username,
+                        (int)user.Balance,
                         user.Currency.Id,
                         request.Language,
-                        request.Country!,
+                        defaultCountry,
                         request.Lobby,
-                        request.Jurisdiction!,
-                        request.OriginUrl!,
-                        request.RealityCheckInterval);
+                        "some jurisdiction",
+                        "some origin url",
+                        123);
 
                     var apiResponse = await _anakatechGameApiClient.GetLaunchGameUrlAsBytesAsync(
                         baseUrl,
@@ -431,7 +421,7 @@ public sealed record LaunchRequest(
                         isDemoLaunchMode,
                         request.CasinoId,
                         request.Language,
-                        request.Device!,
+                        defaultPlatform,
                         user.Currency.Id,
                         session.Id);
 
@@ -458,7 +448,7 @@ public sealed record LaunchRequest(
                         ? new UranusGetDemoLaunchUrlGameApiRequest(
                             request.Game,
                             request.Language,
-                            request.Device!,
+                            defaultPlatform,
                             PlayerIp: playerIp,
                             LobbyUrl: request.Lobby!)
                         : new UranusGetLaunchUrlGameApiRequest(
@@ -499,9 +489,9 @@ public sealed record LaunchRequest(
                         false,
                         session.Id,
                         request.CasinoId,
-                        request.Language!,
-                        request.Cashier!,
-                        request.Lobby!);
+                        request.Language,
+                        "some cashier url",
+                        request.Lobby);
 
                     var apiResponse = await _atlasGameApiClient.LaunchGameAsync(
                         baseUrl,
@@ -556,7 +546,7 @@ public sealed record LaunchRequest(
                         user.Currency.Id,
                         request.Game,
                         request.LaunchMode,
-                        request.PswRealityCheck,
+                        123,
                         casino.Provider is WalletProvider.Betflag,
                         cancellationToken: cancellationToken);
 
@@ -575,7 +565,7 @@ public sealed record LaunchRequest(
                         request.Game,
                         user.CurrencyId,
                         playerType,
-                        request.Country ?? "CN",
+                        defaultCountry,
                         request.Language,
                         request.Lobby);
 
@@ -600,7 +590,7 @@ public sealed record LaunchRequest(
                         user.Username,
                         session.Id,
                         user.Currency.Id,
-                        request.Device ?? "desktop",
+                        defaultPlatform,
                         request.Language,
                         request.Lobby);
 
@@ -624,7 +614,7 @@ public sealed record LaunchRequest(
                         user.Username,
                         session.Id,
                         user.CasinoId,
-                        request.Device ?? "GPL_DESKTOP",
+                        defaultPlatform,
                         user.CasinoId,
                         new Hub88GameServerMetaDto(10, "decimal"),
                         "https://amazing-casino.com/lobby",
@@ -807,7 +797,7 @@ public sealed record LaunchRequest(
                 case WalletProvider.Everymatrix:
                 {
                     var isFreePlay = request.LaunchMode is LaunchMode.Demo;
-                    var isMobile = string.Equals(request.Device, "mobile", StringComparison.OrdinalIgnoreCase);
+                    var isMobile = string.Equals(defaultPlatform, "mobile", StringComparison.OrdinalIgnoreCase);
                     var getLaunchUrlGameApiRequest = new EverymatrixGetLaunchUrlGameApiRequest(
                         casino.Id,
                         request.Game,
@@ -896,7 +886,7 @@ public sealed record LaunchRequest(
         }
     }
 
-    public record Response(
+    public sealed record Response(
         string SessionId,
         decimal Balance,
         string LaunchUrl,
@@ -910,7 +900,7 @@ public sealed record LaunchRequest(
         }
     }
 
-    public class Validator : AbstractValidator<SignUpRequest>
+    public sealed class Validator : AbstractValidator<SignUpRequest>
     {
         public Validator(SupportedCurrenciesFactory supportedCurrenciesFactory)
         {
