@@ -2,6 +2,7 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Nemesis;
 
 using System.ComponentModel;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +10,11 @@ using Services.NemesisGameApi;
 using Services.NemesisGameApi.Requests;
 
 [PublicAPI]
-public record NemesisCreateAwardRequest(
+public sealed record NemesisCreateAwardRequest(
     [property: DefaultValue("test")] string Environment,
     NemesisCreateAwardGameApiRequest ApiRequest) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<NemesisCreateAwardRequest, IResult>
+    public sealed class Handler : IRequestHandler<NemesisCreateAwardRequest, IResult>
     {
         private readonly WalletDbContext _context;
         private readonly INemesisGameApiClient _gameApiClient;
@@ -33,6 +34,7 @@ public record NemesisCreateAwardRequest(
             var environment = await _context.Set<GameEnvironment>()
                .Where(e => e.Id == request.Environment)
                .FirstOrDefaultAsync(cancellationToken);
+
             if (environment is null)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
@@ -42,12 +44,14 @@ public record NemesisCreateAwardRequest(
                .Where(u => u.Username == apiRequest.UserId)
                .Include(u => u.Casino)
                .FirstOrDefaultAsync(cancellationToken);
+
             if (user is null)
                 return ResultFactory.Failure(ErrorCode.UserNotFound);
 
             var award = await _context.Set<Award>()
                .Where(a => a.Id == apiRequest.BonusCode)
                .FirstOrDefaultAsync(cancellationToken);
+
             if (award is not null)
                 return ResultFactory.Failure(ErrorCode.AwardAlreadyExists);
 
@@ -88,6 +92,15 @@ public record NemesisCreateAwardRequest(
                 await _context.Database.RollbackTransactionAsync(cancellationToken);
 
             return response;
+        }
+    }
+
+    public sealed class Validator : AbstractValidator<NemesisCreateAwardRequest>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ApiRequest.ExpirationTimestamp)
+               .GreaterThan(x => x.ApiRequest.StartTimestamp);
         }
     }
 }
