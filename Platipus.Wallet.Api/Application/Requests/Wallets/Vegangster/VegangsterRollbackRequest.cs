@@ -46,7 +46,7 @@ public sealed record VegangsterRollbackRequest(
             var response = new VegangsterTransactionResponse(
                 VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
-                (int)MoneyHelper.ConvertToCents(data.Balance),
+                MoneyHelper.ConvertToCents(data.Balance),
                 data.Transaction.Id);
 
             return walletResult.ToVegangsterResult(response);

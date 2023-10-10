@@ -15,7 +15,7 @@ public sealed record VegangsterBetRequest(
         string TransactionId,
         string RoundId,
         string Currency,
-        int Amount)
+        long Amount)
     : IVegangsterTransactionRequest, IRequest<IVegangsterResult<VegangsterTransactionResponse>>
 {
     public class Handler : IRequestHandler<VegangsterBetRequest, IVegangsterResult<VegangsterTransactionResponse>>
@@ -47,7 +47,7 @@ public sealed record VegangsterBetRequest(
             var response = new VegangsterTransactionResponse(
                 VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
-                (int)MoneyHelper.ConvertToCents(data.Balance),
+                MoneyHelper.ConvertToCents(data.Balance),
                 data.Transaction.Id);
 
             return walletResult.ToVegangsterResult(response);

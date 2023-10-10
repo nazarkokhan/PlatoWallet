@@ -6,7 +6,7 @@ using Base;
 public sealed record VegangsterTransactionResponse(
     string Status,
     string Currency,
-    int Balance,
+    long Balance,
     [property: JsonPropertyName("external_transaction_id")] string ExternalTransactionId) : VegangsterCommonResponse(
     Status,
     Currency,

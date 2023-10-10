@@ -39,7 +39,7 @@ public sealed record VegangsterPlayerBalanceRequest(
             var response = new VegangsterPlayerBalanceResponse(
                 VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
-                (int)MoneyHelper.ConvertToCents(data.Balance));
+                MoneyHelper.ConvertToCents(data.Balance));
 
             return walletResult.ToVegangsterResult(response);
         }

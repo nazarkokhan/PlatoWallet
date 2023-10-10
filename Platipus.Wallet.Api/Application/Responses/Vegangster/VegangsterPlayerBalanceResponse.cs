@@ -2,7 +2,7 @@
 
 using Base;
 
-public sealed record VegangsterPlayerBalanceResponse(string Status, string Currency, int Balance) : VegangsterCommonResponse(
+public sealed record VegangsterPlayerBalanceResponse(string Status, string Currency, long Balance) : VegangsterCommonResponse(
     Status,
     Currency,
     Balance);

@@ -16,7 +16,7 @@ public sealed record VegangsterWinRequest(
         string TransactionId,
         string RoundId,
         string Currency,
-        int Amount,
+        long Amount,
         [property: JsonPropertyName("freegames_reference")] string? FreeGamesReference = null)
     : IVegangsterTransactionRequest, IRequest<IVegangsterResult<VegangsterTransactionResponse>>
 {
@@ -49,7 +49,7 @@ public sealed record VegangsterWinRequest(
             var response = new VegangsterTransactionResponse(
                 VegangsterResponseStatus.OK.ToString(),
                 data.Currency,
-                (int)MoneyHelper.ConvertToCents(data.Balance),
+                MoneyHelper.ConvertToCents(data.Balance),
                 data.Transaction.Id);
 
             return walletResult.ToVegangsterResult(response);
