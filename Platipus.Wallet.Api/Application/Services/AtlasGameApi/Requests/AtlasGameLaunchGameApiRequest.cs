@@ -1,11 +1,13 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.AtlasGameApi.Requests;
 
+using System.Text.Json.Serialization;
+
 public sealed record AtlasGameLaunchGameApiRequest(
-    string GameId,
+    [property: JsonPropertyName("gameId")] string GameId,
     bool Demo,
-    bool IsMobile,
+    [property: JsonPropertyName("isMobile")] bool IsMobile,
     string Token,
-    string CasinoId,
+    [property: JsonPropertyName("casinoId")] string CasinoId,
     string Language,
-    string CashierUrl,
-    string LobbyUrl);
+    [property: JsonPropertyName("cashierUrl")] string CashierUrl,
+    [property: JsonPropertyName("lobbyUrl")] string LobbyUrl);

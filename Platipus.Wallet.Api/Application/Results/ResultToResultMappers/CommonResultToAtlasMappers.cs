@@ -13,14 +13,15 @@ public static class CommonResultToAtlasMappers
     public static IAtlasResult ToAtlasResult(this IResult result)
         => result.IsSuccess
             ? AtlasResultFactory.Success()
-            : AtlasResultFactory.Failure(result.Error.ToAtlasErrorCode(), 
+            : AtlasResultFactory.Failure(
+                result.Error.ToAtlasErrorCode(),
                 exception: result.Exception);
 
-    public static IAtlasResult<TData> ToAtlasResult<TData>(
-        this IResult result, TData response)
+    public static IAtlasResult<TData> ToAtlasResult<TData>(this IResult result, TData response)
         => result.IsSuccess
             ? AtlasResultFactory.Success(response)
-            : AtlasResultFactory.Failure<TData>(result.Error.ToAtlasErrorCode(), 
+            : AtlasResultFactory.Failure<TData>(
+                result.Error.ToAtlasErrorCode(),
                 exception: result.Exception);
 
     private static AtlasErrorCode ToAtlasErrorCode(this ErrorCode source)

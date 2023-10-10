@@ -19,6 +19,12 @@ public sealed class ExternalAtlasController : RestApiController
     public ExternalAtlasController(IMediator mediator) =>
         _mediator = mediator;
 
+    [HttpPost("gameLaunch")]
+    [ProducesResponseType(typeof(Uri), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GameLaunch(
+        [FromBody] AtlasGameLaunchRequest request,
+        CancellationToken cancellationToken) => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
     [HttpPost("getGames")]
     [ProducesResponseType(typeof(AtlasGetGamesListResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetGames(

@@ -21,56 +21,73 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
     private const string ApiBasePath = "atlas/";
 
     public AtlasGameApiClient(
-        HttpClient httpClient, 
+        HttpClient httpClient,
         IOptionsMonitor<JsonOptions> jsonSerializerOptions)
     {
         _httpClient = httpClient;
         _jsonSerializerOptions = jsonSerializerOptions.Get(nameof(WalletProvider.Atlas))
-            .JsonSerializerOptions;
+           .JsonSerializerOptions;
     }
 
     public Task<IResult<IHttpClientResult<AtlasLaunchGameResponse, AtlasErrorResponse>>> LaunchGameAsync(
-        Uri baseUrl, 
+        Uri baseUrl,
         AtlasGameLaunchGameApiRequest apiRequest,
         string token,
         CancellationToken cancellationToken = default)
     {
         return PostAsync<AtlasLaunchGameResponse, AtlasGameLaunchGameApiRequest>(
-            baseUrl, "gamelaunch", apiRequest, token, cancellationToken);
+            baseUrl,
+            "gamelaunch",
+            apiRequest,
+            token,
+            cancellationToken);
     }
 
     public Task<IResult<IHttpClientResult<AtlasGetGamesListResponse, AtlasErrorResponse>>> GetGamesListAsync(
-        Uri baseUrl, 
+        Uri baseUrl,
         AtlasGetGamesListGameApiRequest apiRequest,
         string token,
         CancellationToken cancellationToken = default)
     {
         var request = new Dictionary<string, string?>
         {
-            {nameof(apiRequest.CasinoId), apiRequest.CasinoId}
+            { nameof(apiRequest.CasinoId), apiRequest.CasinoId }
         };
+
         return GetAsync<AtlasGetGamesListResponse>(
-            baseUrl, "getgames", request, token, cancellationToken);
+            baseUrl,
+            "getgames",
+            request,
+            token,
+            cancellationToken);
     }
 
     public Task<IResult<IHttpClientResult<object, AtlasErrorResponse>>> RegisterFreeSpinBonusAsync(
-        Uri baseUrl, 
-        AtlasRegisterFreeSpinBonusGameApiRequest apiRequest, 
+        Uri baseUrl,
+        AtlasRegisterFreeSpinBonusGameApiRequest apiRequest,
         string token,
         CancellationToken cancellationToken = default)
     {
         return PostAsync<object, AtlasRegisterFreeSpinBonusGameApiRequest>(
-            baseUrl, "registerBonus", apiRequest, token, cancellationToken);
+            baseUrl,
+            "registerBonus",
+            apiRequest,
+            token,
+            cancellationToken);
     }
 
     public Task<IResult<IHttpClientResult<object, AtlasErrorResponse>>> AssignFreeSpinBonusAsync(
-        Uri baseUrl, 
-        AtlasAssignFreeSpinBonusGameApiRequest apiRequest, 
+        Uri baseUrl,
+        AtlasAssignFreeSpinBonusGameApiRequest apiRequest,
         string token,
         CancellationToken cancellationToken = default)
     {
         return PostAsync<object, AtlasAssignFreeSpinBonusGameApiRequest>(
-            baseUrl, "assignBonus", apiRequest, token, cancellationToken);
+            baseUrl,
+            "assignBonus",
+            apiRequest,
+            token,
+            cancellationToken);
     }
 
     private async Task<IResult<IHttpClientResult<TSuccess, AtlasErrorResponse>>> PostAsync<TSuccess, TRequest>(
@@ -79,7 +96,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         TRequest request,
         string? token,
         CancellationToken cancellationToken = default)
-    where TRequest : class
+        where TRequest : class
     {
         try
         {
@@ -88,8 +105,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
             var requestContent = JsonSerializer.Serialize(request, _jsonSerializerOptions);
             var content = new StringContent(requestContent, Encoding.UTF8, "application/json");
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Basic", token); //TODO add headers to content, not http client!
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token);
 
             var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, content, cancellationToken);
 
@@ -98,16 +114,14 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
             var httpResult = GetHttpResultAsync<TSuccess>(httpResponse, method);
             if (httpResult.IsFailure)
             {
-                return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(
-                    ErrorCode.Unknown);
+                return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(ErrorCode.Unknown);
             }
 
             return ResultFactory.Success(httpResult);
         }
         catch (Exception e)
         {
-            return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(
-                ErrorCode.UnknownHttpClientError, e);
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(ErrorCode.UnknownHttpClientError, e);
         }
     }
 
@@ -121,7 +135,7 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         try
         {
             baseUrl = new Uri(baseUrl, $"{ApiBasePath}/{method}{QueryString.Create(request)}");
-           
+
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", token);
             var httpResponseOriginal = await _httpClient.GetAsync(baseUrl, cancellationToken);
 
@@ -133,13 +147,13 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
         }
         catch (Exception e)
         {
-            return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(
-                ErrorCode.UnknownHttpClientError, e);
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, AtlasErrorResponse>>(ErrorCode.UnknownHttpClientError, e);
         }
     }
 
     private IHttpClientResult<TSuccess, AtlasErrorResponse> GetHttpResultAsync<TSuccess>(
-        HttpClientRequest httpResponse, string method)
+        HttpClientRequest httpResponse,
+        string method)
     {
         try
         {
@@ -149,26 +163,27 @@ public sealed class AtlasGameApiClient : IAtlasGameApiClient
             {
                 return httpResponse.Success<TSuccess, AtlasErrorResponse>(Activator.CreateInstance<TSuccess>());
             }
-            
+
             if (string.IsNullOrEmpty(responseBody))
             {
                 return httpResponse.Failure<TSuccess, AtlasErrorResponse>();
             }
+
             var responseJson = JsonDocument.Parse(responseBody!).RootElement;
-            
-            if (responseJson.TryGetProperty("error", out _) 
-                && responseJson.TryGetProperty("errorCode", out _))
+
+            if (responseJson.TryGetProperty("error", out _)
+             && responseJson.TryGetProperty("errorCode", out _))
             {
                 var errorResponse = responseJson.Deserialize<AtlasErrorResponse>(_jsonSerializerOptions);
-                if (errorResponse is not null) 
+                if (errorResponse is not null)
                     return httpResponse.Failure<TSuccess, AtlasErrorResponse>(errorResponse);
             }
 
             var success = responseJson.Deserialize<TSuccess>(_jsonSerializerOptions);
-            
-            return success is null ? 
-                httpResponse.Failure<TSuccess, AtlasErrorResponse>() : 
-                httpResponse.Success<TSuccess, AtlasErrorResponse>(success);
+
+            return success is null
+                ? httpResponse.Failure<TSuccess, AtlasErrorResponse>()
+                : httpResponse.Success<TSuccess, AtlasErrorResponse>(success);
         }
         catch (Exception e)
         {
