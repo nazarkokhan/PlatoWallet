@@ -6,12 +6,19 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("external/softswiss")]
-public class ExternalSoftswissController : RestApiController
+public sealed class ExternalSoftswissController : RestApiController
 {
     private readonly IMediator _mediator;
 
     public ExternalSoftswissController(IMediator mediator)
         => _mediator = mediator;
+
+    [HttpPost("sessions")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Sessions(
+        ExternalSoftswissGetLaunchUrlRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("freespins/issue")]
     [ProducesResponseType(StatusCodes.Status200OK)]
