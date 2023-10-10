@@ -11,7 +11,7 @@ using Wallet;
 
 public sealed record VegangsterGetDemoLaunchUrlRequest(
     string Environment,
-    string CasinoId,
+    string OperatorId,
     VegangsterGetDemoLaunchUrlGameApiRequest ApiRequest) : IRequest<IVegangsterResult<VegangsterGetLaunchUrlResponse>>
 {
     public sealed class Handler
@@ -40,13 +40,13 @@ public sealed record VegangsterGetDemoLaunchUrlRequest(
                 cancellationToken);
 
             var casinoXApiSignature = await _walletDbContext.Set<Casino>()
-               .Where(c => c.Id == request.CasinoId)
+               .Where(c => c.Id == request.OperatorId)
                .Select(x => x.Params.VegangsterPrivateWalletSecuritySign)
                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
             var clientResponse = await _vegangsterGameApiClient.GetDemoLaunchUrlAsync(
                 walletResponse.Data.BaseUrl,
-                request.CasinoId,
+                request.OperatorId,
                 casinoXApiSignature!,
                 request.ApiRequest,
                 cancellationToken);

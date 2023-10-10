@@ -8,28 +8,28 @@ public interface IVegangsterGameApiClient
 {
     Task<IResult<IHttpClientResult<VegangsterGetLaunchUrlResponse, VegangsterFailureResponse>>> GetLaunchUrlAsync(
         Uri baseUrl,
-        string casinoId,
+        string operatorId,
         string xApiSignature,
         IVegangsterCommonGetLaunchUrlApiRequest apiRequest,
         CancellationToken cancellationToken = default);
-    
+
     Task<IResult<IHttpClientResult<VegangsterGetLaunchUrlResponse, VegangsterFailureResponse>>> GetDemoLaunchUrlAsync(
         Uri baseUrl,
-        string casinoId,
+        string operatorId,
         string xApiSignature,
         IVegangsterCommonGetLaunchUrlApiRequest apiRequest,
         CancellationToken cancellationToken = default);
-    
+
     Task<IResult<IHttpClientResult<VegangsterGetAvailableGamesResponse, VegangsterFailureResponse>>> GetAvailableGamesAsync(
         Uri baseUrl,
-        string casinoId,
+        string operatorId,
         string xApiSignature,
         VegangsterGetAvailableGamesGameApiRequest apiRequest,
         CancellationToken cancellationToken = default);
-    
+
     Task<IResult<IHttpClientResult<VegangsterGrantResponse, VegangsterFailureResponse>>> GrantAsync(
         Uri baseUrl,
-        string casinoId,
+        string operatorId,
         string xApiSignature,
         VegangsterGrantGameApiRequest apiRequest,
         CancellationToken cancellationToken = default);

@@ -11,7 +11,7 @@ using Wallet;
 
 public sealed record VegangsterGrantRequest(
     string Environment,
-    string CasinoId,
+    string OperatorId,
     VegangsterGrantGameApiRequest ApiRequest) : IRequest<IVegangsterResult<VegangsterGrantResponse>>
 {
     public sealed class Handler : IRequestHandler<VegangsterGrantRequest,
@@ -40,13 +40,13 @@ public sealed record VegangsterGrantRequest(
                 cancellationToken);
 
             var casinoXApiSignature = await _walletDbContext.Set<Casino>()
-               .Where(c => c.Id == request.CasinoId)
+               .Where(c => c.Id == request.OperatorId)
                .Select(x => x.Params.VegangsterPrivateWalletSecuritySign)
                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
             var clientResponse = await _vegangsterGameApiClient.GrantAsync(
                 walletResponse.Data.BaseUrl,
-                request.CasinoId,
+                request.OperatorId,
                 casinoXApiSignature!,
                 request.ApiRequest,
                 cancellationToken);

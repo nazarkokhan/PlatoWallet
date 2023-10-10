@@ -30,7 +30,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
 
     public async Task<IResult<IHttpClientResult<VegangsterGetLaunchUrlResponse, VegangsterFailureResponse>>> GetLaunchUrlAsync(
         Uri baseUrl,
-        string casinoId,
+        string operatorId,
         string xApiSignature,
         IVegangsterCommonGetLaunchUrlApiRequest apiRequest,
         CancellationToken cancellationToken = default)
@@ -39,7 +39,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         return await PostSignedRequestAsync<VegangsterGetLaunchUrlResponse>(
             baseUrl,
             xApiSignature,
-            casinoId,
+            operatorId,
             methodRoute,
             (VegangsterGetLaunchUrlGameApiRequest)apiRequest,
             cancellationToken);
@@ -48,7 +48,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
     public async Task<IResult<IHttpClientResult<VegangsterGetLaunchUrlResponse, VegangsterFailureResponse>>>
         GetDemoLaunchUrlAsync(
             Uri baseUrl,
-            string casinoId,
+            string operatorId,
             string xApiSignature,
             IVegangsterCommonGetLaunchUrlApiRequest apiRequest,
             CancellationToken cancellationToken = default)
@@ -57,7 +57,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         return await PostSignedRequestAsync<VegangsterGetLaunchUrlResponse>(
             baseUrl,
             xApiSignature,
-            casinoId,
+            operatorId,
             methodRoute,
             (VegangsterGetDemoLaunchUrlGameApiRequest)apiRequest,
             cancellationToken);
@@ -66,7 +66,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
     public async Task<IResult<IHttpClientResult<VegangsterGetAvailableGamesResponse, VegangsterFailureResponse>>>
         GetAvailableGamesAsync(
             Uri baseUrl,
-            string casinoId,
+            string operatorId,
             string xApiSignature,
             VegangsterGetAvailableGamesGameApiRequest apiRequest,
             CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         return await PostSignedRequestAsync<VegangsterGetAvailableGamesResponse>(
             baseUrl,
             xApiSignature,
-            casinoId,
+            operatorId,
             methodRoute,
             apiRequest,
             cancellationToken);
@@ -83,7 +83,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
 
     public async Task<IResult<IHttpClientResult<VegangsterGrantResponse, VegangsterFailureResponse>>> GrantAsync(
         Uri baseUrl,
-        string casinoId,
+        string operatorId,
         string xApiSignature,
         VegangsterGrantGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
@@ -92,7 +92,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
         return await PostSignedRequestAsync<VegangsterGrantResponse>(
             baseUrl,
             xApiSignature,
-            casinoId,
+            operatorId,
             methodRoute,
             apiRequest,
             cancellationToken);
@@ -101,14 +101,14 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
     private async Task<IResult<IHttpClientResult<TSuccess, VegangsterFailureResponse>>> PostSignedRequestAsync<TSuccess>(
         Uri baseUrl,
         string vegangsterSignatureKey,
-        string casinoId,
+        string operatorId,
         string methodRoute,
         object request,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{casinoId}/{methodRoute}");
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{operatorId}/{methodRoute}");
 
             var jsonContent = JsonContent.Create(request, options: _jsonSerializerOptions);
             var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
