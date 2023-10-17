@@ -1,8 +1,11 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 
+using Api.Extensions;
 using Application.Requests.Base;
 using Application.Requests.Wallets.Synot;
 using Application.Requests.Wallets.Synot.Base;
+using Application.Results.Synot;
+using Constants.Synot;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Other;
@@ -20,6 +23,11 @@ public sealed class SynotMockedErrorActionFilter : AbstractMockedErrorActionFilt
     {
         var request = (ISynotBaseRequest)baseRequest;
 
+        if (!actionExecutedContext.HttpContext.Request.Headers.TryGetValue(SynotConstants.XEasToken, out var token))
+        {
+            return new MockedErrorIdentifiers();
+        }
+
         var walletMethod = request switch
         {
             SynotGetBalanceRequest => MockedErrorMethod.Balance,
@@ -30,6 +38,6 @@ public sealed class SynotMockedErrorActionFilter : AbstractMockedErrorActionFilt
             _ => throw new ArgumentOutOfRangeException(nameof(baseRequest), "There is no such method in controller.")
         };
 
-        return new MockedErrorIdentifiers(walletMethod, request.Token!, true);
+        return new MockedErrorIdentifiers(walletMethod, token!, true);
     }
 }
