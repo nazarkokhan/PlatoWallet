@@ -49,7 +49,9 @@ public record GetCasinosPageRequest(
                         c.Provider,
                         c.SignatureKey,
                         c.InternalId,
-                        c.GameEnvironmentId,
+                        c.CasinoGameEnvironments
+                           .Select(e => e.GameEnvironmentId)
+                           .ToList(),
                         c.Params,
                         c.CasinoCurrencies
                             .Select(cu => cu.CurrencyId)
@@ -73,7 +75,7 @@ public record GetCasinosPageRequest(
         WalletProvider? Provider,
         string SignatureKey,
         int InternalId,
-        string GameEnvironmentId,
+        List<string> GameEnvironmentId,
         Casino.SpecificParams Params,
         List<string> Currencies,
         List<string> Games,

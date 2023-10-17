@@ -10,15 +10,15 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 [PublicAPI]
-public record CreateCasinoRequest(
-    [property: DefaultValue("custom_psw")] string CasinoId,
+public record UpdateCasinoRequest(
+    [property: DefaultValue("platipus_anakatech")] string CasinoId,
     [property: DefaultValue("12345678")] string SignatureKey,
     WalletProvider Provider,
     List<string> Currencies,
     Casino.SpecificParams Params,
     [property: DefaultValue(new[] { "test" })] List<string> Environments) : IRequest<IResult>
 {
-    public class Handler : IRequestHandler<CreateCasinoRequest, IResult>
+    public class Handler : IRequestHandler<UpdateCasinoRequest, IResult>
     {
         private readonly WalletDbContext _context;
 
@@ -28,21 +28,26 @@ public record CreateCasinoRequest(
         }
 
         public async Task<IResult> Handle(
-            CreateCasinoRequest request,
+            UpdateCasinoRequest request,
             CancellationToken cancellationToken)
         {
-            var casinoExist = await _context.Set<Casino>()
+            var casino = await _context.Set<Casino>()
+               .Include(e => e.CasinoGameEnvironments)
+               .Include(e => e.CasinoCurrencies)
                .Where(e => e.Id == request.CasinoId)
-               .AnyAsync(cancellationToken);
+               .FirstOrDefaultAsync(cancellationToken);
 
-            if (casinoExist)
+            if (casino is null)
                 return ResultFactory.Failure(ErrorCode.CasinoAlreadyExists);
 
-            var environmentsExist = await _context.Set<GameEnvironment>()
+            _context.RemoveRange(casino.CasinoGameEnvironments);
+            _context.RemoveRange(casino.CasinoCurrencies);
+
+            var existingEnvironmentsCount = await _context.Set<GameEnvironment>()
                .Where(e => request.Environments.Contains(e.Id))
                .CountAsync(cancellationToken);
 
-            if (environmentsExist != request.Environments.Count)
+            if (existingEnvironmentsCount != request.Environments.Count)
                 return ResultFactory.Failure(ErrorCode.EnvironmentNotFound);
 
             var supportedCurrencies = await _context.Set<Currency>()
@@ -65,24 +70,27 @@ public record CreateCasinoRequest(
                     return ResultFactory.Failure(ErrorCode.ThisProviderSupportOnlyOneCasino);
             }
 
-            var casino = new Casino(
-                request.CasinoId,
-                request.Provider,
-                request.SignatureKey)
-            {
-                CasinoGameEnvironments = request.Environments
-                   .Select(c => new CasinoGameEnvironments { GameEnvironmentId = c })
-                   .ToList(),
-                CasinoCurrencies = matchedCurrencies
-                   .Select(c => new CasinoCurrencies { CurrencyId = c.Id })
-                   .ToList(),
-                Params = request.Params
-            };
+            casino.Provider = request.Provider;
+            casino.SignatureKey = request.SignatureKey;
+
+            var casinoGameEnvironments = request.Environments
+               .Select(c => new CasinoGameEnvironments { GameEnvironmentId = c })
+               .ToList();
+            _context.AddRange(casinoGameEnvironments);
+            casino.CasinoGameEnvironments.AddRange(casinoGameEnvironments);
+
+            var casinoCurrencies = matchedCurrencies
+               .Select(c => new CasinoCurrencies { CurrencyId = c.Id })
+               .ToList();
+            _context.AddRange(casinoCurrencies);
+            casino.CasinoCurrencies.AddRange(casinoCurrencies);
+
+            casino.Params = request.Params;
 
             if (!ValidateParams(casino))
                 return ResultFactory.Failure(ErrorCode.BadParametersInTheRequest);
 
-            _context.Add(casino);
+            _context.Update(casino);
 
             await _context.SaveChangesAsync(cancellationToken);
             return ResultFactory.Success();
@@ -98,8 +106,8 @@ public record CreateCasinoRequest(
                 WalletProvider.Hub88 when casino.Params.Hub88PrivateWalletSecuritySign is null
                                        || casino.Params.Hub88PublicGameServiceSecuritySign is null
                                        || casino.Params.Hub88PrivateGameServiceSecuritySign is null => false,
-                WalletProvider.Reevo when casino.Params.ReevoCallerId is null || casino.Params.ReevoCallerPassword is null
-                    => false,
+                WalletProvider.Reevo when casino.Params.ReevoCallerId is null
+                                       || casino.Params.ReevoCallerPassword is null => false,
                 WalletProvider.EmaraPlay when casino.Params.EmaraPlayProvider is null => false,
                 WalletProvider.Atlas when casino.Params.AtlasProvider is null => false,
                 WalletProvider.Anakatech when casino.Params.AnakatechProvider is null => false,

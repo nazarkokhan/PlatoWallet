@@ -40,40 +40,46 @@ public static class SeedExtension
         if (!anyCasino)
         {
             var games = await dbContext.Set<Game>()
-                .Select(
+               .Select(
                     g => new
                     {
                         g.Id,
                         g.LaunchName
                     })
-                .ToListAsync();
+               .ToListAsync();
 
             var text = await File.ReadAllTextAsync("StaticFiles/default_casinos.json");
             var serialize = JsonSerializer.Deserialize<List<MigrationDefaultCasinoDto>>(text)!;
 
             var casinos = serialize
-                .Select(
+               .Select(
                     x =>
                     {
                         var casinoCurrencies = x.CasinoCurrencies
-                            .Select(c => new CasinoCurrencies { CurrencyId = c })
-                            .ToList();
+                           .Select(c => new CasinoCurrencies { CurrencyId = c })
+                           .ToList();
                         var casinoGames = x.CasinoGames
-                            .Select(c => new CasinoGames { GameId = games.Single(g => g.LaunchName == c).Id })
-                            .ToList();
+                           .Select(c => new CasinoGames { GameId = games.Single(g => g.LaunchName == c).Id })
+                           .ToList();
                         return new Casino(
                             x.Id,
                             x.Provider,
-                            x.SignatureKey,
-                            x.GameEnvironmentId)
+                            x.SignatureKey)
                         {
+                            CasinoGameEnvironments = new List<CasinoGameEnvironments>()
+                            {
+                                new()
+                                {
+                                    GameEnvironmentId = x.GameEnvironmentId
+                                }
+                            },
                             Params = x.Params,
                             InternalId = x.InternalId ?? 0,
                             CasinoCurrencies = casinoCurrencies,
                             CasinoGames = casinoGames
                         };
                     })
-                .ToList();
+               .ToList();
 
             dbContext.AddRange(casinos);
             await dbContext.SaveChangesAsync();

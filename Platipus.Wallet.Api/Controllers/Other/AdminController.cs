@@ -36,7 +36,15 @@ public sealed class AdminController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("casino")]
-    public async Task<IActionResult> CreateCasino(CreateCasinoRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateCasino(
+        CreateCasinoRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPut("casino")]
+    public async Task<IActionResult> UpdateCasino(
+        UpdateCasinoRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpGet("user/page")]
@@ -82,10 +90,13 @@ public sealed class AdminController : RestApiController
         [FromRoute] string casinoId,
         [FromBody] List<string> currencies,
         CancellationToken cancellationToken)
-        => (await _mediator.Send(new AddCurrenciesToCasinoRequest(casinoId, currencies), cancellationToken)).ToActionResult();
+        => (await _mediator.Send(new AddCurrenciesToCasinoRequest(casinoId, currencies), cancellationToken))
+           .ToActionResult();
 
     [HttpDelete("currencies/{casinoId}")]
-    [ProducesResponseType(typeof(RemoveCurrenciesFromCasinoRequest.RemoveCurrenciesFromCasinoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(
+        typeof(RemoveCurrenciesFromCasinoRequest.RemoveCurrenciesFromCasinoResponse),
+        StatusCodes.Status200OK)]
     public async Task<IActionResult> RemoveCurrenciesFromCasino(
         [FromRoute] string casinoId,
         [FromBody] List<string> currencies,

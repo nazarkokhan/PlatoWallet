@@ -1,6 +1,6 @@
 namespace Platipus.Wallet.Domain.Entities.Enums;
 
-public enum WalletProvider : short
+public enum WalletProvider
 {
     Psw = 0,
     Dafabet = 1,

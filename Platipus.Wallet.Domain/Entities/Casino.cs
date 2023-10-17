@@ -11,13 +11,12 @@ public class Casino : Entity<string>
     public Casino(
         string id,
         WalletProvider provider,
-        string signatureKey,
-        string gameEnvironmentId = GameEnvironment.Default)
+        string signatureKey)
     {
         Id = id;
         Provider = provider;
         SignatureKey = signatureKey;
-        GameEnvironmentId = gameEnvironmentId;
+        GameEnvironmentId = "test";
     }
 
     public WalletProvider Provider { get; set; }
@@ -26,8 +25,11 @@ public class Casino : Entity<string>
 
     public int InternalId { get; set; }
 
+    //TODO make migration.
+    [Obsolete]
     public string GameEnvironmentId { get; set; }
 
+    [Obsolete]
     public GameEnvironment GameEnvironment { get; set; } = null!;
 
     public SpecificParams Params { get; set; } = new();
@@ -38,7 +40,10 @@ public class Casino : Entity<string>
 
     public List<CasinoGames> CasinoGames { get; set; } = new();
 
+    public List<CasinoGameEnvironments> CasinoGameEnvironments { get; set; } = new();
+
     public record SpecificParams(
+
         // ReSharper disable once InconsistentNaming
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
         int? ISoftBetProviderId = null!,

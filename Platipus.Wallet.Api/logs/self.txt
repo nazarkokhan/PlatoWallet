@@ -1779,3 +1779,6 @@
 2023-08-01T11:09:49.1986120Z Maximum destructuring depth reached.
 2023-08-01T11:09:49.1986540Z Maximum destructuring depth reached.
 2023-08-24T15:14:22.4359530Z Ignoring added logger provider Microsoft.EntityFrameworkCore.Design.Internal.OperationLoggerProvider
+2023-10-17T09:06:57.4935810Z Ignoring added logger provider Microsoft.EntityFrameworkCore.Design.Internal.OperationLoggerProvider
+2023-10-17T09:26:09.4986060Z Ignoring added logger provider Microsoft.EntityFrameworkCore.Design.Internal.OperationLoggerProvider
+2023-10-17T09:26:39.0100420Z Ignoring added logger provider Microsoft.EntityFrameworkCore.Design.Internal.OperationLoggerProvider
