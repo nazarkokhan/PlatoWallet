@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Platipus.Api.Common;
 using Platipus.Serilog;
 using Platipus.Wallet.Api;
-using Platipus.Wallet.Api.Application.Requests.Wallets.BetConstruct.Base;
 using Platipus.Wallet.Api.Application.Services.AnakatechGameApi;
 using Platipus.Wallet.Api.Application.Services.AtlasGameApi;
 using Platipus.Wallet.Api.Application.Services.BetconstructGameApi;

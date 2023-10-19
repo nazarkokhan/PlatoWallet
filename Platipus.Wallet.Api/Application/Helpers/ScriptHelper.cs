@@ -2,6 +2,9 @@
 
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
+using HtmlAgilityPack;
+using Jint;
 
 public ref struct ScriptHelper
 {
@@ -12,8 +15,37 @@ public ref struct ScriptHelper
             "local" => ParseLocal(jsScript),
             "wbg" or "gameserver-test" => ParseWbg(jsScript),
             "test" or "gs-everymatrix" => ParseTest(jsScript),
-            _ => string.Empty
+            "prod3" => ExtractUrlFromScript(jsScript),
+            _ => jsScript
         };
+    }
+
+    public static string ExtractUrlFromScript(string jsScript)
+    {
+        var doc = new HtmlDocument();
+        doc.LoadHtml(jsScript);
+        var scriptNode = doc.DocumentNode.SelectSingleNode("//script");
+        var script = scriptNode.InnerText.Trim();
+
+        var engine = new Engine();
+        engine.SetValue("encodeURIComponent", new Func<string, string>(HttpUtility.UrlEncode));
+        var resultUrl = "";
+        var window = new
+        {
+            location = new
+            {
+                assign = new Action<string>(
+                    url =>
+                    {
+                        resultUrl = url;
+                    })
+            }
+        };
+        engine.SetValue("window", window);
+
+        engine.Execute(script);
+
+        return resultUrl;
     }
 
     private static string ParseLocal(string jsScript)

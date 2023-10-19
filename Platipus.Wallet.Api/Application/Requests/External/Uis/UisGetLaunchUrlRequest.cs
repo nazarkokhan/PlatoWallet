@@ -1,6 +1,5 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.External.Uis;
 
-using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Helpers;
 using Services.UisGamesApi;

@@ -55,7 +55,6 @@ using Services.VegangsterGameApi.External;
 using StartupSettings.Factories;
 using StartupSettings.Options;
 using Wallets.Anakatech.Enums;
-using Wallets.Psw.Base.Response;
 
 public sealed record LaunchRequest(
         [property: DefaultValue("753c57f7-234e-4112-925b-1f19b126682a")] string SessionToken,
@@ -850,7 +849,7 @@ public sealed record LaunchRequest(
                     break;
             }
 
-            if (!string.IsNullOrWhiteSpace(launchUrl))
+            if (!string.IsNullOrWhiteSpace(launchUrl) && !launchUrl.StartsWith("<"))
             {
                 var url = new Uri(launchUrl);
                 var queryParams = QueryHelpers.ParseQuery(url.Query);
@@ -891,7 +890,7 @@ public sealed record LaunchRequest(
         decimal Balance,
         string LaunchUrl,
         string? HttpRequestMessage,
-        string? HttpResponseMessage) : PswBalanceResponse(Balance);
+        string? HttpResponseMessage);
 
     public class LaunchRequestValidator : AbstractValidator<LaunchRequest>
     {

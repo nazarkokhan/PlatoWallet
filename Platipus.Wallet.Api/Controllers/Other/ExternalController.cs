@@ -1,5 +1,7 @@
 namespace Platipus.Wallet.Api.Controllers.Other;
 
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Abstract;
 using Application.Requests.External;
 using Application.Requests.Test;
@@ -51,7 +53,6 @@ public sealed class ExternalController : RestApiController
     public async Task<IActionResult> AddBalance(ChangeBalanceRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-
     [HttpGet("error-mock")]
     public async Task<IActionResult> MockError([FromQuery] GetErrorMocksRequest request, CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
@@ -61,6 +62,8 @@ public sealed class ExternalController : RestApiController
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpDelete("error-mock")]
-    public async Task<IActionResult> MockError([FromQuery] DeleteErrorMockRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> MockError(
+        [FromQuery] DeleteErrorMockRequest request,
+        CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

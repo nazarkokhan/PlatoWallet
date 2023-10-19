@@ -1,10 +1,8 @@
 ﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 
-using Api.Extensions;
 using Application.Requests.Base;
 using Application.Requests.Wallets.Synot;
 using Application.Requests.Wallets.Synot.Base;
-using Application.Results.Synot;
 using Constants.Synot;
 using Domain.Entities.Enums;
 using Microsoft.AspNetCore.Mvc.Filters;

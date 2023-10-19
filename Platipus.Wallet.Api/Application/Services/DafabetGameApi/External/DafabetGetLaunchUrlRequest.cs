@@ -1,7 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.DafabetGameApi.External;
 
 using System.Text.Json.Serialization;
-using Api.Extensions.SecuritySign;
 using Domain.Entities;
 using Helpers;
 using Infrastructure.Persistence;
