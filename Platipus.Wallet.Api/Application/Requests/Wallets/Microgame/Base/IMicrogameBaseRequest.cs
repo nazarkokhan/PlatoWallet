@@ -8,10 +8,7 @@ public interface IMicrogameBaseRequest : IBaseWalletRequest
     [JsonPropertyName("gameId")]
     public string GameId { get; }
 
-    [JsonPropertyName("externalId")]
-    public string ExternalId { get; }
-    
     [JsonPropertyName("accessToken")]
-    
+
     public string AccessToken { get; }
 }

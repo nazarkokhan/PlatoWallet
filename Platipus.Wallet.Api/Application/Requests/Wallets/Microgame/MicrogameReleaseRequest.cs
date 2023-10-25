@@ -15,7 +15,7 @@ public sealed record MicrogameReleaseRequest(
     decimal Real,
     string Currency,
     long RoundId,
-    bool? State) : IRequest<IMicrogameResult<MicrogameReleaseResponse>>, IMicrogameBaseRequest, IMicrogameCommonOperationsRequest
+    bool? State) : IRequest<IMicrogameResult<MicrogameReleaseResponse>>, IMicrogameMoneyOperationsRequest, IMicrogameCommonOperationsRequest
 {
     public sealed class Handler : IRequestHandler<MicrogameReleaseRequest, IMicrogameResult<MicrogameReleaseResponse>>
     {

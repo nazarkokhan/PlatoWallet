@@ -18,7 +18,7 @@ public sealed record MicrogameReserveRequest(
     string Currency,
     long RoundId,
     [property: JsonPropertyName("jackpotGain")] decimal JackpotGain) : IRequest<IMicrogameResult<MicrogameReserveResponse>>,
-                                                                       IMicrogameBaseRequest,
+                                                                       IMicrogameMoneyOperationsRequest,
                                                                        IMicrogameCommonOperationsRequest
 {
     public sealed class Handler : IRequestHandler<MicrogameReserveRequest, IMicrogameResult<MicrogameReserveResponse>>

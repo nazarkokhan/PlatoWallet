@@ -23,12 +23,12 @@ public sealed class WalletMicrogameController : RestApiController
 
     public WalletMicrogameController(IMediator mediator) => _mediator = mediator;
 
-    // [HttpPost("authenticate")]
-    // [ProducesResponseType(typeof(MicrogameAuthenticateResponse), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> GetBalance(
-    //     [FromBody] [Required] MicrogameAuthenticateRequest request,
-    //     CancellationToken cancellationToken)
-    //     => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    [HttpPost("authenticate")]
+    [ProducesResponseType(typeof(MicrogameAuthenticateResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetBalance(
+        [FromBody] [Required] MicrogameAuthenticateRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
     [HttpPost("balance")]
     [ProducesResponseType(typeof(MicrogameGetBalanceResponse), StatusCodes.Status200OK)]

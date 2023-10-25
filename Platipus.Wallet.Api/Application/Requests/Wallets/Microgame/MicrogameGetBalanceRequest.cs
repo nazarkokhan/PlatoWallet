@@ -12,7 +12,7 @@ public sealed record MicrogameGetBalanceRequest(
         [property: JsonPropertyName("currency")] string Currency,
         string GameId,
         string ExternalId)
-    : IMicrogameBaseRequest, IRequest<IMicrogameResult<MicrogameGetBalanceResponse>>
+    : IMicrogameMoneyOperationsRequest, IRequest<IMicrogameResult<MicrogameGetBalanceResponse>>
 {
     public sealed class Handler : IRequestHandler<MicrogameGetBalanceRequest, IMicrogameResult<MicrogameGetBalanceResponse>>
     {

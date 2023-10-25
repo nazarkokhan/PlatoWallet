@@ -15,7 +15,7 @@ public sealed record MicrogameCancelReserveRequest(
     decimal Real,
     string Currency,
     long RoundId) : IRequest<IMicrogameResult<MicrogameCancelReserveResponse>>,
-                    IMicrogameBaseRequest,
+                    IMicrogameMoneyOperationsRequest,
                     IMicrogameCommonOperationsRequest
 {
     public sealed class Handler : IRequestHandler<MicrogameCancelReserveRequest, IMicrogameResult<MicrogameCancelReserveResponse>>

@@ -18,7 +18,7 @@ public sealed class MicrogameMockedErrorActionFilter : AbstractMockedErrorAction
         IBaseWalletRequest baseRequest,
         ActionExecutedContext actionExecutedContext)
     {
-        var request = (IMicrogameBaseRequest)baseRequest;
+        var request = (IMicrogameMoneyOperationsRequest)baseRequest;
 
         var walletMethod = request switch
         {
