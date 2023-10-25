@@ -1,3 +1,8 @@
 ﻿namespace Platipus.Wallet.Api.Application.Responses.Microgame.Base;
 
-public sealed record MicrogameErrorResponse(string Error);
+using Results.Microgame;
+
+public sealed record MicrogameErrorResponse(
+    MicrogameStatusCode StatusCode, 
+    string StatusMessage) : MicrogameCommonResponse(
+    StatusCode);

@@ -52,7 +52,9 @@ public static class StartupExtensions
            .AddScoped<SynotSecurityFilter>()
            .AddSingleton<SynotMockedErrorActionFilter>()
            .AddScoped<VegangsterSecurityFilter>()
-           .AddSingleton<VegangsterMockedErrorActionFilter>();
+           .AddSingleton<VegangsterMockedErrorActionFilter>()
+           .AddScoped<MicrogameSecurityFilter>()
+           .AddSingleton<MicrogameMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)

@@ -29,6 +29,7 @@ using Application.Requests.Wallets.Uis.Base.Response;
 using Application.Requests.Wallets.Uranus.Base;
 using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
+using Application.Responses.Microgame.Base;
 using Application.Responses.Synot.Base;
 using Application.Responses.Vegangster.Base;
 using Application.Results.Anakatech.WithData;
@@ -41,6 +42,7 @@ using Application.Results.HttpClient.WithData;
 using Application.Results.Hub88.WithData;
 using Application.Results.ISoftBet;
 using Application.Results.ISoftBet.WithData;
+using Application.Results.Microgame.WithData;
 using Application.Results.Nemesis;
 using Application.Results.Nemesis.WithData;
 using Application.Results.Parimatch;
@@ -133,12 +135,12 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                 case ISoftBetResult iSoftBetResult:
                 {
                     object responseObject;
-                    
+
                     if (iSoftBetResult.IsSuccess)
                     {
                         if (iSoftBetResult is not ISoftBetResult<object> iSoftBetResultWithData)
                             return;
-                        
+
                         responseObject = iSoftBetResultWithData.Data;
                     }
                     else
@@ -556,7 +558,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                         var error = synotResult.Error;
                         responseObject = new SynotErrorResponse(error.ToString(), error.Humanize());
 
-                        context.Result = new OkObjectResult(responseObject)
+                        context.Result = new BadRequestObjectResult(responseObject)
                         {
                             StatusCode = error switch
                             {
@@ -616,6 +618,28 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     {
                         var error = vegangsterResult.Error;
                         responseObject = new VegangsterFailureResponse(error.ToString());
+
+                        context.Result = new BadRequestObjectResult(responseObject);
+                    }
+
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+
+                case IMicrogameResult<object> microgameResult:
+                {
+                    object responseObject;
+
+                    if (microgameResult.IsSuccess)
+                    {
+                        responseObject = microgameResult.Data;
+
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var error = microgameResult.Error;
+                        responseObject = new MicrogameErrorResponse(error, error.Humanize());
 
                         context.Result = new BadRequestObjectResult(responseObject);
                     }
