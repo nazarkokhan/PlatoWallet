@@ -22,5 +22,6 @@ public enum WalletProvider
     Anakatech = 18,
     Nemesis = 19,
     Synot = 20,
-    Vegangster = 21
+    Vegangster = 21,
+    Microgame = 22
 }
