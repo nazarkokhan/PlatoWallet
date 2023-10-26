@@ -80,5 +80,7 @@ public class Casino : Entity<string>
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
         string? VegangsterPrivateGameServerSecuritySign = null!,
         [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
-        string? VegangsterPrivateWalletSecuritySign = null!);
+        string? VegangsterPrivateWalletSecuritySign = null!,
+        [property: DefaultValue(null), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotNull]
+        string? MicrogameProvider = null!);
 }

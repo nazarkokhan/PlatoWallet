@@ -106,6 +106,7 @@ public record CreateCasinoRequest(
                 WalletProvider.Evenbet when casino.Params.EvenbetProvider is null => false,
                 WalletProvider.Uranus when casino.Params.UranusProvider is null => false,
                 WalletProvider.Vegangster when casino.Params.VegangsterProvider is null => false,
+                WalletProvider.Microgame when casino.Params.MicrogameProvider is null => false,
                 _ => true
             };
         }

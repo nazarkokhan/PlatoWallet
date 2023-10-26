@@ -25,7 +25,7 @@ public sealed class WalletMicrogameController : RestApiController
 
     [HttpPost("authenticate")]
     [ProducesResponseType(typeof(MicrogameAuthenticateResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetBalance(
+    public async Task<IActionResult> Authenticate(
         [FromBody] [Required] MicrogameAuthenticateRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();

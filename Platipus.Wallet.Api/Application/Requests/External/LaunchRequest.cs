@@ -29,6 +29,8 @@ using Services.EverymatrixGameApi.External;
 using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
+using Services.MicrogameGameApi;
+using Services.MicrogameGameApi.Requests;
 using Services.NemesisGameApi;
 using Services.NemesisGameApi.Requests;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi;
@@ -91,6 +93,7 @@ public sealed record LaunchRequest(
         private readonly IOpenboxGameApiClient _openboxGameApiClient;
         private readonly ISwGameApiClient _swGameApiClient;
         private readonly IUisGameApiClient _uisGameApiClient;
+        private readonly IMicrogameGameApiClient _microgameGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -115,7 +118,8 @@ public sealed record LaunchRequest(
             IBetconstructGameApiClient betconstructGameApiClient,
             IOpenboxGameApiClient openboxGameApiClient,
             ISwGameApiClient swGameApiClient,
-            IUisGameApiClient uisGameApiClient)
+            IUisGameApiClient uisGameApiClient,
+            IMicrogameGameApiClient microgameGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -139,6 +143,7 @@ public sealed record LaunchRequest(
             _openboxGameApiClient = openboxGameApiClient;
             _swGameApiClient = swGameApiClient;
             _uisGameApiClient = uisGameApiClient;
+            _microgameGameApiClient = microgameGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -215,6 +220,33 @@ public sealed record LaunchRequest(
             string launchUrl;
             switch (casino.Provider)
             {
+                case WalletProvider.Microgame:
+                {
+                    var mode = request.LaunchMode;
+                    var launchGameApiRequest = new MicrogameLaunchGameApiRequest(
+                        request.CasinoId,
+                        mode.ToString().ToLowerInvariant(),
+                        request.Game,
+                        user.CurrencyId,
+                        defaultPlatform,
+                        request.Lobby,
+                        mode is LaunchMode.Real ? request.SessionToken : null);
+
+                    var launcherResult = await _microgameGameApiClient.LaunchAsync(
+                        baseUrl,
+                        launchGameApiRequest,
+                        cancellationToken);
+
+                    if (launcherResult.IsFailure || launcherResult.Data.IsFailure)
+                    {
+                        launchUrl = string.Empty;
+                        break;
+                    }
+
+                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    break;
+                }
+
                 case WalletProvider.Vegangster:
                 {
                     var playerIp = GetPlayerIp();
