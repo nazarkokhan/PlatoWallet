@@ -1,6 +1,6 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.MicrogameGameApi;
 
-using Requests;
+using External;
 using Responses.Microgame.Base;
 using Results.HttpClient.WithData;
 

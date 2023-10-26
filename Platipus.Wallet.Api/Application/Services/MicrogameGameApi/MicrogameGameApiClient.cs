@@ -2,9 +2,9 @@
 
 using System.Text.Json;
 using Domain.Entities.Enums;
+using External;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Requests;
 using Responses.Microgame.Base;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;

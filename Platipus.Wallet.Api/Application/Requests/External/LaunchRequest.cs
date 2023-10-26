@@ -30,7 +30,7 @@ using Services.Hub88GamesApi;
 using Services.Hub88GamesApi.DTOs;
 using Services.Hub88GamesApi.DTOs.Requests;
 using Services.MicrogameGameApi;
-using Services.MicrogameGameApi.Requests;
+using Services.MicrogameGameApi.External;
 using Services.NemesisGameApi;
 using Services.NemesisGameApi.Requests;
 using Services.ObsoleteGameApiStyle.ReevoGamesApi;

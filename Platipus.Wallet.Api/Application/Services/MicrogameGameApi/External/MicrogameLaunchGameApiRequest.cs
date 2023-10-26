@@ -1,4 +1,4 @@
-﻿namespace Platipus.Wallet.Api.Application.Services.MicrogameGameApi.Requests;
+﻿namespace Platipus.Wallet.Api.Application.Services.MicrogameGameApi.External;
 
 using System.Text.Json.Serialization;
 
