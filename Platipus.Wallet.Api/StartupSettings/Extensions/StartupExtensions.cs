@@ -52,7 +52,9 @@ public static class StartupExtensions
            .AddScoped<SynotSecurityFilter>()
            .AddSingleton<SynotMockedErrorActionFilter>()
            .AddScoped<VegangsterSecurityFilter>()
-           .AddSingleton<VegangsterMockedErrorActionFilter>();
+           .AddSingleton<VegangsterMockedErrorActionFilter>()
+           .AddScoped<MicrogameSecurityFilter>()
+           .AddSingleton<MicrogameMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -199,6 +201,13 @@ public static class StartupExtensions
                 options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                })
+           .AddJsonOptions(
+                nameof(WalletProvider.Microgame),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 });
 

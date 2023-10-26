@@ -21,6 +21,7 @@ using Platipus.Wallet.Api.Application.Services.EmaraPlayGameApi;
 using Platipus.Wallet.Api.Application.Services.EvenbetGameApi;
 using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
+using Platipus.Wallet.Api.Application.Services.MicrogameGameApi;
 using Platipus.Wallet.Api.Application.Services.NemesisGameApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
@@ -260,6 +261,10 @@ try
        .Services
        .AddTransient<IOpenboxGameApiClient, OpenboxGameApiClient>()
        .AddHttpClient<IOpenboxGameApiClient, OpenboxGameApiClient>()
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .Services
+       .AddTransient<IMicrogameGameApiClient, MicrogameGameApiClient>()
+       .AddHttpClient<IMicrogameGameApiClient, MicrogameGameApiClient>()
        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services

@@ -112,7 +112,7 @@ public sealed class VegangsterGameApiClient : IVegangsterGameApiClient
 
             var jsonContent = JsonContent.Create(request, options: _jsonSerializerOptions);
             var requestBytes = await jsonContent.ReadAsByteArrayAsync(cancellationToken);
-            var xApiSignature = Hub88SecuritySign.Compute(requestBytes, vegangsterSignatureKey);
+            var xApiSignature = VegangsterSecuritySign.Compute(requestBytes, vegangsterSignatureKey);
 
             jsonContent.Headers.Add(VegangsterHeaders.XApiSignature, xApiSignature);
 
