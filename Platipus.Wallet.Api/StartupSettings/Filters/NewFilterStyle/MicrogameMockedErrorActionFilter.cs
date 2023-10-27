@@ -18,6 +18,11 @@ public sealed class MicrogameMockedErrorActionFilter : AbstractMockedErrorAction
         IBaseWalletRequest baseRequest,
         ActionExecutedContext actionExecutedContext)
     {
+        if (baseRequest is MicrogameAuthenticateRequest authenticateRequest)
+        {
+            return new MockedErrorIdentifiers(MockedErrorMethod.Authenticate, authenticateRequest.SessionId, true);
+        }
+
         var request = (IMicrogameMoneyOperationsRequest)baseRequest;
 
         var walletMethod = request switch

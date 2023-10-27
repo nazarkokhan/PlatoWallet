@@ -23,35 +23,35 @@ public sealed class WalletMicrogameController : RestApiController
 
     public WalletMicrogameController(IMediator mediator) => _mediator = mediator;
 
-    [HttpPost("authenticate")]
+    [HttpPost("Authenticate")]
     [ProducesResponseType(typeof(MicrogameAuthenticateResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Authenticate(
         [FromBody] [Required] MicrogameAuthenticateRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("balance")]
+    [HttpPost("Balance")]
     [ProducesResponseType(typeof(MicrogameGetBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBalance(
         [FromBody] [Required] MicrogameGetBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("reserve")]
+    [HttpPost("Reserve")]
     [ProducesResponseType(typeof(MicrogameReserveResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Bet(
         [FromBody] [Required] MicrogameReserveRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("release")]
+    [HttpPost("Release")]
     [ProducesResponseType(typeof(MicrogameReleaseResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Win(
         [FromBody] [Required] MicrogameReleaseRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("cancelReserve")]
+    [HttpPost("CancelReserve")]
     [ProducesResponseType(typeof(MicrogameCancelReserveResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rollback(
         [FromBody] [Required] MicrogameCancelReserveRequest request,
