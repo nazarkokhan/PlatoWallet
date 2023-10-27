@@ -1,5 +1,7 @@
 using Humanizer;
 
+
+
 namespace Platipus.Wallet.Api.StartupSettings.Filters;
 
 using System.Net;
@@ -31,6 +33,7 @@ using Application.Responses.Anakatech.Base;
 using Application.Responses.Evenbet.Base;
 using Application.Responses.Microgame.Base;
 using Application.Responses.Synot.Base;
+using Application.Responses.Sweepium.Base;
 using Application.Responses.Vegangster.Base;
 using Application.Results.Anakatech.WithData;
 using Application.Results.Atlas.WithData;
@@ -49,6 +52,7 @@ using Application.Results.Parimatch;
 using Application.Results.Parimatch.WithData;
 using Application.Results.Reevo.WithData;
 using Application.Results.Sw.WithData;
+using Application.Results.Sweepium;
 using Application.Results.Synot;
 using Application.Results.Synot.WithData;
 using Application.Results.Uis.WithData;
@@ -645,6 +649,25 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     }
 
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
+                    return;
+                }
+                case ISweepiumResult<object> sweepiumResult:
+                {
+                    object responseObject;
+                    if (sweepiumResult.IsSuccess)
+                    {
+                        responseObject = sweepiumResult.Data;
+                        context.Result = new OkObjectResult(responseObject);
+                    }
+                    else
+                    {
+                        var error = sweepiumResult.Error;
+                        responseObject = new SweepiumErrorResponse(error, error.Humanize());
+
+                        context.Result = new BadRequestObjectResult(responseObject);
+                    }
+                    
+                    context.HttpContext.Items.Add(HttpContextItems.RequestObject, responseObject);
                     return;
                 }
             }

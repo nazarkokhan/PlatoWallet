@@ -1,6 +1,8 @@
-﻿namespace Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
+﻿using Platipus.Wallet.Api.Application.Results.Sweepium;
 
-public class SweepiumCommonResponse
+namespace Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
+
+public abstract record SweepiumCommonResponse(SweepiumErrorCode ErrorCode)
 {
     
 }
