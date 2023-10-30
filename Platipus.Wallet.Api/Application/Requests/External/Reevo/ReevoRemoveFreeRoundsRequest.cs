@@ -40,14 +40,14 @@ public record ReevoRemoveFreeRoundsRequest(
                 return response;
 
             var data = response.Data;
-            if (data.ErrorMessage is not null)
-                return ResultFactory.Success(data.ErrorMessage);
+            if (data.IsFailure)
+                return ResultFactory.Success(data);
 
             await _context.Set<Award>()
                 .Where(e => e.Id == apiRequest.FreeroundId)
                 .ExecuteDeleteAsync(cancellationToken);
 
-            return ResultFactory.Success(data.Success);
+            return ResultFactory.Success(data);
         }
     }
 }

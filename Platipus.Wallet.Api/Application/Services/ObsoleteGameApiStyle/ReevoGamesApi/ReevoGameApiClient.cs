@@ -1,119 +1,141 @@
 namespace Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
 
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Domain.Entities.Enums;
+using Results.HttpClient;
+using Results.HttpClient.HttpData;
+using Results.HttpClient.WithData;
 
-public class ReevoGameApiClient : IReevoGameApiClient
+public sealed class ReevoGameApiClient : IReevoGameApiClient
 {
     private readonly HttpClient _httpClient;
-    private readonly JsonSerializerOptions _hub88JsonSerializerOptions;
+    private readonly JsonSerializerOptions _reevoJsonSerializerOptions;
+
+    private const string ApiBasePath = "reevo";
 
     public ReevoGameApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions)
     {
         _httpClient = httpClient;
-        _hub88JsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Reevo)).JsonSerializerOptions;
+        _reevoJsonSerializerOptions = jsonOptions.Get(nameof(WalletProvider.Reevo)).JsonSerializerOptions;
     }
 
-    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameGameApiResponse>>> GetGameAsync(
+    public async Task<IResult<IHttpClientResult<ReevoGetGameGameApiResponse, ReevoErrorGameApiResponse>>> GetGameAsync(
         Uri baseUrl,
         ReevoGetGameGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await PostSignedRequestAsync<ReevoGetGameGameApiRequest, ReevoGetGameGameApiResponse>(
+        return await PostSignedRequestAsync<ReevoGetGameGameApiResponse>(
             baseUrl,
             request,
             cancellationToken);
     }
 
-    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoAddFreeRoundsGameApiResponse>>> AddFreeRoundsAsync(
-        Uri baseUrl,
-        ReevoAddFreeRoundsGameApiRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<IResult<IHttpClientResult<ReevoAddFreeRoundsGameApiResponse, ReevoErrorGameApiResponse>>>
+        AddFreeRoundsAsync(
+            Uri baseUrl,
+            ReevoAddFreeRoundsGameApiRequest request,
+            CancellationToken cancellationToken = default)
     {
-        return await PostSignedRequestAsync<ReevoAddFreeRoundsGameApiRequest, ReevoAddFreeRoundsGameApiResponse>(
+        return await PostSignedRequestAsync<ReevoAddFreeRoundsGameApiResponse>(
             baseUrl,
             request,
             cancellationToken);
     }
 
-    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoErrorGameApiResponse>>> RemoveFreeRoundsAsync(
+    public async Task<IResult<IHttpClientResult<ReevoErrorGameApiResponse, ReevoErrorGameApiResponse>>> RemoveFreeRoundsAsync(
         Uri baseUrl,
         ReevoRemoveFreeRoundsGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await PostSignedRequestAsync<ReevoRemoveFreeRoundsGameApiRequest, ReevoErrorGameApiResponse>(
+        return await PostSignedRequestAsync<ReevoErrorGameApiResponse>(
             baseUrl,
             request,
             cancellationToken);
     }
 
-    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameHistoryGameApiResponse>>> GetGameHistoryAsync(
-        Uri baseUrl,
-        ReevoGetGameHistoryGameApiRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<IResult<IHttpClientResult<ReevoGetGameHistoryGameApiResponse, ReevoErrorGameApiResponse>>>
+        GetGameHistoryAsync(
+            Uri baseUrl,
+            ReevoGetGameHistoryGameApiRequest request,
+            CancellationToken cancellationToken = default)
     {
-        return await PostSignedRequestAsync<ReevoGetGameHistoryGameApiRequest, ReevoGetGameHistoryGameApiResponse>(
+        return await PostSignedRequestAsync<ReevoGetGameHistoryGameApiResponse>(
             baseUrl,
             request,
             cancellationToken);
     }
 
-    public async Task<IResult<ReevoCommonBoxGameApiResponse<ReevoGetGameListGameApiResponse>>> GetGameListAsync(
+    public async Task<IResult<IHttpClientResult<ReevoGetGameListGameApiResponse, ReevoErrorGameApiResponse>>> GetGameListAsync(
         Uri baseUrl,
         ReevoGetGameListGameApiRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await PostSignedRequestAsync<ReevoGetGameListGameApiRequest, ReevoGetGameListGameApiResponse>(
+        return await PostSignedRequestAsync<ReevoGetGameListGameApiResponse>(
             baseUrl,
             request,
             cancellationToken);
     }
 
-    private async Task<IResult<ReevoCommonBoxGameApiResponse<TResponse>>> PostSignedRequestAsync<TRequest, TResponse>(
+    private async Task<IResult<IHttpClientResult<TSuccess, ReevoErrorGameApiResponse>>> PostSignedRequestAsync<TSuccess>(
         Uri baseUrl,
-        TRequest request,
+        object request,
         CancellationToken cancellationToken)
     {
         try
         {
-            baseUrl = new Uri(baseUrl, "reevo");
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}");
 
-            var jsonContent = JsonContent.Create(request, options: _hub88JsonSerializerOptions);
+            var jsonContent = JsonContent.Create(request, options: _reevoJsonSerializerOptions);
 
-            var httpResponse = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
+            var httpResponseOriginal = await _httpClient.PostAsync(baseUrl, jsonContent, cancellationToken);
 
-            var responseString = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+            var httpResponse = await httpResponseOriginal.MapToHttpClientResponseAsync(cancellationToken);
 
-            if (string.IsNullOrWhiteSpace(responseString))
-                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.EmptyExternalResponse);
-
-            var responseJsonNode = JsonNode.Parse(responseString);
-
-            var error = responseJsonNode?["error"]?.GetValue<int?>();
-            if (error is not 0)
-            {
-                var errorResponse = responseJsonNode.Deserialize<ReevoErrorGameApiResponse>(_hub88JsonSerializerOptions);
-                if (errorResponse is null)
-                    return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidExternalResponse);
-                var errorBox = new ReevoCommonBoxGameApiResponse<TResponse>(errorResponse, default!);
-
-                return ResultFactory.Success(errorBox);
-            }
-
-            var successResponse = responseJsonNode.Deserialize<TResponse>(_hub88JsonSerializerOptions);
-            if (successResponse is null)
-                return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.InvalidExternalResponse);
-            var successBox = new ReevoCommonBoxGameApiResponse<TResponse>(null, successResponse);
-
-            return ResultFactory.Success(successBox);
+            var httpResult = GetHttpResultAsync<TSuccess>(httpResponse);
+            return httpResult.IsFailure
+                ? ResultFactory.Failure<IHttpClientResult<TSuccess, ReevoErrorGameApiResponse>>(ErrorCode.Unknown)
+                : ResultFactory.Success(httpResult);
         }
         catch (Exception e)
         {
-            return ResultFactory.Failure<ReevoCommonBoxGameApiResponse<TResponse>>(ErrorCode.Unknown, e);
+            return ResultFactory.Failure<IHttpClientResult<TSuccess, ReevoErrorGameApiResponse>>(
+                ErrorCode.UnknownHttpClientError,
+                e);
+        }
+    }
+
+    private IHttpClientResult<TSuccess, ReevoErrorGameApiResponse> GetHttpResultAsync<TSuccess>(HttpClientRequest httpResponse)
+    {
+        try
+        {
+            var responseBody = httpResponse.ResponseData.Body;
+
+            if (string.IsNullOrEmpty(responseBody))
+            {
+                return httpResponse.Failure<TSuccess, ReevoErrorGameApiResponse>();
+            }
+
+            var responseJson = JsonDocument.Parse(responseBody).RootElement;
+
+            if (responseJson.TryGetProperty("error", out var error) && !error.ValueKind.Equals(JsonValueKind.Null))
+            {
+                var errorResponse = responseJson.Deserialize<ReevoErrorGameApiResponse>(_reevoJsonSerializerOptions);
+                if (errorResponse is not null)
+                    return httpResponse.Failure<TSuccess, ReevoErrorGameApiResponse>(errorResponse);
+            }
+
+            var success = responseJson.Deserialize<TSuccess>(_reevoJsonSerializerOptions);
+
+            return success is null
+                ? httpResponse.Failure<TSuccess, ReevoErrorGameApiResponse>()
+                : httpResponse.Success<TSuccess, ReevoErrorGameApiResponse>(success);
+        }
+        catch (Exception e)
+        {
+            return httpResponse.Failure<TSuccess, ReevoErrorGameApiResponse>(e);
         }
     }
 }

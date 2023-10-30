@@ -804,10 +804,10 @@ public sealed record LaunchRequest(
                             casino.Id),
                         cancellationToken);
 
-                    if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.ErrorMessage is not null)
+                    if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    var dataSuccess = reevoLaunchUrlResult.Data.Success;
+                    var dataSuccess = reevoLaunchUrlResult.Data.Data;
 
                     session.Id = dataSuccess.GameSessionId;
                     _context.Add(session);
