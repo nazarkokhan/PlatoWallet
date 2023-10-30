@@ -229,6 +229,7 @@ public sealed record LaunchRequest(
                         request.Game,
                         user.CurrencyId,
                         defaultPlatform,
+                        request.Language,
                         request.Lobby,
                         mode is LaunchMode.Real ? request.SessionToken : null);
 

@@ -8,5 +8,6 @@ public sealed record MicrogameLaunchGameApiRequest(
     [property: JsonPropertyName("gameId")] string GameId,
     [property: JsonPropertyName("currency")] string Currency,
     [property: JsonPropertyName("device")] string Device,
+    [property: JsonPropertyName("language")] string Language,
     [property: JsonPropertyName("lobbyUrl")] string? LobbyUrl,
     [property: JsonPropertyName("sessionId")] string? SessionId);
