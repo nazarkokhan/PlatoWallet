@@ -5,7 +5,7 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
+using Services.SoftswissGamesApi;
 using Services.Wallet;
 using StartupSettings.Options;
 

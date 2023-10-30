@@ -4,8 +4,8 @@ using Domain.Entities;
 using Infrastructure.Persistence;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
-using Services.ObsoleteGameApiStyle.SoftswissGamesApi.DTOs.Requests;
+using Services.SoftswissGamesApi;
+using Services.SoftswissGamesApi.DTOs.Requests;
 
 [PublicAPI]
 public record ExternalSoftswissCancelFreespinsRequest(

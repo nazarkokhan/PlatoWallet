@@ -70,7 +70,6 @@
 
     <ItemGroup>
         <Folder Include="Application\Services\MicrogameGameApi\DTOs\" />
-        <Folder Include="Application\Services\ObsoleteGameApiStyle\" />
         <Folder Include="Application\Services\SoftBetGameApi\Models\" />
     </ItemGroup>
 

@@ -3,8 +3,8 @@ namespace Platipus.Wallet.Api.Application.Requests.External.Softswiss;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
-using Services.ObsoleteGameApiStyle.SoftswissGamesApi.DTOs.Requests;
+using Services.SoftswissGamesApi;
+using Services.SoftswissGamesApi.DTOs.Requests;
 
 public record ExternalSoftswissRoundDetailsRequest(
         string Environment,

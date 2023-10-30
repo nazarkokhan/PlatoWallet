@@ -6,8 +6,8 @@ using System.Text.Json.Nodes;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.ObsoleteGameApiStyle.ReevoGamesApi;
-using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
+using Services.ReevoGamesApi;
+using Services.ReevoGamesApi.DTO;
 
 public record ReevoAddFreeRoundRequest(
     [property: DefaultValue("test")] string Environment,
