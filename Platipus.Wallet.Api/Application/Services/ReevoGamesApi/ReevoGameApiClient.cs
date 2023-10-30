@@ -14,7 +14,7 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _reevoJsonSerializerOptions;
 
-    private const string ApiBasePath = "reevo";
+    private const string ApiBasePath = "reevo/";
 
     public ReevoGameApiClient(HttpClient httpClient, IOptionsMonitor<JsonOptions> jsonOptions)
     {
@@ -30,6 +30,7 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
         return await PostSignedRequestAsync<ReevoGetGameGameApiResponse>(
             baseUrl,
             request,
+            "getgame",
             cancellationToken);
     }
 
@@ -42,6 +43,7 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
         return await PostSignedRequestAsync<ReevoAddFreeRoundsGameApiResponse>(
             baseUrl,
             request,
+            "addfreerounds",
             cancellationToken);
     }
 
@@ -53,6 +55,7 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
         return await PostSignedRequestAsync<ReevoErrorGameApiResponse>(
             baseUrl,
             request,
+            "removefreerounds",
             cancellationToken);
     }
 
@@ -65,6 +68,7 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
         return await PostSignedRequestAsync<ReevoGetGameHistoryGameApiResponse>(
             baseUrl,
             request,
+            "getgamehistory",
             cancellationToken);
     }
 
@@ -76,17 +80,19 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
         return await PostSignedRequestAsync<ReevoGetGameListGameApiResponse>(
             baseUrl,
             request,
+            "getgamelist",
             cancellationToken);
     }
 
     private async Task<IResult<IHttpClientResult<TSuccess, ReevoErrorGameApiResponse>>> PostSignedRequestAsync<TSuccess>(
         Uri baseUrl,
         object request,
+        string methodRoute,
         CancellationToken cancellationToken)
     {
         try
         {
-            baseUrl = new Uri(baseUrl, $"{ApiBasePath}");
+            baseUrl = new Uri(baseUrl, $"{ApiBasePath}{methodRoute.ToUpper()}");
 
             var jsonContent = JsonContent.Create(request, options: _reevoJsonSerializerOptions);
 
@@ -120,7 +126,9 @@ public sealed class ReevoGameApiClient : IReevoGameApiClient
 
             var responseJson = JsonDocument.Parse(responseBody).RootElement;
 
-            if (responseJson.TryGetProperty("error", out var error) && !error.ValueKind.Equals(JsonValueKind.Null))
+            if (responseJson.TryGetProperty("error", out var error)
+             && !error.ValueKind.Equals(JsonValueKind.Null)
+             && error.GetInt32() is 1)
             {
                 var errorResponse = responseJson.Deserialize<ReevoErrorGameApiResponse>(_reevoJsonSerializerOptions);
                 if (errorResponse is not null)
