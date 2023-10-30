@@ -5,7 +5,6 @@ using System.Text;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
-using Helpers;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -472,7 +471,7 @@ public sealed record LaunchRequest(
                             request.Language,
                             defaultPlatform,
                             PlayerIp: playerIp,
-                            LobbyUrl: request.Lobby!)
+                            LobbyUrl: request.Lobby)
                         : new UranusGetLaunchUrlGameApiRequest(
                             request.Game,
                             session.Id,
@@ -521,7 +520,7 @@ public sealed record LaunchRequest(
                         token,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure || apiResponse.Data?.Data?.Url is null)
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     launchUrl = apiResponse.Data.Data.Url.ToString();
@@ -536,11 +535,11 @@ public sealed record LaunchRequest(
                         request.CasinoId,
                         request.Game,
                         request.LaunchMode.ToString(),
-                        request.Language!,
+                        request.Language,
                         "someChannel",
                         "someJurisdiction",
                         user.Currency.Id,
-                        ip!,
+                        ip,
                         User: user.Username,
                         Lobby: request.Lobby,
                         Cashier: "someCashier",
@@ -572,7 +571,7 @@ public sealed record LaunchRequest(
                         casino.Provider is WalletProvider.Betflag,
                         cancellationToken: cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.Data.LaunchUrl ?? "";
+                    launchUrl = getGameLinkResult.Data.Data.LaunchUrl;
                     break;
                 }
 
@@ -797,7 +796,7 @@ public sealed record LaunchRequest(
                             user.Password,
                             "en",
                             game.GameServerId.ToString(),
-                            request.Lobby ?? "",
+                            request.Lobby,
                             request.LaunchMode is LaunchMode.Real ? "0" : "1",
                             user.Currency.Id,
                             casino.Id),
@@ -871,7 +870,7 @@ public sealed record LaunchRequest(
                     break;
             }
 
-            if (!string.IsNullOrWhiteSpace(launchUrl) && !launchUrl.StartsWith("<"))
+            if (!string.IsNullOrWhiteSpace(launchUrl) && !launchUrl.StartsWith('<'))
             {
                 var url = new Uri(launchUrl);
                 var queryParams = QueryHelpers.ParseQuery(url.Query);
@@ -913,13 +912,6 @@ public sealed record LaunchRequest(
         string LaunchUrl,
         string? HttpRequestMessage,
         string? HttpResponseMessage);
-
-    public class LaunchRequestValidator : AbstractValidator<LaunchRequest>
-    {
-        public LaunchRequestValidator()
-        {
-        }
-    }
 
     public sealed class Validator : AbstractValidator<SignUpRequest>
     {
