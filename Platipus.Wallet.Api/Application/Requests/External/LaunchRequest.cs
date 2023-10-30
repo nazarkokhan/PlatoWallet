@@ -243,7 +243,7 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 
@@ -324,7 +324,7 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    launchUrl = launcherResult.Data.Data;
 
                     var lastUsersSession = await _context.Set<Session>()
                        .Include(u => u.User)
@@ -366,7 +366,7 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 
@@ -394,7 +394,7 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 
@@ -430,15 +430,7 @@ public sealed record LaunchRequest(
                     if (apiResponse.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    var script = apiResponse.Data.Data;
-
-                    var environmentToUse = request.Environment ?? "local";
-                    if (environmentToUse is "test")
-                    {
-                        environmentToUse = "local";
-                    }
-
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(script, environmentToUse);
+                    launchUrl = apiResponse.Data.Data;
 
                     break;
                 }
@@ -464,9 +456,7 @@ public sealed record LaunchRequest(
                     if (apiResponse.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    var script = apiResponse.Data.Data;
-
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(script, request.Environment ?? "local");
+                    launchUrl = apiResponse.Data.Data;
                     break;
                 }
 
@@ -608,7 +598,7 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -634,7 +624,7 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -732,7 +722,7 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -764,7 +754,7 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -791,7 +781,7 @@ public sealed record LaunchRequest(
 
                     httpRequestMessage = getLaunchScriptResult.Data.HttpRequest.RequestData.RequestUri.AbsoluteUri;
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -848,7 +838,7 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -871,7 +861,7 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }

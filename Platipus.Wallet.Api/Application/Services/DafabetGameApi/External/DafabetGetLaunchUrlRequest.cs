@@ -54,8 +54,7 @@ public sealed record DafabetGetLaunchUrlRequest(
             if (clientResponse.IsFailure)
                 return clientResponse.ToDafabetResult<string>();
 
-            var gameLaunchScript = clientResponse.Data.Data;
-            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
+            var launchUrl = clientResponse.Data.Data;
 
             return clientResponse.ToDafabetResult(launchUrl);
         }

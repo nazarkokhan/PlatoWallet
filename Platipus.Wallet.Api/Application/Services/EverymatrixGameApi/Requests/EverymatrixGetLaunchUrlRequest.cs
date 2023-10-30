@@ -18,7 +18,7 @@ public sealed record EverymatrixGetLaunchUrlRequest(
         private readonly IEverymatrixGameApiClient _everymatrixGameApiClient;
 
         public Handler(
-            IWalletService walletService, 
+            IWalletService walletService,
             IEverymatrixGameApiClient everymatrixGameApiClient)
         {
             _walletService = walletService;
@@ -39,8 +39,7 @@ public sealed record EverymatrixGetLaunchUrlRequest(
             if (clientResponse.IsFailure)
                 return clientResponse.ToEverymatrixResult<string>();
 
-            var gameLaunchScript = clientResponse.Data.Data;
-            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
+            var launchUrl = clientResponse.Data.Data;
 
             return clientResponse.ToEverymatrixResult(launchUrl);
         }
