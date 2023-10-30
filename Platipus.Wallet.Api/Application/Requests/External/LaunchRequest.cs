@@ -243,6 +243,9 @@ public sealed record LaunchRequest(
                         break;
                     }
 
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = launcherResult.Data.Data;
                     break;
                 }
@@ -296,6 +299,9 @@ public sealed record LaunchRequest(
                         break;
                     }
 
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
                 }
@@ -323,6 +329,9 @@ public sealed record LaunchRequest(
                         launchUrl = string.Empty;
                         break;
                     }
+
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = launcherResult.Data.Data;
 
@@ -366,6 +375,9 @@ public sealed record LaunchRequest(
                         break;
                     }
 
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = launcherResult.Data.Data;
                     break;
                 }
@@ -393,6 +405,9 @@ public sealed record LaunchRequest(
                         launchUrl = string.Empty;
                         break;
                     }
+
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = launcherResult.Data.Data;
                     break;
@@ -427,8 +442,11 @@ public sealed record LaunchRequest(
                         apiRequest,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure)
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = apiResponse.Data.Data;
 
@@ -453,8 +471,11 @@ public sealed record LaunchRequest(
                         apiRequest,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure)
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = apiResponse.Data.Data;
                     break;
@@ -494,6 +515,9 @@ public sealed record LaunchRequest(
                     if (IsInvalidUranusApiResponse(apiResponse))
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = apiResponse.Data.Data.Data.Url.ToString();
                     break;
                 }
@@ -522,6 +546,9 @@ public sealed record LaunchRequest(
 
                     if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
@@ -553,6 +580,9 @@ public sealed record LaunchRequest(
                     if (apiResponse.IsFailure || apiResponse.Data.Data.Result.Url is null)
                         ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = apiResponse.Data.Data.Result.Url?.ToString()!;
                     break;
                 }
@@ -570,6 +600,12 @@ public sealed record LaunchRequest(
                         123,
                         casino.Provider is WalletProvider.Betflag,
                         cancellationToken: cancellationToken);
+
+                    if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
+                        ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = getGameLinkResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = getGameLinkResult.Data.Data.LaunchUrl;
                     break;
@@ -598,6 +634,9 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
@@ -623,6 +662,9 @@ public sealed record LaunchRequest(
 
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = getLaunchScriptResult.Data.Data;
 
@@ -654,10 +696,12 @@ public sealed record LaunchRequest(
                         cancellationToken);
 
                     if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
-                        launchUrl = "";
-                    else
-                        launchUrl = getGameLinkResult.Data.Data.Url;
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = getGameLinkResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getGameLinkResult.Data.Data.Url;
                     break;
                 }
 
@@ -676,9 +720,7 @@ public sealed record LaunchRequest(
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     var data = getGameLinkResult.Data;
-
-                    httpRequestMessage = data.HttpRequest.RequestData.RequestUri.ToString();
-                    httpResponseMessage = data.HttpRequest.ResponseData.Body;
+                    SetHttpMessages(data);
 
                     var content = data.Data;
                     var existingSession = await _context.Set<Session>()
@@ -721,6 +763,9 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
@@ -753,6 +798,9 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
@@ -778,7 +826,8 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    httpRequestMessage = getLaunchScriptResult.Data.HttpRequest.RequestData.RequestUri.AbsoluteUri;
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = getLaunchScriptResult.Data.Data;
 
@@ -806,6 +855,7 @@ public sealed record LaunchRequest(
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     var dataSuccess = reevoLaunchUrlResult.Data.Data;
+                    SetHttpMessages(reevoLaunchUrlResult.Data);
 
                     session.Id = dataSuccess.GameSessionId;
                     _context.Add(session);
@@ -837,6 +887,9 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
@@ -859,6 +912,9 @@ public sealed record LaunchRequest(
 
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = getLaunchScriptResult.Data.Data;
 
@@ -890,6 +946,12 @@ public sealed record LaunchRequest(
                 httpResponseMessage);
 
             return ResultFactory.Success(result);
+
+            void SetHttpMessages(dynamic data)
+            {
+                httpRequestMessage = data.HttpRequest.RequestData.RequestUri.ToString();
+                httpResponseMessage = data.HttpRequest.ResponseData.Body;
+            }
         }
 
         private string GetPlayerIp()
