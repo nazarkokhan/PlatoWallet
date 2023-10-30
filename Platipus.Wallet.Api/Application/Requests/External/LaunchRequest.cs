@@ -668,21 +668,20 @@ public sealed record LaunchRequest(
                         baseUrl,
                         user.CasinoId,
                         user.Username,
-                        session.Id,
                         game.GameServerId,
                         user.Currency.Id,
                         _currencyMultipliers.GetSumOut(user.Currency.Id, user.Balance),
                         cancellationToken);
 
-                    if (getGameLinkResult.IsFailure)
+                    if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     var data = getGameLinkResult.Data;
 
-                    httpRequestMessage = data.HttpRequest;
-                    httpResponseMessage = data.HttpResponse;
+                    httpRequestMessage = data.HttpRequest.RequestData.RequestUri.ToString();
+                    httpResponseMessage = data.HttpRequest.ResponseData.Body;
 
-                    var content = data.Content!;
+                    var content = data.Data;
                     var existingSession = await _context.Set<Session>()
                        .Where(s => s.Id == content.SessionId)
                        .FirstOrDefaultAsync(cancellationToken);

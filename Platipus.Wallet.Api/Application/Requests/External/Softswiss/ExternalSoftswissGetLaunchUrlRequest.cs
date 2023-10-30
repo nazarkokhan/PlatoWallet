@@ -79,18 +79,16 @@ public sealed record ExternalSoftswissGetLaunchUrlRequest(
                 walletResponse.Data.BaseUrl,
                 user.CasinoId,
                 user.Username,
-                session.Id,
                 request.GameId,
                 user.Currency.Id,
                 _currencyMultipliers.GetSumOut(user.Currency.Id, user.Balance),
                 cancellationToken);
 
-            if (getGameLinkResult.IsFailure)
+            if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
                 return ResultFactory.Failure<string>(ErrorCode.GameServerApiError);
 
-            var data = getGameLinkResult.Data;
+            var content = getGameLinkResult.Data.Data;
 
-            var content = data.Content!;
             var existingSession = await _walletDbContext.Set<Session>()
                .Where(s => s.Id == content.SessionId)
                .FirstOrDefaultAsync(cancellationToken);
