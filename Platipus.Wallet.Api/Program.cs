@@ -123,7 +123,7 @@ try
                 options.InvalidModelStateResponseFactory =
                     context =>
                     {
-                        //TODO suppress and move to ResultToResponseResultFilterAttribute
+                        //TODO suppress and move to the ResultToResponseResultFilterAttribute
                         var errors = context.ModelState
                            .Where(x => x.Value?.Errors.Count > 0)
                            .SelectMany(kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));
