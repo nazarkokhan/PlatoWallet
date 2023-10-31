@@ -216,6 +216,7 @@ public sealed record LaunchRequest(
 
             string? httpRequestMessage = null;
             string? httpResponseMessage = null;
+            string? httpRequestUrl = null;
             string launchUrl;
             switch (casino.Provider)
             {
@@ -943,13 +944,15 @@ public sealed record LaunchRequest(
                 user.Balance,
                 launchUrl,
                 httpRequestMessage,
+                httpRequestUrl,
                 httpResponseMessage);
 
             return ResultFactory.Success(result);
 
             void SetHttpMessages(dynamic data)
             {
-                httpRequestMessage = data.HttpRequest.RequestData.RequestUri.ToString();
+                httpRequestMessage = data.HttpRequest.RequestData.Body;
+                httpRequestUrl = data.HttpRequest.RequestData.RequestUri.ToString();
                 httpResponseMessage = data.HttpRequest.ResponseData.Body;
             }
         }
@@ -973,6 +976,7 @@ public sealed record LaunchRequest(
         decimal Balance,
         string LaunchUrl,
         string? HttpRequestMessage,
+        string? HttpRequestUrl,
         string? HttpResponseMessage);
 
     public sealed class Validator : AbstractValidator<SignUpRequest>
