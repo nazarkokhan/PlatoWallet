@@ -1,10 +1,11 @@
 ﻿using Platipus.Wallet.Api.Application.Results.Sweepium;
+using Platipus.Wallet.Api.Application.Results.Sweepium.WithData;
 
 namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
 public static class CommonResultToSweepiumMappers
 {
-    public static ISweepiumResult<TData> ToSweepiumFailureResult<TData>(this IResult result)
+    public static ISweepiumResult<TData> ToSweepiumErrorResult<TData>(this IResult result)
     {
         throw new NotImplementedException();
     }

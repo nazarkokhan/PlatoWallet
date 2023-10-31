@@ -657,12 +657,11 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     if (sweepiumResult.IsSuccess)
                     {
                         responseObject = sweepiumResult.Data;
-                        context.Result = new OkObjectResult(responseObject);
                     }
                     else
                     {
                         var error = sweepiumResult.Error;
-                        responseObject = new SweepiumErrorResponse(error, error.Humanize());
+                        responseObject = new SweepiumErrorResponse(sweepiumResult.IsSuccess, error.Humanize(), (int)error);
 
                         context.Result = new BadRequestObjectResult(responseObject);
                     }

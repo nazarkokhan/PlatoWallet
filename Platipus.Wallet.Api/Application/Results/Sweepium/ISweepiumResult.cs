@@ -1,9 +1,8 @@
-﻿using Platipus.Wallet.Api.Application.Results.Base.WithData;
-using Platipus.Wallet.Api.Application.Results.Sweepium.WithData;
+﻿using Platipus.Wallet.Api.Application.Results.Base;
 
 namespace Platipus.Wallet.Api.Application.Results.Sweepium;
 
-public interface ISweepiumResult<out TData> : IBaseResult<SweepiumErrorCode, TData>, ISweepiumResult
+public interface ISweepiumResult : IBaseResult<SweepiumErrorCode>
 {
     
 }
