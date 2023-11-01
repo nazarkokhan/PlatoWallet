@@ -29,7 +29,7 @@ public sealed class WalletSweepiumController : RestApiController
     [HttpPost("UpdateBalance")]
     [ProducesResponseType(typeof(SweepiumStartUpdateBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateBalance(
-        [FromBody] SweepiumStartUpdateBalanceResponse request,
+        [FromBody] SweepiumStartUpdateBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
@@ -39,25 +39,25 @@ public sealed class WalletSweepiumController : RestApiController
         [FromBody] SweepiumBetRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-//
-    //[HttpPost("Win")]
-    //[ProducesResponseType(typeof(SweepiumWinResponse), StatusCodes.Status200OK)]
-    //public async Task<IActionResult> Win(
-    //    [FromBody] SweepiumWinRequest request,
-    //    CancellationToken cancellationToken)
-    //    => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-//
-    //[HttpPost("Rollback")]
-    //[ProducesResponseType(typeof(SweepiumRollbackResponse), StatusCodes.Status200OK)]
-    //public async Task<IActionResult> Rollback(
-    //    [FromBody] SweepiumRollbackRequest request,
-    //    CancellationToken cancellationToken)
-    //    => (await _mediator.Send(request, cancellationToken)).ToActionResult();
-    //
+
+    [HttpPost("Win")]
+    [ProducesResponseType(typeof(SweepiumSuccessResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Win(
+        [FromBody] SweepiumWinRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+
+    [HttpPost("Rollback")]
+    [ProducesResponseType(typeof(SweepiumSuccessResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Rollback(
+        [FromBody] SweepiumRollbackRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
     [HttpPost("Start")]
     [ProducesResponseType(typeof(SweepiumStartUpdateBalanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Start(
-        [FromBody] SweepiumStartUpdateBalanceResponse request,
+        [FromBody] SweepiumStartUpdateBalanceRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

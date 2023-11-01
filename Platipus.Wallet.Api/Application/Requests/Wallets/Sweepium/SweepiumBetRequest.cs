@@ -11,6 +11,7 @@ using Platipus.Wallet.Api.Application.Responses.Sweepium;
 using Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
 using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 using Platipus.Wallet.Api.Application.Results.Sweepium;
+using Platipus.Wallet.Api.Application.Results.Sweepium.WithData;
 using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
