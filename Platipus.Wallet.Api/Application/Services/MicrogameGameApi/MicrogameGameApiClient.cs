@@ -1,11 +1,12 @@
 ﻿namespace Platipus.Wallet.Api.Application.Services.MicrogameGameApi;
 
 using System.Text.Json;
+using Application.Responses.Microgame.Base;
 using Domain.Entities.Enums;
 using External;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Responses.Microgame.Base;
+using Responses;
 using Results.HttpClient;
 using Results.HttpClient.HttpData;
 using Results.HttpClient.WithData;
@@ -26,13 +27,13 @@ public sealed class MicrogameGameApiClient : IMicrogameGameApiClient
            .JsonSerializerOptions;
     }
 
-    public async Task<IResult<IHttpClientResult<string, MicrogameErrorResponse>>> LaunchAsync(
+    public async Task<IResult<IHttpClientResult<MicrogameLaunchGameApiResponse, MicrogameErrorResponse>>> LaunchAsync(
         Uri baseUrl,
         MicrogameLaunchGameApiRequest apiRequest,
         CancellationToken cancellationToken = default)
     {
         const string methodRoute = "game/launch";
-        return await PostRequestAsync<string>(
+        return await PostRequestAsync<MicrogameLaunchGameApiResponse>(
             baseUrl,
             methodRoute,
             apiRequest,
@@ -100,7 +101,7 @@ public sealed class MicrogameGameApiClient : IMicrogameGameApiClient
         var root = parsedJson.RootElement;
         if (root.ValueKind == JsonValueKind.Object
          && root.TryGetProperty("error", out var error)
-         && error.ValueKind is not JsonValueKind.Null)
+         && error.GetInt32() is not 0)
         {
             var errorResponse = root.Deserialize<MicrogameErrorResponse>(_jsonSerializerOptions);
             if (errorResponse is not null)

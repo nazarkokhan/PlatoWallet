@@ -247,7 +247,7 @@ public sealed record LaunchRequest(
                     var data = launcherResult.Data;
                     SetHttpMessages(data);
 
-                    launchUrl = launcherResult.Data.Data;
+                    launchUrl = launcherResult.Data.Data.Url;
                     break;
                 }
 
