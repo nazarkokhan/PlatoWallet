@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 using StartupSettings.Filters.Security.Uranus;
 
-[Route("external/uranus/game")]
+[Route("external/uranus")]
 [ServiceFilter(typeof(UranusExternalSecurityFilter), Order = 1)]
 [JsonSettingsName(WalletProvider.Uranus)]
 [ProducesResponseType(typeof(UranusFailureResponse), StatusCodes.Status200OK)]
@@ -22,7 +22,7 @@ public sealed class ExternalUranusController : RestApiController
     public ExternalUranusController(IMediator mediator) =>
         _mediator = mediator;
 
-    [HttpPost("list")]
+    [HttpPost("game/list")]
     [ProducesResponseType(typeof(UranusSuccessResponse<UranusAvailableGamesData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAvailableGames(
         [FromBody] UranusGetAvailableGamesRequest request,
@@ -30,7 +30,7 @@ public sealed class ExternalUranusController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 
-    [HttpPost("launch")]
+    [HttpPost("game/launch")]
     [ProducesResponseType(typeof(UranusSuccessResponse<UranusGameUrlData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLaunchGameUrl(
         [FromBody] UranusGetLaunchGameUrlRequest request,
@@ -38,10 +38,26 @@ public sealed class ExternalUranusController : RestApiController
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
     
-    [HttpPost("demo")]
+    [HttpPost("game/demo")]
     [ProducesResponseType(typeof(UranusSuccessResponse<UranusGameUrlData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDemoLaunchGameUrl(
         [FromBody] UranusGetDemoLaunchGameUrlRequest request,
+        [Required][FromHeader(Name = UranusHeaders.XSignature)] string xSignature,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("freespin/create")]
+    [ProducesResponseType(typeof(UranusSuccessResponse<string[]>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateCampaign(
+        [FromBody] UranusCreateCampaignRequest request,
+        [Required][FromHeader(Name = UranusHeaders.XSignature)] string xSignature,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("freespin/cancel")]
+    [ProducesResponseType(typeof(UranusSuccessResponse<string[]>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CancelCampaign(
+        [FromBody] UranusCancelCampaignRequest request,
         [Required][FromHeader(Name = UranusHeaders.XSignature)] string xSignature,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
