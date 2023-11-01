@@ -2,6 +2,7 @@
 
 using System.Text.Json.Serialization;
 using Application.Requests.Wallets.Uranus.Base;
+using FluentValidation;
 using Requests;
 using Wallet;
 
@@ -44,6 +45,41 @@ public sealed record UranusCreateCampaignRequest(
             var response = new UranusSuccessResponse<string[]>(Array.Empty<string>());
 
             return ResultFactory.Success(response);
+        }
+    }
+
+    public sealed class Validator : AbstractValidator<UranusCreateCampaignRequest>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Environment)
+               .NotEmpty();
+
+            RuleFor(x => x.ApiRequest.Currency)
+               .NotEmpty()
+               .WithMessage("Currency cannot be empty or null.");
+
+            RuleFor(x => x.ApiRequest.PlayerId)
+               .NotEmpty()
+               .WithMessage("PlayerId cannot be empty or null.");
+
+            RuleFor(x => x.ApiRequest.PlayerCampaignId)
+               .NotEmpty()
+               .WithMessage("PlayerCampaignId cannot be empty or null.");
+
+            RuleFor(x => x.ApiRequest.CampaignEndTime)
+               .NotEmpty()
+               .WithMessage("CampaignEndTime cannot be empty or null.");
+
+            RuleFor(x => x.ApiRequest.SpinsCount)
+               .GreaterThan(0)
+               .WithMessage("SpinsCount must be greater than 0.");
+
+            RuleFor(x => x.ApiRequest.GameIds)
+               .NotEmpty()
+               .WithMessage("GameIds cannot be empty or null.")
+               .Must(gameIds => gameIds.Count > 0)
+               .WithMessage("GameIds must contain at least one item.");
         }
     }
 }

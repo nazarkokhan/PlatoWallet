@@ -2,6 +2,7 @@
 
 using System.Text.Json.Serialization;
 using Application.Requests.Wallets.Uranus.Base;
+using FluentValidation;
 using Requests;
 using Wallet;
 
@@ -44,6 +45,18 @@ public sealed record UranusCancelCampaignRequest(
             var response = new UranusSuccessResponse<string[]>(Array.Empty<string>());
 
             return ResultFactory.Success(response);
+        }
+    }
+
+    public sealed class Validator : AbstractValidator<UranusCancelCampaignRequest>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Environment)
+               .NotEmpty();
+
+            RuleFor(x => x.ApiRequest.PlayerCampaignId)
+               .NotEmpty();
         }
     }
 }

@@ -78,7 +78,7 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
     {
         return PostAsync<UranusSuccessResponse<string[]>, UranusCreateCampaignGameApiRequest>(
             baseUrl,
-            "freespins/create",
+            "freespin/create",
             apiRequest,
             cancellationToken);
     }
