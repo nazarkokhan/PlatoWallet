@@ -651,6 +651,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
+                
                 case ISweepiumResult<object> sweepiumResult:
                 {
                     object responseObject;
@@ -660,13 +661,12 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     }
                     else
                     {
-                        var error = sweepiumResult.Error;
-                        responseObject = new SweepiumErrorResponse(sweepiumResult.IsSuccess, error.Humanize(), (int)error);
-
-                        context.Result = new BadRequestObjectResult(responseObject);
+                        var errorCode = sweepiumResult.Error;
+                        responseObject = new SweepiumErrorResponse(errorCode);
                     }
-                    
-                    context.HttpContext.Items.Add(HttpContextItems.RequestObject, responseObject);
+
+                    context.Result = new OkObjectResult(responseObject);
+                    context.HttpContext.Items.Add(HttpContextItems.ResponseObject, responseObject);
                     return;
                 }
             }

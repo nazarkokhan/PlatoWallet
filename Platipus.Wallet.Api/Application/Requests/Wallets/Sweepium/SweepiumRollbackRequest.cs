@@ -1,12 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
-using Bogus.DataSets;
-using FluentValidation;
-using Humanizer;
-using Newtonsoft.Json;
 using Platipus.Wallet.Api.Application.Helpers;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
-using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Data;
 using Platipus.Wallet.Api.Application.Responses.Sweepium;
 using Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
 using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
@@ -17,38 +11,38 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
 
 public sealed record SweepiumRollbackRequest(
-        [property: DefaultValue("your session token")] string DateTime,
-        [property: DefaultValue("requested API method parameters")] SweepiumWinData Data,
-        [property: DefaultValue("your hash")] string Hash)
-    : ISweepiumRequest, IRequest<ISweepiumResult<SweepiumCommonResponse>>
+        string Token,
+        string TransactionId,
+        string RoundId,
+        string GameId)
+    : ISweepiumRequest, IRequest<ISweepiumResult<SweepiumSuccessResponse>>
 {
     public sealed class Handler
-        : IRequestHandler<SweepiumRollbackRequest, ISweepiumResult<SweepiumCommonResponse>>
+        : IRequestHandler<SweepiumRollbackRequest, ISweepiumResult<SweepiumSuccessResponse>>
     {
         private readonly IWalletService _walletService;
 
         public Handler(IWalletService walletService) => 
             _walletService = walletService;
 
-        public async Task<ISweepiumResult<SweepiumCommonResponse>> Handle(
+        public async Task<ISweepiumResult<SweepiumSuccessResponse>> Handle(
             SweepiumRollbackRequest request,
             CancellationToken cancellationToken)
         {
-            var data = request.Data;
             var walletResult = await _walletService.RollbackAsync(
-                data.Token,
-                data.RoundId,
-                data.TransactionId,
+                request.Token,
+                request.TransactionId,
+                request.RoundId,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)
-                return walletResult.ToSweepiumErrorResult<SweepiumErrorResponse>();
+                return walletResult.ToSweepiumResult<SweepiumSuccessResponse>();
+
+            var data = walletResult.Data;
 
             var response = new SweepiumSuccessResponse(
-                    walletResult.IsSuccess,
-                    walletResult.Data.Transaction.Id,
-                    (int)MoneyHelper.ConvertToCents(walletResult.Data!.Balance)
-                    );
+                data.Transaction.Id,
+                data.Balance);
 
             return SweepiumResultFactory.Success(response);
         }

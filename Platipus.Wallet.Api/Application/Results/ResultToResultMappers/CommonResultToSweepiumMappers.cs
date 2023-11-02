@@ -1,19 +1,27 @@
-﻿using Platipus.Wallet.Api.Application.Results.Sweepium;
+﻿using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
+using Platipus.Wallet.Api.Application.Results.Sweepium;
 using Platipus.Wallet.Api.Application.Results.Sweepium.WithData;
 
 namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 
 public static class CommonResultToSweepiumMappers
 {
-    public static ISweepiumResult<TData> ToSweepiumErrorResult<TData>(this IResult result)
-    {
-        throw new NotImplementedException();
-    }
-
     public static ISweepiumResult<TData> ToSweepiumResult<TData>(this IResult result, TData response)
-    {
-        throw new NotImplementedException();
-    }
+        => result.IsSuccess
+            ? SweepiumResultFactory.Success(response)
+            : SweepiumResultFactory.Failure<TData>(
+                result.Error.ToSweepiumErrorCode(),
+                exception: result.Exception);
+
+    public static ISweepiumResult<TData> ToSweepiumResult<TData>(this IResult result)
+        => result.IsFailure
+            ? SweepiumResultFactory.Failure<TData>(result.Error.ToSweepiumErrorCode(), result.Exception)
+            : throw new ArgumentException("Can not create failure result from success result", nameof(result));
+
+    public static ISweepiumResult ToSweepiumResult(this IResult result)
+        => result.IsSuccess
+            ? SweepiumResultFactory.Success()
+            : SweepiumResultFactory.Failure(result.Error.ToSweepiumErrorCode(), result.Exception);
 
     private static SweepiumErrorCode ToSweepiumErrorCode(this ErrorCode source)
     {

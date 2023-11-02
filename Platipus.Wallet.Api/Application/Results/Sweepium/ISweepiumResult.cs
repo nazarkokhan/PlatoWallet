@@ -4,5 +4,4 @@ namespace Platipus.Wallet.Api.Application.Results.Sweepium;
 
 public interface ISweepiumResult : IBaseResult<SweepiumErrorCode>
 {
-    
 }

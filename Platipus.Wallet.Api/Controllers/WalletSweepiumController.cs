@@ -1,7 +1,7 @@
 ﻿using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
 using Platipus.Wallet.Api.Application.Responses.Sweepium;
 using Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
-using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle.Other;
+using Platipus.Wallet.Api.StartupSettings.Filters.NewFilterStyle;
 using Platipus.Wallet.Api.StartupSettings.Filters.Security;
 
 namespace Platipus.Wallet.Api.Controllers;
