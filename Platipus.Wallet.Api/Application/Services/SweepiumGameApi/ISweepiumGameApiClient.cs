@@ -4,6 +4,8 @@ using Platipus.Wallet.Api.Application.Services.SweepiumGameApi.Requests;
 
 namespace Platipus.Wallet.Api.Application.Services.SweepiumGameApi;
 
+using External;
+
 public interface ISweepiumGameApiClient
 {
     Task<IResult<IHttpClientResult<string, SweepiumErrorResponse>>> LaunchAsync(

@@ -7,6 +7,7 @@ using Domain.Entities.Enums;
 using FluentValidation;
 using Helpers;
 using Infrastructure.Persistence;
+using Jint.Parser;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -44,6 +45,7 @@ using Services.PswGameApi;
 using Services.SoftBetGameApi;
 using Services.SoftBetGameApi.External;
 using Services.SweepiumGameApi;
+using Services.SweepiumGameApi.External;
 using Services.SweepiumGameApi.Requests;
 using Services.SwGameApi;
 using Services.SwGameApi.Requests;
@@ -880,7 +882,7 @@ public sealed record LaunchRequest(
 
                     break;
                 }
-                
+
                 case WalletProvider.Sweepium:
                 {
                     var mode = request.LaunchMode is LaunchMode.Real ? 1 : 0;
@@ -890,8 +892,7 @@ public sealed record LaunchRequest(
                         mode is 1 ? request.SessionToken : null,
                         request.Language,
                         request.Lobby,
-                        mode
-                        );
+                        mode);
 
                     var launcherResult = await _sweepiumGameApiClient.LaunchAsync(
                         baseUrl,
@@ -904,7 +905,7 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 

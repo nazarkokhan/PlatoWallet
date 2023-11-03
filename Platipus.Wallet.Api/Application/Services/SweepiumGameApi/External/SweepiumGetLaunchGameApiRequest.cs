@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace Platipus.Wallet.Api.Application.Services.SweepiumGameApi.External;
 
-namespace Platipus.Wallet.Api.Application.Services.SweepiumGameApi.Requests;
+using System.Text.Json.Serialization;
 
 public record SweepiumGetLaunchGameApiRequest(
     [property: JsonPropertyName("idGame")] int GameId,

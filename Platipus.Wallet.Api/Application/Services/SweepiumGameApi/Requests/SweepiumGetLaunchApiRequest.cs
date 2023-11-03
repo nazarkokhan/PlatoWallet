@@ -6,40 +6,43 @@ using Platipus.Wallet.Api.Application.Services.Wallet;
 
 namespace Platipus.Wallet.Api.Application.Services.SweepiumGameApi.Requests;
 
+using External;
+
 public sealed record SweepiumGetLaunchUrlRequest(
         [property: JsonPropertyName("environment")] string Environment,
         [property: JsonPropertyName("apiRequest")] SweepiumGetLaunchGameApiRequest ApiRequest)
-    : IRequest<ISweepiumResult<string>>
+    : IRequest<IResult<string>>
 {
-    public sealed class Handler : IRequestHandler<SweepiumGetLaunchUrlRequest, ISweepiumResult<string>>
+    public sealed class Handler : IRequestHandler<SweepiumGetLaunchUrlRequest, IResult<string>>
     {
         private readonly IWalletService _walletService;
-        private readonly ISweepiumGameApiClient _SweepiumGameApiClient;
+        private readonly ISweepiumGameApiClient _sweepiumGameApiClient;
 
-        public Handler(IWalletService walletService, ISweepiumGameApiClient SweepiumGameApiClient)
+        public Handler(IWalletService walletService, ISweepiumGameApiClient sweepiumGameApiClient)
         {
             _walletService = walletService;
-            _SweepiumGameApiClient = SweepiumGameApiClient;
+            _sweepiumGameApiClient = sweepiumGameApiClient;
         }
 
-        public async Task<ISweepiumResult<string>> Handle(
+        public async Task<IResult<string>> Handle(
             SweepiumGetLaunchUrlRequest request,
             CancellationToken cancellationToken)
         {
-            var walletResponse = await _walletService.GetEnvironmentAsync(request.Environment, cancellationToken);
+            var walletResponse = await _walletService.GetEnvironmentAsync(
+                request.Environment,
+                cancellationToken);
 
-            var clientResponse = await _SweepiumGameApiClient.LaunchAsync(
+            var clientResponse = await _sweepiumGameApiClient.LaunchAsync(
                 walletResponse.Data.BaseUrl,
                 request.ApiRequest,
                 cancellationToken);
 
-            if (clientResponse.IsFailure)
-                return clientResponse.ToSweepiumResult<string>();
+            if (clientResponse.IsFailure || clientResponse.Data.IsFailure)
+                return ResultFactory.Failure<string>(ErrorCode.GameServerApiError);
 
             var gameLaunchScript = clientResponse.Data.Data;
-            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
 
-            return clientResponse.ToSweepiumResult(launchUrl);
+            return ResultFactory.Success(gameLaunchScript);
         }
     }
 }
