@@ -16,7 +16,6 @@ public sealed record SweepiumResult : BaseResult<SweepiumErrorCode>, ISweepiumRe
       {
             ErrorDescription = description ?? string.Empty;
       }
-      
-
+    
       public string ErrorDescription { get; set; }
 }

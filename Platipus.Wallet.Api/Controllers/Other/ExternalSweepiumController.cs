@@ -18,7 +18,7 @@ public sealed class ExternalSweepiumController : ApiController
         _mediator = mediator;
     }
 
-    [HttpPost("launch")]
+    [HttpPost("game/launch")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLaunchUrl(
         SweepiumGetLaunchUrlRequest request,

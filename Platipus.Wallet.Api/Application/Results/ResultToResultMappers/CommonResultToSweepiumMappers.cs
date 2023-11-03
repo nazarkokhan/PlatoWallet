@@ -1,5 +1,4 @@
-﻿using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
-using Platipus.Wallet.Api.Application.Results.Sweepium;
+﻿using Platipus.Wallet.Api.Application.Results.Sweepium;
 using Platipus.Wallet.Api.Application.Results.Sweepium.WithData;
 
 namespace Platipus.Wallet.Api.Application.Results.ResultToResultMappers;

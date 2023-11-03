@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Platipus.Wallet.Api.Application.Services.SweepiumGameApi.Requests;
 
