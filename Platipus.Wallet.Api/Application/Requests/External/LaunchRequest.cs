@@ -6,7 +6,6 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
 using Infrastructure.Persistence;
-using Jint.Parser;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -45,7 +44,6 @@ using Services.SoftBetGameApi.External;
 using Services.SoftswissGamesApi;
 using Services.SweepiumGameApi;
 using Services.SweepiumGameApi.External;
-using Services.SweepiumGameApi.Requests;
 using Services.SwGameApi;
 using Services.SwGameApi.Requests;
 using Services.SynotGameApi;
@@ -950,6 +948,9 @@ public sealed record LaunchRequest(
                         launchUrl = string.Empty;
                         break;
                     }
+
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = launcherResult.Data.Data;
                     break;

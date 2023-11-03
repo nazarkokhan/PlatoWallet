@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿namespace Platipus.Wallet.Api.StartupSettings.Filters.Security.Sweepium;
+
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
@@ -6,12 +8,10 @@ using Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
 using Platipus.Wallet.Api.Application.Results.Sweepium;
 using Platipus.Wallet.Api.Extensions;
 using Platipus.Wallet.Api.Extensions.SecuritySign.Sweepium;
-using Platipus.Wallet.Domain.Entities;
-using Platipus.Wallet.Infrastructure.Persistence;
+using Domain.Entities;
+using Infrastructure.Persistence;
 
-namespace Platipus.Wallet.Api.StartupSettings.Filters.Security;
-
-public class SweepiumSecurityFilter : IAsyncActionFilter
+public sealed class SweepiumSecurityFilter : IAsyncActionFilter
 {
     private readonly WalletDbContext _dbContext;
 

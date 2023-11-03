@@ -12,6 +12,7 @@ using Domain.Entities.Enums;
 using Filters.NewFilterStyle;
 using Filters.Security;
 using Filters.Security.Evenbet;
+using Filters.Security.Sweepium;
 using Filters.Security.Uranus;
 using Filters.Swagger;
 using JorgeSerrano.Json;
@@ -54,7 +55,9 @@ public static class StartupExtensions
            .AddScoped<VegangsterSecurityFilter>()
            .AddSingleton<VegangsterMockedErrorActionFilter>()
            .AddScoped<MicrogameSecurityFilter>()
-           .AddSingleton<MicrogameMockedErrorActionFilter>();
+           .AddSingleton<MicrogameMockedErrorActionFilter>()
+           .AddScoped<SweepiumSecurityFilter>()
+           .AddSingleton<SweepiumMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -211,12 +214,12 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 })
            .AddJsonOptions(
-               nameof(WalletProvider.Sweepium),
-               options =>
-               {
-                   options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
-                   options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-               });
+                nameof(WalletProvider.Sweepium),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                });
 
         return builder.Services;
     }

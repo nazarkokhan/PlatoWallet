@@ -11,6 +11,7 @@ using Domain.Entities.Enums;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
+using StartupSettings.Filters.Security.Sweepium;
 
 [Route("wallet/sweepium/")]
 [ServiceFilter(typeof(SweepiumMockedErrorActionFilter), Order = 1)]
