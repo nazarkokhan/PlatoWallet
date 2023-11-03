@@ -29,6 +29,7 @@ using Platipus.Wallet.Api.Application.Services.OpenboxGameApi;
 using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
 using Platipus.Wallet.Api.Application.Services.PswGameApi;
 using Platipus.Wallet.Api.Application.Services.SoftBetGameApi;
+using Platipus.Wallet.Api.Application.Services.SweepiumGameApi;
 using Platipus.Wallet.Api.Application.Services.SwGameApi;
 using Platipus.Wallet.Api.Application.Services.SynotGameApi;
 using Platipus.Wallet.Api.Application.Services.UisGamesApi;
@@ -175,97 +176,101 @@ try
 
     // GameServer APIs
     services
-       .AddTransient<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
-       .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
+        .AddTransient<ISoftswissGamesApiClient, SoftswissGamesApiClient>()
+        .AddHttpClient<ISoftswissGamesApiClient, SoftswissGamesApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}softswiss/"); //TODO remove after refactor
             })
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IReevoGameApiClient, ReevoGameApiClient>()
-       .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IReevoGameApiClient, ReevoGameApiClient>()
+        .AddHttpClient<IReevoGameApiClient, ReevoGameApiClient>(
             options =>
             {
                 options.BaseAddress = new Uri($"{gamesApiUrl}reevo/"); //TODO remove after refactor
             })
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IPswGameApiClient, PswGameApiClient>()
-       .AddHttpClient<IPswGameApiClient, PswGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IHub88GameApiClient, Hub88GameApiClient>()
-       .AddHttpClient<IHub88GameApiClient, Hub88GameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IUisGameApiClient, UisGameApiClient>()
-       .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
-       .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IAtlasGameApiClient, AtlasGameApiClient>()
-       .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IUranusGameApiClient, UranusGameApiClient>()
-       .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IEvenbetGameApiClient, EvenbetGameApiClient>()
-       .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IAnakatechGameApiClient, AnakatechGameApiClient>()
-       .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<INemesisGameApiClient, NemesisGameApiClient>()
-       .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<ISwGameApiClient, SwGameApiClient>()
-       .AddHttpClient<ISwGameApiClient, SwGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
-       .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IParimatchGameApiClient, ParimatchGameApiClient>()
-       .AddHttpClient<IParimatchGameApiClient, ParimatchGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<ISynotGameApiClient, SynotGameApiClient>()
-       .AddHttpClient<ISynotGameApiClient, SynotGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IVegangsterGameApiClient, VegangsterGameApiClient>()
-       .AddHttpClient<IVegangsterGameApiClient, VegangsterGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<ISoftBetGameApiClient, SoftBetGameApiClient>()
-       .AddHttpClient<ISoftBetGameApiClient, SoftBetGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IDafabetGameApiClient, DafabetGameApiClient>()
-       .AddHttpClient<IDafabetGameApiClient, DafabetGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IBetconstructGameApiClient, BetconstructGameApiClient>()
-       .AddHttpClient<IBetconstructGameApiClient, BetconstructGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IOpenboxGameApiClient, OpenboxGameApiClient>()
-       .AddHttpClient<IOpenboxGameApiClient, OpenboxGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-       .Services
-       .AddTransient<IMicrogameGameApiClient, MicrogameGameApiClient>()
-       .AddHttpClient<IMicrogameGameApiClient, MicrogameGameApiClient>()
-       .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IPswGameApiClient, PswGameApiClient>()
+        .AddHttpClient<IPswGameApiClient, PswGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IHub88GameApiClient, Hub88GameApiClient>()
+        .AddHttpClient<IHub88GameApiClient, Hub88GameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IUisGameApiClient, UisGameApiClient>()
+        .AddHttpClient<IUisGameApiClient, UisGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+        .AddHttpClient<IEmaraPlayGameApiClient, EmaraPlayGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IAtlasGameApiClient, AtlasGameApiClient>()
+        .AddHttpClient<IAtlasGameApiClient, AtlasGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IUranusGameApiClient, UranusGameApiClient>()
+        .AddHttpClient<IUranusGameApiClient, UranusGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IEvenbetGameApiClient, EvenbetGameApiClient>()
+        .AddHttpClient<IEvenbetGameApiClient, EvenbetGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IAnakatechGameApiClient, AnakatechGameApiClient>()
+        .AddHttpClient<IAnakatechGameApiClient, AnakatechGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<INemesisGameApiClient, NemesisGameApiClient>()
+        .AddHttpClient<INemesisGameApiClient, NemesisGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<ISwGameApiClient, SwGameApiClient>()
+        .AddHttpClient<ISwGameApiClient, SwGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
+        .AddHttpClient<IEverymatrixGameApiClient, EverymatrixGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IParimatchGameApiClient, ParimatchGameApiClient>()
+        .AddHttpClient<IParimatchGameApiClient, ParimatchGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<ISynotGameApiClient, SynotGameApiClient>()
+        .AddHttpClient<ISynotGameApiClient, SynotGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IVegangsterGameApiClient, VegangsterGameApiClient>()
+        .AddHttpClient<IVegangsterGameApiClient, VegangsterGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<ISoftBetGameApiClient, SoftBetGameApiClient>()
+        .AddHttpClient<ISoftBetGameApiClient, SoftBetGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IDafabetGameApiClient, DafabetGameApiClient>()
+        .AddHttpClient<IDafabetGameApiClient, DafabetGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IBetconstructGameApiClient, BetconstructGameApiClient>()
+        .AddHttpClient<IBetconstructGameApiClient, BetconstructGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IOpenboxGameApiClient, OpenboxGameApiClient>()
+        .AddHttpClient<IOpenboxGameApiClient, OpenboxGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<IMicrogameGameApiClient, MicrogameGameApiClient>()
+        .AddHttpClient<IMicrogameGameApiClient, MicrogameGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .Services
+        .AddTransient<ISweepiumGameApiClient, SweepiumGameApiClient>()
+        .AddHttpClient<ISweepiumGameApiClient, SweepiumGameApiClient>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
     services
        .AddHealthChecks()
