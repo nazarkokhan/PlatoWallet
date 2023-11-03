@@ -23,5 +23,6 @@ public enum WalletProvider
     Nemesis = 19,
     Synot = 20,
     Vegangster = 21,
-    Microgame = 22
+    Microgame = 22,
+    Sweepium = 23
 }

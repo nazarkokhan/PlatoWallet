@@ -6,6 +6,7 @@ using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
 using Infrastructure.Persistence;
+using Jint.Parser;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -42,6 +43,9 @@ using Services.ReevoGamesApi.DTO;
 using Services.SoftBetGameApi;
 using Services.SoftBetGameApi.External;
 using Services.SoftswissGamesApi;
+using Services.SweepiumGameApi;
+using Services.SweepiumGameApi.External;
+using Services.SweepiumGameApi.Requests;
 using Services.SwGameApi;
 using Services.SwGameApi.Requests;
 using Services.SynotGameApi;
@@ -93,6 +97,7 @@ public sealed record LaunchRequest(
         private readonly ISwGameApiClient _swGameApiClient;
         private readonly IUisGameApiClient _uisGameApiClient;
         private readonly IMicrogameGameApiClient _microgameGameApiClient;
+        private readonly ISweepiumGameApiClient _sweepiumGameApiClient;
 
         public Handler(
             WalletDbContext context,
@@ -118,7 +123,8 @@ public sealed record LaunchRequest(
             IOpenboxGameApiClient openboxGameApiClient,
             ISwGameApiClient swGameApiClient,
             IUisGameApiClient uisGameApiClient,
-            IMicrogameGameApiClient microgameGameApiClient)
+            IMicrogameGameApiClient microgameGameApiClient,
+            ISweepiumGameApiClient sweepiumGameApiClient)
         {
             _context = context;
             _pswGameApiClient = pswGameApiClient;
@@ -143,6 +149,7 @@ public sealed record LaunchRequest(
             _swGameApiClient = swGameApiClient;
             _uisGameApiClient = uisGameApiClient;
             _microgameGameApiClient = microgameGameApiClient;
+            _sweepiumGameApiClient = sweepiumGameApiClient;
             _currencyMultipliers = currencyMultipliers.Value;
         }
 
@@ -919,6 +926,32 @@ public sealed record LaunchRequest(
 
                     launchUrl = getLaunchScriptResult.Data.Data;
 
+                    break;
+                }
+
+                case WalletProvider.Sweepium:
+                {
+                    var mode = request.LaunchMode is LaunchMode.Real ? 1 : 0;
+                    var getLaunchScriptGameApiRequest = new SweepiumGetLaunchGameApiRequest(
+                        game.GameServerId,
+                        casino.Id,
+                        mode is 1 ? request.SessionToken : null,
+                        request.Language,
+                        request.Lobby,
+                        mode);
+
+                    var launcherResult = await _sweepiumGameApiClient.LaunchAsync(
+                        baseUrl,
+                        getLaunchScriptGameApiRequest,
+                        cancellationToken);
+
+                    if (launcherResult.IsFailure || launcherResult.Data.IsFailure)
+                    {
+                        launchUrl = string.Empty;
+                        break;
+                    }
+
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 

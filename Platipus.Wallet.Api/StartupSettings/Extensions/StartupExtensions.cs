@@ -209,7 +209,14 @@ public static class StartupExtensions
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                });
+                })
+           .AddJsonOptions(
+               nameof(WalletProvider.Sweepium),
+               options =>
+               {
+                   options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                   options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+               });
 
         return builder.Services;
     }
