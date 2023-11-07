@@ -1,8 +1,9 @@
 ﻿namespace Platipus.Wallet.Api.Application.Requests.Wallets.Microgame;
 
 using System.Text.Json.Serialization;
+using Requests.Base;
 
-public interface IMicrogameCommonOperationsRequest
+public interface IMicrogameCommonOperationsRequest : IBaseWalletRequest
 {
     [JsonPropertyName("transactionId")]
     public string TransactionId { get; }

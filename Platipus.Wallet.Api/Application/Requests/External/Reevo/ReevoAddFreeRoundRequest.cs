@@ -6,8 +6,8 @@ using System.Text.Json.Nodes;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Services.ObsoleteGameApiStyle.ReevoGamesApi;
-using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
+using Services.ReevoGamesApi;
+using Services.ReevoGamesApi.DTO;
 
 public record ReevoAddFreeRoundRequest(
     [property: DefaultValue("test")] string Environment,
@@ -29,8 +29,8 @@ public record ReevoAddFreeRoundRequest(
             CancellationToken cancellationToken)
         {
             var environment = await _context.Set<GameEnvironment>()
-                .Where(e => e.Id == request.Environment)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(e => e.Id == request.Environment)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (environment is null)
                 return ResultFactory.Failure<object>(ErrorCode.EnvironmentNotFound);
@@ -39,25 +39,25 @@ public record ReevoAddFreeRoundRequest(
             if (response.IsFailure)
                 return response;
 
-            var (errorData, successData) = response.Data;
-            if (errorData is not null)
-                return ResultFactory.Success(errorData);
+            var responseData = response.Data;
+            if (responseData.IsFailure)
+                return ResultFactory.Success(response.Data.Error);
 
             var validTo = DateTime.ParseExact(request.ApiRequest.ValidTo, "yyyy-MM-dd", CultureInfo.DefaultThreadCurrentCulture)
-                .ToUniversalTime();
+               .ToUniversalTime();
 
-            var awardId = JsonNode.Parse(successData.Response)?["freeround_id"]?.GetValue<string>();
+            var awardId = JsonNode.Parse(responseData.Data.Response)?["freeround_id"]?.GetValue<string>();
             if (awardId is null)
                 return ResultFactory.Failure<object>(ErrorCode.InvalidExternalResponse);
 
             var user = await _context.Set<User>()
-                .Where(e => e.Username == request.ApiRequest.PlayerIds)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(e => e.Username == request.ApiRequest.PlayerIds)
+               .FirstOrDefaultAsync(cancellationToken);
 
             if (user is null)
                 return ResultFactory.Failure<object>(ErrorCode.UserNotFound);
 
-            var award = new Award(awardId, validTo) { UserId = user.Id, Currency = request.ApiRequest.Currency};
+            var award = new Award(awardId, validTo) { UserId = user.Id, Currency = request.ApiRequest.Currency };
             _context.Add(award);
             await _context.SaveChangesAsync(cancellationToken);
 

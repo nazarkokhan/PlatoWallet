@@ -5,9 +5,7 @@ using System.Text;
 using Domain.Entities;
 using Domain.Entities.Enums;
 using FluentValidation;
-using Helpers;
 using Infrastructure.Persistence;
-using Jint.Parser;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -34,19 +32,18 @@ using Services.MicrogameGameApi;
 using Services.MicrogameGameApi.External;
 using Services.NemesisGameApi;
 using Services.NemesisGameApi.Requests;
-using Services.ObsoleteGameApiStyle.ReevoGamesApi;
-using Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
-using Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Services.OpenboxGameApi;
 using Services.OpenboxGameApi.External;
 using Services.ParimatchGameApi;
 using Services.ParimatchGameApi.Requests;
 using Services.PswGameApi;
+using Services.ReevoGamesApi;
+using Services.ReevoGamesApi.DTO;
 using Services.SoftBetGameApi;
 using Services.SoftBetGameApi.External;
+using Services.SoftswissGamesApi;
 using Services.SweepiumGameApi;
 using Services.SweepiumGameApi.External;
-using Services.SweepiumGameApi.Requests;
 using Services.SwGameApi;
 using Services.SwGameApi.Requests;
 using Services.SynotGameApi;
@@ -224,6 +221,7 @@ public sealed record LaunchRequest(
 
             string? httpRequestMessage = null;
             string? httpResponseMessage = null;
+            string? httpRequestUrl = null;
             string launchUrl;
             switch (casino.Provider)
             {
@@ -236,6 +234,7 @@ public sealed record LaunchRequest(
                         request.Game,
                         user.CurrencyId,
                         defaultPlatform,
+                        request.Language,
                         request.Lobby,
                         mode is LaunchMode.Real ? request.SessionToken : null);
 
@@ -250,7 +249,10 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = launcherResult.Data.Data.Url;
                     break;
                 }
 
@@ -303,6 +305,9 @@ public sealed record LaunchRequest(
                         break;
                     }
 
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
                 }
@@ -331,7 +336,10 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = launcherResult.Data.Data;
 
                     var lastUsersSession = await _context.Set<Session>()
                        .Include(u => u.User)
@@ -373,7 +381,10 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 
@@ -401,7 +412,10 @@ public sealed record LaunchRequest(
                         break;
                     }
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(launcherResult.Data.Data, request.Environment);
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = launcherResult.Data.Data;
                     break;
                 }
 
@@ -434,18 +448,13 @@ public sealed record LaunchRequest(
                         apiRequest,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure)
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    var script = apiResponse.Data.Data;
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
-                    var environmentToUse = request.Environment ?? "local";
-                    if (environmentToUse is "test")
-                    {
-                        environmentToUse = "local";
-                    }
-
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(script, environmentToUse);
+                    launchUrl = apiResponse.Data.Data;
 
                     break;
                 }
@@ -468,12 +477,13 @@ public sealed record LaunchRequest(
                         apiRequest,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure)
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    var script = apiResponse.Data.Data;
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(script, request.Environment ?? "local");
+                    launchUrl = apiResponse.Data.Data;
                     break;
                 }
 
@@ -488,7 +498,7 @@ public sealed record LaunchRequest(
                             request.Language,
                             defaultPlatform,
                             PlayerIp: playerIp,
-                            LobbyUrl: request.Lobby!)
+                            LobbyUrl: request.Lobby)
                         : new UranusGetLaunchUrlGameApiRequest(
                             request.Game,
                             session.Id,
@@ -510,6 +520,9 @@ public sealed record LaunchRequest(
 
                     if (IsInvalidUranusApiResponse(apiResponse))
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = apiResponse.Data.Data.Data.Url.ToString();
                     break;
@@ -537,8 +550,11 @@ public sealed record LaunchRequest(
                         token,
                         cancellationToken: cancellationToken);
 
-                    if (apiResponse.IsFailure || apiResponse.Data?.Data?.Url is null)
+                    if (apiResponse.IsFailure || apiResponse.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = apiResponse.Data.Data.Url.ToString();
                     break;
@@ -552,11 +568,11 @@ public sealed record LaunchRequest(
                         request.CasinoId,
                         request.Game,
                         request.LaunchMode.ToString(),
-                        request.Language!,
+                        request.Language,
                         "someChannel",
                         "someJurisdiction",
                         user.Currency.Id,
-                        ip!,
+                        ip,
                         User: user.Username,
                         Lobby: request.Lobby,
                         Cashier: "someCashier",
@@ -569,6 +585,9 @@ public sealed record LaunchRequest(
 
                     if (apiResponse.IsFailure || apiResponse.Data.Data.Result.Url is null)
                         ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = apiResponse.Data;
+                    SetHttpMessages(data);
 
                     launchUrl = apiResponse.Data.Data.Result.Url?.ToString()!;
                     break;
@@ -588,7 +607,13 @@ public sealed record LaunchRequest(
                         casino.Provider is WalletProvider.Betflag,
                         cancellationToken: cancellationToken);
 
-                    launchUrl = getGameLinkResult.Data?.Data.LaunchUrl ?? "";
+                    if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
+                        ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
+
+                    var data = getGameLinkResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getGameLinkResult.Data.Data.LaunchUrl;
                     break;
                 }
 
@@ -615,7 +640,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -641,7 +669,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -671,10 +702,12 @@ public sealed record LaunchRequest(
                         cancellationToken);
 
                     if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
-                        launchUrl = "";
-                    else
-                        launchUrl = getGameLinkResult.Data.Data.Url;
+                        return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
+                    var data = getGameLinkResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getGameLinkResult.Data.Data.Url;
                     break;
                 }
 
@@ -684,21 +717,18 @@ public sealed record LaunchRequest(
                         baseUrl,
                         user.CasinoId,
                         user.Username,
-                        session.Id,
                         game.GameServerId,
                         user.Currency.Id,
                         _currencyMultipliers.GetSumOut(user.Currency.Id, user.Balance),
                         cancellationToken);
 
-                    if (getGameLinkResult.IsFailure)
+                    if (getGameLinkResult.IsFailure || getGameLinkResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
                     var data = getGameLinkResult.Data;
+                    SetHttpMessages(data);
 
-                    httpRequestMessage = data.HttpRequest;
-                    httpResponseMessage = data.HttpResponse;
-
-                    var content = data.Content!;
+                    var content = data.Data;
                     var existingSession = await _context.Set<Session>()
                        .Where(s => s.Id == content.SessionId)
                        .FirstOrDefaultAsync(cancellationToken);
@@ -739,7 +769,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -771,7 +804,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -796,9 +832,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    httpRequestMessage = getLaunchScriptResult.Data.HttpRequest.RequestData.RequestUri.AbsoluteUri;
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -814,16 +851,17 @@ public sealed record LaunchRequest(
                             user.Password,
                             "en",
                             game.GameServerId.ToString(),
-                            request.Lobby ?? "",
+                            request.Lobby,
                             request.LaunchMode is LaunchMode.Real ? "0" : "1",
                             user.Currency.Id,
                             casino.Id),
                         cancellationToken);
 
-                    if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.ErrorMessage is not null)
+                    if (reevoLaunchUrlResult.IsFailure || reevoLaunchUrlResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    var dataSuccess = reevoLaunchUrlResult.Data.Success;
+                    var dataSuccess = reevoLaunchUrlResult.Data.Data;
+                    SetHttpMessages(reevoLaunchUrlResult.Data);
 
                     session.Id = dataSuccess.GameSessionId;
                     _context.Add(session);
@@ -855,7 +893,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -878,7 +919,10 @@ public sealed record LaunchRequest(
                     if (getLaunchScriptResult.IsFailure || getLaunchScriptResult.Data.IsFailure)
                         return ResultFactory.Failure<Response>(ErrorCode.GameServerApiError);
 
-                    launchUrl = ScriptHelper.ExtractUrlFromScript(getLaunchScriptResult.Data.Data, request.Environment);
+                    var data = getLaunchScriptResult.Data;
+                    SetHttpMessages(data);
+
+                    launchUrl = getLaunchScriptResult.Data.Data;
 
                     break;
                 }
@@ -887,7 +931,7 @@ public sealed record LaunchRequest(
                 {
                     var mode = request.LaunchMode is LaunchMode.Real ? 1 : 0;
                     var getLaunchScriptGameApiRequest = new SweepiumGetLaunchGameApiRequest(
-                        game.GameServerId.ToString(),
+                        game.GameServerId,
                         casino.Id,
                         mode is 1 ? request.SessionToken : null,
                         request.Language,
@@ -905,6 +949,9 @@ public sealed record LaunchRequest(
                         break;
                     }
 
+                    var data = launcherResult.Data;
+                    SetHttpMessages(data);
+
                     launchUrl = launcherResult.Data.Data;
                     break;
                 }
@@ -914,7 +961,7 @@ public sealed record LaunchRequest(
                     break;
             }
 
-            if (!string.IsNullOrWhiteSpace(launchUrl) && !launchUrl.StartsWith("<"))
+            if (!string.IsNullOrWhiteSpace(launchUrl) && !launchUrl.StartsWith('<'))
             {
                 var url = new Uri(launchUrl);
                 var queryParams = QueryHelpers.ParseQuery(url.Query);
@@ -931,9 +978,17 @@ public sealed record LaunchRequest(
                 user.Balance,
                 launchUrl,
                 httpRequestMessage,
+                httpRequestUrl,
                 httpResponseMessage);
 
             return ResultFactory.Success(result);
+
+            void SetHttpMessages(dynamic data)
+            {
+                httpRequestMessage = data.HttpRequest.RequestData.Body;
+                httpRequestUrl = data.HttpRequest.RequestData.RequestUri.ToString();
+                httpResponseMessage = data.HttpRequest.ResponseData.Body;
+            }
         }
 
         private string GetPlayerIp()
@@ -955,14 +1010,8 @@ public sealed record LaunchRequest(
         decimal Balance,
         string LaunchUrl,
         string? HttpRequestMessage,
+        string? HttpRequestUrl,
         string? HttpResponseMessage);
-
-    public class LaunchRequestValidator : AbstractValidator<LaunchRequest>
-    {
-        public LaunchRequestValidator()
-        {
-        }
-    }
 
     public sealed class Validator : AbstractValidator<SignUpRequest>
     {

@@ -15,7 +15,7 @@ public sealed record MicrogameReleaseRequest(
     decimal Real,
     string Currency,
     long RoundId,
-    bool? State) : IRequest<IMicrogameResult<MicrogameReleaseResponse>>, IMicrogameMoneyOperationsRequest, IMicrogameCommonOperationsRequest
+    int? State) : IRequest<IMicrogameResult<MicrogameReleaseResponse>>, IMicrogameMoneyOperationsRequest, IMicrogameCommonOperationsRequest
 {
     public sealed class Handler : IRequestHandler<MicrogameReleaseRequest, IMicrogameResult<MicrogameReleaseResponse>>
     {
@@ -34,7 +34,7 @@ public sealed record MicrogameReleaseRequest(
                 amount: request.Real,
                 currency: request.Currency,
                 searchByUsername: true,
-                roundFinished: request.State ?? true,
+                roundFinished: request.State is 1,
                 cancellationToken: cancellationToken);
 
             if (walletResult.IsFailure)

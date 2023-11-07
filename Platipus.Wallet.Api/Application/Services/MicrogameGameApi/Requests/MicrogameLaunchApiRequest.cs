@@ -2,13 +2,15 @@
 
 using System.Text.Json.Serialization;
 using External;
+using Responses;
 using Wallet;
 
 public sealed record MicrogameLaunchApiRequest(
     [property: JsonPropertyName("environment")] string Environment,
-    [property: JsonPropertyName("apiRequest")] MicrogameLaunchGameApiRequest ApiRequest) : IRequest<IResult<string>>
+    [property: JsonPropertyName("apiRequest")] MicrogameLaunchGameApiRequest ApiRequest) : IRequest<
+    IResult<MicrogameLaunchGameApiResponse>>
 {
-    public sealed class Handler : IRequestHandler<MicrogameLaunchApiRequest, IResult<string>>
+    public sealed class Handler : IRequestHandler<MicrogameLaunchApiRequest, IResult<MicrogameLaunchGameApiResponse>>
     {
         private readonly IWalletService _walletService;
         private readonly IMicrogameGameApiClient _microgameGameApiClient;
@@ -21,7 +23,7 @@ public sealed record MicrogameLaunchApiRequest(
             _microgameGameApiClient = microgameGameApiClient;
         }
 
-        public async Task<IResult<string>> Handle(
+        public async Task<IResult<MicrogameLaunchGameApiResponse>> Handle(
             MicrogameLaunchApiRequest request,
             CancellationToken cancellationToken)
         {
@@ -36,8 +38,8 @@ public sealed record MicrogameLaunchApiRequest(
                     request.ApiRequest,
                     cancellationToken);
 
-                if (clientResponse.IsFailure)
-                    return ResultFactory.Failure<string>(ErrorCode.GameServerApiError);
+                if (clientResponse.IsFailure || clientResponse.Data.IsFailure)
+                    return ResultFactory.Failure<MicrogameLaunchGameApiResponse>(ErrorCode.GameServerApiError);
 
                 var response = clientResponse.Data.Data;
 
@@ -45,7 +47,7 @@ public sealed record MicrogameLaunchApiRequest(
             }
             catch (Exception e)
             {
-                return ResultFactory.Failure<string>(ErrorCode.Unknown, e);
+                return ResultFactory.Failure<MicrogameLaunchGameApiResponse>(ErrorCode.Unknown, e);
             }
         }
     }

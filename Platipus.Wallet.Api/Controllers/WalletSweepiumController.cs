@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;

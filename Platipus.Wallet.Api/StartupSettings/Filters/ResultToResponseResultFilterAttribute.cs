@@ -102,6 +102,18 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                                 httpClientResult.Error,
                                 httpClientResult.Exception
                             };
+                        
+                        if (ResultAsJavaScript(commonObjectResult))
+                        {
+                            context.Result = new ContentResult
+                            {
+                                ContentType = "text/html",
+                                StatusCode = (int)HttpStatusCode.OK,
+                                Content = commonObjectResult.Data.ToString()
+                            };
+
+                            return;
+                        }
 
                         context.Result = new OkObjectResult(responseObject);
                     }

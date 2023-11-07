@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Platipus.Wallet.Api.Application.Services.SweepiumGameApi.External;
 

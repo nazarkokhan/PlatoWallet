@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Platipus.Wallet.Api.Application.Requests.Base;
 
 namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;

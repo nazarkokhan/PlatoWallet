@@ -2,7 +2,7 @@
 
 using System.Text.Json.Serialization;
 
-public interface IMicrogameMoneyOperationsRequest
+public interface IMicrogameMoneyOperationsRequest : IMicrogameBaseRequest
 {
     [JsonPropertyName("externalId")]
     public string ExternalId { get; }

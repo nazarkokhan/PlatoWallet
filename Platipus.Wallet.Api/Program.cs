@@ -23,12 +23,12 @@ using Platipus.Wallet.Api.Application.Services.EverymatrixGameApi;
 using Platipus.Wallet.Api.Application.Services.Hub88GamesApi;
 using Platipus.Wallet.Api.Application.Services.MicrogameGameApi;
 using Platipus.Wallet.Api.Application.Services.NemesisGameApi;
-using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.ReevoGamesApi;
-using Platipus.Wallet.Api.Application.Services.ObsoleteGameApiStyle.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.OpenboxGameApi;
 using Platipus.Wallet.Api.Application.Services.ParimatchGameApi;
 using Platipus.Wallet.Api.Application.Services.PswGameApi;
+using Platipus.Wallet.Api.Application.Services.ReevoGamesApi;
 using Platipus.Wallet.Api.Application.Services.SoftBetGameApi;
+using Platipus.Wallet.Api.Application.Services.SoftswissGamesApi;
 using Platipus.Wallet.Api.Application.Services.SweepiumGameApi;
 using Platipus.Wallet.Api.Application.Services.SwGameApi;
 using Platipus.Wallet.Api.Application.Services.SynotGameApi;
@@ -124,7 +124,7 @@ try
                 options.InvalidModelStateResponseFactory =
                     context =>
                     {
-                        //TODO suppress and move to ResultToResponseResultFilterAttribute
+                        //TODO suppress and move to the ResultToResponseResultFilterAttribute
                         var errors = context.ModelState
                            .Where(x => x.Value?.Errors.Count > 0)
                            .SelectMany(kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage));

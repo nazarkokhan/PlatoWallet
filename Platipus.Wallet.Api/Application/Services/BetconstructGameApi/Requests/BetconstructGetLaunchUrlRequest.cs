@@ -37,8 +37,7 @@ public sealed record BetconstructGetLaunchUrlRequest(
             if (clientResponse.IsFailure)
                 return clientResponse.ToBetConstructResult<string>();
 
-            var gameLaunchScript = clientResponse.Data.Data;
-            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
+            var launchUrl = clientResponse.Data.Data;
 
             return clientResponse.ToBetConstructResult(launchUrl);
         }

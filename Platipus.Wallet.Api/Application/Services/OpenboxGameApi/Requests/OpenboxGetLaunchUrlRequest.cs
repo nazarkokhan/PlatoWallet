@@ -38,8 +38,7 @@ public sealed record OpenboxGetLaunchUrlRequest(
             if (clientResponse.IsFailure)
                 return clientResponse.ToOpenboxResult<string>();
 
-            var gameLaunchScript = clientResponse.Data.Data;
-            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
+            var launchUrl = clientResponse.Data.Data;
 
             return clientResponse.ToOpenboxResult(launchUrl);
         }

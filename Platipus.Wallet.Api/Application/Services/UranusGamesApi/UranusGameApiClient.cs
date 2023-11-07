@@ -35,13 +35,13 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
     public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>>
         GetGameLaunchUrlAsync(
             Uri baseUrl,
-            IUranusCommonGetLaunchUrlApiRequest apiApiRequest,
+            IUranusCommonGetLaunchUrlApiRequest apiRequest,
             CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetLaunchUrlGameApiRequest>(
             baseUrl,
             "game/launch",
-            (UranusGetLaunchUrlGameApiRequest)apiApiRequest,
+            (UranusGetLaunchUrlGameApiRequest)apiRequest,
             cancellationToken);
     }
 
@@ -61,13 +61,37 @@ public sealed class UranusGameApiClient : IUranusGameApiClient
     public Task<IResult<IHttpClientResult<UranusSuccessResponse<UranusGameUrlData>, UranusFailureResponse>>>
         GetDemoLaunchUrlAsync(
             Uri baseUrl,
-            IUranusCommonGetLaunchUrlApiRequest apiApiRequest,
+            IUranusCommonGetLaunchUrlApiRequest apiRequest,
             CancellationToken cancellationToken = default)
     {
         return PostAsync<UranusSuccessResponse<UranusGameUrlData>, UranusGetDemoLaunchUrlGameApiRequest>(
             baseUrl,
             "game/demo",
-            (UranusGetDemoLaunchUrlGameApiRequest)apiApiRequest,
+            (UranusGetDemoLaunchUrlGameApiRequest)apiRequest,
+            cancellationToken);
+    }
+
+    public Task<IResult<IHttpClientResult<UranusSuccessResponse<string[]>, UranusFailureResponse>>> CreateCampaignAsync(
+        Uri baseUrl,
+        UranusCreateCampaignGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default)
+    {
+        return PostAsync<UranusSuccessResponse<string[]>, UranusCreateCampaignGameApiRequest>(
+            baseUrl,
+            "freespin/create",
+            apiRequest,
+            cancellationToken);
+    }
+
+    public Task<IResult<IHttpClientResult<UranusSuccessResponse<string[]>, UranusFailureResponse>>> CancelCampaignAsync(
+        Uri baseUrl,
+        UranusCancelCampaignGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default)
+    {
+        return PostAsync<UranusSuccessResponse<string[]>, UranusCancelCampaignGameApiRequest>(
+            baseUrl,
+            "freespin/cancel",
+            apiRequest,
             cancellationToken);
     }
 

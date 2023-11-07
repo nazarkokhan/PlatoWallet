@@ -12,6 +12,7 @@ using Domain.Entities.Enums;
 using Filters.NewFilterStyle;
 using Filters.Security;
 using Filters.Security.Evenbet;
+using Filters.Security.Sweepium;
 using Filters.Security.Uranus;
 using Filters.Swagger;
 using JorgeSerrano.Json;
@@ -26,37 +27,37 @@ public static class StartupExtensions
     public static IServiceCollection AddSecurityAndErrorMockFilters(this IServiceCollection services)
     {
         return services
-            .AddSingleton<SoftswissMockedErrorActionFilter>()
-            .AddScoped<SoftswissSecurityFilter>()
-            .AddSingleton<BetflagMockedErrorActionFilter>()
-            .AddScoped<BetflagSecurityFilter>()
-            .AddSingleton<BetconstructMockedErrorActionFilter>()
-            .AddScoped<BetconstructSecurityFilter>()
-            .AddSingleton<OpenboxMockedErrorActionFilter>()
-            .AddSingleton<EmaraPlayMockedErrorActionFilter>()
-            .AddScoped<EmaraPlaySecurityFilter>()
-            .AddSingleton<AtlasMockedErrorActionFilter>()
-            .AddScoped<AtlasSecurityFilter>()
-            .AddScoped<AtlasExternalSecurityFilter>()
-            .AddSingleton<UranusMockedErrorActionFilter>()
-            .AddScoped<UranusSecurityFilter>()
-            .AddScoped<UranusExternalSecurityFilter>()
-            .AddSingleton<EvenbetMockedErrorActionFilter>()
-            .AddScoped<EvenbetSecurityFilter>()
-            .AddScoped<AnakatechSecurityFilter>()
-            .AddSingleton<AnakatechMockedErrorActionFilter>()
-            .AddSingleton<NemesisMockedErrorActionFilter>()
-            .AddScoped<NemesisSecurityFilter>()
-            .AddSingleton<ParimatchMockedErrorActionFilter>()
-            .AddScoped<ParimatchSecurityFilter>()
-            .AddScoped<SynotSecurityFilter>()
-            .AddSingleton<SynotMockedErrorActionFilter>()
-            .AddScoped<VegangsterSecurityFilter>()
-            .AddSingleton<VegangsterMockedErrorActionFilter>()
-            .AddScoped<MicrogameSecurityFilter>()
-            .AddSingleton<MicrogameMockedErrorActionFilter>()
-            .AddSingleton<SweepiumMockedErrorActionFilter>()
-            .AddScoped<SweepiumSecurityFilter>();
+           .AddSingleton<SoftswissMockedErrorActionFilter>()
+           .AddScoped<SoftswissSecurityFilter>()
+           .AddSingleton<BetflagMockedErrorActionFilter>()
+           .AddScoped<BetflagSecurityFilter>()
+           .AddSingleton<BetconstructMockedErrorActionFilter>()
+           .AddScoped<BetconstructSecurityFilter>()
+           .AddSingleton<OpenboxMockedErrorActionFilter>()
+           .AddSingleton<EmaraPlayMockedErrorActionFilter>()
+           .AddScoped<EmaraPlaySecurityFilter>()
+           .AddSingleton<AtlasMockedErrorActionFilter>()
+           .AddScoped<AtlasSecurityFilter>()
+           .AddScoped<AtlasExternalSecurityFilter>()
+           .AddSingleton<UranusMockedErrorActionFilter>()
+           .AddScoped<UranusSecurityFilter>()
+           .AddScoped<UranusExternalSecurityFilter>()
+           .AddSingleton<EvenbetMockedErrorActionFilter>()
+           .AddScoped<EvenbetSecurityFilter>()
+           .AddScoped<AnakatechSecurityFilter>()
+           .AddSingleton<AnakatechMockedErrorActionFilter>()
+           .AddSingleton<NemesisMockedErrorActionFilter>()
+           .AddScoped<NemesisSecurityFilter>()
+           .AddSingleton<ParimatchMockedErrorActionFilter>()
+           .AddScoped<ParimatchSecurityFilter>()
+           .AddScoped<SynotSecurityFilter>()
+           .AddSingleton<SynotMockedErrorActionFilter>()
+           .AddScoped<VegangsterSecurityFilter>()
+           .AddSingleton<VegangsterMockedErrorActionFilter>()
+           .AddScoped<MicrogameSecurityFilter>()
+           .AddSingleton<MicrogameMockedErrorActionFilter>()
+           .AddScoped<SweepiumSecurityFilter>()
+           .AddSingleton<SweepiumMockedErrorActionFilter>();
     }
 
     public static IServiceCollection AddJsonOptionsForProviders(this IMvcBuilder builder)
@@ -213,12 +214,12 @@ public static class StartupExtensions
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 })
            .AddJsonOptions(
-               nameof(WalletProvider.Sweepium),
-               options =>
-               {
-                   options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
-                   options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-               });
+                nameof(WalletProvider.Sweepium),
+                options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                });
 
         return builder.Services;
     }

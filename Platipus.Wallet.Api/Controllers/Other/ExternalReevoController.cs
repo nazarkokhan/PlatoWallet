@@ -2,7 +2,7 @@ namespace Platipus.Wallet.Api.Controllers.Other;
 
 using Abstract;
 using Application.Requests.External.Reevo;
-using Application.Services.ObsoleteGameApiStyle.ReevoGamesApi.DTO;
+using Application.Services.ReevoGamesApi.DTO;
 using Extensions;
 using Microsoft.AspNetCore.Mvc;
 

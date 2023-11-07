@@ -37,8 +37,7 @@ public sealed record SoftBetGetLaunchUrlRequest(
             if (clientResponse.IsFailure)
                 return clientResponse.ToSoftBetResult<string>();
 
-            var gameLaunchScript = clientResponse.Data.Data;
-            var launchUrl = ScriptHelper.ExtractUrlFromScript(gameLaunchScript, request.Environment);
+            var launchUrl = clientResponse.Data.Data;
 
             return clientResponse.ToSoftBetResult(launchUrl);
         }
