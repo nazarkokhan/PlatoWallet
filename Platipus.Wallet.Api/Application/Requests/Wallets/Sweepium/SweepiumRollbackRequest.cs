@@ -1,4 +1,5 @@
-﻿using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
+﻿using System.Text.Json.Serialization;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
 using Platipus.Wallet.Api.Application.Responses.Sweepium;
 using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 using Platipus.Wallet.Api.Application.Results.Sweepium;
@@ -9,9 +10,9 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
 
 public sealed record SweepiumRollbackRequest(
         string Token,
-        string TransactionId,
-        string RoundId,
-        string GameId)
+        [property: JsonPropertyName("transactionId")] string TransactionId,
+        [property: JsonPropertyName("roundId")] string RoundId,
+        [property: JsonPropertyName("gameId")] string GameId)
     : ISweepiumRequest, IRequest<ISweepiumResult<SweepiumSuccessResponse>>
 {
     public sealed class Handler

@@ -12,7 +12,6 @@ using Domain.Entities.Enums;
 using Filters.NewFilterStyle;
 using Filters.Security;
 using Filters.Security.Evenbet;
-using Filters.Security.Sweepium;
 using Filters.Security.Uranus;
 using Filters.Swagger;
 using JorgeSerrano.Json;

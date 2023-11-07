@@ -1,4 +1,6 @@
-﻿using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
+﻿using System.Text.Json.Serialization;
+using Platipus.Wallet.Api.Application.Helpers;
+using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
 using Platipus.Wallet.Api.Application.Responses.Sweepium;
 using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
 using Platipus.Wallet.Api.Application.Results.Sweepium;
@@ -9,11 +11,11 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
 
 public sealed record SweepiumWinRequest(
         string Token,
-        string TransactionId,
-        string RoundId,
-        string GameId,
-        string CurrencyId,
-        decimal WinAmount)
+        [property: JsonPropertyName("transactionId")] string TransactionId,
+        [property: JsonPropertyName("roundId")] string RoundId,
+        [property: JsonPropertyName("gameId")] string GameId,
+        [property: JsonPropertyName("currencyId")] string CurrencyId,
+        [property: JsonPropertyName("winAmount")] string WinAmount)
     : ISweepiumRequest, IRequest<ISweepiumResult<SweepiumSuccessResponse>>
 {
     public sealed class Handler
@@ -28,11 +30,12 @@ public sealed record SweepiumWinRequest(
             SweepiumWinRequest request,
             CancellationToken cancellationToken)
         {
+            var amount = int.Parse(request.WinAmount);
             var walletResult = await _walletService.WinAsync(
                 request.Token,
                 request.RoundId,
                 request.TransactionId,
-                request.WinAmount,
+                MoneyHelper.ConvertFromCents(amount),
                 currency: request.CurrencyId,
                 cancellationToken: cancellationToken);
 
