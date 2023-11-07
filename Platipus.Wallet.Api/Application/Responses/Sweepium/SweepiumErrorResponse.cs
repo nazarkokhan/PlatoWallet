@@ -1,12 +1,10 @@
-﻿using Humanizer;
-using Platipus.Wallet.Api.Application.Results.Sweepium;
+﻿using System.Text.Json.Serialization;
 
 namespace Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
 
-public record SweepiumErrorResponse : SweepiumCommonResponse
+public record SweepiumErrorResponse(
+    [property: JsonPropertyName("err_desc")] string ErrDesc,
+    [property: JsonPropertyName("err_code")] int ErrCode,
+    bool Result = false) : SweepiumCommonResponse
 {
-    public SweepiumErrorResponse(SweepiumErrorCode error)
-        : base(false, error.Humanize(), (int)error)
-    {
-    }
 }

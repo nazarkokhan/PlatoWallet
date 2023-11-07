@@ -45,7 +45,7 @@ public sealed record SweepiumBetRequest(
 
             var response = new SweepiumSuccessResponse(
                     data.Transaction.Id,
-                    data.Balance);
+                    (int)MoneyHelper.ConvertToCents(data.Balance));
 
             return SweepiumResultFactory.Success(response);
         }

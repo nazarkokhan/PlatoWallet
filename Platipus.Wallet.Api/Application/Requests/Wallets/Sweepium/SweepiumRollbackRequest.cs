@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Platipus.Wallet.Api.Application.Helpers;
 using Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium.Base;
 using Platipus.Wallet.Api.Application.Responses.Sweepium;
 using Platipus.Wallet.Api.Application.Results.ResultToResultMappers;
@@ -10,9 +12,9 @@ namespace Platipus.Wallet.Api.Application.Requests.Wallets.Sweepium;
 
 public sealed record SweepiumRollbackRequest(
         string Token,
-        [property: JsonPropertyName("transactionId")] string TransactionId,
-        [property: JsonPropertyName("roundId")] string RoundId,
-        [property: JsonPropertyName("gameId")] string GameId)
+        [property: JsonPropertyName("transactionId")] [property: BindProperty(Name = "transactionId")] string TransactionId,
+        [property: JsonPropertyName("roundId")] [property: BindProperty(Name = "roundId")] string RoundId,
+        [property: JsonPropertyName("gameId")] [property: BindProperty(Name = "gameId")] string GameId)
     : ISweepiumRequest, IRequest<ISweepiumResult<SweepiumSuccessResponse>>
 {
     public sealed class Handler
@@ -40,7 +42,7 @@ public sealed record SweepiumRollbackRequest(
 
             var response = new SweepiumSuccessResponse(
                 data.Transaction.Id,
-                data.Balance);
+                (int)MoneyHelper.ConvertToCents(data.Balance));
 
             return SweepiumResultFactory.Success(response);
         }

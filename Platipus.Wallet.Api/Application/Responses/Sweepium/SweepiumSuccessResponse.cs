@@ -1,8 +1,9 @@
-﻿using Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
+﻿using System.Text.Json.Serialization;
+using Platipus.Wallet.Api.Application.Responses.Sweepium.Base;
 
 namespace Platipus.Wallet.Api.Application.Responses.Sweepium;
 
 public record SweepiumSuccessResponse(
-    string TransactionId,
-    decimal Balance) : SweepiumCommonResponse;
+    [property: JsonPropertyName("transactionId")] string TransactionId,
+    [property: JsonPropertyName("balance")] int Balance) : SweepiumCommonResponse;
     

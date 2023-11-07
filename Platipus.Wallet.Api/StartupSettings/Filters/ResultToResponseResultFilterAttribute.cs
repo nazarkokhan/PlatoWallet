@@ -674,7 +674,7 @@ public sealed class ResultToResponseResultFilterAttribute : ResultFilterAttribut
                     else
                     {
                         var errorCode = sweepiumResult.Error;
-                        responseObject = new SweepiumErrorResponse(errorCode);
+                        responseObject = new SweepiumErrorResponse(errorCode.Humanize(), (int)errorCode);
                     }
 
                     context.Result = new OkObjectResult(responseObject);
