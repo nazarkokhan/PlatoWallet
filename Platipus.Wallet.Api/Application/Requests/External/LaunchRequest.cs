@@ -887,7 +887,7 @@ public sealed record LaunchRequest(
                 {
                     var mode = request.LaunchMode is LaunchMode.Real ? 1 : 0;
                     var getLaunchScriptGameApiRequest = new SweepiumGetLaunchGameApiRequest(
-                        game.GameServerId,
+                        game.GameServerId.ToString(),
                         casino.Id,
                         mode is 1 ? request.SessionToken : null,
                         request.Language,

@@ -24,7 +24,7 @@ public static class SweepiumSecurityHash
         var dataBytes = Encoding.UTF8.GetBytes(dataString);
 
         var md5 = MD5.HashData(dataBytes);
-        var md5String = Convert.ToHexString(md5);
+        var md5String = Convert.ToHexString(md5).ToLower();
 
         return md5String;
     }

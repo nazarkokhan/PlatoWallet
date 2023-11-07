@@ -7,7 +7,7 @@ using Extensions;
 using Microsoft.AspNetCore.Mvc;
 using StartupSettings.ControllerSpecificJsonOptions;
 
-[Route("external/sweepium")]
+[Route("external/sweepium/")]
 [JsonSettingsName(WalletProvider.Sweepium)]
 public sealed class ExternalSweepiumController : ApiController
 {
@@ -21,7 +21,7 @@ public sealed class ExternalSweepiumController : ApiController
     [HttpPost("game/launch")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLaunchUrl(
-        SweepiumGetLaunchUrlRequest request,
+        [FromBody]SweepiumGetLaunchUrlRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }
