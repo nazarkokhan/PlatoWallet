@@ -33,4 +33,11 @@ public sealed class ExternalSwController : RestApiController
         [FromBody] SwGetLaunchUrlRequest request,
         CancellationToken cancellationToken)
         => (await _mediator.Send(request, cancellationToken)).ToActionResult();
+    
+    [HttpPost("gamebets.do")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetGameBets(
+        [FromBody] SwGetGameBetsRequest request,
+        CancellationToken cancellationToken)
+        => (await _mediator.Send(request, cancellationToken)).ToActionResult();
 }

@@ -20,4 +20,9 @@ public interface ISwGameApiClient
         Uri baseUrl,
         SwGetLaunchUrlGameApiRequest apiRequest,
         CancellationToken cancellationToken = default);
+    
+    Task<IResult<IHttpClientResult<SwGetGameBetsGameApiResponse, object>>> GetGameBetsAsync(
+        Uri baseUrl,
+        SwGetGameBetsGameApiRequest apiRequest,
+        CancellationToken cancellationToken = default);
 }

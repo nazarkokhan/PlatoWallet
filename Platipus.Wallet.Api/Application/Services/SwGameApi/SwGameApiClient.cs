@@ -67,6 +67,17 @@ public sealed class SwGameApiClient : ISwGameApiClient
             cancellationToken);
     }
 
+    public Task<IResult<IHttpClientResult<SwGetGameBetsGameApiResponse, object>>> GetGameBetsAsync(Uri baseUrl, SwGetGameBetsGameApiRequest apiRequest, CancellationToken cancellationToken = default)
+    {
+        var queryParamsCollection = ObjectToDictionaryConverter.ConvertToDictionary(apiRequest);
+
+        return GetSignedRequestAsync<SwGetGameBetsGameApiResponse>(
+            baseUrl,
+            "GAMEBETS.DO",
+            queryParamsCollection,
+            cancellationToken);
+    }
+
     private async Task<IResult<IHttpClientResult<TSuccess, object>>> GetSignedRequestAsync<TSuccess>(
         Uri baseUrl,
         string method,
